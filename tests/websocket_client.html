@@ -30,8 +30,10 @@
     })
 
     socket.addEventListener("message", (event) => {
-        console.log(event.data);
-        addElement(event.data);
+        message_json = JSON.parse(event.data);
+
+        if (message_json.type === "NUMBER")
+            addElement(message_json.data);
     });
 </script>
 
