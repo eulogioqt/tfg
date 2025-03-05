@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Client</title>
+</head>
+
+<body>
+    <h1>WebSocket Client</h1>
+    <ul id="list">
+
+    </ul>
+</body>
+
+<script>
+    const socket = new WebSocket("ws://localhost:8765");
+    const list = document.getElementById("list");
+
+    const addElement = (text) => {
+        const newElement = document.createElement("li");
+        newElement.textContent = text;
+        list.appendChild(newElement);
+    }
+
+    socket.addEventListener("open", (event) => {
+        socket.send("Hola, soy un cliente nuevo");
+        addElement("Conexión establecida con el servidor");
+    })
+
+    socket.addEventListener("message", (event) => {
+        console.log(event.data);
+        addElement(event.data);
+    });
+</script>
+
+</html>

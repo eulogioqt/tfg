@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video en Tiempo Real</title>
+</head>
+
+<body>
+    <h1>Transmisión de Video en Tiempo Real</h1>
+    <img id="video" alt="Video en vivo" width="640" height="480">
+
+    <script>
+        const videoElement = document.getElementById('video');
+
+        // Crea una conexión WebSocket
+        const socket = new WebSocket('ws://localhost:8765');
+
+        socket.onmessage = function (event) {
+            // Recibe el frame de video como base64
+            const frameBase64 = event.data;
+
+            // Convierte el base64 a una URL de imagen y actualiza la fuente de la imagen
+            videoElement.src = 'data:image/jpeg;base64,' + frameBase64;
+        };
+
+        socket.onopen = function () {
+            console.log("Conexión WebSocket abierta.");
+        };
+
+        socket.onerror = function (error) {
+            console.log("Error en WebSocket: ", error);
+        };
+
+        socket.onclose = function () {
+            console.log("Conexión WebSocket cerrada.");
+        };
+    </script>
+</body>
+
+</html>
