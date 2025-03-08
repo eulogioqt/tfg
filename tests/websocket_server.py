@@ -5,7 +5,7 @@ import json
 
 from websockets import WebSocketServerProtocol
 
-async def send_data(websocket: WebSocketServerProtocol, path):
+async def send_data(websocket: WebSocketServerProtocol, path=None):
     while True:
         n = random.randint(1, 100)
         message_dict = {
@@ -21,7 +21,10 @@ async def send_data(websocket: WebSocketServerProtocol, path):
 
 async def main():
     async with websockets.serve(send_data, "localhost", 8765):
-        print("Servidor WebSocket inicializado correctamente [127.0.0.1:8765]")
+        url = f"http://localhost:{8765}"
+        print(f"Running on {url}")  # Este mensaje es clave para que VSCode lo detecte
+
+        print(f"Listening on port {8765}...")
         await asyncio.Future()
 
 asyncio.run(main())
