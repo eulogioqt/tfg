@@ -15,6 +15,8 @@ export const WebSocketProvider = ({ children }) => {
             const serverIP = window.location.hostname;
             const ws = new WebSocket("ws://" + serverIP + ":8765");
 
+            console.log("Intentando conectar con el servidor WebSocket");
+
             ws.onopen = () => {
                 console.log("Conexión establecida con el servidor WebSocket");
                 socketRef.current = ws;
@@ -27,6 +29,11 @@ export const WebSocketProvider = ({ children }) => {
                     const data = message.data;
                     dispatch({ type: data.type, payload: data.value });
                 } else if (message.type === "RESPONSE") {
+                    // poner que sea el response el que salga en el chat no el display data
+                    // hacer algo tipo que el chat pueda poner un callback para los responses cuando envia un mensaje o algo asi con el
+                    // identificador del mensaje y al responder si matchea el identificador pues se devuelve el mensaje en el callback
+                    // alguna vaina asi HIPER epica
+                    // y hacerlo como el chat de chatgpt
                 } else if (message.type === "INIT") {
                 } else {
                     console.log("Mensaje desconocido:", message);
@@ -57,7 +64,7 @@ export const WebSocketProvider = ({ children }) => {
     }, []);
 
     const sendMessage = (message) => {
-        console.log("Sending message to ROS: ", message);
+        console.log("Sending message to ROS:", message);
         socketRef.current.send(message);
     };
 
