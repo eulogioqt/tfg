@@ -1,0 +1,21 @@
+Mensajes con datos a mostrar (IMAGE, PEOPLE, AUDIO...):
+{
+    type: "DISPLAY_DATA",
+    data: {
+        type: "IMAGE",
+        value: ...
+    }
+}
+
+Respuestas a prompts: 
+{
+    type: "RESPONSE",
+    id: id,
+    data: ...
+}
+
+Inicializacion de comandos y lo que sea: 
+{
+    type: "INIT",
+    data. ...
+}

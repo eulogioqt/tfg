@@ -9,8 +9,11 @@ async def send_data(websocket: WebSocketServerProtocol, path=None):
     while True:
         n = random.randint(1, 100)
         message_dict = {
-            "type": "NUMBER",
-            "data": n
+            "type": "DISPLAY_DATA",
+            "data": {
+                "type": "NUMBER",
+                "value": n
+            }
         }
         message_json = json.dumps(message_dict)
         
