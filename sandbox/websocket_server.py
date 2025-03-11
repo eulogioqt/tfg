@@ -29,6 +29,7 @@ async def handle_client(websocket: WebSocketServerProtocol, path=None):
 
     async def receive_data():
         async for message in websocket:
+            message_json = json.loads(message) # hacer lo del formato y todo el rollo para hacerlo bien que lo he cambiao con el uuid
             print(f"Recibido de {websocket.remote_address[0]}:{websocket.remote_address[1]} → {message}")
 
             message_reversed = message[::-1]

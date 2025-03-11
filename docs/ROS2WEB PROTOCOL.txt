@@ -1,3 +1,4 @@
+SERVIDOR => CLIENTE
 Mensajes con datos a mostrar (IMAGE, PEOPLE, AUDIO...):
 {
     type: "DISPLAY_DATA",
@@ -11,7 +12,7 @@ Respuestas a prompts con ID:
 {
     type: "RESPONSE",
     data: {
-        id: id,
+        id: uuid,
         value: ...
     }
 }
@@ -21,3 +22,14 @@ Inicializacion de comandos y lo que sea:
     type: "INIT",
     data. ...
 }
+
+
+CLIENTE => SERVIDOR
+Prompt del cliente:
+{
+    type: "PROMPT",
+    data: {
+        id: uuid,
+        value: ...
+    },
+};

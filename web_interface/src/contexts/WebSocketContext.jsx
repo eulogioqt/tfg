@@ -1,4 +1,5 @@
 import React, { useReducer, useEffect, useContext, createContext, useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 const WebSocketContext = createContext();
 
@@ -38,7 +39,7 @@ export const WebSocketProvider = ({ children }) => {
                 if (type === MESSAGE_TYPE.DISPLAY_DATA) {
                     dispatch({ type: data.type, payload: data.value });
                 } else if (type === MESSAGE_TYPE.RESPONSE) {
-                    setPromptResponse(data); // sendMessage podria asignar un ID al prompt y al responder devolver ese ID para trackear
+                    setPromptResponse(data);
                 } else if (type === MESSAGE_TYPE.INIT) {
                 } else {
                     console.log("Tipo de mensaje desconocido:", type, data);
@@ -67,9 +68,18 @@ export const WebSocketProvider = ({ children }) => {
     }, []);
 
     const sendMessage = (message) => {
-        // poner que devuelva si success o no
-        console.log("Sending message to ROS:", message);
-        socketRef.current.send(message);
+        const messageWithId = {
+            type: "PROMPT",
+            data: {
+                id: uuidv4(),
+                value: message,
+            },
+        };
+
+        console.log("Sending message to ROS:", messageWithId);
+        socketRef.current.send(JSON.stringify(messageWithId));
+
+        // poner que devuelva si success o no y el uuid del mensaje para asociarlo
     };
 
     return (
