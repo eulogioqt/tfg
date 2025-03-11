@@ -5,7 +5,7 @@ import Message from "./components/Message";
 import { useWebSocket } from "../../contexts/WebSocketContext";
 
 const Chat = () => {
-    const { displayData, sendMessage } = useWebSocket();
+    const { promptResponse, sendMessage } = useWebSocket();
 
     const [messages, setMessages] = useState([]);
     const [inputMessage, setInputMessage] = useState("");
@@ -34,9 +34,9 @@ const Chat = () => {
     };
 
     useEffect(() => {
-        const newValue = displayData["NUMBER"];
-        if (newValue !== undefined) addMessage(newValue, false);
-    }, [displayData["NUMBER"]]);
+        const newResponse = promptResponse;
+        if (newResponse !== undefined) addMessage(newResponse, false);
+    }, [promptResponse]);
 
     useEffect(() => {
         if (messagesEndRef.current) messagesEndRef.current.scrollIntoView({ behavior: "smooth" });

@@ -7,11 +7,13 @@ Mensajes con datos a mostrar (IMAGE, PEOPLE, AUDIO...):
     }
 }
 
-Respuestas a prompts: 
+Respuestas a prompts con ID: 
 {
     type: "RESPONSE",
-    id: id,
-    data: ...
+    data: {
+        id: id,
+        value: ...
+    }
 }
 
 Inicializacion de comandos y lo que sea: 

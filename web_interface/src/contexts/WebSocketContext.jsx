@@ -1,12 +1,19 @@
-import React, { useReducer, useEffect, useContext, createContext, useRef } from "react";
+import React, { useReducer, useEffect, useContext, createContext, useRef, useState } from "react";
 
 const WebSocketContext = createContext();
+
+const MESSAGE_TYPE = {
+    DISPLAY_DATA: "DISPLAY_DATA",
+    RESPONSE: "RESPONSE",
+    INIT: "INIT",
+};
 
 const initialState = {};
 const reducer = (state, action) => ({ ...state, [action.type]: action.payload });
 
 export const WebSocketProvider = ({ children }) => {
     const [displayData, dispatch] = useReducer(reducer, initialState);
+    const [promptResponse, setPromptResponse] = useState(undefined);
 
     const socketRef = useRef(null);
 
@@ -25,18 +32,16 @@ export const WebSocketProvider = ({ children }) => {
             ws.onmessage = (event) => {
                 const message = JSON.parse(event.data);
 
-                if (message.type === "DISPLAY_DATA") {
-                    const data = message.data;
+                const type = message.type;
+                const data = message.data;
+
+                if (type === MESSAGE_TYPE.DISPLAY_DATA) {
                     dispatch({ type: data.type, payload: data.value });
-                } else if (message.type === "RESPONSE") {
-                    // poner que sea el response el que salga en el chat no el display data
-                    // hacer algo tipo que el chat pueda poner un callback para los responses cuando envia un mensaje o algo asi con el
-                    // identificador del mensaje y al responder si matchea el identificador pues se devuelve el mensaje en el callback
-                    // alguna vaina asi HIPER epica
-                    // y hacerlo como el chat de chatgpt
-                } else if (message.type === "INIT") {
+                } else if (type === MESSAGE_TYPE.RESPONSE) {
+                    setPromptResponse(data); // sendMessage podria asignar un ID al prompt y al responder devolver ese ID para trackear
+                } else if (type === MESSAGE_TYPE.INIT) {
                 } else {
-                    console.log("Mensaje desconocido:", message);
+                    console.log("Tipo de mensaje desconocido:", type, data);
                 }
             };
 
@@ -51,9 +56,7 @@ export const WebSocketProvider = ({ children }) => {
             };
         };
 
-        if (!socketRef.current) {
-            connectWebSocket();
-        }
+        if (!socketRef.current) connectWebSocket();
 
         return () => {
             if (socketRef.current) {
@@ -64,6 +67,7 @@ export const WebSocketProvider = ({ children }) => {
     }, []);
 
     const sendMessage = (message) => {
+        // poner que devuelva si success o no
         console.log("Sending message to ROS:", message);
         socketRef.current.send(message);
     };
@@ -72,6 +76,7 @@ export const WebSocketProvider = ({ children }) => {
         <WebSocketContext.Provider
             value={{
                 displayData,
+                promptResponse,
                 sendMessage,
             }}
         >
