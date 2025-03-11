@@ -39,6 +39,7 @@ export const WebSocketProvider = ({ children }) => {
                 if (type === MESSAGE_TYPE.DISPLAY_DATA) {
                     dispatch({ type: data.type, payload: data.value });
                 } else if (type === MESSAGE_TYPE.RESPONSE) {
+                    console.log("Respuesta recibida:", message);
                     setPromptResponse(data);
                 } else if (type === MESSAGE_TYPE.INIT) {
                 } else {

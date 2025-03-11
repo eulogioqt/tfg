@@ -1,0 +1,9 @@
+- Hacer un context para el Chat y que ahi se maneje todo sobre eso, el cargado del historial de los distintos chats
+conversaciones y demas y el temporal etc
+
+- Usar para algo lo de que cada prompt este asociado con su respuesta, para que si se dicen varias cosas a la vez por
+ejemplo se muestre com en whatsapp arriba de la respuesta a que mensaje responde o algo asi
+
+- Poner los mensajes con los colores de chatgpt o alguna interfaz asi
+
+- Modelo da la cabeza de sancho donde se vean los ojos y la boca tal y como se ve en la vida real

@@ -29,16 +29,29 @@ async def handle_client(websocket: WebSocketServerProtocol, path=None):
 
     async def receive_data():
         async for message in websocket:
-            message_json = json.loads(message) # hacer lo del formato y todo el rollo para hacerlo bien que lo he cambiao con el uuid
-            print(f"Recibido de {websocket.remote_address[0]}:{websocket.remote_address[1]} → {message}")
-
-            message_reversed = message[::-1]
-            message_dict = {
-                "type": "RESPONSE",
-                "data": message_reversed
-            }
+            message_json = json.loads(message)
             
-            await send_message(message_dict)
+            type = message_json["type"]
+            data = message_json["data"]
+
+            print(f"Recibido de {websocket.remote_address[0]}:{websocket.remote_address[1]} → {type}")
+
+            if type == "PROMPT": # Ponerlo con MESSAGE_TYPE.PROMPT
+                id = data["id"]
+                value = data["value"]
+
+                value_reversed = value[::-1]
+                message_dict = {
+                    "type": "RESPONSE",
+                    "data": {
+                        "id": id,
+                        "value": value_reversed
+                    }
+                }
+                
+                await send_message(message_dict)
+            else:
+                print(f"Tipo de mensaje desconocido: {type}")
 
     await asyncio.gather(send_data(), receive_data())
 

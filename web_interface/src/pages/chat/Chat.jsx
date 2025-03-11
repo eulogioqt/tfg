@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import Message from "./components/Message";
 import { useWebSocket } from "../../contexts/WebSocketContext";
 
+import sanchoHead from "../../assets/images/sancho_head.jpg";
+
 const Chat = () => {
     const { promptResponse, sendMessage } = useWebSocket();
 
@@ -16,6 +18,7 @@ const Chat = () => {
 
     const addMessage = (text, isHuman) => {
         setMessages((oldMessages) => [...oldMessages, { text: text, isHuman: isHuman }]);
+        setIsReplying(isHuman);
     };
 
     const handleSend = () => {
@@ -35,7 +38,7 @@ const Chat = () => {
 
     useEffect(() => {
         const newResponse = promptResponse;
-        if (newResponse !== undefined) addMessage(newResponse, false);
+        if (newResponse !== undefined) addMessage(newResponse.value, false);
     }, [promptResponse]);
 
     useEffect(() => {
@@ -52,12 +55,12 @@ const Chat = () => {
                     <div className="d-flex align-items-center">
                         <img
                             className="img-fluid rounded-circle"
-                            src="https://github.com/eulogioqt.png"
-                            alt="User"
+                            src={sanchoHead}
+                            alt="Sancho"
                             style={{ width: "50px", height: "50px" }}
                         />
                         <div className="ms-3 d-flex flex-column">
-                            <span className="fw-bold">Eulogio</span>
+                            <span className="fw-bold">Sancho</span>
                             <span>{isReplying ? "Escribiendo..." : "En línea"}</span>
                         </div>
                     </div>
