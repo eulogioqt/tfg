@@ -1,20 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useWindowSize, BREAKPOINTS } from "../../../hooks/useWindowSize";
 
-const Sidebar = ({ onNewChat, onCollapse }) => {
-    const { width, height } = useWindowSize();
-    const [collapsed, setCollapsed] = useState(false);
+const Sidebar = ({ collapsed, setCollapsed, handleNewChat }) => {
+    const { width } = useWindowSize();
 
     const navigate = useNavigate();
-
-    const onCollapseClick = () =>
-        setCollapsed((collapsed) => {
-            const newValue = !collapsed;
-            onCollapse(newValue);
-
-            return newValue;
-        });
 
     return (
         <>
@@ -22,7 +13,7 @@ const Sidebar = ({ onNewChat, onCollapse }) => {
                 <div
                     className="sidebar bg-light border-end p-3 d-flex flex-column"
                     style={{
-                        transform: collapsed ? "translateX(-11.25rem)" : "translateX(0)",
+                        transform: collapsed ? "translateX(-16rem)" : "translateX(0)",
                         transition: "transform " + (collapsed ? "0s" : "0.3s") + " ease",
                         width: "16rem",
                         position: "fixed",
@@ -36,13 +27,13 @@ const Sidebar = ({ onNewChat, onCollapse }) => {
                                 Sancho
                             </span>
 
-                            <button className="btn btn-light" onClick={() => onCollapseClick()}>
+                            <button className="btn btn-light" onClick={() => setCollapsed((collapsed) => !collapsed)}>
                                 <i className="bi bi-list"></i>
                             </button>
                         </div>
 
-                        <div className="d-flex flex-column mt-3">
-                            <button className="btn btn-light text-start" onClick={() => onNewChat()}>
+                        <div className="flex-column mt-3" style={{ display: collapsed ? "none" : "flex" }}>
+                            <button className="btn btn-light text-start" onClick={() => handleNewChat()}>
                                 <i className="bi bi-chat-dots me-2"></i>
                                 <span>Nuevo Chat</span>
                             </button>
@@ -58,7 +49,7 @@ const Sidebar = ({ onNewChat, onCollapse }) => {
                 {/* Manage moving chat along with sidebar*/}
                 <div
                     style={{
-                        width: collapsed || width < BREAKPOINTS.MD ? "4.75rem" : "16rem",
+                        width: collapsed || width < BREAKPOINTS.MD ? "0rem" : "16rem",
                         transition: "width " + (collapsed ? "0s" : "0.3s") + " ease",
                         height: "100vh",
                         overflow: "hidden",
@@ -70,6 +61,7 @@ const Sidebar = ({ onNewChat, onCollapse }) => {
             {/* Gray background */}
             <div
                 className="vh-100 vw-100 position-absolute"
+                onClick={() => setCollapsed(true)}
                 style={{
                     display: !collapsed && width < BREAKPOINTS.MD ? "block" : "none",
                     zIndex: "5",
