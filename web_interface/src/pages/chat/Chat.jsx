@@ -18,15 +18,15 @@ const Chat = () => {
     const navigate = useNavigate();
     const messagesEndRef = useRef(null);
 
-    const addMessage = (text, isHuman) => {
-        setMessages((oldMessages) => [...oldMessages, { text: text, isHuman: isHuman }]);
+    const addMessage = (text, id, isHuman) => {
+        setMessages((oldMessages) => [...oldMessages, { text: text, id: id, isHuman: isHuman }]);
         setIsReplying(isHuman);
     };
 
     const handleSend = () => {
         if (inputMessage.length > 0) {
-            sendMessage(inputMessage);
-            addMessage(inputMessage, true);
+            const id = sendMessage(inputMessage);
+            addMessage(inputMessage, id, true);
             setInputMessage("");
         }
     };
@@ -40,7 +40,14 @@ const Chat = () => {
 
     useEffect(() => {
         const newResponse = promptResponse;
-        if (newResponse !== undefined) addMessage(newResponse.value, false);
+        if (newResponse !== undefined) {
+            const isResponseAdded = messages
+                .filter((m) => !m.isHuman)
+                .map((m) => m.id)
+                .includes(newResponse.id);
+
+            if (!isResponseAdded) addMessage(newResponse.value, newResponse.id, false);
+        }
     }, [promptResponse]);
 
     useEffect(() => {
@@ -50,7 +57,7 @@ const Chat = () => {
     return (
         <>
             <div className="d-flex vh-100">
-                <Sidebar />
+                <Sidebar collapseCallback={setCollapsed} />
 
                 <div className="d-flex flex-column flex-grow-1">
                     <div
@@ -62,24 +69,28 @@ const Chat = () => {
                                 className="img-fluid rounded-circle"
                                 src={sanchoHead}
                                 alt="Sancho"
-                                style={{ width: "50px", height: "50px" }}
+                                style={{ width: "50px", height: "50px", display: collapsed ? "block" : "block" }}
                             />
-                            <div className="ms-3 d-flex flex-column">
-                                <span className="fw-bold">Sancho</span>
-                                <span>{isReplying ? "Escribiendo..." : "En línea"}</span>
-                            </div>
+
+                            <span
+                                className="fw-bold fs-2 ms-3"
+                                style={{ whiteSpace: "nowrap", display: collapsed ? "block" : "none" }}
+                            >
+                                Sancho
+                            </span>
                         </div>
-                        <button className="btn btn-secondary" onClick={() => navigate("/")}>
-                            Salir
-                        </button>
                     </div>
+
                     <div
                         className="flex-grow-1 d-flex flex-column"
-                        style={{ backgroundColor: "#F9EEE8", overflowY: "auto" }}
+                        style={{
+                            backgroundColor: "white",
+                            overflowY: "auto",
+                        }}
                     >
-                        <div className="d-flex flex-column flex-grow-1 px-md-5 px-3 py-3">
+                        <div className="container-sm d-flex flex-column flex-grow-1 px-md-5 px-3 py-3">
                             {messages.map((message, index) => (
-                                <Message key={index} text={message.text} isHuman={message.isHuman} />
+                                <Message key={index} message={message} />
                             ))}
                             <div ref={messagesEndRef} />
                         </div>
@@ -104,19 +115,6 @@ const Chat = () => {
                     </div>
                 </div>
             </div>
-
-            <style>{`
-                .sidebar-expanded {
-                    width: 260px;
-                    transition: width 0.3s ease;
-                    height: 100vh;
-                }
-                .sidebar-collapsed {
-                    width: 60px;
-                    transition: width 0.3s ease;
-                    height: 100vh;
-                }
-            `}</style>
         </>
     );
 };

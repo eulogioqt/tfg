@@ -69,10 +69,11 @@ export const WebSocketProvider = ({ children }) => {
     }, []);
 
     const sendMessage = (message) => {
+        const id = uuidv4();
         const messageWithId = {
             type: "PROMPT",
             data: {
-                id: uuidv4(),
+                id: id,
                 value: message,
             },
         };
@@ -80,7 +81,7 @@ export const WebSocketProvider = ({ children }) => {
         console.log("Sending message to ROS:", messageWithId);
         socketRef.current.send(JSON.stringify(messageWithId));
 
-        // poner que devuelva si success o no y el uuid del mensaje para asociarlo
+        return id; // Poner que si falla algo devuelva undefined indicando ha fallado algo
     };
 
     return (

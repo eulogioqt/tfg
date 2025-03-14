@@ -1,9 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const Sidebar = ({ children }) => {
+const Sidebar = ({ collapseCallback }) => {
     const [collapsed, setCollapsed] = useState(false);
     const navigate = useNavigate();
+
+    const onCollapseClick = () =>
+        setCollapsed((collapsed) => {
+            const newValue = !collapsed;
+            collapseCallback(newValue);
+
+            return newValue;
+        });
 
     return (
         <div className="d-flex">
@@ -11,10 +19,11 @@ const Sidebar = ({ children }) => {
                 className="sidebar bg-light border-end p-3 d-flex flex-column"
                 style={{
                     transform: collapsed ? "translateX(-11.25rem)" : "translateX(0)",
-                    transition: "transform 0.3s ease",
+                    transition: "transform " + (collapsed ? "0s" : "0.3s") + " ease",
                     width: "16rem",
                     position: "fixed",
                     height: "100vh",
+                    overflowX: "hidden",
                 }}
             >
                 <div>
@@ -23,7 +32,7 @@ const Sidebar = ({ children }) => {
                             Sancho
                         </span>
 
-                        <button className="btn btn-light" onClick={() => setCollapsed(!collapsed)}>
+                        <button className="btn btn-light" onClick={() => onCollapseClick()}>
                             <i className="bi bi-list"></i>
                         </button>
                     </div>
@@ -45,7 +54,7 @@ const Sidebar = ({ children }) => {
             <div
                 style={{
                     width: collapsed ? "4.75rem" : "16rem",
-                    transition: "width 0.3s ease",
+                    transition: "width " + (collapsed ? "0s" : "0.3s") + " ease",
                     height: "100vh",
                     overflow: "hidden",
                     flexShrink: 0,

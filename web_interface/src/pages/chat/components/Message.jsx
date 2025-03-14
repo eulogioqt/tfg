@@ -1,8 +1,10 @@
 import React from "react";
 
-const Message = ({ text, isHuman }) => {
-    const backgroundColor = isHuman ? "#D9FDD3" : "#FFFFFF";
-    const shadowColor = isHuman ? "#A3D8A4" : "#E2E2E2";
+const Message = ({ message }) => {
+    const { text, id, isHuman } = message;
+
+    const backgroundColor = isHuman ? "#E0E0E0" : "#FFFFFF";
+    const shadowColor = isHuman ? "#C0C0C0" : "#DDDDDD";
 
     return (
         <div className={isHuman ? "d-flex justify-content-end" : ""}>
@@ -10,10 +12,10 @@ const Message = ({ text, isHuman }) => {
                 className="d-inline-block mb-2"
                 style={{
                     backgroundColor: backgroundColor,
+                    border: "1px " + shadowColor + " solid",
                     borderRadius: "8px",
-                    maxWidth: "80%",
+                    maxWidth: "70%",
                     padding: "8px",
-                    boxShadow: `1px 1px ${shadowColor}`,
                 }}
             >
                 {text}
