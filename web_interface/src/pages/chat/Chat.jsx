@@ -7,6 +7,8 @@ import { useWebSocket } from "../../contexts/WebSocketContext";
 import sanchoHead from "../../assets/images/sancho_head.jpg";
 import Sidebar from "./components/Sidebar";
 
+// Hacer que sea mas estrecho, que sea responsive y demas
+
 const Chat = () => {
     const { promptResponse, sendMessage } = useWebSocket();
 
@@ -70,8 +72,9 @@ const Chat = () => {
     return (
         <>
             <div className="d-flex vh-100">
-                <Sidebar collapseCallback={setCollapsed} />
+                <Sidebar onNewChat={() => setMessages([])} onCollapse={setCollapsed} />
 
+                {/* Top part */}
                 <div className="d-flex flex-column flex-grow-1">
                     <div
                         className="w-100 d-flex align-items-center justify-content-between px-md-5 px-3"
@@ -94,6 +97,7 @@ const Chat = () => {
                         </div>
                     </div>
 
+                    {/* Chat part */}
                     <div
                         className="flex-grow-1 d-flex flex-column"
                         style={{
@@ -110,9 +114,9 @@ const Chat = () => {
                     </div>
 
                     {/* Bottom part*/}
-                    <div className="d-flex w-100 align-items-center">
+                    <div className="d-flex align-items-center px-md-5 px-3">
                         {/* Text area */}
-                        <div className="container shadow-sm d-flex flex-column px-md-2 pb-2 py-1 border border-2 border-light-subtle rounded-5 mb-4">
+                        <div className="container d-flex flex-column pb-2 py-1 mb-4 shadow-sm border border-2 border-light-subtle rounded-5">
                             <div className="input-group border-body-secondary mb-4">
                                 <textarea
                                     ref={textAreaRef}
