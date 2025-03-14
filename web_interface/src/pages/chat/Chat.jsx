@@ -17,6 +17,7 @@ const Chat = () => {
 
     const navigate = useNavigate();
     const messagesEndRef = useRef(null);
+    const textAreaRef = useRef(null);
 
     const addMessage = (text, id, isHuman) => {
         setMessages((oldMessages) => [...oldMessages, { text: text, id: id, isHuman: isHuman }]);
@@ -28,6 +29,9 @@ const Chat = () => {
             const id = sendMessage(inputMessage);
             addMessage(inputMessage, id, true);
             setInputMessage("");
+            if (textAreaRef.current) {
+                textAreaRef.current.style.height = "40px";
+            }
         }
     };
 
@@ -35,6 +39,15 @@ const Chat = () => {
         if (event.key === "Enter") {
             event.preventDefault();
             handleSend();
+        }
+    };
+
+    const handleInputChange = (event) => {
+        setInputMessage(event.target.value);
+        const textarea = textAreaRef.current;
+        if (textarea) {
+            textarea.style.height = "40px";
+            textarea.style.height = `${textarea.scrollHeight}px`;
         }
     };
 
@@ -95,25 +108,46 @@ const Chat = () => {
                             <div ref={messagesEndRef} />
                         </div>
                     </div>
-                    <div
-                        className="d-flex w-100 align-items-center"
-                        style={{ minHeight: "75px", height: "75px", borderTop: "1px solid #EAEAEA" }}
-                    >
-                        <div className="input-group px-md-5 px-3">
-                            <input
-                                type="text"
-                                value={inputMessage}
-                                className="form-control border border-0"
-                                placeholder="Escribe un mensaje..."
-                                onChange={(event) => setInputMessage(event.target.value)}
-                                onKeyDown={handleKeyDown}
-                            />
-                            <button className="btn btn-outline-secondary" type="button" onClick={handleSend}>
-                                Enviar
-                            </button>
+
+                    {/* Bottom part*/}
+                    <div className="d-flex w-100 align-items-center">
+                        {/* Text area */}
+                        <div className="container shadow-sm d-flex flex-column px-md-2 pb-2 py-1 border border-2 border-light-subtle rounded-5 mb-4">
+                            <div className="input-group border-body-secondary mb-4">
+                                <textarea
+                                    ref={textAreaRef}
+                                    value={inputMessage}
+                                    className="small-scrollbar form-control ms-3 me-5"
+                                    placeholder="Escribe un mensaje..."
+                                    onChange={(event) => handleInputChange(event)}
+                                    onKeyDown={handleKeyDown}
+                                    rows="2"
+                                    style={{
+                                        resize: "none",
+                                        overflowY: "auto",
+                                        height: "40px",
+                                        minHeight: "40px",
+                                        maxHeight: "150px",
+                                        border: "none",
+                                        outline: "none",
+                                    }}
+                                />
+                            </div>
+
+                            <div className="d-flex justify-content-end align-items-end pe-1 pb-1">
+                                <button className="btn btn-dark rounded-circle" type="button" onClick={handleSend}>
+                                    <i className="bi bi-send"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <style>{`
+                    textarea:focus {
+                        box-shadow: none !important;
+                    }
+                `}</style>
             </div>
         </>
     );

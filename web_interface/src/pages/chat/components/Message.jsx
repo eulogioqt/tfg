@@ -16,6 +16,7 @@ const Message = ({ message }) => {
                     borderRadius: "8px",
                     maxWidth: "70%",
                     padding: "8px",
+                    wordWrap: "break-word",
                 }}
             >
                 {text}
