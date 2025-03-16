@@ -19,3 +19,32 @@
     background: #f1f1f1;
     border-radius: 10px;
 }
+
+.btn-white {
+    background-color: white;
+    border: none;
+}
+
+.btn-white:hover {
+    background-color: #d3d4d5;
+}
+
+.btn-white:active {
+    background-color: #c6c7c8 !important;
+}
+
+.btn-black {
+    background-color: black;
+    color: white;
+    border: none;
+}
+
+.btn-black:hover {
+    background-color: #333333;
+    color: white;
+}
+
+.btn-black:active {
+    background-color: #444444 !important;
+    color: white !important;
+}

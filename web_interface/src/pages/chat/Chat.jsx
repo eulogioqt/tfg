@@ -6,8 +6,8 @@ import { useWebSocket } from "../../contexts/WebSocketContext";
 
 import sanchoHead from "../../assets/images/sancho_head.jpg";
 import Sidebar from "./components/Sidebar";
+import { useWindowSize, BREAKPOINTS } from "../../hooks/useWindowSize";
 
-// Poner la animacion al cerrar tambien 0.3s
 // Hacer que sea mas estrecho en pantallas grandes
 // Refactorizar para que haya por un lado mensajes, por otro lado top part y por otro lado bottom part y aqui
 // se mezcle todo, sidebar, top, bottom y mensajes part
@@ -15,11 +15,12 @@ import Sidebar from "./components/Sidebar";
 
 const Chat = () => {
     const { promptResponse, sendMessage } = useWebSocket();
+    const { width } = useWindowSize();
 
     const [messages, setMessages] = useState([]);
     const [inputMessage, setInputMessage] = useState("");
     const [isReplying, setIsReplying] = useState(false);
-    const [collapsed, setCollapsed] = useState(true);
+    const [collapsed, setCollapsed] = useState(width < BREAKPOINTS.MD);
 
     const navigate = useNavigate();
     const messagesEndRef = useRef(null);
@@ -59,7 +60,7 @@ const Chat = () => {
 
     const handleNewChat = () => {
         setMessages([]);
-        setCollapsed(true);
+        if (width < BREAKPOINTS.MD) setCollapsed(true);
     };
 
     useEffect(() => {
@@ -91,11 +92,11 @@ const Chat = () => {
                     >
                         <div className="d-flex align-items-center justify-content-between justify-content-md-start w-100">
                             <button
-                                className="btn btn-light me-3"
+                                className="btn btn-white me-3"
                                 style={{ display: collapsed ? "block" : "none" }}
                                 onClick={() => setCollapsed((collapsed) => !collapsed)}
                             >
-                                <i className="bi bi-list"></i>
+                                <i class="bi bi-list"></i>
                             </button>
 
                             <div className="d-flex justify-content-center align-items-center">
@@ -115,7 +116,7 @@ const Chat = () => {
                             </div>
 
                             <button
-                                className="btn btn-light text-start d-md-none"
+                                className="btn btn-white text-start d-md-none"
                                 style={{ display: collapsed ? "block" : "none" }}
                                 onClick={() => handleNewChat()}
                             >
@@ -166,7 +167,7 @@ const Chat = () => {
                             </div>
 
                             <div className="d-flex justify-content-end align-items-end pe-1 pb-1">
-                                <button className="btn btn-dark rounded-circle" type="button" onClick={handleSend}>
+                                <button className="btn btn-black rounded-circle" type="button" onClick={handleSend}>
                                     <i className="bi bi-send"></i>
                                 </button>
                             </div>
