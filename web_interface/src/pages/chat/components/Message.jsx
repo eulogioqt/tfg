@@ -9,17 +9,17 @@ const Message = ({ message }) => {
     return (
         <div className={isHuman ? "d-flex justify-content-end" : ""}>
             <div
-                className="d-inline-block mb-2"
+                className="d-inline-block mb-3"
                 style={{
                     backgroundColor: backgroundColor,
                     border: "1px " + shadowColor + " solid",
                     borderRadius: "8px",
                     maxWidth: "70%",
-                    padding: "8px",
+                    padding: "6px 10px 6px 10px",
                     wordWrap: "break-word",
                 }}
             >
-                {text}
+                <span>{text}</span>
             </div>
         </div>
     );

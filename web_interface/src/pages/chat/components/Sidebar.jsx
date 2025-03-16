@@ -33,7 +33,7 @@ const Sidebar = ({ collapsed, setCollapsed, handleNewChat }) => {
                         </div>
 
                         <div className="flex-column mt-3" style={{ display: collapsed ? "none" : "flex" }}>
-                            <button className="btn btn-light text-start" onClick={() => handleNewChat()}>
+                            <button className="btn btn-light text-start" onClick={handleNewChat}>
                                 <i className="bi bi-chat-dots me-2"></i>
                                 <span>Nuevo Chat</span>
                             </button>
