@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+
 import ChatSidebar from "./components/ChatSidebar";
 import ChatFooter from "./components/ChatFooter";
 import ChatMessageArea from "./components/ChatMessageArea";
@@ -6,8 +7,11 @@ import ChatHeader from "./components/ChatHeader";
 
 import { useWebSocket } from "../../contexts/WebSocketContext";
 import { useWindowSize, BREAKPOINTS } from "../../hooks/useWindowSize";
+import WebSocketVideoViewer from "../../components/WebSocketVideoViewer";
 
 // Poner que cuando el chat no tiene mensajes el text area y demas este en medio
+// Hacer un chatcontext o un collapsedcontext si se extiende todo demasiado y hay muchas cosas que ir pasando
+// al menos collapsedcontext por el momento
 const Chat = () => {
     const { promptResponse, sendMessage, isConnected } = useWebSocket();
     const { width } = useWindowSize();
@@ -56,6 +60,7 @@ const Chat = () => {
                 <div className="d-flex flex-column flex-grow-1">
                     <ChatHeader collapsed={collapsed} setCollapsed={setCollapsed} handleNewChat={handleNewChat} />
 
+                    <WebSocketVideoViewer />
                     <ChatMessageArea messages={messages} />
 
                     <ChatFooter chatAreaRef={chatAreaRef} handleSend={handleSend} />

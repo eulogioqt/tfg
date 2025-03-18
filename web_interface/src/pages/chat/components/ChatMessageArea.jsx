@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import ChatMessage from "./ChatMessage";
 
 const ChatMessageArea = ({ messages }) => {

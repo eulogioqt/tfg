@@ -9,7 +9,7 @@ const Sidebar = ({ collapsed, setCollapsed, handleNewChat }) => {
 
     return (
         <>
-            <div className="d-flex" style={{ zIndex: "10" }}>
+            <div className="d-flex" style={{ zIndex: "100" }}>
                 <div
                     className="sidebar bg-light border-end p-3 d-flex flex-column"
                     style={{
@@ -64,7 +64,7 @@ const Sidebar = ({ collapsed, setCollapsed, handleNewChat }) => {
                 onClick={() => setCollapsed(true)}
                 style={{
                     display: !collapsed && width < BREAKPOINTS.MD ? "block" : "none",
-                    zIndex: "5",
+                    zIndex: "50",
                     backgroundColor: "rgba(224, 224, 224, 0.5)",
                 }}
             ></div>
