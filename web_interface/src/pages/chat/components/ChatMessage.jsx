@@ -15,7 +15,7 @@ const Message = ({ message }) => {
                     border: "1px " + shadowColor + " solid",
                     borderRadius: "8px",
                     maxWidth: "70%",
-                    padding: "6px 10px 6px 10px",
+                    padding: "4px 10px 4px 10px",
                     wordWrap: "break-word",
                 }}
             >

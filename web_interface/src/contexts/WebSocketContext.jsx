@@ -15,6 +15,7 @@ const reducer = (state, action) => ({ ...state, [action.type]: action.payload })
 export const WebSocketProvider = ({ children }) => {
     const [displayData, dispatch] = useReducer(reducer, initialState);
     const [promptResponse, setPromptResponse] = useState(undefined);
+    const [isConnected, setConnected] = useState(false);
 
     const socketRef = useRef(null);
 
@@ -27,6 +28,8 @@ export const WebSocketProvider = ({ children }) => {
 
             ws.onopen = () => {
                 console.log("Conexión establecida con el servidor WebSocket");
+
+                setConnected(true);
                 socketRef.current = ws;
             };
 
@@ -49,11 +52,15 @@ export const WebSocketProvider = ({ children }) => {
 
             ws.onclose = () => {
                 console.log("Conexión cerrada, intentando reconectar...");
+
+                setConnected(false);
                 setTimeout(connectWebSocket, 3000); // Intenta reconectar después de 3 segundos
             };
 
             ws.onerror = (error) => {
                 console.error("Error en la conexión WebSocket:", error);
+
+                setConnected(false);
                 ws.close();
             };
         };
@@ -63,6 +70,8 @@ export const WebSocketProvider = ({ children }) => {
         return () => {
             if (socketRef.current) {
                 console.log("Closing socket...");
+
+                setConnected(false);
                 socketRef.current.close();
             }
         };
@@ -89,6 +98,7 @@ export const WebSocketProvider = ({ children }) => {
             value={{
                 displayData,
                 promptResponse,
+                isConnected,
                 sendMessage,
             }}
         >
