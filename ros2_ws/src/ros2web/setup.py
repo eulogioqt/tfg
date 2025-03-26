@@ -20,6 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'camera = ros2web.camera:main',
+            'server = ros2web.server:main'
         ],
     },
 )
