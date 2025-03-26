@@ -1,5 +1,6 @@
 import cv2
 import rclpy
+import asyncio
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 
@@ -7,6 +8,12 @@ from cv_bridge import CvBridge
 
 from .websocket_thread_mixer import WebSocketThreadMixer
 from .websocket_server import WebSocketServer
+from . import protocol
+
+# revisar todo
+# comparar con el antiguo
+# eliminar _broadcast de websocket server o ver como hacerlo alli en vez de aqui
+# dejarlo todo clean y seguir. Tal cual esta va muy fluido
 
 class ServerNode(Node):
 
@@ -35,18 +42,12 @@ class Server:
         self.run_node = True
 
     def spin(self):
-        pass
+        if self.node.img is not None:
+            message_json = protocol.image_message(self.node.img)
+            self.websocket_server.broadcast_message(message_json)
 
     def on_message(self, msg):
         print(f"Mensaje recibido: {msg}")
-        response = None
-
-        if msg == "STOP":
-            self.websocket_server.stop_program()
-        elif msg == "TEST":
-            response = "Working fine"
-        
-        return response
 
     def on_user_connect(self, client_ip, client_port):
         print(f"Cliente conectado ({client_ip}:{client_port}) (Conexiones: {self.websocket_server.get_connection_count()})")
@@ -61,8 +62,8 @@ class Server:
         try:
             while rclpy.ok() and self.run_node:
                 self.spin()
-                
-                rclpy.spin_once(self.node, timeout_sec=0)
+
+                rclpy.spin_once(self.node)
         except Exception:
             pass
     

@@ -14,14 +14,13 @@ class WebSocketServer:
         self.on_user_disconnect = on_user_disconnect
 
         self.clients = set()
-        self.queue = Queue()
         self.stop_event = asyncio.Event()
 
     def get_connection_count(self):
         return len(self.clients)
 
-    def broadcast_message(self, msg):
-        self.queue.put(msg)
+    def broadcast_message(self, message):
+        asyncio.run(self._send_to_all(message))
 
     def send_message(self, sender, message):
         asyncio.run(self._send_message(sender, message))
@@ -29,8 +28,6 @@ class WebSocketServer:
     def stop_program(self):
         if not self.stop_event.is_set():
             self.stop_event.set()
-
-
 
     async def _handler(self, websocket, path):
         client_ip, client_port = websocket.remote_address
@@ -59,12 +56,18 @@ class WebSocketServer:
                     if self.clients:
                         msg = self.queue.get()
 
-                        await asyncio.gather(*[self._send_message(client, msg) for client in self.clients])
-                        await asyncio.sleep(0)
+                        asyncio.run(self.send_to_all("asd", msg))
+                        #await asyncio.gather(*[self._send_message(client, msg) for client in self.clients])
+                        #await asyncio.sleep(0)
                 else:
                     await asyncio.sleep(1)
         finally:
             pass
+
+    async def _send_to_all(self, message):
+        if len(self.clients) > 0:
+            tasks = [asyncio.create_task(self._send_message(client, message)) for client in self.clients]
+            await asyncio.wait(tasks)
 
     async def _send_message(self, client, message):
         try:
@@ -74,7 +77,8 @@ class WebSocketServer:
 
     async def _websocket_server(self):
         try:
-            async with websockets.serve(self._handler, "0.0.0.0", self.port):
+            async with websockets.serve(self._handler, "localhost", self.port):
+                print(f"WebSocket running on port {self.port}")
                 await self.stop_event.wait()
         finally:
             for client in self.clients:
@@ -90,8 +94,8 @@ class WebSocketServer:
             self.stop_program()
 
     def run(self):
-        try: 
-            asyncio.run(self._main())
+        try:
+            asyncio.run(self._websocket_server())
         except KeyboardInterrupt: pass
         except Exception: pass
         finally: pass
