@@ -1,5 +1,6 @@
 import threading
 
+
 class WebSocketThreadMixer:
 
     def __init__(self, websocket, *others):
@@ -25,4 +26,4 @@ class WebSocketThreadMixer:
                 self.threads[th_name].join()
                 print(th_name + " finalizado.")
 
-            print("Programa terminado.")
+            print("Programa terminado correctamente.")

@@ -23,11 +23,16 @@ class WebSocketServer:
     def broadcast_message(self, msg):
         self.queue.put(msg)
 
+    def send_message(self, sender, message):
+        asyncio.run(self._send_message(sender, message))
+
     def stop_program(self):
         if not self.stop_event.is_set():
             self.stop_event.set()
 
-    async def _handler(self, websocket, path): # Hacer objeto websocket propio para wrappear al de websockets y tener abstraccion
+
+
+    async def _handler(self, websocket, path):
         client_ip, client_port = websocket.remote_address
 
         self.clients.add(websocket)
@@ -54,7 +59,7 @@ class WebSocketServer:
                     if self.clients:
                         msg = self.queue.get()
 
-                        await asyncio.gather(*[self._send_message(client, msg) for client in self.clients]) # LO SABIA RETURNS EXCEPTION
+                        await asyncio.gather(*[self._send_message(client, msg) for client in self.clients])
                         await asyncio.sleep(0)
                 else:
                     await asyncio.sleep(1)
