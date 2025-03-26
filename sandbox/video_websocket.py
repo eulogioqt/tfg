@@ -2,6 +2,7 @@ import asyncio
 import websockets
 import cv2
 import base64
+import json
 
 async def send_video(websocket, path):
     cap = cv2.VideoCapture(0)
@@ -27,12 +28,19 @@ async def send_video(websocket, path):
         ret, jpeg = cv2.imencode('.jpg', frame)
 
         if ret:
-            # Convierte el JPEG a base64 para enviarlo por WebSocket
             frame_base64 = base64.b64encode(jpeg.tobytes()).decode('utf-8')
-            
-            # Enviar el frame codificado a través de WebSocket
-            await websocket.send(frame_base64)
-        await asyncio.sleep(0.01)  # Ajusta la velocidad de la transmisión
+
+            message = {
+                "type": "DISPLAY_DATA",
+                "data": {
+                    "type": "IMAGE",
+                    "value": frame_base64
+                }
+            }
+            message_json = json.dumps(message)
+
+            await websocket.send(message_json)
+        #await asyncio.sleep(0.01)  # Ajusta la velocidad de la transmisión
 
     cap.release()
 
