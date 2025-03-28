@@ -3,12 +3,16 @@ import { v4 as uuidv4 } from "uuid";
 
 const WebSocketContext = createContext();
 
+const R2W_MESSAGE_TYPE = { // hacer objeto que wrapee el protocolo ros2web
+    MESSAGE: "MESSAGE",
+    TOPIC: "TOPIC"
+}
+
 const MESSAGE_TYPE = {
-    DISPLAY_DATA: "DISPLAY_DATA",
     RESPONSE: "RESPONSE",
     INIT: "INIT",
 };
-// hacer objeto que wrapee el protocolo ros2web
+
 const initialState = {};
 const reducer = (state, action) => ({ ...state, [action.type]: action.payload });
 
@@ -36,23 +40,29 @@ export const WebSocketProvider = ({ children }) => {
             ws.onmessage = (event) => {
                 const message = JSON.parse(event.data);
 
-                if (message.type === "MESSAGE") { // High level protocol
+                if (message.type === R2W_MESSAGE_TYPE.MESSAGE) { // High level protocol
                     const lowMessage = JSON.parse(message.data);
 
                     const type = lowMessage.type;
                     const data = lowMessage.data;
 
-                    if (type === MESSAGE_TYPE.DISPLAY_DATA) { // Low level protocol
-                        dispatch({ type: data.type, payload: data.value });
-                    } else if (type === MESSAGE_TYPE.RESPONSE) {
+                    if (type === MESSAGE_TYPE.RESPONSE) {
                         console.log("Respuesta recibida:", message);
                         setPromptResponse(data);
                     } else if (type === MESSAGE_TYPE.INIT) {
                     } else {
                         console.log("Tipo de mensaje desconocido:", type, data);
                     }
-                } else if (message.type === "TOPIC") {
-                    console.log("ha llegao un topic!!!", message.data);
+                } else if (message.type === R2W_MESSAGE_TYPE.TOPIC) {
+                    const lowMessage = message.data;
+
+                    const topic = lowMessage.topic;
+                    const name = lowMessage.name;
+                    const value = lowMessage.value;
+
+                    dispatch({ type: name, payload: value });
+                } else {
+                    console.log("Tipo de mensaje R2W desconocido:", type, data);
                 }
             };
 

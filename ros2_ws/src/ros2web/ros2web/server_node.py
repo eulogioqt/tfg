@@ -1,17 +1,21 @@
 import json
 import rclpy
 from rclpy.node import Node
-#from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image
 
 from queue import Queue
-from cv_bridge import CvBridge
 
 from .websocket_thread_mixer import WebSocketThreadMixer
 from .websocket_server import WebSocketServer
 from .stoppable_node import StoppableNode
-from .protocol import MessageType, Message, parse_message
+from .protocol import MessageType, Message, TopicMessage, parse_message
+from .bridge import R2WBridge
 
 from ros2web_msgs.msg import R2WMessage
+
+# añadir lo de autosubscribirse a topics
+# documentar todo y el protocolo aunque sea basico
+# añadir algo para cuando entra y sale un usuario
 
 class ServerNode(Node):
 
@@ -19,12 +23,18 @@ class ServerNode(Node):
         super().__init__("server")
 
         self.ros_queue = Queue()
+        self.broadcast_data = {}
 
+        self.img_sub = self.create_subscription(Image, "camera/color/image_raw", self.camera_callback, 1) # temp
+        
         self.ros_sub = self.create_subscription(R2WMessage, "ros2web/ros", self.server_callback, 1)
         self.web_pub = self.create_publisher(R2WMessage, "ros2web/web", 1)
 
-        self.bridge = CvBridge()
+        self.r2w_bridge = R2WBridge()
         self.get_logger().info("Server Node initializated succesfully")
+
+    def camera_callback(self, img):
+        self.broadcast_data["IMAGE"] = img
 
     def server_callback(self, msg):
         self.ros_queue.put([msg.key, msg.value])
@@ -37,6 +47,7 @@ class Server(StoppableNode):
         self.run_node = True
 
         self.ws = WebSocketServer(self.on_message, self.on_user_connect, self.on_user_disconnect)
+        #add http server here and to ws th mixer
 
     def spin(self):
         if self.node.ros_queue.qsize() > 0: # ROS messages
@@ -48,14 +59,16 @@ class Server(StoppableNode):
 
             self.ws.send_message(client, message_json)
 
-        #for type in self.node.broadcast_data.keys(): # Broadcast topics
-        #    data = self.node.broadcast_data[type]
-        #    if data is not None:
-        #        message = DisplayDataMessage(data, type)
-        #        message_json = message.to_json()
-        #
-        #        self.ws.broadcast_message(message_json)
-        #        self.node.broadcast_data[type] = None
+        for type in self.node.broadcast_data.keys(): # Broadcast topics
+            data = self.node.broadcast_data[type]
+            if data is not None:
+                data = self.node.r2w_bridge.any_to_r2w(data)
+                
+                message = TopicMessage(type, type, data)
+                message_json = message.to_json()
+        
+                self.ws.broadcast_message(message_json)
+                self.node.broadcast_data[type] = None
 
     def on_message(self, key, msg):
         type, data = parse_message(msg)

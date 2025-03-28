@@ -16,7 +16,23 @@ class Message():
 
         return json.dumps(message)
     
-#class TopicMessage()
+class TopicMessage():
+    def __init__(self, topic, name, value):
+        self.topic = topic
+        self.name = name
+        self.value = value
+
+    def to_json(self):
+        message = {
+            "type": MessageType.TOPIC,
+            "data": {
+                "topic": self.topic,
+                "name": self.name,
+                "value": self.value
+            }
+        }
+
+        return json.dumps(message)
 
 
 ##### TYPES #####
@@ -27,6 +43,7 @@ class MessageType(str, Enum):
 
 MESSAGE_OBJECT = {
     MessageType.MESSAGE: Message,
+    MessageType.TOPIC: TopicMessage
 }
 
 

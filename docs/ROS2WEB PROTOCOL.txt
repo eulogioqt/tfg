@@ -2,20 +2,14 @@ CLIENTE => SERVIDOR
 El cliente envia un mensaje cualquiera:
 {
     type: "MESSAGE",
-    data: {
-        id: client:port,
-        value: ...
-    }
+    data: ...
 }
 
 SERVIDOR => CLIENTE
 El servidor envia un mensaje cualquiera:
 {
     type: "MESSAGE",
-    data: {
-        key: client:port,
-        value: ...
-    }
+    data: ...
 }
 
 El servidor envia un mensaje de un topic a todos los clientes:
