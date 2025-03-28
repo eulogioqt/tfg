@@ -8,7 +8,7 @@ const MESSAGE_TYPE = {
     RESPONSE: "RESPONSE",
     INIT: "INIT",
 };
-
+// hacer objeto que wrapee el protocolo ros2web
 const initialState = {};
 const reducer = (state, action) => ({ ...state, [action.type]: action.payload });
 
@@ -36,17 +36,21 @@ export const WebSocketProvider = ({ children }) => {
             ws.onmessage = (event) => {
                 const message = JSON.parse(event.data);
 
-                const type = message.type;
-                const data = message.data;
+                if (message.type === "MESSAGE") { // High level protocol
+                    const type = message.data.type;
+                    const data = message.data.data;
 
-                if (type === MESSAGE_TYPE.DISPLAY_DATA) {
-                    dispatch({ type: data.type, payload: data.value });
-                } else if (type === MESSAGE_TYPE.RESPONSE) {
-                    console.log("Respuesta recibida:", message);
-                    setPromptResponse(data);
-                } else if (type === MESSAGE_TYPE.INIT) {
-                } else {
-                    console.log("Tipo de mensaje desconocido:", type, data);
+                    if (type === MESSAGE_TYPE.DISPLAY_DATA) { // Low level protocol
+                        dispatch({ type: data.type, payload: data.value });
+                    } else if (type === MESSAGE_TYPE.RESPONSE) {
+                        console.log("Respuesta recibida:", message);
+                        setPromptResponse(data);
+                    } else if (type === MESSAGE_TYPE.INIT) {
+                    } else {
+                        console.log("Tipo de mensaje desconocido:", type, data);
+                    }
+                } else if (message.type === "TOPIC") {
+                    console.log("ha llegao un topic!!!", message.data);
                 }
             };
 
@@ -79,7 +83,7 @@ export const WebSocketProvider = ({ children }) => {
 
     const sendMessage = (message) => {
         const id = uuidv4();
-        const messageWithId = {
+        const messageWithId = { // low level protocol
             type: "PROMPT",
             data: {
                 id: id,
@@ -87,8 +91,13 @@ export const WebSocketProvider = ({ children }) => {
             },
         };
 
-        console.log("Sending message to ROS:", messageWithId);
-        socketRef.current.send(JSON.stringify(messageWithId));
+        const messageR2W = { // high level protocol
+            type: "MESSAGE",
+            data: messageWithId
+        }
+
+        console.log("Sending message to ROS:", messageR2W);
+        socketRef.current.send(JSON.stringify(messageR2W));
 
         return id; // Poner que si falla algo devuelva undefined indicando ha fallado algo
     };
