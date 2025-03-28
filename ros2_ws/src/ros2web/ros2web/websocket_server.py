@@ -1,8 +1,6 @@
 import asyncio
 import websockets
 
-from queue import Queue
-
 
 class WebSocketServer:
 
@@ -13,11 +11,14 @@ class WebSocketServer:
         self.on_user_connect = on_user_connect
         self.on_user_disconnect = on_user_disconnect
 
-        self.clients = set()
+        self.clients = {}
         self.stop_event = asyncio.Event()
 
+    def get_client(self, key):
+        return self.clients.get(key)
+
     def get_connection_count(self):
-        return len(self.clients)
+        return len(self.clients.keys())
 
     def broadcast_message(self, message):
         asyncio.run(self._send_to_all(message))
@@ -31,29 +32,32 @@ class WebSocketServer:
 
     async def _handler(self, websocket, path):
         client_ip, client_port = websocket.remote_address
+        key = f"{client_ip}:{client_port}"
 
-        self.clients.add(websocket)
-        response = self.on_user_connect(client_ip, client_port)
+        self.clients[key] = websocket
+        response = self.on_user_connect(key)
         if response is not None:
             await self._send_message(websocket, response)
 
         try:
             async for message in websocket:
-                response = self.on_message(message)
+                response = self.on_message(key, message)
                 if response is not None:
                     await self._send_message(websocket, response)
                     
         except Exception as e:
             print(f"Error en el cliente: {e}")
         finally:
-            self.clients.remove(websocket)
-            self.on_user_disconnect(client_ip, client_port)
+            if key in self.clients.keys():
+                self.clients.pop(key)
+
+            self.on_user_disconnect(key)
 
     async def _broadcast(self):
         try:
             while not self.stop_event.is_set():
                 if not self.queue.empty():
-                    if self.clients:
+                    if len(self.clients.keys()) > 0:
                         msg = self.queue.get()
 
                         asyncio.run(self._send_to_all(msg))
@@ -64,8 +68,8 @@ class WebSocketServer:
             pass
 
     async def _send_to_all(self, message):
-        if len(self.clients) > 0:
-            tasks = [asyncio.create_task(self._send_message(client, message)) for client in self.clients]
+        if len(self.clients.keys()) > 0:
+            tasks = [asyncio.create_task(self._send_message(client, message)) for client in self.clients.values()]
             await asyncio.wait(tasks)
 
     async def _send_message(self, client, message):
@@ -80,7 +84,7 @@ class WebSocketServer:
                 print(f"WebSocket running on port {self.port}")
                 await self.stop_event.wait()
         finally:
-            for client in self.clients:
+            for client in self.clients.values():
                 await client.close()
 
     async def _main(self): # Revisar esto, ahora mismo el broadcast se hace en el spin de server, pero lo suyo seria que se hiciese asi

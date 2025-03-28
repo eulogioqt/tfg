@@ -1,35 +1,29 @@
-SERVIDOR => CLIENTE
-Mensajes con datos a mostrar (IMAGE, PEOPLE, AUDIO...):
-{
-    type: "DISPLAY_DATA",
-    data: {
-        type: "IMAGE",
-        value: ...
-    }
-}
-
-Respuestas a prompts con ID: 
-{
-    type: "RESPONSE",
-    data: {
-        id: uuid,
-        value: ...
-    }
-}
-
-Inicializacion de comandos y lo que sea: 
-{
-    type: "INIT",
-    data. ...
-}
-
-
 CLIENTE => SERVIDOR
-Prompt del cliente:
+El cliente envia un mensaje cualquiera:
 {
-    type: "PROMPT",
+    type: "MESSAGE",
     data: {
-        id: uuid,
+        id: client:port,
         value: ...
-    },
-};
+    }
+}
+
+SERVIDOR => CLIENTE
+El servidor envia un mensaje cualquiera:
+{
+    type: "MESSAGE",
+    data: {
+        key: client:port,
+        value: ...
+    }
+}
+
+El servidor envia un mensaje de un topic a todos los clientes:
+{
+    type: "TOPIC",
+    data: {
+        topic: "topic",
+        name: "name",
+        value: ...
+    }
+}
