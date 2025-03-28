@@ -56,9 +56,8 @@ class WebSocketServer:
                     if self.clients:
                         msg = self.queue.get()
 
-                        asyncio.run(self.send_to_all("asd", msg))
-                        #await asyncio.gather(*[self._send_message(client, msg) for client in self.clients])
-                        #await asyncio.sleep(0)
+                        asyncio.run(self._send_to_all(msg))
+                        await asyncio.sleep(0)
                 else:
                     await asyncio.sleep(1)
         finally:
@@ -84,7 +83,7 @@ class WebSocketServer:
             for client in self.clients:
                 await client.close()
 
-    async def _main(self):    
+    async def _main(self): # Revisar esto, ahora mismo el broadcast se hace en el spin de server, pero lo suyo seria que se hiciese asi
         websocket_task = asyncio.create_task(self._websocket_server())
         broadcast_task = asyncio.create_task(self._broadcast())
 
