@@ -37,8 +37,10 @@ export const WebSocketProvider = ({ children }) => {
                 const message = JSON.parse(event.data);
 
                 if (message.type === "MESSAGE") { // High level protocol
-                    const type = message.data.type;
-                    const data = message.data.data;
+                    const lowMessage = JSON.parse(message.data);
+
+                    const type = lowMessage.type;
+                    const data = lowMessage.data;
 
                     if (type === MESSAGE_TYPE.DISPLAY_DATA) { // Low level protocol
                         dispatch({ type: data.type, payload: data.value });

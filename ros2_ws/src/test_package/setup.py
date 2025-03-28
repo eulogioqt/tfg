@@ -20,8 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'talker = test_package.minimal_publisher:main',
-            'listener = test_package.minimal_subscriber:main',
+            'camera = test_package.camera_node:main',
+            'assistant = test_package.assistant_node:main',
         ],
     },
 )

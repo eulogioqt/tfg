@@ -1,49 +1,43 @@
-import json
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import Image
 
+from queue import Queue
 from cv_bridge import CvBridge
 
-from .websocket_thread_mixer import WebSocketThreadMixer
-from .websocket_server import WebSocketServer
-from .stoppable_node import StoppableNode
-from .protocol import MessageType, DisplayDataType, DisplayDataMessage, PromptMessage, ResponseMessage, parse_message
+from .protocol import MessageType, PromptMessage, ResponseMessage, parse_message
 
+from ros2web_msgs.msg import R2WMessage
 
-class ServerNode(Node):
+class AssistantNode(Node):
 
     def __init__(self):
-        super().__init__("server")
+        super().__init__("assistant")
 
-        self.broadcast_data = {}
+        self.web_queue = Queue()
 
-        self.subscriber = self.create_subscription(Image, "camera/color/image_raw", self.camera_callback, 1)
+        self.ros_pub = self.create_publisher(R2WMessage, "ros2web/ros", 1)
+        self.web_sub = self.create_subscription(R2WMessage, "ros2web/web", self.web_callback, 1)
         self.bridge = CvBridge()
 
-        self.get_logger().info("Server Node initializated succesfully")
+        self.get_logger().info("Assistant Node initializated succesfully")
 
-    def camera_callback(self, msg):
-        self.broadcast_data[DisplayDataType.IMAGE] = self.bridge.imgmsg_to_cv2(msg)
-    
+    def web_callback(self, msg):
+        self.web_queue.put([msg.key, msg.value])
 
-class Server(StoppableNode):
+class Assistant:
     
     def __init__(self):
-        self.node = ServerNode()
-        self.run_node = True
-
-        self.ws = WebSocketServer(self.on_message, self.on_user_connect, self.on_user_disconnect)
+        self.node = AssistantNode()
 
     def spin(self):
-        for type in self.node.broadcast_data.keys(): # Broadcast display data
-            data = self.node.broadcast_data[type]
-            if data is not None:
-                message = DisplayDataMessage(data, type)
-                message_json = message.to_json()
+        while True:
+            if self.node.web_queue.qsize() > 0: # ROS messages
+                [key, value] = self.node.web_queue.get()
 
-                self.ws.broadcast_message(message_json)
-                self.node.broadcast_data[type] = None
+                response_json = self.on_message(value)
+                self.node.ros_pub.publish(R2WMessage(key=key, value=response_json))
+
+            rclpy.spin_once(self.node)
 
     def on_message(self, msg):
         type, data = parse_message(msg)
@@ -56,18 +50,12 @@ class Server(StoppableNode):
             value = prompt.value
 
             response = ResponseMessage(id, value[::-1])
-            return response.to_json()
-
-    def on_user_connect(self, client_ip, client_port):
-        print(f"Cliente conectado ({client_ip}:{client_port}) (Conexiones: {self.ws.get_connection_count()})")
-    
-    def on_user_disconnect(self, client_ip, client_port):
-        print(f"Cliente desconectado ({client_ip}:{client_port}) (Conexiones: {self.ws.get_connection_count()})")
-    
+            return response.to_json()    
 
 def main(args=None):
     rclpy.init(args=args)
 
-    server = Server()
-    websocket_thread_mixer = WebSocketThreadMixer(server.ws, server)
-    websocket_thread_mixer.run()
+    assistant = Assistant()
+
+    assistant.spin()
+    rclpy.shutdown()
