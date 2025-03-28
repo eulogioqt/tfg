@@ -2,6 +2,7 @@ import cv2
 import base64
 
 from cv_bridge import CvBridge
+from sensor_msgs.msg import Image
 
 class R2WBridge():
 
@@ -18,7 +19,7 @@ class R2WBridge():
             raise Exception("Error on protocol.image_message (not ret)")
         
     def any_to_r2w(self, data):
-        if str(type(data)) == "<class 'sensor_msgs.msg._image.Image'>":
+        if isinstance(data, Image):
             return self.img_to_r2w(data)
         else:
             return data
