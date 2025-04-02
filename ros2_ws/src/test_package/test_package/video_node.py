@@ -4,7 +4,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
-
+from ros2web_msgs.srv import R2WSubscribe
 
 class Video(Node):
 
@@ -14,11 +14,29 @@ class Video(Node):
         path = "../sandbox/video.mp4"
         self.get_logger().info(f"Trying to open video on path {path}")
         self.video = cv2.VideoCapture(path)
-
         self.publisher = self.create_publisher(Image, "video/color/image_raw", 1)
+
+        self.subscribe_client = self.create_client(R2WSubscribe, "ros2web/subscribe")
+        while not self.subscribe_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().warning("ROS2WEB Subscribe Service not available, waiting...")
+        
+        success = self.subscribe_request("video/color/image_raw", "IMAGE")
+        self.get_logger().info(f"Success: {bool(success)}")
+
         self.bridge = CvBridge()
 
         self.spin()
+
+    def subscribe_request(self, topic, name=""):
+        subscribe_request = R2WSubscribe.Request()
+        subscribe_request.topic = topic
+        subscribe_request.name = name
+
+        future_subscribe = self.subscribe_client.call_async(subscribe_request)
+        rclpy.spin_until_future_complete(self, future_subscribe)
+        result_subscribe = future_subscribe.result()
+
+        return result_subscribe.value
 
     def spin(self):
         fps = self.video.get(cv2.CAP_PROP_FPS)

@@ -17,6 +17,7 @@ find_package(std_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/R2WMessage.msg"
+  "srv/R2WSubscribe.srv"
 )
 
 if(BUILD_TESTING)

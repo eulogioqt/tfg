@@ -38,7 +38,7 @@ class ServerNode(DynamicSubscribableNode):
 
     def __init__(self):
         super().__init__("server")
-
+    
         self.ros_queue = Queue()
         self.broadcast_topics = {}
 
@@ -61,9 +61,6 @@ class Server(StoppableNode):
 
         self.node = ServerNode()
         self.ws = WebSocketServer(self.on_message, self.on_user_connect, self.on_user_disconnect)
-        self.node.subscribe_to_topic("/video/color/image_raw", "IMAGE")
-        self.node.subscribe_to_topic("/chatter", "CHATTER") # cambiar a service y que otro nodo sea el que active esto
-        # tambien hacer que en un launch se pase por argmento los topics a los que subscribrse y sus nombres
         #add http server here and add to the ws th mixer
 
     def spin(self):
