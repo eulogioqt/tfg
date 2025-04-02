@@ -7,6 +7,7 @@ from queue import Queue
 from .websocket_thread_mixer import WebSocketThreadMixer
 from .websocket_server import WebSocketServer
 from .stoppable_node import StoppableNode
+from .dynamic_subscribable_node import DynamicSubscribableNode
 from .protocol import MessageType, Message, TopicMessage, parse_message
 from .r2w_bridge import R2WBridge
 
@@ -33,12 +34,10 @@ from ros2web_msgs.msg import R2WMessage
 
 # hacer un paquete para el tema llms
 
-class ServerNode(Node):
+class ServerNode(DynamicSubscribableNode):
 
     def __init__(self):
         super().__init__("server")
-
-        self.auto_subscriptions = [] # al autosubscriptablenode
 
         self.ros_queue = Queue()
         self.broadcast_topics = {}
@@ -49,46 +48,18 @@ class ServerNode(Node):
         self.r2w_bridge = R2WBridge()
         self.get_logger().info("Server Node initializated succesfully")
 
-    def subscribe_to_topic(self, topic_name, name=None): # al autosubscriptablenode
-        name = name if name else topic_name
-        topic_name = topic_name if topic_name.startswith("/") else "/" + topic_name
-        topic_types = dict(self.get_topic_names_and_types())
-
-        if topic_name not in topic_types:
-            self.get_logger().warn(f"Topic {topic_name} not found")
-            return
-        
-        topic_type = topic_types[topic_name][0]
-        self.get_logger().info(f"Topic '{topic_name}' is of type '{topic_type}'")
-
-        data = topic_type.split('/')
-        msg_module_name = ".".join(data[:-1])
-        msg_class_name = data[-1]
-
-        try:
-            msg_module = __import__(msg_module_name, fromlist=[msg_class_name])
-            msg_class = getattr(msg_module, msg_class_name)
-        except (ImportError, AttributeError) as e:
-            self.get_logger().error(f"No se pudo importar el tipo {topic_type}: {e}")
-            return
-
-        callback = lambda msg, tn=topic_name, nm=name: self.generic_callback(tn, nm, msg)
-        auto_subscription = self.create_subscription(msg_class, topic_name, callback, 1)
-        self.auto_subscriptions.append(auto_subscription)
-
-    def generic_callback(self, topic, name, value): # al autosubscriptablenode
-        self.broadcast_topics[topic] = [name, value]
-
     def server_callback(self, msg):
         self.ros_queue.put([msg.key, msg.value])
 
+    def generic_callback(self, topic, name, value):
+        self.broadcast_topics[topic] = [name, value]
 
 class Server(StoppableNode):
     
     def __init__(self):
-        self.node = ServerNode()
-        self.run_node = True
+        super().__init__()
 
+        self.node = ServerNode()
         self.ws = WebSocketServer(self.on_message, self.on_user_connect, self.on_user_disconnect)
         self.node.subscribe_to_topic("/video/color/image_raw", "IMAGE")
         self.node.subscribe_to_topic("/chatter", "CHATTER") # cambiar a service y que otro nodo sea el que active esto
