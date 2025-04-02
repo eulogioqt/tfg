@@ -29,7 +29,7 @@ class Camera(Node):
             
             if first_frame:
                 first_frame = False
-                self.get_logger().info("Camera initializated succesfully")
+                self.get_logger().info("Camera Node initializated succesfully")
             
             self.publisher.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
             cv2.waitKey(1)

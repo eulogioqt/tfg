@@ -2,7 +2,7 @@ import rclpy
 from abc import ABC, abstractmethod
 
 
-class StoppableNode(ABC):
+class StoppableNode(ABC): # No me gusta que stoppablenode y quien hereda de esto no es el nodo si no el wrapper
 
     @abstractmethod
     def spin(self):
@@ -16,5 +16,5 @@ class StoppableNode(ABC):
             while rclpy.ok() and self.run_node:
                 self.spin()
                 rclpy.spin_once(self.node)
-        except Exception:
-            pass
+        except Exception as e:
+            print("ERROR ON SPIN:", e)

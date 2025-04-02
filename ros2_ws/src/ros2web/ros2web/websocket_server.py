@@ -30,7 +30,7 @@ class WebSocketServer:
         if not self.stop_event.is_set():
             self.stop_event.set()
 
-    async def _handler(self, websocket, path):
+    async def _handler(self, websocket): # Depende de la version hay que poner un argumento, path despues de websocket
         client_ip, client_port = websocket.remote_address
         key = f"{client_ip}:{client_port}"
 
@@ -81,7 +81,7 @@ class WebSocketServer:
     async def _websocket_server(self):
         try:
             async with websockets.serve(self._handler, "localhost", self.port):
-                print(f"WebSocket running on port {self.port}")
+                print(f"WebSocket running on https://localhost:{self.port}")
                 await self.stop_event.wait()
         finally:
             for client in self.clients.values():

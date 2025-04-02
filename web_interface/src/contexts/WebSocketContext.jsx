@@ -3,10 +3,11 @@ import { v4 as uuidv4 } from "uuid";
 
 const WebSocketContext = createContext();
 
-const R2W_MESSAGE_TYPE = { // hacer objeto que wrapee el protocolo ros2web
+const R2W_MESSAGE_TYPE = {
+    // hacer objeto que wrapee el protocolo ros2web, parte del framework ros2web
     MESSAGE: "MESSAGE",
-    TOPIC: "TOPIC"
-}
+    TOPIC: "TOPIC",
+};
 
 const MESSAGE_TYPE = {
     RESPONSE: "RESPONSE",
@@ -40,7 +41,8 @@ export const WebSocketProvider = ({ children }) => {
             ws.onmessage = (event) => {
                 const message = JSON.parse(event.data);
 
-                if (message.type === R2W_MESSAGE_TYPE.MESSAGE) { // High level protocol
+                if (message.type === R2W_MESSAGE_TYPE.MESSAGE) {
+                    // High level protocol
                     const lowMessage = JSON.parse(message.data);
 
                     const type = lowMessage.type;
@@ -59,7 +61,8 @@ export const WebSocketProvider = ({ children }) => {
                     const topic = lowMessage.topic;
                     const name = lowMessage.name;
                     const value = lowMessage.value;
-
+                    //console.log(lowMessage);
+                    //console.log(`[${topic}] ${value}`);
                     dispatch({ type: name, payload: value });
                 } else {
                     console.log("Tipo de mensaje R2W desconocido:", type, data);
@@ -95,7 +98,8 @@ export const WebSocketProvider = ({ children }) => {
 
     const sendMessage = (message) => {
         const id = uuidv4();
-        const messageWithId = { // low level protocol
+        const messageWithId = {
+            // low level protocol
             type: "PROMPT",
             data: {
                 id: id,
@@ -103,10 +107,11 @@ export const WebSocketProvider = ({ children }) => {
             },
         };
 
-        const messageR2W = { // high level protocol
+        const messageR2W = {
+            // high level protocol
             type: "MESSAGE",
-            data: messageWithId
-        }
+            data: messageWithId,
+        };
 
         console.log("Sending message to ROS:", messageR2W);
         socketRef.current.send(JSON.stringify(messageR2W));

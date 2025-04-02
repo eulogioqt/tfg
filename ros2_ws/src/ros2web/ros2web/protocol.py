@@ -4,7 +4,7 @@ from enum import Enum
 
 
 ##### SERVER MESSAGES #####
-class Message():
+class Message(): # Cambiar a GeneralMessage o algo asi para no confundir, seria MessageMessage
     def __init__(self, data):
         self.data = data
     

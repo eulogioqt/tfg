@@ -8,19 +8,37 @@ from .websocket_thread_mixer import WebSocketThreadMixer
 from .websocket_server import WebSocketServer
 from .stoppable_node import StoppableNode
 from .protocol import MessageType, Message, TopicMessage, parse_message
-from .bridge import R2WBridge
+from .r2w_bridge import R2WBridge
 
 from ros2web_msgs.msg import R2WMessage
 
 # añadir lo de autosubscribirse a topics
 # documentar todo y el protocolo aunque sea basico
 # añadir algo para cuando entra y sale un usuario
-# hacer un service para subscribirse al topic que se le pase. Un mensaje R2WSubscription con topic y nombre
+# hacer un service para subscribirse al topic que se le pase. Un mensaje R2WSubscription con topic y nombre (mensaje para subscribirse a topics)
+# ponerlo tambien como argumentos de un launch
+# no me mola que el stoppable node el que lo hereda es el wrapper del nodo no el node
+# hacer AutosubscriptableNode para el node real y wrappear el service y todo eso ahi
+# hacer que si el topic aun no esta disponible lo intenta cada cierto tiempo hasta que este
+
+# coger todo el codigo y refactorizarlo y documentarlo hasta dejarlo perfecto cuando este todo hecho
+# generar una documentacion para la memoria o algo asi de calidad, donde se describa bien tipo
+# el websocketserver tiene esto esto y esto
+# el httpserver esto y estas funciones "publicas" y asi con todo perfectisimo sabe o no sabe o si sabe
+
+# hacer alguna forma para autorserializar o que el usuario al menos pueda (lo de bridge de ros_to_r2w)
+# en esta conversacion pone que se puede "https://chatgpt.com/c/67ed892c-cf14-800f-b877-2e727bcfafa8"
+# hacer que eso sea el por defecto y si no que el usuario pueda definir formas de serializar mensajes
+# especificos, como las imagenes a jpg codificarlas y todo el rollo para que vaya mas rapido...
+
+# hacer un paquete para el tema llms
 
 class ServerNode(Node):
 
     def __init__(self):
         super().__init__("server")
+
+        self.auto_subscriptions = [] # al autosubscriptablenode
 
         self.ros_queue = Queue()
         self.broadcast_topics = {}
@@ -31,7 +49,7 @@ class ServerNode(Node):
         self.r2w_bridge = R2WBridge()
         self.get_logger().info("Server Node initializated succesfully")
 
-    def subscribe_to_topic(self, topic_name, name=None):
+    def subscribe_to_topic(self, topic_name, name=None): # al autosubscriptablenode
         name = name if name else topic_name
         topic_name = topic_name if topic_name.startswith("/") else "/" + topic_name
         topic_types = dict(self.get_topic_names_and_types())
@@ -55,9 +73,10 @@ class ServerNode(Node):
             return
 
         callback = lambda msg, tn=topic_name, nm=name: self.generic_callback(tn, nm, msg)
-        self.create_subscription(msg_class, topic_name, callback, 1)
+        auto_subscription = self.create_subscription(msg_class, topic_name, callback, 1)
+        self.auto_subscriptions.append(auto_subscription)
 
-    def generic_callback(self, topic, name, value):
+    def generic_callback(self, topic, name, value): # al autosubscriptablenode
         self.broadcast_topics[topic] = [name, value]
 
     def server_callback(self, msg):
@@ -71,7 +90,9 @@ class Server(StoppableNode):
         self.run_node = True
 
         self.ws = WebSocketServer(self.on_message, self.on_user_connect, self.on_user_disconnect)
-        self.node.subscribe_to_topic("/camera/color/image_raw", "IMAGE") # cambiar a service y que otro nodo sea el que active esto
+        self.node.subscribe_to_topic("/video/color/image_raw", "IMAGE")
+        self.node.subscribe_to_topic("/chatter", "CHATTER") # cambiar a service y que otro nodo sea el que active esto
+        # tambien hacer que en un launch se pase por argmento los topics a los que subscribrse y sus nombres
         #add http server here and add to the ws th mixer
 
     def spin(self):
@@ -92,7 +113,7 @@ class Server(StoppableNode):
 
                 message = TopicMessage(topic, name, value)
                 message_json = message.to_json()
-        
+
                 self.node.broadcast_topics[topic] = None
                 self.ws.broadcast_message(message_json)
 

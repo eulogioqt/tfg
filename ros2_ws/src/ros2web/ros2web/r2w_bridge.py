@@ -3,6 +3,9 @@ import base64
 
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
+from std_msgs.msg import String
+
+from rosidl_runtime_py.convert import message_to_ordereddict
 
 class R2WBridge():
 
@@ -17,9 +20,14 @@ class R2WBridge():
             return base64.b64encode(jpeg.tobytes()).decode('utf-8')
         else:
             raise Exception("Error on protocol.image_message (not ret)")
-        
+    
+    def str_to_r2w(self, data):
+        return data.data
+
     def any_to_r2w(self, data):
-        if isinstance(data, Image):
+        if isinstance(data, Image): # esto igual
             return self.img_to_r2w(data)
+        if isinstance(data, String): # esto que sea opcional
+            return self.str_to_r2w(data)
         else:
-            return data
+            return message_to_ordereddict(data)

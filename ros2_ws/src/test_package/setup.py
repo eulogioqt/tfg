@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'camera = test_package.camera_node:main',
+            'video = test_package.video_node:main',
             'assistant = test_package.assistant_node:main',
         ],
     },

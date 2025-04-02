@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useWebSocket } from "../contexts/WebSocketContext";
 import { useWindowSize, BREAKPOINTS } from "../hooks/useWindowSize";
+
 import DraggableItem from "./DraggableItem";
 
 const WebSocketVideoViewer = () => {
@@ -32,8 +33,7 @@ const WebSocketVideoViewer = () => {
     }, [displayData.IMAGE]);
 
     const calculatedWidth = Math.max(width * 0.2, 160);
-    const calculatedHeight =
-        imgDimensions && (calculatedWidth * imgDimensions.height) / imgDimensions.width;
+    const calculatedHeight = imgDimensions && (calculatedWidth * imgDimensions.height) / imgDimensions.width;
 
     return (
         <DraggableItem>
