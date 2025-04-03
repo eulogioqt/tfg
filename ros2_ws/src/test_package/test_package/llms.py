@@ -24,5 +24,6 @@
 # luego ver tambien la comunicacion con csar que era un follon
 # los logs en la web de todo lo que ha hecho x usuario
 # firebase pa iniciar sesion y eso... reutilizar de la wiki
+# lo de poner la cabeza tambien en la interfaz y que sepas si esta hablando o no, los ojos la boca....
 
 # https://chatgpt.com/c/67dac8c1-affc-800f-91d3-02cb7a121d57
