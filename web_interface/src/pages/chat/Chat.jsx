@@ -7,6 +7,7 @@ import ChatHeader from "./components/ChatHeader";
 
 import { useWebSocket } from "../../contexts/WebSocketContext";
 import { useWindowSize, BREAKPOINTS } from "../../hooks/useWindowSize";
+import { v4 as uuidv4 } from "uuid";
 
 // Poner que cuando el chat no tiene mensajes el text area y demas este en medio
 // Hacer un chatcontext o un collapsedcontext si se extiende todo demasiado y hay muchas cosas que ir pasando
@@ -28,7 +29,16 @@ const Chat = () => {
 
     const handleSend = (inputMessage) => {
         if (inputMessage.length > 0) {
-            const id = isConnected ? sendMessage(inputMessage) : 10; // REMOVE if
+            const id = uuidv4();
+            const messageWithId = {
+                type: "PROMPT",
+                data: {
+                    id: id,
+                    value: inputMessage,
+                },
+            };
+
+            sendMessage(messageWithId);
             addMessage(inputMessage, id, true);
         }
     };

@@ -1,17 +1,10 @@
 import React, { useReducer, useEffect, useContext, createContext, useRef, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+import R2WSocket from "../utils/R2WSocket";
 
 const WebSocketContext = createContext();
 
-const R2W_MESSAGE_TYPE = {
-    // hacer objeto que wrapee el protocolo ros2web, parte del framework ros2web
-    MESSAGE: "MESSAGE",
-    TOPIC: "TOPIC",
-};
-
 const MESSAGE_TYPE = {
     RESPONSE: "RESPONSE",
-    INIT: "INIT",
 };
 
 const initialState = {};
@@ -27,8 +20,7 @@ export const WebSocketProvider = ({ children }) => {
     useEffect(() => {
         const connectWebSocket = () => {
             const serverIP = window.location.hostname;
-            const ws = new WebSocket("ws://" + serverIP + ":8765");
-
+            const ws = new R2WSocket("ws://" + serverIP + ":8765"); // Intentar meter en el R2WSocket el retry tmb por defecto
             console.log("Intentando conectar con el servidor WebSocket");
 
             ws.onopen = () => {
@@ -36,37 +28,6 @@ export const WebSocketProvider = ({ children }) => {
 
                 setConnected(true);
                 socketRef.current = ws;
-            };
-
-            ws.onmessage = (event) => {
-                const message = JSON.parse(event.data);
-
-                if (message.type === R2W_MESSAGE_TYPE.MESSAGE) {
-                    // High level protocol
-                    const lowMessage = JSON.parse(message.data);
-
-                    const type = lowMessage.type;
-                    const data = lowMessage.data;
-
-                    if (type === MESSAGE_TYPE.RESPONSE) {
-                        console.log("Respuesta recibida:", message);
-                        setPromptResponse(data);
-                    } else if (type === MESSAGE_TYPE.INIT) {
-                    } else {
-                        console.log("Tipo de mensaje desconocido:", type, data);
-                    }
-                } else if (message.type === R2W_MESSAGE_TYPE.TOPIC) {
-                    const lowMessage = message.data;
-
-                    const topic = lowMessage.topic;
-                    const name = lowMessage.name;
-                    const value = lowMessage.value;
-                    //console.log(lowMessage);
-                    //console.log(`[${topic}] ${value}`);
-                    dispatch({ type: name, payload: value });
-                } else {
-                    console.log("Tipo de mensaje R2W desconocido:", type, data);
-                }
             };
 
             ws.onclose = () => {
@@ -82,6 +43,9 @@ export const WebSocketProvider = ({ children }) => {
                 setConnected(false);
                 ws.close();
             };
+
+            ws.ontopic = (event) => onTopic(event);
+            ws.onmessage = (event) => onMessage(event);
         };
 
         if (!socketRef.current) connectWebSocket();
@@ -96,27 +60,30 @@ export const WebSocketProvider = ({ children }) => {
         };
     }, []);
 
+    const onTopic = (event) => {
+        const topic = event.topic;
+        const name = event.name;
+        const value = event.value;
+        //console.log(event);
+        //console.log(`[${topic}] ${value}`);
+        dispatch({ type: name, payload: value });
+    };
+
+    const onMessage = (event) => {
+        const type = event.type;
+        const data = event.data;
+
+        if (type === MESSAGE_TYPE.RESPONSE) {
+            console.log("Respuesta recibida:", event);
+            setPromptResponse(data); // hacer eso mejor, como minimo una lista appendeando las respuestas
+        } else {
+            console.log("Tipo de mensaje desconocido:", type, data);
+        }
+    };
+
     const sendMessage = (message) => {
-        const id = uuidv4();
-        const messageWithId = {
-            // low level protocol
-            type: "PROMPT",
-            data: {
-                id: id,
-                value: message,
-            },
-        };
-
-        const messageR2W = {
-            // high level protocol
-            type: "MESSAGE",
-            data: messageWithId,
-        };
-
-        console.log("Sending message to ROS:", messageR2W);
-        socketRef.current.send(JSON.stringify(messageR2W));
-
-        return id; // Poner que si falla algo devuelva undefined indicando ha fallado algo
+        if (socketRef.current) socketRef.current.send(message);
+        else console.log("No conectado al R2WSocket");
     };
 
     return (
