@@ -25,5 +25,17 @@
 # los logs en la web de todo lo que ha hecho x usuario
 # firebase pa iniciar sesion y eso... reutilizar de la wiki
 # lo de poner la cabeza tambien en la interfaz y que sepas si esta hablando o no, los ojos la boca....
+# pensar bien como organizar la interfaz web. Sobre lo de que usen varios la interfaz a la vez,
+# pues seria como si en la vida real hubiese varios robots hablandole a la vez, se va a agobiar
+
+# IDEA CLAVE: Hacer el chat general, que si un usuario escribe o habla a traves de la interfaz, pues se ponga que esa
+# persona ha puesto ese mensaje y sancho responda a eso. Que si habla alguien en persona y sabe quien es (lo tiene como
+# interlocutor), pues tambien ponga quien es, si no que ponga Unknown. Creo que esto es puntazo para solucionar esto
+# Y que los que hablen usando la interfaz web mande el audio por websocket o incluso se haga el TTS en el frontend
+
+# idea a futuro: asociar la cara de una persona con la cuenta de firebase o lo que sea y al iniciar sesion
+# sepa quien eres a nivel de cara y usando los registros de la base de datos de caras pues sepa la ultima vez
+# que te vio si habia mas gente cosas asi
+# En la bd de caras tambien poner logs de caras y salga la fecha en la que esta y mucha info en plan asi
 
 # https://chatgpt.com/c/67dac8c1-affc-800f-91d3-02cb7a121d57
