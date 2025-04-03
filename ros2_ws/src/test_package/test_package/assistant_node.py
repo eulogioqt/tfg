@@ -34,12 +34,15 @@ class Assistant:
             if self.node.web_queue.qsize() > 0: # ROS messages
                 [key, value] = self.node.web_queue.get()
 
-                response_json = self.on_message(value)
+                response_json = self.on_protocol_message(value)
                 self.node.ros_pub.publish(R2WMessage(key=key, value=response_json))
 
             rclpy.spin_once(self.node)
 
-    def on_message(self, msg):
+    """La idea aquí sería simplemente procesar texto, no el protocolo. Habria un nodo que se encargaria del protocolo
+    y aqui solo llegarian los prompts para generar las responses. Entonces el on_protocol_message simula ese nodo que aun
+    no hay y el on_message el on_message real de un assistant"""
+    def on_protocol_message(self, msg):
         type, data = parse_message(msg)
         print(f"Mensaje recibido: {type}")
 
@@ -47,10 +50,14 @@ class Assistant:
             prompt = PromptMessage(data)
 
             id = prompt.id
-            value = prompt.value
-
-            response = ResponseMessage(id, value[::-1])
+            message = prompt.value
+            resp = self.on_message(message)
+            
+            response = ResponseMessage(id, resp)
             return response.to_json()    
+
+    def on_message(self, message):
+        return message[::-1]
 
 def main(args=None):
     rclpy.init(args=args)

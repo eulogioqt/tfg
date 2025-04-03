@@ -34,6 +34,8 @@ from ros2web_msgs.msg import R2WMessage
 
 # hacer un paquete para el tema llms
 
+# en el refactor hacer mas carpetas dentro de los paquetes aunque no sean paquetes
+
 class ServerNode(DynamicSubscribableNode):
 
     def __init__(self):
