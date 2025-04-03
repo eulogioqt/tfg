@@ -8,7 +8,7 @@ def generate_launch_description():
             executable='server',
             name='server',
             parameters=[{
-                'topics': "[['/video/color/image_raw', 'IMAGE'], ['/chatter', 'CHATTER_123']]"
+                'topics': "[['/camera/color/image_raw', 'IMAGE'], ['/chatter', 'CHATTER_123']]"
             }],
             output='screen'
         )
