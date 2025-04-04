@@ -25,16 +25,10 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'converter = hri_vision.yuvu_image_converter:main',
-            'camera_parameters = hri_vision.camera_parameters:main',
-            'camera = hri_vision.camera_capturer:main',
+            'camera = hri_vision.camera_node:main',
             'detector = hri_vision.human_face_detector:main',       
             'recognizer = hri_vision.human_face_recognizer:main',
-            'logic = hri_vision.hri_logic_copy:main',
-            'head = hri_vision.hri_head:main',
-            'gui = hri_vision.hri_gui:main',
-            'body = hri_vision.hri_body:main',
-            'metrics = hri_vision.hri_metrics:main',
+            'logic = hri_vision.hri_logic:main',
         ],
     },
 )

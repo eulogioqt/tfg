@@ -18,11 +18,9 @@ class Camera(Node):
         self.publisher = self.create_publisher(Image, "camera/color/image_raw", 1)
 
         self.subscribe_client = self.create_client(R2WSubscribe, "ros2web/subscribe") # hacer una clase para que se herede con estas cosas repetidas
-        while not self.subscribe_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().warning("ROS2WEB Subscribe Service not available, waiting...")
-        
-        success = self.subscribe_request("camera/color/image_raw", "IMAGE")
-        self.get_logger().info(f"Success: {bool(success)}")
+        if self.subscribe_client.wait_for_service(timeout_sec=1.0):
+            success = self.subscribe_request("camera/color/image_raw", "IMAGE")
+            self.get_logger().info(f"Success: {bool(success)}")
 
         self.bridge = CvBridge()
 

@@ -88,10 +88,8 @@ class HumanFaceDetector(Node):
 
 def main(args=None):
     rclpy.init(args=args)
+
     human_face_detector = HumanFaceDetector()
+
     rclpy.spin(human_face_detector)
     rclpy.shutdown()
-
-
-if __name__ == "__main__":
-    main()

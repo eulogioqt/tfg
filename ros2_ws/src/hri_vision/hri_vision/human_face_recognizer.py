@@ -34,6 +34,7 @@ class HumanFaceRecognizer(Node):
         self.faces_publisher = self.create_publisher(Image, "camera/color/aligned_faces", 10)
 
         self.classifier = ComplexClassifier(use_database)
+        self.get_logger().info(f"Using database: {use_database}")
 
         self.training_dispatcher = {
             "refine_class": self.classifier.refine_class,
@@ -143,7 +144,3 @@ def main(args=None):
 
     rclpy.spin(human_face_recognizer)
     rclpy.shutdown()
-
-
-if __name__ == "__main__":
-    main()
