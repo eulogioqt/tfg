@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'test_package'
+package_name = 'sancho_ai'
 
 setup(
     name=package_name,
@@ -20,9 +20,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'camera = test_package.camera_node:main',
-            'video = test_package.video_node:main',
-            'assistant = test_package.assistant_node:main',
+            'camera = sancho_ai.camera_node:main',
+            'video = sancho_ai.video_node:main',
+            'assistant = sancho_ai.assistant_node:main',
         ],
     },
 )
