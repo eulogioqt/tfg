@@ -66,6 +66,8 @@ export const WebSocketProvider = ({ children }) => {
         const value = event.value;
         //console.log(event);
         //console.log(`[${topic}] ${value}`);
+        if (name == "ACTUAL_PEOPLE")
+            console.log(topic, name, value)
         dispatch({ type: name, payload: value });
     };
 

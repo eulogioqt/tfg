@@ -1,3 +1,4 @@
-hri_msgs/Prompt prompt
+string id
+string text
 ---
-hri_msgs/Response response
+string text

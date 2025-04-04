@@ -62,10 +62,10 @@ class SanchoWeb:
         sancho_prompt_request.text = text
 
         future_sancho_prompt = self.node.sancho_prompt_client.call_async(sancho_prompt_request)
-        rclpy.spin_until_future_complete(self, future_sancho_prompt)
+        rclpy.spin_until_future_complete(self.node, future_sancho_prompt)
         result_sancho_prompt = future_sancho_prompt.result()
 
-        return result_sancho_prompt.id, result_sancho_prompt.text
+        return result_sancho_prompt.text
 
 def main(args=None):
     rclpy.init(args=args)

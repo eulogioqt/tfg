@@ -11,9 +11,35 @@ from hri_msgs.srv import Detection, Recognition, Training, GetString
 from .hri_bridge import HRIBridge
 from .api.gui import get_name, ask_if_name, mark_face
 
+# refactorizar esta vaina
+# tema de que se congele si te pide el nombre o lo que sea
+# revisar que a veces estas mirando pa otro lao y cierras la ventana y te pilla una foto antigua
+
+# tema hacerlo mejor tipo quiza que todo el proceos se haga en otro lao y haya un sitio donde se vaya cogiendo
+# la info que se publica de deteccion y reconocimiento y entonces solo coja siempre el ultimo frame asin fluido
+# y con la ultima info de reconocimiento y deteccion se pinte. Entonces tendriamos la camara fluida y con esa info,
+# no que ahora va lentita
+
+# para la bd investigar y ver como hacer. Yo creo que el classifier deberia manejar todo el tema bd o incluso otro nodo para la bd
+# con ros pero que luego hubiese un api rest cuyas peticiones usen el nodo de ros para acceder a esa bd tambien, o por lo contrario
+# que lo haga externamente, pero que sea un diseño asin epico
+
+# para lo de que se queda pillado si te esta preguntando el nombre, pues poner que en vez de quitarse el video ponga "sin señal" o se quede el ultimo frame y ya
+
+# revisar tema prints y logs que es un caos
+# en la interfaz web poner de nuevo lo de ver la gente conectada
+# hacer algo para cuando borrar que esto lo detecte
+# algo tipo un topic informativo de la bd y si publica que se ha borrado pues borra aqui tmb
+
+# al publicar el actual people es un stringify del json, quiza en el r2wsubscribe o lo q sea meter un argumento de json parse q si es true sabes
+# q lo q esta publicnado es json y lo parsee
+# la idea es que llegue todo a la web en json y no dependiendo ed una cosa u otra lo jsonice o no, pensar esto bien
+
+# en el recognizer y eso importar todo al principio o algo asi para que no de un lagazo en el primer reconocimiento
+
 class HRILogicNode(Node):
 
-    def __init__(self, hri_logic):
+    def __init__(self, hri_logic : "HRILogic"):
         """Initializes the logic node. Subscribes to camera and publishes recognition images"""
 
         super().__init__('hri_logic')
@@ -21,12 +47,12 @@ class HRILogicNode(Node):
         self.hri_logic = hri_logic
         self.data_queue = Queue(maxsize = 1) # Queremos que olvide frames antiguos, siempre a por los mas nuevos
 
-        self.get_actual_people_service = self.create_service(GetString, 'video/get/actual_people', self.get_actual_people)
+        self.get_actual_people_service = self.create_service(GetString, 'logic/get/actual_people', self.hri_logic.get_actual_people)
 
         self.subscription_camera = self.create_subscription(Image, 'camera/color/image_raw', self.frame_callback, 1)
 
         self.publisher_recognition = self.create_publisher(Image, 'camera/color/recognition', 1)
-        self.publisher_people = self.create_publisher(String, 'robot/info/actual_people', 1)
+        self.publisher_people = self.create_publisher(String, 'logic/info/actual_people', 1)
 
         self.detection_client = self.create_client(Detection, 'detection')
         while not self.detection_client.wait_for_service(timeout_sec=1.0):
@@ -44,11 +70,6 @@ class HRILogicNode(Node):
         self.br = HRIBridge()
 
         self.get_logger().info("HRI Logic Node initializated succesfully")
-
-    def get_actual_people(self, request, response):
-        actual_people_json = json.dumps(self.hri_logic.actual_people)
-        response.text = String(data=actual_people_json)
-        return response
 
     def frame_callback(self, frame_msg):
         if self.data_queue.empty(): # We don't want blocking
@@ -197,9 +218,16 @@ class HRILogic():
             mark_face(frame, positions[i], distance, self.MIDDLE_BOUND, self.UPPER_BOUND, classified=classified, 
                       drawRectangle=self.draw_rectangle, score=scores[i], showDistance=self.show_distance, showScore=self.show_score)
 
-        actual_people_json = json.dumps(self.actual_people)
+        actual_people_time = self.get_actual_people_time()
+        actual_people_json = json.dumps(actual_people_time)
         self.node.publisher_people.publish(String(data=actual_people_json))
         self.node.publisher_recognition.publish(self.node.br.cv2_to_imgmsg(frame, "bgr8"))
+
+    def get_actual_people_time(self):
+        actual_people_time = {}
+        for key, value in self.actual_people.items():
+            actual_people_time[key] = time.time() - value
+        return actual_people_time
 
     def read_text(self, text):
         """Reads text with speech to text
@@ -211,6 +239,7 @@ class HRILogic():
         print(f"[SANCHO] {text}")
         self.node.input_tts.publish(String(data=text))
 
+    # Clients
     def detection_request(self, frame_msg):
         """Makes a detection request to the detection service.
 
@@ -281,6 +310,13 @@ class HRILogic():
         result_training = future_training.result()
 
         return result_training.result, result_training.message
+
+    # Services
+    def get_actual_people(self, request, response):
+        actual_people_time = self.get_actual_people_time()
+        actual_people_json = json.dumps(actual_people_time)
+        response.text = String(data=actual_people_json)
+        return response
 
 def main(args=None):
     rclpy.init(args=args)

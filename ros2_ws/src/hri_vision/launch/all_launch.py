@@ -32,5 +32,32 @@ def generate_launch_description():
             executable='logic',
             name='logic',
             output='screen',
-        )
+        ),
+        Node(
+            package='ros2web',
+            executable='server',
+            name='r2w_server',
+            parameters=[{
+                'topics': "[['/camera/color/recognition', 'IMAGE'], ['/logic/info/actual_people', 'ACTUAL_PEOPLE']]"
+            }],
+            output='screen',
+            prefix="xterm -hold -e",
+            emulate_tty=True,
+        ),
+        Node(
+            package='sancho_web',
+            executable='sancho_web',
+            name='sancho_web',
+            output='screen',
+            prefix="xterm -hold -e",
+            emulate_tty=True,
+        ),
+        Node(
+            package='sancho_ai',
+            executable='sancho_ai',
+            name='sancho_ai',
+            output='screen',
+            prefix="xterm -hold -e",
+            emulate_tty=True,
+        ),
     ])
