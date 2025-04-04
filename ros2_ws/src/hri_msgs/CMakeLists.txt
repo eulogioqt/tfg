@@ -17,25 +17,18 @@ find_package(std_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/FacePosition.msg"
-  "msg/HeadOrientation.msg"
   "msg/ChunkStereo.msg"
   "msg/ChunkMono.msg"
   "msg/FaceGuiRequest.msg"
-  "msg/BodyOrientation.msg"
-  "msg/BodyMovement.msg"
+  "msg/Prompt.msg"
+  "msg/Response.msg"
+
   "srv/Detection.srv"
   "srv/Recognition.srv"
   "srv/Training.srv"
-  "srv/AudioRecognition.srv"
-  "srv/HelperMode.srv"
   "srv/GetString.srv"
-  "srv/GetBool.srv"
-  "srv/AudioLocation.srv"
   "srv/FaceGuiResponse.srv"
-  "srv/Emotions.srv"
-  "srv/Tracking.srv"
-  "srv/GetCameraParameters.srv"
-  "srv/PlayAudio.srv"
+  
   DEPENDENCIES sensor_msgs std_msgs
 )
 

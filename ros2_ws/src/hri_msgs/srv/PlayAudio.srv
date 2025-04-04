@@ -1,4 +1,0 @@
-float64[] audio_data
----
-bool success
-string message

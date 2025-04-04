@@ -20,9 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'camera = sancho_ai.camera_node:main',
-            'video = sancho_ai.video_node:main',
-            'assistant = sancho_ai.assistant_node:main',
+            'ai = sancho_ai.ai_node:main',
         ],
     },
 )
