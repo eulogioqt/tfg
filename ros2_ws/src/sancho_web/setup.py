@@ -22,7 +22,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'web = sancho_web.hri_web:main',
+            'sancho_web = sancho_web.sancho_web_node:main',
         ],
     },
 )

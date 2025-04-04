@@ -15,7 +15,7 @@ class DynamicSubscribableNode(Node, ABC):
         for [topic_name, name] in self.parse_topics(topics_str):
             self.subscribe_to_topic(topic_name, name)
         
-        self.subscribe_service = self.create_service(R2WSubscribe, "ros2web/subscribe", self.subscribe_client)
+        self.subscribe_serv = self.create_service(R2WSubscribe, "ros2web/subscribe", self.subscribe_service)
 
     def subscribe_to_topic(self, topic_name, name=None):
         name = name if name else topic_name # Prepara name
@@ -57,7 +57,7 @@ class DynamicSubscribableNode(Node, ABC):
 
         return 1
 
-    def subscribe_client(self, request, response):
+    def subscribe_service(self, request, response):
         success = self.subscribe_to_topic(request.topic, request.name)
         response.value = success
         return response

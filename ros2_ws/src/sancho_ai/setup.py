@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'ai = sancho_ai.ai_node:main',
+            'sancho_ai = sancho_ai.sancho_ai_node:main',
         ],
     },
 )

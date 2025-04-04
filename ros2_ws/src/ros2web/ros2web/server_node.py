@@ -44,8 +44,8 @@ class ServerNode(DynamicSubscribableNode):
         self.ros_queue = Queue()
         self.broadcast_topics = {}
 
-        self.ros_sub = self.create_subscription(R2WMessage, "ros2web/ros", self.server_callback, 1)
-        self.web_pub = self.create_publisher(R2WMessage, "ros2web/web", 1)
+        self.ros_sub = self.create_subscription(R2WMessage, "ros2web/ros", self.server_callback, 10)
+        self.web_pub = self.create_publisher(R2WMessage, "ros2web/web", 10)
 
         self.r2w_bridge = R2WBridge()
         self.get_logger().info("Server Node initializated succesfully")

@@ -1,17 +1,19 @@
 import cv2
 import time
+
 import rclpy
 from rclpy.node import Node
+
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
+
 from ros2web_msgs.srv import R2WSubscribe
 
 class Video(Node):
 
-    def __init__(self):
+    def __init__(self, path):
         super().__init__("video")
 
-        path = "../sandbox/video.mp4"
         self.get_logger().info(f"Trying to open video on path {path}")
         self.video = cv2.VideoCapture(path)
         self.publisher = self.create_publisher(Image, "video/color/image_raw", 1)
@@ -80,6 +82,8 @@ class Video(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    video = Video()
+
+    video = Video("../sandbox/video.mp4")
+
     rclpy.spin(video)
     rclpy.shutdown()
