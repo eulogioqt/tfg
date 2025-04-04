@@ -33,7 +33,7 @@ class DynamicSubscribableNode(Node, ABC):
 
             def retry_callback():
                 self.subscribe_to_topic(topic_name, name)
-                retry_timer.cancel()
+                retry_timer.cancel() # ver como hacer mejor sin timer que se cancela algo que sea como setTimeout en javascript
 
             retry_timer = self.create_timer(1.0, retry_callback)
             return 0
