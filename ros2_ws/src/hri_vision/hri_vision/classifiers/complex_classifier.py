@@ -33,20 +33,21 @@ class ComplexClassifier:
             use_database (str): If True, uses and stores new data into database.
         '''
 
+        self.people = {}
+        self.size = {}
+
         self.use_database = use_database
         if self.use_database:
             self.db_path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "database/faceprints_db.json"))
             self.database = FaceprintsDatabase(self.db_path)
             self.load()
-    
-        self.people = {}
-        self.size = {}
 
     def save(self):
         '''Saves the learned data to a file.'''
-
+        
         if self.use_database:
             self.database.save_from_dictionary(self.people, self.size)
+            print("Data saved to database")
 
     def load(self):
         '''Loads the learned data from a file.'''
@@ -62,14 +63,13 @@ class ComplexClassifier:
         Returns:
             str: JSON Array with all people names.
         '''
-
         return json.dumps(list(self.people.keys()))
 
     def print_people(self):
         '''Prints the names of the existing people.'''
-        
+
         print("Personas que conozco:")
-        for key in self.people:
+        for key in self.people.keys():
             print(key)
 
     def classify_face(self, new_features):

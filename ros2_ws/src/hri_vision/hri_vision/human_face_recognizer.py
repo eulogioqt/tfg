@@ -22,20 +22,19 @@ class HumanFaceRecognizer(Node):
 
         super().__init__("human_face_recognizer")
 
-        self.recognition_count = 0
-
         show_metrics_param = self.declare_parameter("show_metrics", False)
         self.show_metrics = show_metrics_param.get_parameter_value().bool_value
         self.get_logger().info("Show Metrics: " + str(self.show_metrics))
 
         self.recognition_service = self.create_service(Recognition, "recognition", self.recognition)
         self.training_service = self.create_service(Training, "recognition/training", self.training)
-        #self.get_people_service = self.create_service(GetString, "recognition/get_all", self.get_people)
+        self.get_people_service = self.create_service(GetString, "recognition/get_people", self.get_people)
         # hacer esto bien, un get_all, un get by name (o id si se hace bien), put para rename class y delete para delete class
         self.faces_publisher = self.create_publisher(Image, "camera/color/aligned_faces", 10)
 
-        self.classifier = ComplexClassifier(use_database)
         self.get_logger().info(f"Using database: {use_database}")
+        self.classifier = ComplexClassifier(use_database)
+        self.save_db_timer = self.create_timer(10.0, self.save_data)
 
         self.training_dispatcher = {
             "refine_class": self.classifier.refine_class,
@@ -86,10 +85,6 @@ class HumanFaceRecognizer(Node):
 
         self.faces_publisher.publish(face_aligned_msg)
 
-        self.recognition_count = self.recognition_count + 1
-        if self.recognition_count % 30 == 0: # Cada 30 reconocimientos, guarda la información en la base de datos
-            self.classifier.save()
-
         recognition_time = time.time() - start_recognition
         response.recognition_time = recognition_time
         if self.show_metrics:
@@ -134,10 +129,12 @@ class HumanFaceRecognizer(Node):
         Returns:
             response (String): JSON array with the names of the people in classifier database
         """
-
         response.text = String(data=self.classifier.get_people())
 
         return response
+
+    def save_data(self):
+        self.classifier.save()
 
 def main(args=None):
     rclpy.init(args=args)

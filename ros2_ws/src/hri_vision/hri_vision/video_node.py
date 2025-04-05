@@ -22,8 +22,10 @@ class Video(Node):
         while not self.subscribe_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().warning("ROS2WEB Subscribe Service not available, waiting...")
         
-        success = self.subscribe_request("camera/color/image_raw", "IMAGE")
-        self.get_logger().info(f"Success: {bool(success)}")
+        #success = self.subscribe_request("camera/color/image_raw", "IMAGE") poner aqui como camera o algo para poder ver la camara y lo otro
+        # o incluso que el recognizer solo publique los bounding box scores y etiqueta y el frontend dibuje eso...
+        # el actual people ya veremos com ose coge si por websocket o como
+        #self.get_logger().info(f"Success: {bool(success)}")
 
         self.bridge = CvBridge()
 
