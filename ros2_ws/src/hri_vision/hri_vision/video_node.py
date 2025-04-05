@@ -16,13 +16,13 @@ class Video(Node):
 
         self.get_logger().info(f"Trying to open video on path {path}")
         self.video = cv2.VideoCapture(path)
-        self.publisher = self.create_publisher(Image, "video/color/image_raw", 1)
+        self.publisher = self.create_publisher(Image, "camera/color/image_raw", 1)
 
         self.subscribe_client = self.create_client(R2WSubscribe, "ros2web/subscribe")
         while not self.subscribe_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().warning("ROS2WEB Subscribe Service not available, waiting...")
         
-        success = self.subscribe_request("video/color/image_raw", "IMAGE")
+        success = self.subscribe_request("camera/color/image_raw", "IMAGE")
         self.get_logger().info(f"Success: {bool(success)}")
 
         self.bridge = CvBridge()

@@ -1,3 +1,7 @@
+import os
+import string
+import random
+
 import tkinter as tk
 import cv2
 import numpy as np
@@ -54,6 +58,9 @@ def submit(root):
     root.event_generate('<Return>')
 
 def ask_if_name(face, class_name, initial_value=None):
+    if not os.environ.get("DISPLAY"):
+        return True
+    
     root = tk.Tk()
     root.title("Confirmar")
 
@@ -119,6 +126,10 @@ def submit_name(root):
     root.destroy()
 
 def get_name(face, initial_value=None):
+    if not os.environ.get("DISPLAY"):
+        rnd_name = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+        return rnd_name
+
     root = tk.Tk()
     root.title("Nombre")
 

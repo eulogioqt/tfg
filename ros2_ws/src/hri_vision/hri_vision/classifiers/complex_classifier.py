@@ -36,7 +36,6 @@ class ComplexClassifier:
         self.use_database = use_database
         if self.use_database:
             self.db_path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "database/faceprints_db.json"))
-            print(self.db_path)
             self.database = FaceprintsDatabase(self.db_path)
             self.load()
     
@@ -47,13 +46,13 @@ class ComplexClassifier:
         '''Saves the learned data to a file.'''
 
         if self.use_database:
-            self.database.add_users_from_dictionary(self.people, self.size)
+            self.database.save_from_dictionary(self.people, self.size)
 
     def load(self):
         '''Loads the learned data from a file.'''
         
         if self.use_database:
-            self.people, self.size = self.database.get_all_users_as_dictionary()
+            self.people, self.size = self.database.load_as_dictionary()
         
         self.print_people()
 

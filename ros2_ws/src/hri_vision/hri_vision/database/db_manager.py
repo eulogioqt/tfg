@@ -43,7 +43,7 @@ class FaceprintsDatabase:
     def get_all_users(self):
         return self.db.all()
 
-    def add_users_from_dictionary(self, users_dict_characteristics, users_dict_size):#, users_dict_faces):
+    def save_from_dictionary(self, users_dict_characteristics, users_dict_size):#, users_dict_faces):
         for name, features in users_dict_characteristics.items():
             size = users_dict_size.get(name, {})
             #face = users_dict_faces.get(name, "")
@@ -53,7 +53,7 @@ class FaceprintsDatabase:
             else:
                 self.add_user(name, features, size)#, face)
 
-    def get_all_users_as_dictionary(self):
+    def load_as_dictionary(self):
         users_dict_characteristics = {}
         users_dict_size = {}
         #users_dict_faces = {}
