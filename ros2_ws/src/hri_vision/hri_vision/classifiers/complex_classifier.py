@@ -1,7 +1,8 @@
+import os
 import json
 
 from ..api.utils import normalized_cosine_similarity_distance
-from ..database.database_manager import EmbeddedDatabase
+from ..database.db_manager import FaceprintsDatabase
 
 # make_complex_classifier an Object that extends from a classifier interface or abstract object
 # Nota: el size es necesario porque lelva la cuenta de cuantos refinamientos tiene cada vector especifico
@@ -11,18 +12,32 @@ from ..database.database_manager import EmbeddedDatabase
 
 # para enviar cmd y args en json o algo asi
 
+# este objeto va a tener la base de datos, va a ser el dueño, y es lo mejor ya que asi
+# la api rest consulta este objeto que va a tener en sus diccionarios en todo momento los datos actualizados
+# y no pueden ocurrir inconsistencias, si la bd quiere eliminar a alguien, entonces
+# llegara aqui y el complex lo borra de su diccionario y ya al rato lo volcara en la bd
+# no que si la bd la tiene la api rest el nodo este se jode y al final todo es solo para este nodo
+# hacer servicios para todo, get all, get, put (para rename), delete (que ya lo hay)
+
+# refactorizar esto para hacerlo bien en condiciones:
+# tener un diccionario donde cada clave sea el name y el valor el objeto tal cual de la bd, y asi es easy de couyons
+# para hacer el load el save y todo
+# los modelos serian compartidos con la api rest
+
 class ComplexClassifier:
 
     def __init__(self, use_database = False):
         '''Inits classifier
 
         Args:
-            use_database (str): If not True, uses and stores new data into database.
+            use_database (str): If True, uses and stores new data into database.
         '''
 
         self.use_database = use_database
         if self.use_database:
-            self.database = EmbeddedDatabase("database.db")
+            self.db_path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "database/faceprints_db.json"))
+            print(self.db_path)
+            self.database = FaceprintsDatabase(self.db_path)
             self.load()
     
         self.people = {}

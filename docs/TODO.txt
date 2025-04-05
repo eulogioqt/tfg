@@ -1,3 +1,5 @@
+A FUTURO METER LOS PAQUETES _MSGS EN EL PROPIO PAQUETE SI SE PUEDE
+
 - Hacer un context para el Chat y que ahi se maneje todo sobre eso, el cargado del historial de los distintos chats
 conversaciones y demas y el temporal etc
 
@@ -40,3 +42,41 @@ ros2web/
 ├── package.xml
 └── launch/
     └── ros2web.launch.py
+
+
+# sqlite
+# nodo que administra sqlite
+# api rest para acceder a esa bd a traves del nodo ros
+# adaptador
+# state sync and events
+
+Al iniciar, el nodo BD carga la info de la SQLite y se la pasa al nodo reconocedor.
+El nodo reconocedor guarda una copia local en RAM para comparar, clasificar, etc.
+Cuando aprende algo nuevo:
+Actualiza la BD (por evento).
+Notifica al nodo web (que se encarga de avisar a la web).
+La web se entera vía WebSocket y vuelve a consultar a la API REST si necesita los nuevos datos.
+
+BD: SQLite → con FastAPI para exponer datos a la web (REST).
+Nodo BD: gestiona toda la persistencia.
+Nodo reconocedor: maneja RAM y manda eventos.
+Nodo "web": adapta ROS a WebSocket (centraliza protocolo).
+Web: consulta a API REST cuando le avisan por WebSocket.
+Todo asíncrono, en tiempo real, modular, limpio. Muy buen diseño.
+
+Aplicación 1: Nodo reconocedor y la base de datos
+State sync:
+Al iniciar, el nodo reconocedor le pide al nodo BD que le mande toda la info (personas aprendidas y sus vectores).
+Ya puede trabajar sin consultar la BD todo el rato.
+Event update:
+Si se aprende una persona nueva, el nodo reconocedor manda un evento al nodo BD para actualizarlo.
+Si quisieras hacerlo bidireccional (por si hay más fuentes), el nodo BD también podría emitir eventos de cambio.
+
+Aplicación 2: Web y visualización de datos
+State sync:
+Cuando se abre la web, hace una llamada inicial al API REST para cargar todo (personas, fotos, vectores…).
+Muestra ese estado completo.
+Event update:
+Cuando algo cambia en ROS (por ejemplo, una persona nueva), el nodo "web" lo publica por WebSocket con un mensaje tipo "BD_INFO" o "NEW_PERSON".
+La web no recibe todos los datos por el WebSocket, solo la notificación.
+Al recibirla, la web vuelve a llamar al API REST para traer los datos actualizados.

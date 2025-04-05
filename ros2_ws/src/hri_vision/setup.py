@@ -26,6 +26,7 @@ setup(
     entry_points={
         'console_scripts': [
             'camera = hri_vision.camera_node:main',
+            'video = hri_vision.video_node:main',
             'detector = hri_vision.human_face_detector:main',       
             'recognizer = hri_vision.human_face_recognizer:main',
             'logic = hri_vision.hri_logic:main',

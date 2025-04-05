@@ -13,7 +13,7 @@ from .classifiers.complex_classifier import ComplexClassifier
 
 class HumanFaceRecognizer(Node):
 
-    def __init__(self, use_database = False):
+    def __init__(self, use_database = True):
         """Initializes the recognizer node.
 
         Args:
@@ -30,7 +30,8 @@ class HumanFaceRecognizer(Node):
 
         self.recognition_service = self.create_service(Recognition, "recognition", self.recognition)
         self.training_service = self.create_service(Training, "recognition/training", self.training)
-        self.get_people_service = self.create_service(GetString, "recognition/get_people", self.get_people)
+        #self.get_people_service = self.create_service(GetString, "recognition/get_all", self.get_people)
+        # hacer esto bien, un get_all, un get by name (o id si se hace bien), put para rename class y delete para delete class
         self.faces_publisher = self.create_publisher(Image, "camera/color/aligned_faces", 10)
 
         self.classifier = ComplexClassifier(use_database)
@@ -39,9 +40,10 @@ class HumanFaceRecognizer(Node):
         self.training_dispatcher = {
             "refine_class": self.classifier.refine_class,
             "add_features": self.classifier.add_features,
-            "add_class": self.classifier.add_class,
-            "rename_class": self.classifier.rename_class,
-            "delete_class": self.classifier.delete_class
+            "add_class": self.classifier.add_class, # y este igual realmente, pensarlo bien porque en vd si es train "nueva clase"
+
+            "rename_class": self.classifier.rename_class, # cambiar estos
+            "delete_class": self.classifier.delete_class # porque no son training, simplemente por significado
         }
 
         self.br = HRIBridge()

@@ -1,6 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useWindowSize } from "../hooks/useWindowSize";
 
+// Hacer que funcione como lo de youtube que se va a a esquinas y todo eso
+// Si pongo el raton encima que se oscurezca un poco y salga el boton de cerrar y el de poner en grande
+// En el en grande que sea otro route y se pueda luego volver a donde estabas guardado donde estabas (o que se ponga el componetne en grande)
+// El cerrar si lo cierras en algun lado el boton para volver a ponerlo en la pantalla
+
 const DraggableItem = ({ children }) => {
     const { width, height } = useWindowSize();
 
@@ -21,7 +26,7 @@ const DraggableItem = ({ children }) => {
 
         childrenSizeRef.current = {
             width: e.target.width + 8,
-            height: e.target.height + 8
+            height: e.target.height + 8,
         };
     };
 
@@ -35,7 +40,7 @@ const DraggableItem = ({ children }) => {
 
             setPosition({
                 x: Math.min(Math.max(newX, 0), window.innerWidth - sizeX),
-                y: Math.min(Math.max(newY, 0), window.innerHeight - sizeY)
+                y: Math.min(Math.max(newY, 0), window.innerHeight - sizeY),
             });
         }
     };
@@ -45,14 +50,14 @@ const DraggableItem = ({ children }) => {
     };
 
     useEffect(() => {
-        setPosition(oldPosition => {
+        setPosition((oldPosition) => {
             const sizeX = childrenSizeRef.current.width;
             const sizeY = childrenSizeRef.current.height;
 
-            const newX = oldPosition.x > (width - sizeX) ? (width - sizeX) : oldPosition.x;
-            const newY = oldPosition.y > (height - sizeY) ? (height - sizeY) : oldPosition.y;
+            const newX = oldPosition.x > width - sizeX ? width - sizeX : oldPosition.x;
+            const newY = oldPosition.y > height - sizeY ? height - sizeY : oldPosition.y;
 
-            return { x: newX, y: newY }
+            return { x: newX, y: newY };
         });
     }, [width, height]);
 
@@ -73,7 +78,7 @@ const DraggableItem = ({ children }) => {
                 position: "absolute",
                 top: position.y,
                 left: position.x,
-                cursor: "move",
+                cursor: draggingRef.current ? "grabbing" : "move",
                 userSelect: "none",
             }}
         >
