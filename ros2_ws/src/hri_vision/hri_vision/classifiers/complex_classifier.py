@@ -47,7 +47,6 @@ class ComplexClassifier:
         
         if self.use_database:
             self.database.save_from_dictionary(self.people, self.size)
-            print("Data saved to database")
 
     def load(self):
         '''Loads the learned data from a file.'''
@@ -169,7 +168,10 @@ class ComplexClassifier:
             new_name (str): The new class name.
         '''
 
-        if old_name not in self.people or old_name not in self.size:
+        if old_name == new_name:
+            result = 1
+            message = "Has intentado renombrar con el mismo nombre, no se ha cambiado nada"
+        elif old_name not in self.people or old_name not in self.size:
             result = 0 
             message = "La clase " + old_name + " no existe."
         elif new_name in self.people or new_name in self.size:

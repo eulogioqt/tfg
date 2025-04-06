@@ -27,7 +27,7 @@ const App = () => {
                     <Routes>
                         <Route path="/" element={wrap(<HomePage />)} />
                         <Route path="/chat" element={<ChatPage />} />
-                        <Route path="/faceprints" element={<FaceprintsPage />} />
+                        <Route path="/faceprints" element={wrap(<FaceprintsPage />)} />
                         <Route path="*" element={<Navigate to="/" />} />
                     </Routes>
                 </WebSocketProvider>

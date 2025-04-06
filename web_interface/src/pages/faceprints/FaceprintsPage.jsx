@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useAPI } from "../../contexts/APIContext";
 
+// hacer esta pagina mas chula
+// poner los spinner de cargando cuando este cargando
+// paginacion...
+
+// poner los ROS INFO con las subscripciones y esas cosas en ros2web
+// poner que con los websockets haya un mensaje del protoclo HRI de UPDATE o algo asi
+// para cuando se meta una clase nueva o lo q sea para q la api vuelva a hacer fetch. Poenr tmb un boton de recargar
+// manual. Ver que pasa cuando sales de la pagina y entras como guardar la data en un context o algo
+// cuando llegue ese mensaje de update al websocketcontext, que se guarde en una lista y este vaya consumiendo los datos
+// preguntar ideas a chatgpt pa hacer esto ultimo super mega pro
+
 const FaceprintsPage = () => {
     const { faceprints } = useAPI();
     const [data, setData] = useState([]);
@@ -10,7 +21,13 @@ const FaceprintsPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             const response = await faceprints.getAll();
-            if (response.status >= 200 && response.status < 300) setData(response.data);
+            if (response.status >= 200 && response.status < 300) {
+                const data = response.data.sort(
+                    (a, b) => b.size.reduce((c, d) => c + d) - a.size.reduce((c, d) => c + d)
+                ); // cambiar a fecha de creacion cuando fixee eso
+                setData(data);
+                console.log(data);
+            }
         };
         fetchData();
     }, []);
@@ -28,14 +45,18 @@ const FaceprintsPage = () => {
 
     const handleUpdate = async (oldName) => {
         if (newName.trim() === "") return;
-        const updated = await faceprints.update(oldName, { name: newName });
-        setData(data.map((item) => (item.name === oldName ? updated.data : item)));
+
+        if (newName.trim() != oldName.trim()) {
+            const updated = await faceprints.update(oldName, { name: newName });
+            setData(data.map((item) => (item.name === oldName ? updated.data : item)));
+        }
+
         setEditingName(null);
     };
-    console.log("data", data);
+
     return (
-        <div className="container mt-5">
-            <h2 className="mb-4">Base de Datos de Rostros Reconocidos</h2>
+        <div className="container mt-5 dvh-100">
+            <h2 className="mb-4 pt-4">Base de Datos de Rostros Reconocidos</h2>
             <div className="table-responsive">
                 <table className="table table-striped table-hover align-middle">
                     <thead className="table-dark">
@@ -54,7 +75,7 @@ const FaceprintsPage = () => {
                                 <tr key={person.name}>
                                     <td>
                                         <img
-                                            src="https://via.placeholder.com/64"
+                                            src="https://t3.ftcdn.net/jpg/05/16/27/58/360_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg"
                                             alt="face"
                                             className="rounded"
                                             width={64}
@@ -74,7 +95,7 @@ const FaceprintsPage = () => {
                                         )}
                                     </td>
                                     <td>{person.features.length} vectores</td>
-                                    <td>{person.size.reduce((a, b) => a + b, 0)}</td>
+                                    <td>{person.size.join(", ")}</td>
                                     <td>{new Date(person.learning_date * 1000).toLocaleString()}</td>
                                     <td>
                                         {editingName === person.name ? (
@@ -89,14 +110,14 @@ const FaceprintsPage = () => {
                                                 className="btn btn-outline-primary btn-sm me-2"
                                                 onClick={() => startEditing(person.name)}
                                             >
-                                                <i class="bi bi-pencil"></i>
+                                                <i className="bi bi-pencil"></i>
                                             </button>
                                         )}
                                         <button
                                             className="btn btn-outline-danger btn-sm"
                                             onClick={() => handleDelete(person.name)}
                                         >
-                                            <i class="bi bi-trash"></i>
+                                            <i className="bi bi-trash"></i>
                                         </button>
                                     </td>
                                 </tr>

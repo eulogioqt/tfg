@@ -1,8 +1,11 @@
-import json
 from datetime import datetime
 from tinydb import TinyDB, Query
 
+# creo q lo mejor va a ser usar directamente esto en tiempo real no tener una copia y luego volcarla,
+# porque al final es un json nama ya de por si es rapido
+# estudarlo pero vaya si es esta opcion pues super mega isiii
 
+# en el recognizer quitar lo de los mensajes y poner codigos qu es como realmente se hace zabe
 class FaceprintsDatabase:
     def __init__(self, db_path='faceprints_db.json'):
         self.db = TinyDB(db_path)
@@ -13,8 +16,8 @@ class FaceprintsDatabase:
             return False  # Ya existe
         self.db.insert({
             'name': name,
-            'features': json.dumps(features),
-            'size': json.dumps(size),
+            'features': features,
+            'size': size,
             'learning_date': self._timestamp(),
             #'face': face
         })
@@ -23,9 +26,9 @@ class FaceprintsDatabase:
     def update_user(self, name, new_features=None, new_size=None):#, new_face):
         update_data = {}
         if new_features:
-            update_data['features'] = json.dumps(new_features)
+            update_data['features'] = new_features
         if new_size:
-            update_data['size'] = json.dumps(new_size)
+            update_data['size'] = new_size
         #if new_face:
         #    update_data['face'] = new_face
         if update_data:
@@ -64,8 +67,8 @@ class FaceprintsDatabase:
         #users_dict_faces = {}
         for user in self.get_all_users():
             name = user.get('name')
-            features = json.loads(user.get('features', '{}'))
-            size = json.loads(user.get('size', '{}'))
+            features = user.get('features', '{}')
+            size = user.get('size', '{}')
             #face = user.get('face', '')
             users_dict_characteristics[name] = features
             users_dict_size[name] = size
