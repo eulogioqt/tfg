@@ -28,7 +28,7 @@ class HumanFaceRecognizer(Node):
 
         self.recognition_service = self.create_service(Recognition, "recognition", self.recognition)
         self.training_service = self.create_service(Training, "recognition/training", self.training)
-        self.get_people_service = self.create_service(GetString, "recognition/get_people", self.get_people)
+        self.get_faceprint_service = self.create_service(GetString, "recognition/get_faceprint", self.get_people)
         # hacer esto bien, un get_all, un get by name (o id si se hace bien), put para rename class y delete para delete class
         self.faces_publisher = self.create_publisher(Image, "camera/color/aligned_faces", 10)
 
@@ -121,15 +121,22 @@ class HumanFaceRecognizer(Node):
         return response
 
     def get_people(self, request, response):
-        """Get people service
+        args = request.args
+        print(args)
+        if args:
+            args = json.loads(args)
+            name = args["name"]
 
-        Args:
-            request (GetString.srv): Empty request (uses service name to know what to do)
+            # refactorizar el classifier para que este todo formateado en el formato ese de diccionario para buscar...
+            # o directamente acceder a la bd todo del tiron no se ya vere pero de momento
+            # con los metodos estos que luego habra que cambiar porque lo coge del tiron de la bd y no de la copia
+            # y ni compruebo si se esta usando bd ni na sabe to gipsy
 
-        Returns:
-            response (String): JSON array with the names of the people in classifier database
-        """
-        response.text = String(data=self.classifier.get_people())
+            faceprint = self.classifier.database.get_user_by_name(name)
+            response.text = json.dumps(faceprint)
+        else:
+            faceprints = self.classifier.database.get_all_users()
+            response.text = json.dumps(faceprints)
 
         return response
 

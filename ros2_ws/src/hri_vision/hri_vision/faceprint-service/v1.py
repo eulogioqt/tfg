@@ -5,12 +5,12 @@ import rclpy
 from fastapi import APIRouter, HTTPException, Query, Request, Path, Depends
 from fastapi.responses import JSONResponse
 from fastapi import FastAPI
-from ros_client_node import RosClientNode
+from api_client_node import APIClientNode
 
 app = FastAPI()
 
 rclpy.init()
-ros_node = RosClientNode()
+api_node = APIClientNode()
 
 # hacer bien los endpoints:
 # poner esto con el app y demas
@@ -27,7 +27,7 @@ ros_node = RosClientNode()
 @app.get("/faceprints")
 def get_faceprints():
     try:
-        datos = ros_node.pedir_faceprints()
+        datos = api_node.pedir_faceprints()
         return JSONResponse(
             status_code=200,
             content=datos,

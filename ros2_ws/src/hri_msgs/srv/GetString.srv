@@ -1,2 +1,3 @@
+string args # json format
 ---
-std_msgs/String text
+string text

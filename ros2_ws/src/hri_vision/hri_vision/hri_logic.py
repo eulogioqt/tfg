@@ -315,7 +315,7 @@ class HRILogic():
     def get_actual_people(self, request, response):
         actual_people_time = self.get_actual_people_time()
         actual_people_json = json.dumps(actual_people_time)
-        response.text = String(data=actual_people_json)
+        response.text = actual_people_json
         return response
 
 def main(args=None):
