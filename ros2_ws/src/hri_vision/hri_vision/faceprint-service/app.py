@@ -1,9 +1,10 @@
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
-from v1 import router as v1_router
+from .v1 import router as v1_router
 
 load_dotenv()
 
@@ -25,4 +26,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(v1_router, prefix="/api/v1")
+app.include_router(v1_router, prefix="/api/v1/faceprints")
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="localhost", port=8000)

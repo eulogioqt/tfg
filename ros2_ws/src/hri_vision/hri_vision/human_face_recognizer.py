@@ -122,7 +122,7 @@ class HumanFaceRecognizer(Node):
 
     def get_people(self, request, response):
         args = request.args
-        print(args)
+
         if args:
             args = json.loads(args)
             name = args["name"]
