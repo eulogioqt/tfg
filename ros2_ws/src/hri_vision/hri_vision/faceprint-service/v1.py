@@ -90,7 +90,6 @@ async def get_faceprint_by_name(
 
         #marker = DatabaseConnection.read_document("marker", id, projection)
         faceprint = api_node.get_faceprint_request(json.dumps({ "name": name }))
-        print(faceprint)
         if faceprint is None:
             return JSONResponse(status_code=404, content={"detail": f"Faceprint con nombre {name} no encontrado"})
         

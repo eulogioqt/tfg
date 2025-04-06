@@ -5,7 +5,9 @@ import Home from "./pages/home/Home";
 import Chat from "./pages/chat/Chat";
 
 import WebSocketVideoViewer from "./components/WebSocketVideoViewer";
+
 import { WebSocketProvider } from "./contexts/WebSocketContext";
+import { APIProvider } from "./contexts/APIContext";
 
 const App = () => {
     const wrap = (page) => (
@@ -17,15 +19,17 @@ const App = () => {
 
     return (
         <Router>
-            <WebSocketProvider>
-                <WebSocketVideoViewer />
+            <APIProvider>
+                <WebSocketProvider>
+                    <WebSocketVideoViewer />
 
-                <Routes>
-                    <Route path="/" element={wrap(<Home />)} />
-                    <Route path="/chat" element={<Chat />} />
-                    <Route path="*" element={<Navigate to="/" />} />
-                </Routes>
-            </WebSocketProvider>
+                    <Routes>
+                        <Route path="/" element={wrap(<Home />)} />
+                        <Route path="/chat" element={<Chat />} />
+                        <Route path="*" element={<Navigate to="/" />} />
+                    </Routes>
+                </WebSocketProvider>
+            </APIProvider>
         </Router>
     );
 };
