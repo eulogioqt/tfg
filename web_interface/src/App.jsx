@@ -1,8 +1,9 @@
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 
 import Header from "./components/Header";
-import Home from "./pages/home/Home";
-import Chat from "./pages/chat/Chat";
+import HomePage from "./pages/home/HomePage";
+import ChatPage from "./pages/chat/ChatPage";
+import FaceprintsPage from "./pages/faceprints/FaceprintsPage";
 
 import WebSocketVideoViewer from "./components/WebSocketVideoViewer";
 
@@ -24,8 +25,9 @@ const App = () => {
                     <WebSocketVideoViewer />
 
                     <Routes>
-                        <Route path="/" element={wrap(<Home />)} />
-                        <Route path="/chat" element={<Chat />} />
+                        <Route path="/" element={wrap(<HomePage />)} />
+                        <Route path="/chat" element={<ChatPage />} />
+                        <Route path="/faceprints" element={<FaceprintsPage />} />
                         <Route path="*" element={<Navigate to="/" />} />
                     </Routes>
                 </WebSocketProvider>

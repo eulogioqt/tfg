@@ -52,7 +52,12 @@ class FaceprintsDatabase:
                 self.update_user(name, features, size)#, face)
             else:
                 self.add_user(name, features, size)#, face)
-
+        
+        db_users = [user["name"] for user in self.get_all_users()]
+        for user in db_users: # delete deleted ones
+            if user not in users_dict_characteristics.keys():
+                self.remove_user(user)
+            
     def load_as_dictionary(self):
         users_dict_characteristics = {}
         users_dict_size = {}

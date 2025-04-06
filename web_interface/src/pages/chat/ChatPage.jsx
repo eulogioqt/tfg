@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from "uuid";
 // Poner que cuando el chat no tiene mensajes el text area y demas este en medio
 // Hacer un chatcontext o un collapsedcontext si se extiende todo demasiado y hay muchas cosas que ir pasando
 // al menos collapsedcontext por el momento
-const Chat = () => {
+const ChatPage = () => {
     const { promptResponse, sendMessage, isConnected } = useWebSocket();
     const { width } = useWindowSize();
 
@@ -78,4 +78,4 @@ const Chat = () => {
     );
 };
 
-export default Chat;
+export default ChatPage;

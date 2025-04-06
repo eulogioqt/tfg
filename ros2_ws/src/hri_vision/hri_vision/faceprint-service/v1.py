@@ -129,11 +129,12 @@ async def update_item(
         new_name = update_data["name"]
         if new_name is None:
             raise HTTPException(status_code=400, detail=f"No has incluido un campo name.")
-        
+        print(new_name)
         result, message = api_node.training_request(String(data="rename_class"), String(data=json.dumps({
             "old_name": name,
             "new_name": new_name,
         })))
+        print(result, message)
         if result <= 0:
             raise HTTPException(status_code=400, detail=message)
         

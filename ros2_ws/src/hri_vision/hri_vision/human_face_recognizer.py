@@ -117,6 +117,8 @@ class HumanFaceRecognizer(Node):
 
         response.result = result
         response.message = String(data=message)
+        
+        self.save_data()
 
         return response
 
