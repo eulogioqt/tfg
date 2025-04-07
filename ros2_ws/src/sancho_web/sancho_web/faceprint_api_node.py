@@ -1,7 +1,12 @@
 import json
 import rclpy
+import uvicorn
+
 from rclpy.node import Node
 from hri_msgs.srv import GetString, Training
+
+from .faceprint_service.app import app
+from .faceprint_service.v1 import set_api_node
 
 class APIClientNode(Node):
     def __init__(self):
@@ -37,3 +42,11 @@ class APIClientNode(Node):
         result_training = future_training.result()
 
         return result_training.result, result_training.message.data
+
+def main(args=None):
+    rclpy.init(args=args)
+
+    api_node = APIClientNode()
+    set_api_node(api_node)
+    
+    uvicorn.run(app, host="localhost", port=7654)

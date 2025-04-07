@@ -17,17 +17,18 @@ from typing import Optional, Dict, List
 from fastapi import APIRouter, HTTPException, Query, Request, Path, Depends
 from fastapi.responses import JSONResponse
 
-from ..database.faceprint_model import Faceprint, FaceprintDeleteResponse, FaceprintUpdate
+from .faceprint_model import Faceprint, FaceprintDeleteResponse, FaceprintUpdate
 from .api_utils import APIUtils
-from .api_client_node import APIClientNode
 
 from dotenv import load_dotenv
 from std_msgs.msg import String
 
 load_dotenv()
 
-rclpy.init()
-api_node = APIClientNode()
+api_node = None
+def set_api_node(node):
+    global api_node
+    api_node = node
 
 router = APIRouter()
 

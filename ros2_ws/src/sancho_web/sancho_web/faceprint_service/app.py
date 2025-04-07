@@ -27,6 +27,3 @@ app.add_middleware(
 )
 
 app.include_router(v1_router, prefix="/api/v1/faceprints")
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=7654)
