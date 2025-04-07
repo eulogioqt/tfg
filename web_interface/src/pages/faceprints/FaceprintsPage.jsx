@@ -60,6 +60,7 @@ const FaceprintsPage = () => {
                     <thead className="table-dark">
                         <tr>
                             <th>Imagen</th>
+                            <th>Score</th>
                             <th>Nombre</th>
                             <th>Features</th>
                             <th>Veces Promediado</th>
@@ -85,6 +86,7 @@ const FaceprintsPage = () => {
                                             height={64}
                                         />
                                     </td>
+                                    <td>{person.face_score.toFixed(2)}</td>
                                     <td>
                                         {editingName === person.name ? (
                                             <input

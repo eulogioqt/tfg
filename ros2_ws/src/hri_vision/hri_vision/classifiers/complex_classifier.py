@@ -185,22 +185,28 @@ class ComplexClassifier:
         self.save()
         return result, message
     
-    def save_face(self, class_name, face):
+    def save_face(self, class_name, face, face_score):
         '''Saves face image as a representation of the class
 
         Args:
             class_name (str): The class.
             face (cv2-Image): Cropped face image.
+            face_score (float): Score of the detection.
         '''
 
-        target_size = (128, 128)
-        resized = cv2.resize(face, target_size, interpolation=cv2.INTER_AREA)
+        faceprint = self.db.get_by_name(class_name)
+        if faceprint and face_score > faceprint.get("face_score", 0):
+            target_size = (128, 128)
+            resized = face#cv2.resize(face, target_size, interpolation=cv2.INTER_AREA)
 
-        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 50]
-        _, jpeg = cv2.imencode('.jpg', resized, encode_param)
+            encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 50]
+            _, jpeg = cv2.imencode('.jpg', resized, encode_param)
 
-        face_base64 = base64.b64encode(jpeg.tobytes()).decode('utf-8')
-        self.db.update(class_name, { "face": face_base64 })
+            face_base64 = base64.b64encode(jpeg.tobytes()).decode('utf-8')
+            self.db.update(class_name, { 
+                "face": face_base64, 
+                "face_score": face_score 
+            })
 
     def save(self):
         '''Saves the learned data to a file.'''

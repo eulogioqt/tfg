@@ -72,10 +72,9 @@ class HumanFaceRecognizer(Node):
         
         features = encode_face(face_aligned)
         classified, distance, pos = self.classifier.classify_face(features)
-        if score >= 1.5 and distance >= 0.9: # Si la cara es buena y estamos seguro de que es esa persona
-            self.classifier.save_face(classified, face_aligned) # Ver si hacer que solo guarde la mejor de la historia
-            # lo bueno de asi es que siempre tiene una cara reciente
-            self.get_logger().info(f"ORIGINAL SHAPE {face_aligned.shape}")
+        if score >= 1 and distance >= 0.9: # Si la cara es buena y estamos seguro de que es esa persona
+            self.classifier.save_face(classified, face_aligned, score) # lo bueno de asi es que siempre tiene una cara reciente
+
         face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg = (
             self.br.recognizer_to_msg(face_aligned, features, classified, distance, pos)
         )
