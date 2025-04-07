@@ -22,6 +22,10 @@ class APIClientNode(Node):
 
         self.get_logger().info("ROS Client Node initializated succesfully")
 
+    def spin(self):
+        set_api_node(self)
+        uvicorn.run(app, host="localhost", port=7654)
+
     def get_faceprint_request(self, args_msg=""):
         get_all_request = GetString.Request()
         get_all_request.args = args_msg
@@ -47,6 +51,7 @@ def main(args=None):
     rclpy.init(args=args)
 
     api_node = APIClientNode()
-    set_api_node(api_node)
-    
-    uvicorn.run(app, host="localhost", port=7654)
+
+    api_node.spin()
+    rclpy.shutdown()
+

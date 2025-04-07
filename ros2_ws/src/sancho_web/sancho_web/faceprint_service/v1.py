@@ -1,19 +1,6 @@
-# hacer bien los endpoints:
-# poner esto con el app y demas
-# y el nodo ros bien
-
-# get all, te da todos los users en el formato del pydantic (service nuevo)
-# get by name, te da solo uno (service nuevo)
-# put para cambiar nombre (service recognition/training)
-# delete para borrar clase (service recognition/training)
-# con chatgpt se hace en un plis plas
-
-# hacer todo con las buenas practicas de ing web
 import json
-import time
-import rclpy
 
-from typing import Optional, Dict, List
+from typing import Optional, List
 from fastapi import APIRouter, HTTPException, Query, Request, Path, Depends
 from fastapi.responses import JSONResponse
 
@@ -25,15 +12,15 @@ from std_msgs.msg import String
 
 load_dotenv()
 
-api_node = None
-def set_api_node(node):
-    global api_node
-    api_node = node
-
 router = APIRouter()
 
 endpoint_name = "faceprints"
 version = "v1"
+
+api_node = None
+def set_api_node(node):
+    global api_node
+    api_node = node
 
 @router.get("", tags=["Faceprints CRUD endpoints"], response_model=List[Faceprint])
 async def get_faceprints(

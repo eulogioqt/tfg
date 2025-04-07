@@ -33,43 +33,13 @@ class ComplexClassifier:
             use_database (str): If True, uses and stores new data into database.
         '''
 
-        self.people = {}
-        self.size = {}
-
         self.use_database = use_database
+        self.db_path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "database/faceprints_db.json"))
+        self.database = FaceprintsDatabase(self.db_path)
+
         if self.use_database:
-            self.db_path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "database/faceprints_db.json"))
-            self.database = FaceprintsDatabase(self.db_path)
             self.load()
-
-    def save(self):
-        '''Saves the learned data to a file.'''
-        
-        if self.use_database:
-            self.database.save_from_dictionary(self.people, self.size)
-
-    def load(self):
-        '''Loads the learned data from a file.'''
-        
-        if self.use_database:
-            self.people, self.size = self.database.load_as_dictionary()
-        
-        self.print_people()
-
-    def get_people(self):
-        '''Get all people names.
-        
-        Returns:
-            str: JSON Array with all people names.
-        '''
-        return json.dumps(list(self.people.keys()))
-
-    def print_people(self):
-        '''Prints the names of the existing people.'''
-
-        print("Personas que conozco:")
-        for key in self.people.keys():
-            print(key)
+            self.print_people()
 
     def classify_face(self, new_features):
         '''Given a feature vector, gives the closest class.
@@ -87,10 +57,6 @@ class ComplexClassifier:
         closest_class = None
         closest_distance = 0
         position = 0
-
-        if not self.people:
-            return closest_class, closest_distance, position
-
         for class_name, feature_list in self.people.items():
             for i in range(0, len(feature_list)):
                 distance = normalized_cosine_similarity_distance(new_features, feature_list[i])
@@ -205,3 +171,30 @@ class ComplexClassifier:
             message = "La clase " + class_name + " no existe"
 
         return result, message
+    
+    def save(self):
+        '''Saves the learned data to a file.'''
+        
+        if self.use_database:
+            self.database.save_from_dictionary(self.people, self.size)
+
+    def load(self):
+        '''Loads the learned data from a file.'''
+        
+        if self.use_database:
+            self.people, self.size = self.database.load_as_dictionary()
+
+    def get_people(self):
+        '''Get all people names.
+        
+        Returns:
+            str: JSON Array with all people names.
+        '''
+        return json.dumps(list(self.people.keys()))
+
+    def print_people(self):
+        '''Prints the names of the existing people.'''
+
+        print("Personas que conozco:")
+        for key in self.people.keys():
+            print(key)
