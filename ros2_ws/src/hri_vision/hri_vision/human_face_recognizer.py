@@ -29,7 +29,6 @@ class HumanFaceRecognizer(Node):
         self.recognition_service = self.create_service(Recognition, "recognition", self.recognition)
         self.training_service = self.create_service(Training, "recognition/training", self.training)
         self.get_faceprint_service = self.create_service(GetString, "recognition/get_faceprint", self.get_people)
-        # hacer esto bien, un get_all, un get by name (o id si se hace bien), put para rename class y delete para delete class
         self.faces_publisher = self.create_publisher(Image, "camera/color/aligned_faces", 10)
 
         self.get_logger().info(f"Using database: {use_database}")
@@ -117,8 +116,6 @@ class HumanFaceRecognizer(Node):
 
         response.result = result
         response.message = String(data=message)
-        
-        self.save_data()
 
         return response
 

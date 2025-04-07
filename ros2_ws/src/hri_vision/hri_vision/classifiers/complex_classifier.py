@@ -35,7 +35,7 @@ class ComplexClassifier:
 
         self.use_database = use_database
         self.db_path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "database/faceprints_db.json"))
-        self.database = FaceprintsDatabase(self.db_path)
+        self.db = FaceprintsDatabase(self.db_path)
 
         if self.use_database:
             self.load()
@@ -57,7 +57,8 @@ class ComplexClassifier:
         closest_class = None
         closest_distance = 0
         position = 0
-        for class_name, feature_list in self.people.items():
+        for class_name, faceprint in self.db.get_all():
+            feature_list = faceprint["features"]
             for i in range(0, len(feature_list)):
                 distance = normalized_cosine_similarity_distance(new_features, feature_list[i])
 
@@ -77,11 +78,15 @@ class ComplexClassifier:
             position (int): The position of the known feature vector we want to make more precise.
         '''
 
-        new_size = self.size[class_name][position] + 1
-        self.size[class_name][position] = new_size
+        faceprint = self.db.get_by_name(class_name)
+        
+        new_size = faceprint["size"][position] + 1
+        faceprint["size"][position] = new_size
 
-        self.people[class_name][position] = [(x * (new_size - 1)+ y) / new_size for x, y in 
-                                             zip(self.people[class_name][position], features)]
+        faceprint["features"][position] = [(x * (new_size - 1) + y) / new_size for x, y in 
+                                             zip(faceprint["features"][position], features)]
+        
+        self.db.update(class_name, faceprint)
 
         result = 1
         message = "La clase " + class_name + " ha sido refinada"
@@ -95,14 +100,19 @@ class ComplexClassifier:
             class_name (str): The class.
             features (Array: float): The new feature vector.
         '''
+        
+        faceprint = self.db.get_by_name(class_name)
 
-        self.people[class_name].append(features)
-        self.size[class_name].append(1)
+        faceprint["features"].append(features)
+        faceprint["size"].append(1)
 
+        self.db.update(class_name, faceprint)
+        
         result = 1
         message = ("La clase " + class_name + " ahora tiene " + 
-            str(len(self.people[class_name])) + " vectores de características independientes.")
+            str(len(faceprint["features"])) + " vectores de características independientes.")
 
+        self.save()
         return result, message
 
     def add_class(self, class_name, features):
@@ -113,17 +123,16 @@ class ComplexClassifier:
             features (Array: float): The feature vector.
         '''
 
-        already_known = class_name in self.people
+        already_known = self.db.add(class_name, features) is None
 
         if already_known:
             _, message = self.add_features(class_name, features)
         else:
-            self.people[class_name] = [features]
-            self.size[class_name] = [1]
             message = "Nueva clase aprendida: " + class_name
 
         result = int(already_known)
 
+        self.save()
         return result, message
 
     def rename_class(self, old_name, new_name):
@@ -134,22 +143,23 @@ class ComplexClassifier:
             new_name (str): The new class name.
         '''
 
+        all_names = self.db.get_all_names()
         if old_name == new_name:
             result = 1
             message = "Has intentado renombrar con el mismo nombre, no se ha cambiado nada"
-        elif old_name not in self.people or old_name not in self.size:
+        elif old_name not in all_names:
             result = 0 
             message = "La clase " + old_name + " no existe."
-        elif new_name in self.people or new_name in self.size:
+        elif new_name in all_names:
             result = 0 
             message = "La clase " + new_name + " ya existe."
         else:
-            self.people[new_name] = self.people.pop(old_name)
-            self.size[new_name] = self.size.pop(old_name)
+            self.db.update(old_name, { "name": new_name })
         
             result = 1
             message = "La clase " + old_name + " ha sido renombrada a " + new_name
 
+        self.save()
         return result, message
 
     def delete_class(self, class_name):
@@ -159,30 +169,29 @@ class ComplexClassifier:
             class_name (str): The class.
         '''
         
-        if class_name in self.people:
-            self.people.pop(class_name)
-            self.size.pop(class_name)
+        if class_name in self.db.get_all_names():
+            self.db.remove(class_name)
 
             result = 1
             message = "La clase " + class_name + " ha sido eliminada correctamente"
-        
         else:
             result = -1
             message = "La clase " + class_name + " no existe"
 
+        self.save()
         return result, message
     
     def save(self):
         '''Saves the learned data to a file.'''
         
         if self.use_database:
-            self.database.save_from_dictionary(self.people, self.size)
+            self.db.save()
 
     def load(self):
         '''Loads the learned data from a file.'''
         
         if self.use_database:
-            self.people, self.size = self.database.load_as_dictionary()
+            self.db.load()
 
     def get_people(self):
         '''Get all people names.
@@ -190,11 +199,12 @@ class ComplexClassifier:
         Returns:
             str: JSON Array with all people names.
         '''
-        return json.dumps(list(self.people.keys()))
 
+        return json.dumps(self.db.get_all_names())
+    
     def print_people(self):
-        '''Prints the names of the existing people.'''
+        '''Prints all known people'''
 
-        print("Personas que conozco:")
-        for key in self.people.keys():
-            print(key)
+        print("Known people:")
+        for name in self.db.get_all_names():
+            print(f"- {name}")

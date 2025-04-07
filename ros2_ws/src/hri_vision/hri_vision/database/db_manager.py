@@ -4,12 +4,16 @@ import json
 from datetime import datetime
 from threading import RLock
 
-
+# a esta clase se le pueden hacer test unitarios jeje
 class FaceprintsDatabase:
     def __init__(self, db_path='faceprints_db.json'):
         self.db_path = db_path
         self.faceprints = {}
         self._lock = RLock()
+
+    def get_all_names(self):
+        with self._lock:
+            return list(self.faceprints.keys())
 
     def get_all(self):
         with self._lock:
@@ -37,22 +41,25 @@ class FaceprintsDatabase:
 
     def update(self, name, new_data):
         with self._lock:
-            existing = self.get_by_name(name)
-            if existing is None:
-                return None
+            original_entry = self.get_by_name(name)
+            if original_entry is None:
+                return None # No existe
 
-            for key, value in new_data.items():
-                if key in existing:
-                    existing[key] = value
+            new_name = new_data.get("name")
+            if new_name and new_name != name and new_name in self.faceprints:
+                return None # Estas intentando cambiar de nombre a otro que ya existe
 
-            new_name = existing["name"]
-            if new_name != name:
-                self.faceprints[new_name] = existing
+            for key, value in new_data.items(): # Actualizamos los campos
+                if key in original_entry:
+                    original_entry[key] = value
+            
+            if new_name and new_name != name: # Si son distintos, cambia nombre
+                self.faceprints[new_name] = original_entry
                 self.remove(name)
             else:
-                self.faceprints[name] = existing
+                self.faceprints[name] = original_entry
 
-            return existing
+            return original_entry
 
     def remove(self, name):
         with self._lock:
