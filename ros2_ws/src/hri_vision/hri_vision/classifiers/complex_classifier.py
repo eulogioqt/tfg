@@ -1,5 +1,7 @@
 import os
+import cv2
 import json
+import base64
 
 from ..api.utils import normalized_cosine_similarity_distance
 from ..database.db_manager import FaceprintsDatabase
@@ -60,7 +62,7 @@ class ComplexClassifier:
         for faceprint in self.db.get_all():
             class_name = faceprint["name"]
             feature_list = faceprint["features"]
-            
+
             for i in range(0, len(feature_list)):
                 distance = normalized_cosine_similarity_distance(new_features, feature_list[i])
 
@@ -183,6 +185,23 @@ class ComplexClassifier:
         self.save()
         return result, message
     
+    def save_face(self, class_name, face):
+        '''Saves face image as a representation of the class
+
+        Args:
+            class_name (str): The class.
+            face (cv2-Image): Cropped face image.
+        '''
+
+        target_size = (128, 128)
+        resized = cv2.resize(face, target_size, interpolation=cv2.INTER_AREA)
+
+        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 50]
+        _, jpeg = cv2.imencode('.jpg', resized, encode_param)
+
+        face_base64 = base64.b64encode(jpeg.tobytes()).decode('utf-8')
+        self.db.update(class_name, { "face": face_base64 })
+
     def save(self):
         '''Saves the learned data to a file.'''
         

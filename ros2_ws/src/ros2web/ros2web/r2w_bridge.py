@@ -14,7 +14,8 @@ class R2WBridge():
     
     def img_to_r2w(self, img):
         img_cv2 = self.cv_bridge.imgmsg_to_cv2(img)
-        ret, jpeg = cv2.imencode('.jpg', img_cv2)
+        #encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 50] # pasar los bounding box como texto
+        ret, jpeg = cv2.imencode('.jpg', img_cv2)#, encode_param)
 
         if ret:
             return base64.b64encode(jpeg.tobytes()).decode('utf-8')

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useWindowSize } from "../hooks/useWindowSize";
+import { useWindowSize, BREAKPOINTS } from "../hooks/useWindowSize";
 
 // Hacer que funcione como lo de youtube que se va a a esquinas y todo eso
 // Si pongo el raton encima que se oscurezca un poco y salga el boton de cerrar y el de poner en grande
@@ -75,7 +75,9 @@ const DraggableItem = ({ children }) => {
         <div
             onMouseDown={handleMouseDown}
             style={{
-                position: "absolute",
+                zIndex: 40 * (width < BREAKPOINTS.MD ? 1 : 10),
+                objectFit: "contain",
+                position: "fixed",
                 top: position.y,
                 left: position.x,
                 cursor: draggingRef.current ? "grabbing" : "move",

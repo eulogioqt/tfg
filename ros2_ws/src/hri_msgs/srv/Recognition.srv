@@ -1,5 +1,6 @@
 sensor_msgs/Image frame
 hri_msgs/FacePosition position
+float32 score
 ---
 sensor_msgs/Image face_aligned
 float32[] features

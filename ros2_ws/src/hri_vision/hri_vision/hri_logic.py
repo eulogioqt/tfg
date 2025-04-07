@@ -131,7 +131,7 @@ class HRILogic():
         positions, scores = self.node.br.msg_to_detector(positions_msg, scores_msg)
         for i in range(len(positions)):
             face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg = \
-                self.recognition_request(frame_msg, positions_msg[i])                   # Recognition
+                self.recognition_request(frame_msg, positions_msg[i], scores_msg[i])        # Recognition
             face_aligned, features, classified, distance, pos = \
                 self.node.br.msg_to_recognizer(face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg)
      
@@ -260,12 +260,13 @@ class HRILogic():
 
         return result_detection.positions, result_detection.scores
 
-    def recognition_request(self, frame_msg, position_msg):
+    def recognition_request(self, frame_msg, position_msg, score_msg):
         """Makes a recognition request to the recognition service.
 
         Args:
             frame_msg (Image-ROS2): The frame in ROS2 format.
             position_msg (int[4]): 4 ints determining the square surronding the face.
+            score_msg (float): Score of the detection
         
         Returns:
             face_aligned (Image-ROS2): The face aligned horizontally.
@@ -278,6 +279,7 @@ class HRILogic():
         recognition_request = Recognition.Request()
         recognition_request.frame = frame_msg
         recognition_request.position = position_msg
+        recognition_request.score = score_msg
 
         future_recognition = self.node.recognition_client.call_async(recognition_request)
         rclpy.spin_until_future_complete(self.node, future_recognition)

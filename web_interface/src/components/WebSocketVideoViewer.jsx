@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useWebSocket } from "../contexts/WebSocketContext";
-import { useWindowSize, BREAKPOINTS } from "../hooks/useWindowSize";
+import { useWindowSize } from "../hooks/useWindowSize";
 
 import DraggableItem from "./DraggableItem";
 
@@ -39,11 +39,7 @@ const WebSocketVideoViewer = () => {
         <DraggableItem>
             {showVideo && imgDimensions && (
                 <img
-                    className="position-absolute border border-dark bg-dark border-4 rounded shadow-lg"
-                    style={{
-                        zIndex: 40 * (width < BREAKPOINTS.MD ? 1 : 10),
-                        objectFit: "contain",
-                    }}
+                    className="border border-dark bg-dark border-4 rounded shadow-lg"
                     src={`data:image/jpeg;base64,${displayData.IMAGE}`}
                     width={calculatedWidth}
                     height={calculatedHeight}

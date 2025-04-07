@@ -73,7 +73,12 @@ const FaceprintsPage = () => {
                                 <tr key={person.name}>
                                     <td>
                                         <img
-                                            src="https://t3.ftcdn.net/jpg/05/16/27/58/360_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg"
+                                            src={`data:image/jpg;base64,${person.face}`}
+                                            onError={(e) => {
+                                                e.target.onerror = null;
+                                                e.target.src =
+                                                    "https://t3.ftcdn.net/jpg/05/16/27/58/360_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg";
+                                            }}
                                             alt="face"
                                             className="rounded"
                                             width={64}

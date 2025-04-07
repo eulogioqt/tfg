@@ -24,16 +24,16 @@ class HumanFaceRecognizer(Node):
 
         show_metrics_param = self.declare_parameter("show_metrics", False)
         self.show_metrics = show_metrics_param.get_parameter_value().bool_value
-        self.get_logger().info("Show Metrics: " + str(self.show_metrics))
+        self.get_logger().info(f"Show Metrics: {self.show_metrics}")
 
         self.recognition_service = self.create_service(Recognition, "recognition", self.recognition)
         self.training_service = self.create_service(Training, "recognition/training", self.training)
         self.get_faceprint_service = self.create_service(GetString, "recognition/get_faceprint", self.get_people)
         self.faces_publisher = self.create_publisher(Image, "camera/color/aligned_faces", 10)
 
-        self.get_logger().info(f"Using database: {use_database}")
         self.classifier = ComplexClassifier(use_database)
         self.save_db_timer = self.create_timer(10.0, self.save_data)
+        self.get_logger().info(f"Using database: {use_database}")
 
         self.training_dispatcher = {
             "refine_class": self.classifier.refine_class,
@@ -66,12 +66,16 @@ class HumanFaceRecognizer(Node):
             request.position.w,
             request.position.h,
         ]
+        score = request.score
 
         face_aligned = align_face(frame, position)
         
         features = encode_face(face_aligned)
         classified, distance, pos = self.classifier.classify_face(features)
-
+        if score >= 1.5 and distance >= 0.9: # Si la cara es buena y estamos seguro de que es esa persona
+            self.classifier.save_face(classified, face_aligned) # Ver si hacer que solo guarde la mejor de la historia
+            # lo bueno de asi es que siempre tiene una cara reciente
+            self.get_logger().info(f"ORIGINAL SHAPE {face_aligned.shape}")
         face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg = (
             self.br.recognizer_to_msg(face_aligned, features, classified, distance, pos)
         )
