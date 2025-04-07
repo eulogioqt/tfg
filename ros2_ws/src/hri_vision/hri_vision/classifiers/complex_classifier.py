@@ -57,8 +57,10 @@ class ComplexClassifier:
         closest_class = None
         closest_distance = 0
         position = 0
-        for class_name, faceprint in self.db.get_all():
+        for faceprint in self.db.get_all():
+            class_name = faceprint["name"]
             feature_list = faceprint["features"]
+            
             for i in range(0, len(feature_list)):
                 distance = normalized_cosine_similarity_distance(new_features, feature_list[i])
 

@@ -126,15 +126,10 @@ class HumanFaceRecognizer(Node):
             args = json.loads(args)
             name = args["name"]
 
-            # refactorizar el classifier para que este todo formateado en el formato ese de diccionario para buscar...
-            # o directamente acceder a la bd todo del tiron no se ya vere pero de momento
-            # con los metodos estos que luego habra que cambiar porque lo coge del tiron de la bd y no de la copia
-            # y ni compruebo si se esta usando bd ni na sabe to gipsy
-
-            faceprint = self.classifier.database.get_user_by_name(name)
+            faceprint = self.classifier.db.get_by_name(name)
             response.text = json.dumps(faceprint)
         else:
-            faceprints = self.classifier.database.get_all_users()
+            faceprints = self.classifier.db.get_all()
             response.text = json.dumps(faceprints)
 
         return response

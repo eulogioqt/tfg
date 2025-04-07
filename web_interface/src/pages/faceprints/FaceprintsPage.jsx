@@ -22,9 +22,7 @@ const FaceprintsPage = () => {
         const fetchData = async () => {
             const response = await faceprints.getAll();
             if (response.status >= 200 && response.status < 300) {
-                const data = response.data.sort(
-                    (a, b) => b.size.reduce((c, d) => c + d) - a.size.reduce((c, d) => c + d)
-                ); // cambiar a fecha de creacion cuando fixee eso
+                const data = response.data.sort((a, b) => a.learning_date - b.learning_date);
                 setData(data);
                 console.log(data);
             }
