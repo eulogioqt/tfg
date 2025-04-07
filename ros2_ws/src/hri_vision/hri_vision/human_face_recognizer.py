@@ -1,6 +1,8 @@
-import rclpy
 import json
 import time
+import math
+
+import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from std_msgs.msg import String
@@ -67,13 +69,22 @@ class HumanFaceRecognizer(Node):
             request.position.h,
         ]
         score = request.score
-
+        size = math.sqrt(position[2]**2 + position[3]**2)
+        
         face_aligned = align_face(frame, position)
         
         features = encode_face(face_aligned)
         classified, distance, pos = self.classifier.classify_face(features)
         if score >= 1 and distance >= 0.9: # Si la cara es buena y estamos seguro de que es esa persona
             self.classifier.save_face(classified, face_aligned, score) # lo bueno de asi es que siempre tiene una cara reciente
+            self.get_logger().info(f"{classified} FACE SIZE: {size}") # hacer que el score guardado sea size / 256 por el score  real o algo o poner un minimo
+            self.get_logger().info(f"{classified} FACE SIZE: {size}")
+            self.get_logger().info(f"{classified} FACE SIZE: {size}")
+            self.get_logger().info(f"{classified} FACE SIZE: {size}")
+            self.get_logger().info(f"{classified} FACE SIZE: {size}")
+            self.get_logger().info(f"{classified} FACE SIZE: {size}")
+            self.get_logger().info(f"{classified} FACE SIZE: {size}")
+            self.get_logger().info(f"{classified} FACE SIZE: {size}")
 
         face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg = (
             self.br.recognizer_to_msg(face_aligned, features, classified, distance, pos)
