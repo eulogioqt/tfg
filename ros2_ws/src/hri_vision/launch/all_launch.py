@@ -53,6 +53,14 @@ def generate_launch_description():
             emulate_tty=True,
         ),
         Node(
+            package='sancho_web',
+            executable='faceprint_api',
+            name='faceprint_api',
+            output='screen',
+            prefix="xterm -hold -e",
+            emulate_tty=True,
+        ),
+        Node(
             package='sancho_ai',
             executable='sancho_ai',
             name='sancho_ai',

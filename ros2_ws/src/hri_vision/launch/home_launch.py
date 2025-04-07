@@ -43,6 +43,12 @@ def generate_launch_description():
             output='screen'
         ),
         Node(
+            package='sancho_web',
+            executable='faceprint_api',
+            name='faceprint_api',
+            output='screen'
+        ),
+        Node(
             package='sancho_ai',
             executable='sancho_ai',
             name='sancho_ai',
