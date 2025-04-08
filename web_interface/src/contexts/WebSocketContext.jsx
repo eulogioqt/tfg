@@ -1,5 +1,7 @@
-import React, { useReducer, useEffect, useContext, createContext, useRef, useState } from "react";
+import React, { useEffect, useContext, createContext, useRef, useState } from "react";
 import R2WSocket from "../utils/R2WSocket";
+
+import { useEventBus } from "./EventBusContext";
 
 const WebSocketContext = createContext();
 
@@ -7,12 +9,8 @@ const MESSAGE_TYPE = {
     RESPONSE: "RESPONSE",
 };
 
-const initialState = {};
-const reducer = (state, action) => ({ ...state, [action.type]: action.payload });
-
 export const WebSocketProvider = ({ children }) => {
-    const [displayData, dispatch] = useReducer(reducer, initialState);
-    const [promptResponse, setPromptResponse] = useState(undefined);
+    const { publish } = useEventBus();
     const [isConnected, setConnected] = useState(false);
 
     const socketRef = useRef(null);
@@ -64,11 +62,8 @@ export const WebSocketProvider = ({ children }) => {
         const topic = event.topic;
         const name = event.name;
         const value = event.value;
-        //console.log(event);
-        //console.log(`[${topic}] ${value}`);
-        //if (name == "ACTUAL_PEOPLE")
-        //    console.log(topic, name, value)
-        dispatch({ type: name, payload: value });
+
+        publish("TOPIC-" + name, value);
     };
 
     const onMessage = (event) => {
@@ -77,7 +72,8 @@ export const WebSocketProvider = ({ children }) => {
 
         if (type === MESSAGE_TYPE.RESPONSE) {
             console.log("Respuesta recibida:", event);
-            setPromptResponse(data); // hacer eso mejor, como minimo una lista appendeando las respuestas
+
+            publish("PROMPT-RESPONSE", data);
         } else {
             console.log("Tipo de mensaje desconocido:", type, data);
         }
@@ -91,8 +87,6 @@ export const WebSocketProvider = ({ children }) => {
     return (
         <WebSocketContext.Provider
             value={{
-                displayData,
-                promptResponse,
                 isConnected,
                 sendMessage,
             }}

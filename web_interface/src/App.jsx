@@ -7,9 +7,6 @@ import FaceprintsPage from "./pages/faceprints/FaceprintsPage";
 
 import WebSocketVideoViewer from "./components/WebSocketVideoViewer";
 
-import { WebSocketProvider } from "./contexts/WebSocketContext";
-import { APIProvider } from "./contexts/APIContext";
-
 const App = () => {
     const wrap = (page) => (
         <>
@@ -20,18 +17,14 @@ const App = () => {
 
     return (
         <Router>
-            <APIProvider>
-                <WebSocketProvider>
-                    <WebSocketVideoViewer />
+            <WebSocketVideoViewer />
 
-                    <Routes>
-                        <Route path="/" element={wrap(<HomePage />)} />
-                        <Route path="/faceprints" element={wrap(<FaceprintsPage />)} />
-                        <Route path="/chat" element={wrap(<ChatPage />)} />
-                        <Route path="*" element={<Navigate to="/" />} />
-                    </Routes>
-                </WebSocketProvider>
-            </APIProvider>
+            <Routes>
+                <Route path="/" element={wrap(<HomePage />)} />
+                <Route path="/faceprints" element={wrap(<FaceprintsPage />)} />
+                <Route path="/chat" element={wrap(<ChatPage />)} />
+                <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
         </Router>
     );
 };

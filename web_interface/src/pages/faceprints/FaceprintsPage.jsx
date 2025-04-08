@@ -45,6 +45,7 @@ const FaceprintsPage = () => {
         if (newName.trim() === "") return;
 
         if (newName.trim() != oldName.trim()) {
+            // Solo si ha cambiado
             const updated = await faceprints.update(oldName, { name: newName });
             setData(data.map((item) => (item.name === oldName ? updated.data : item)));
         }

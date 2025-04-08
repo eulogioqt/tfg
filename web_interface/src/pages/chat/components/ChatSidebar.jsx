@@ -16,7 +16,7 @@ const Sidebar = ({ collapsed, setCollapsed, handleNewChat }) => {
                         transform: collapsed ? "translateX(-16rem)" : "translateX(0)",
                         transition: "transform " + (collapsed ? "0s" : "0.3s") + " ease",
                         width: "16rem",
-                        marginTop: "50px", /* quitar */
+                        marginTop: "50px" /* quitar */,
                         position: "fixed",
                         height: "100vh",
                         overflowX: "hidden",

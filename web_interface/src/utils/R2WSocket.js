@@ -5,7 +5,7 @@ const R2W_MESSAGE_TYPE = {
 
 export default class R2WSocket {
     constructor(url) {
-        this.socket = new WebSocket(url);
+        this.socket = new WebSocket(url); // Usar reconnecting websocket
 
         this.socket.onopen = (event) => {
             if (this.onopen) this.onopen(event);

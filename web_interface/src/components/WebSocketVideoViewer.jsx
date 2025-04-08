@@ -1,25 +1,27 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useWebSocket } from "../contexts/WebSocketContext";
+import { useEventBus } from "../contexts/EventBusContext";
 import { useWindowSize } from "../hooks/useWindowSize";
 
 import DraggableItem from "./DraggableItem";
 
 const WebSocketVideoViewer = () => {
-    const { displayData } = useWebSocket();
+    const { subscribe } = useEventBus();
     const { width } = useWindowSize();
 
     const [imgDimensions, setImgDimensions] = useState(null);
     const [showVideo, setShowVideo] = useState(false);
+    const [imageData, setImageData] = useState(null);
 
     const timeoutRef = useRef(null);
 
     useEffect(() => {
-        if (displayData.IMAGE) {
+        const handleImage = (base64) => {
             const img = new Image();
-            img.src = `data:image/jpeg;base64,${displayData.IMAGE}`;
+            img.src = `data:image/jpeg;base64,${base64}`;
 
             img.onload = () => {
                 setImgDimensions({ width: img.width, height: img.height });
+                setImageData(base64);
                 setShowVideo(true);
 
                 if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -27,20 +29,28 @@ const WebSocketVideoViewer = () => {
                     setShowVideo(false);
                 }, 5000);
             };
-        }
 
-        return () => clearTimeout(timeoutRef.current);
-    }, [displayData.IMAGE]);
+            img.onerror = (err) => {
+                console.error("Error al cargar imagen del WebSocket:", err);
+            };
+        };
+
+        const unsubscribe = subscribe("TOPIC-IMAGE", handleImage);
+        return () => {
+            unsubscribe();
+            clearTimeout(timeoutRef.current);
+        };
+    }, []);
 
     const calculatedWidth = Math.max(width * 0.2, 160);
     const calculatedHeight = imgDimensions && (calculatedWidth * imgDimensions.height) / imgDimensions.width;
 
     return (
         <DraggableItem>
-            {showVideo && imgDimensions && (
+            {showVideo && imgDimensions && imageData && (
                 <img
                     className="border border-dark bg-dark border-4 rounded shadow-lg"
-                    src={`data:image/jpeg;base64,${displayData.IMAGE}`}
+                    src={`data:image/jpeg;base64,${imageData}`}
                     width={calculatedWidth}
                     height={calculatedHeight}
                     alt="WebSocket Video"

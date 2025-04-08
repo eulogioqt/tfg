@@ -6,6 +6,7 @@ import ChatMessageArea from "./components/ChatMessageArea";
 import ChatHeader from "./components/ChatHeader";
 
 import { useWebSocket } from "../../contexts/WebSocketContext";
+import { useEventBus } from "../../contexts/EventBusContext";
 import { useWindowSize, BREAKPOINTS } from "../../hooks/useWindowSize";
 import { v4 as uuidv4 } from "uuid";
 
@@ -13,7 +14,8 @@ import { v4 as uuidv4 } from "uuid";
 // Hacer un chatcontext o un collapsedcontext si se extiende todo demasiado y hay muchas cosas que ir pasando
 // al menos collapsedcontext por el momento
 const ChatPage = () => {
-    const { promptResponse, sendMessage, isConnected } = useWebSocket();
+    const { sendMessage, isConnected } = useWebSocket();
+    const { subscribe } = useEventBus();
     const { width } = useWindowSize();
 
     const [messages, setMessages] = useState([]);
@@ -50,16 +52,16 @@ const ChatPage = () => {
     };
 
     useEffect(() => {
-        const newResponse = promptResponse;
-        if (newResponse !== undefined) {
-            const isResponseAdded = messages
-                .filter((m) => !m.isHuman)
-                .map((m) => m.id)
-                .includes(newResponse.id);
+        const handlePromptResponse = (newResponse) => {
+            const isResponseAdded = messages.filter((m) => !m.isHuman).some((m) => m.id === newResponse.id);
+            if (!isResponseAdded) {
+                addMessage(newResponse.value, newResponse.id, false);
+            }
+        };
 
-            if (!isResponseAdded) addMessage(newResponse.value, newResponse.id, false);
-        }
-    }, [promptResponse]);
+        const unsubscribe = subscribe("PROMPT-RESPONSE", handlePromptResponse);
+        return () => unsubscribe();
+    }, []);
 
     return (
         <>
