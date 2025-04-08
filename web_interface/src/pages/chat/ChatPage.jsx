@@ -65,10 +65,10 @@ const ChatPage = () => {
 
     return (
         <>
-            <div className="d-flex dvh-100">
+            <div className="d-flex vh-100">
                 <ChatSidebar collapsed={collapsed} setCollapsed={setCollapsed} handleNewChat={handleNewChat} />
 
-                <div className="d-flex flex-column mt-5 flex-grow-1">
+                <div className="d-flex flex-column mt-5 flex-grow-1" style={{ overflow: "hidden" }}>
                     <ChatHeader collapsed={collapsed} setCollapsed={setCollapsed} handleNewChat={handleNewChat} />
 
                     <ChatMessageArea messages={messages} />
