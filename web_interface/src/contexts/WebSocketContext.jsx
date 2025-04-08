@@ -2,6 +2,7 @@ import React, { useEffect, useContext, createContext, useRef, useState } from "r
 import R2WSocket from "../utils/R2WSocket";
 
 import { useEventBus } from "./EventBusContext";
+import { useToast } from "./ToastContext";
 
 const WebSocketContext = createContext();
 
@@ -11,6 +12,8 @@ const MESSAGE_TYPE = {
 
 export const WebSocketProvider = ({ children }) => {
     const { publish } = useEventBus();
+    const { showToast } = useToast();
+
     const [isConnected, setConnected] = useState(false);
 
     const socketRef = useRef(null);
@@ -23,6 +26,7 @@ export const WebSocketProvider = ({ children }) => {
 
             ws.onopen = () => {
                 console.log("Conexión establecida con el servidor WebSocket");
+                showToast("Conectado", "Conexión establecida con ROS", "green");
 
                 setConnected(true);
                 socketRef.current = ws;
@@ -30,6 +34,7 @@ export const WebSocketProvider = ({ children }) => {
 
             ws.onclose = () => {
                 console.log("Conexión cerrada, intentando reconectar...");
+                showToast("Conexión cerrada", "Intentado reconectar...", "red");
 
                 setConnected(false);
                 setTimeout(connectWebSocket, 3000); // Intenta reconectar después de 3 segundos
@@ -37,6 +42,7 @@ export const WebSocketProvider = ({ children }) => {
 
             ws.onerror = (error) => {
                 console.error("Error en la conexión WebSocket:", error);
+                showToast("Conexión cerrada", "Error en la conexión: " + error, "red");
 
                 setConnected(false);
                 ws.close();
@@ -81,7 +87,10 @@ export const WebSocketProvider = ({ children }) => {
 
     const sendMessage = (message) => {
         if (socketRef.current) socketRef.current.send(message);
-        else console.log("No conectado al R2WSocket");
+        else {
+            console.log("No conectado al R2WSocket");
+            showToast("Sin conexión", "No estás conectado a ROS", "red");
+        }
     };
 
     return (
