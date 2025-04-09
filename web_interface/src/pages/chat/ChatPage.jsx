@@ -59,7 +59,7 @@ const ChatPage = () => {
             }
         };
 
-        const unsubscribe = subscribe("PROMPT-RESPONSE", handlePromptResponse);
+        const unsubscribe = subscribe("ROS_MESSAGE_RESPONSE", handlePromptResponse);
         return () => unsubscribe();
     }, []);
 

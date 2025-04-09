@@ -34,16 +34,13 @@ export const WebSocketProvider = ({ children }) => {
 
             ws.onclose = () => {
                 console.log("Conexión cerrada, intentando reconectar...");
-                showToast("Conexión cerrada", "Intentado reconectar...", "red");
+                showToast("No conectado", "Iniciando nuevo intento de conexión...", "red");
 
                 setConnected(false);
                 setTimeout(connectWebSocket, 3000); // Intenta reconectar después de 3 segundos
             };
 
             ws.onerror = (error) => {
-                console.error("Error en la conexión WebSocket:", error);
-                showToast("Conexión cerrada", "Error en la conexión: " + error, "red");
-
                 setConnected(false);
                 ws.close();
             };
@@ -64,24 +61,16 @@ export const WebSocketProvider = ({ children }) => {
         };
     }, []);
 
-    const onTopic = (event) => {
-        const topic = event.topic;
-        const name = event.name;
-        const value = event.value;
-
-        publish("TOPIC-" + name, value);
+    const onTopic = (event) => { // También se tiene event.topic, name no es el /x/y.. de ros
+        publish(`ROS_TOPIC_${event.name}`, event.value);
     };
 
     const onMessage = (event) => {
-        const type = event.type;
-        const data = event.data;
-
-        if (type === MESSAGE_TYPE.RESPONSE) {
-            console.log("Respuesta recibida:", event);
-
-            publish("PROMPT-RESPONSE", data);
+        if (type in MESSAGE_TYPE) {
+            publish(`ROS_MESSAGE_${event.type}`, event.data);
         } else {
             console.log("Tipo de mensaje desconocido:", type, data);
+            showToast("Mensaje no reconocido", "Se ha recibido un mensaje con tipo " + type + ", no reconocido", "red");
         }
     };
 

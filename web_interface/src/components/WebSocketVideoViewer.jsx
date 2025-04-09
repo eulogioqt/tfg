@@ -35,7 +35,7 @@ const WebSocketVideoViewer = () => {
             };
         };
 
-        const unsubscribe = subscribe("TOPIC-IMAGE", handleImage);
+        const unsubscribe = subscribe("ROS_TOPIC_IMAGE", handleImage);
         return () => {
             unsubscribe();
             clearTimeout(timeoutRef.current);

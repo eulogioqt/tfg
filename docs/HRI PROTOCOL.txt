@@ -1,13 +1,4 @@
 SERVIDOR => CLIENTE
-Mensajes con datos a mostrar (IMAGE, PEOPLE, AUDIO...):
-{
-    type: "DISPLAY_DATA",
-    data: {
-        type: "IMAGE",
-        value: ...
-    }
-}
-
 Respuestas a prompts con ID: 
 {
     type: "RESPONSE",
@@ -16,13 +7,14 @@ Respuestas a prompts con ID:
         value: ...
     }
 }
-
-Inicializacion de comandos y lo que sea: 
+Mensajes sobre la API de faceprints:
 {
-    type: "INIT",
-    data. ...
+    "type": "FACEPRINT_EVENT",
+    "data": {
+        "event": "CREATE" | "DELETE" | "UPDATE",
+        "name": name
+    }
 }
-
 
 CLIENTE => SERVIDOR
 Prompt del cliente:

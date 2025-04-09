@@ -21,3 +21,5 @@ El servidor envia un mensaje de un topic a todos los clientes:
         value: ...
     }
 }
+
+hacer mensaje INFO con cosas tipo se ha subscrito a este topic automaticamente
