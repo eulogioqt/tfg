@@ -4,10 +4,11 @@ import math
 
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import Image
 from std_msgs.msg import String
 
+from hri_msgs.msg import FaceprintEvent
 from hri_msgs.srv import Recognition, Training, GetString
+
 from .hri_bridge import HRIBridge
 from .aligners.aligner_dlib import align_face
 from .encoders.encoder_facenet import encode_face
@@ -31,7 +32,8 @@ class HumanFaceRecognizer(Node):
         self.recognition_service = self.create_service(Recognition, "recognition", self.recognition)
         self.training_service = self.create_service(Training, "recognition/training", self.training)
         self.get_faceprint_service = self.create_service(GetString, "recognition/get_faceprint", self.get_people)
-        self.faces_publisher = self.create_publisher(Image, "camera/color/aligned_faces", 10)
+
+        self.faceprint_event_pub = self.create_publisher(FaceprintEvent, "recognition/event", 10)
 
         self.classifier = ComplexClassifier(use_database)
         self.save_db_timer = self.create_timer(10.0, self.save_data)
@@ -44,6 +46,13 @@ class HumanFaceRecognizer(Node):
 
             "rename_class": self.classifier.rename_class, # cambiar estos
             "delete_class": self.classifier.delete_class # porque no son training, simplemente por significado
+        }
+
+        self.faceprint_event_map = {
+            "add_class": FaceprintEvent.CREATE,
+            "delete_class": FaceprintEvent.DELETE,
+            "rename_class": FaceprintEvent.UPDATE,
+            "add_features": FaceprintEvent.UPDATE,
         }
 
         self.br = HRIBridge()
@@ -96,8 +105,6 @@ class HumanFaceRecognizer(Node):
         response.distance = distance_msg
         response.pos = pos_msg
 
-        self.faces_publisher.publish(face_aligned_msg)
-
         recognition_time = time.time() - start_recognition
         response.recognition_time = recognition_time
         if self.show_metrics:
@@ -106,32 +113,50 @@ class HumanFaceRecognizer(Node):
         return response
 
     def training(self, request, response):
-        """Training service. Takes the command type (training type) and uses the arguments needed to
-        perform that kind of training.
+        """
+        Handles training-related service requests by dispatching them to the corresponding handler
+        based on the command type and arguments.
 
         Args:
-            request (Training.srv): Command type, and arguments in JSON Object format.
+            request (Training.srv): Contains the command type and arguments (in JSON format).
+            response (Training.srv): Will be filled with the result and a message.
 
         Returns:
-            response (Training.srv): Result. -1 means something went wrong. 0 means everything is okay
-                and in case of cmd_type = add_class, also means that the class wasn't already known.
-                1 means that the class was already known, and means the same as 0 for cmd_type != add_class.
+            Training.srv: Response object with result code and message.
+                result = -1 → error
+                result = 0  → success (new class added or generic success)
+                result = 1  → class already existed (only meaningful for cmd_type == "add_class")
         """
 
         cmd_type = request.cmd_type.data
-        args = json.loads(request.args.data)
+        try:
+            args = json.loads(request.args.data)
+        except json.JSONDecodeError as e:
+            response.result = -1
+            response.message = String(data=f"Invalid JSON: {e}")
+            return response
 
         try:
             function = self.training_dispatcher[cmd_type]
             result, message = function(**args)
         except Exception as e:
-            result, message = -1, "Error executing " + cmd_type + ": " + str(e)
-            pass
-        # enviar faceprint events............
+            result, message = -1, f"Error executing {cmd_type}: {e}"
+
+        if result >= 0:
+            self.send_faceprint_event(cmd_type, args)
+
         response.result = result
         response.message = String(data=message)
 
         return response
+
+    def send_faceprint_event(self, cmd_type, args):
+        event_type = self.faceprint_event_map.get(cmd_type)
+        if event_type is not None and "class_name" in args:
+            faceprint_event = FaceprintEvent()
+            faceprint_event.event = event_type
+            faceprint_event.name = args["class_name"]
+            self.faceprint_event_pub.publish(faceprint_event)
 
     def get_people(self, request, response):
         args = request.args

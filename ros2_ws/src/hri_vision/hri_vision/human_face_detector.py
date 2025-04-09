@@ -2,8 +2,9 @@ import cv2
 import rclpy
 import time
 from rclpy.node import Node
-from sensor_msgs.msg import Image
+
 from hri_msgs.srv import Detection
+
 from .hri_bridge import HRIBridge
 
 class HumanFaceDetector(Node):
@@ -31,12 +32,7 @@ class HumanFaceDetector(Node):
             self.get_logger().info("Importing DLIB FRONTAL")
             self.get_faces = get_faces
 
-        self.detection_service = self.create_service(
-            Detection, "detection", self.detection
-        )
-        self.detection_publisher = self.create_publisher(
-            Image, "camera/color/detection", 10
-        )
+        self.detection_service = self.create_service(Detection, "detection", self.detection)
 
         self.last_detection_time = 0
         self.br = HRIBridge()
@@ -63,20 +59,13 @@ class HumanFaceDetector(Node):
         frame_ycrcb[:, :, 0] = gray_equalized
         frame_equalized = cv2.cvtColor(frame_ycrcb, cv2.COLOR_YCrCb2BGR)
 
-        postProcess_image = frame_equalized
         if self.get_faces:
-            positions, scores, _ = self.get_faces(postProcess_image)
+            positions, scores, _ = self.get_faces(frame_equalized)
             positions_msg, scores_msg = self.br.detector_to_msg(positions, scores)
             self.get_logger().info("Faces detected: " + str(len(positions_msg)))
 
             response.positions = positions_msg
             response.scores = scores_msg
-
-            for x, y, w, h in positions:
-                cv2.rectangle(postProcess_image, (x, y), (x + w, y + h), (255, 0, 0), 2)
-            
-            detection_imgmsg = self.br.cv2_to_imgmsg(postProcess_image, "bgr8")
-            self.detection_publisher.publish(detection_imgmsg)
 
         detection_time = time.time() - start_detection
         response.detection_time = detection_time

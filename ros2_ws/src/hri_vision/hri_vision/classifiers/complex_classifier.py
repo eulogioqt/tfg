@@ -139,29 +139,29 @@ class ComplexClassifier:
         self.save()
         return result, message
 
-    def rename_class(self, old_name, new_name):
+    def rename_class(self, class_name, new_name):
         '''Renames a class.
 
         Args:
-            old_name (str): The actual class.
+            class_name (str): The actual class.
             new_name (str): The new class name.
         '''
 
         all_names = self.db.get_all_names()
-        if old_name == new_name:
+        if class_name == new_name:
             result = 1
             message = "Has intentado renombrar con el mismo nombre, no se ha cambiado nada"
-        elif old_name not in all_names:
+        elif class_name not in all_names:
             result = 0 
-            message = "La clase " + old_name + " no existe."
+            message = "La clase " + class_name + " no existe."
         elif new_name in all_names:
             result = 0 
             message = "La clase " + new_name + " ya existe."
         else:
-            self.db.update(old_name, { "name": new_name })
+            self.db.update(class_name, { "name": new_name })
         
             result = 1
-            message = "La clase " + old_name + " ha sido renombrada a " + new_name
+            message = "La clase " + class_name + " ha sido renombrada a " + new_name
 
         self.save()
         return result, message

@@ -27,7 +27,7 @@ class DefaultCommands(CommandExecutor):
                 self.web_node.send_message(sender, "No has especificado el nuevo nombre de la clase")
             else:
                 _, message_data = self.web_node.training_request(String(data="rename_class"), String(data=json.dumps({
-                    "old_name": args[0],
+                    "class_name": args[0],
                     "new_name": args[1]
                 })))
                 self.web_node.send_message(sender, message_data.data)
