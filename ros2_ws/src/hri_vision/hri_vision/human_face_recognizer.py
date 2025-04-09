@@ -127,7 +127,7 @@ class HumanFaceRecognizer(Node):
         except Exception as e:
             result, message = -1, "Error executing " + cmd_type + ": " + str(e)
             pass
-
+        # enviar faceprint events............
         response.result = result
         response.message = String(data=message)
 

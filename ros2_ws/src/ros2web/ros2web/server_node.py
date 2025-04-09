@@ -92,7 +92,7 @@ class Server(StoppableNode):
         print(f"Mensaje recibido ({key}): {type}")
 
         if type == MessageType.MESSAGE:
-            value = json.dumps(data)
+            value = json.dumps(data) # do this only if is JSON, you should be able to send any kind of data not only json formatted
             self.node.web_pub.publish(R2WMessage(key=key, value=value))
 
     def on_user_connect(self, key):
