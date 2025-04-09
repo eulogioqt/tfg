@@ -40,6 +40,7 @@ class APIClientNode(Node):
         training_request = Training.Request()
         training_request.cmd_type = cmd_type_msg
         training_request.args = args_msg
+        training_request.origin = Training.Request.ORIGIN_WEB
 
         future_training = self.training_client.call_async(training_request)
         rclpy.spin_until_future_complete(self, future_training)

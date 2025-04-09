@@ -128,9 +128,10 @@ class HumanFaceRecognizer(Node):
                 result = 1  → class already existed (only meaningful for cmd_type == "add_class")
         """
 
-        cmd_type = request.cmd_type.data
         try:
+            cmd_type = request.cmd_type.data
             args = json.loads(request.args.data)
+            origin = request.origin
         except json.JSONDecodeError as e:
             response.result = -1
             response.message = String(data=f"Invalid JSON: {e}")
@@ -143,19 +144,21 @@ class HumanFaceRecognizer(Node):
             result, message = -1, f"Error executing {cmd_type}: {e}"
 
         if result >= 0:
-            self.send_faceprint_event(cmd_type, args)
+            self.send_faceprint_event(cmd_type, args, origin)
 
         response.result = result
         response.message = String(data=message)
 
         return response
 
-    def send_faceprint_event(self, cmd_type, args):
+    def send_faceprint_event(self, cmd_type, args, origin):
         event_type = self.faceprint_event_map.get(cmd_type)
         if event_type is not None and "class_name" in args:
             faceprint_event = FaceprintEvent()
             faceprint_event.event = event_type
             faceprint_event.name = args["class_name"]
+            faceprint_event.origin = origin
+            
             self.faceprint_event_pub.publish(faceprint_event)
 
     def get_people(self, request, response):

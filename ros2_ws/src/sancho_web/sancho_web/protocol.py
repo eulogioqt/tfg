@@ -1,7 +1,7 @@
 import json
 
 from enum import Enum
-
+from abc import ABC, abstractmethod
 
 ##### CLIENT MESSAGES #####
 class PromptMessage():
@@ -11,13 +11,22 @@ class PromptMessage():
 
 
 ##### SERVER MESSAGES #####
-class ResponseMessage():
+class JSONMessage(ABC):
+    @abstractmethod
+    def to_dict(self) -> dict:
+        pass
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_dict())
+
+
+class ResponseMessage(JSONMessage):
     def __init__(self, id, response):
         self.id = id
         self.response = response
     
-    def to_json(self):
-        message = {
+    def to_dict(self):
+        return {
             "type": MessageType.RESPONSE,
             "data": {
                 "id": self.id,
@@ -25,9 +34,8 @@ class ResponseMessage():
             }
         }
 
-        return json.dumps(message)
 
-class FaceprintEventMessage():
+class FaceprintEventMessage(JSONMessage):
     class Event(str, Enum):
         CREATE = "CREATE"
         UPDATE = "UPDATE"
@@ -37,17 +45,15 @@ class FaceprintEventMessage():
         self.event = event
         self.name = name
     
-    def to_json(self):
-        message = {
+    def to_dict(self):
+        return {
             "type": MessageType.FACEPRINT_EVENT,
             "data": {
                 "event": self.event,
                 "name": self.name
             }
         }
-
-        return json.dumps(message)
-
+    
 
 ##### TYPES #####
 class MessageType(str, Enum):

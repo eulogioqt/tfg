@@ -8,6 +8,7 @@ const WebSocketContext = createContext();
 
 const MESSAGE_TYPE = {
     RESPONSE: "RESPONSE",
+    //FACEPRINT_EVENT: "FACEPRINT_EVENT",
 };
 
 export const WebSocketProvider = ({ children }) => {
@@ -23,6 +24,7 @@ export const WebSocketProvider = ({ children }) => {
             const serverIP = window.location.hostname;
             const ws = new R2WSocket("ws://" + serverIP + ":8765"); // Intentar meter en el R2WSocket el retry tmb por defecto
             console.log("Intentando conectar con el servidor WebSocket");
+            showToast("Intentando conectar", "Intentando establecer conexión con ROS", "blue");
 
             ws.onopen = () => {
                 console.log("Conexión establecida con el servidor WebSocket");
@@ -61,16 +63,21 @@ export const WebSocketProvider = ({ children }) => {
         };
     }, []);
 
-    const onTopic = (event) => { // También se tiene event.topic, name no es el /x/y.. de ros
+    const onTopic = (event) => {
+        // También se tiene event.topic, name no es el /x/y.. de ros
         publish(`ROS_TOPIC_${event.name}`, event.value);
     };
 
     const onMessage = (event) => {
-        if (type in MESSAGE_TYPE) {
+        if (event.type in MESSAGE_TYPE) {
             publish(`ROS_MESSAGE_${event.type}`, event.data);
         } else {
-            console.log("Tipo de mensaje desconocido:", type, data);
-            showToast("Mensaje no reconocido", "Se ha recibido un mensaje con tipo " + type + ", no reconocido", "red");
+            console.log("Tipo de mensaje desconocido:", event.type, event.data);
+            showToast(
+                "Mensaje no reconocido",
+                "Se ha recibido un mensaje con tipo " + event.type + ", no reconocido",
+                "red"
+            );
         }
     };
 

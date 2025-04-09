@@ -1,7 +1,7 @@
 import json
 
 from typing import Optional, List
-from fastapi import APIRouter, HTTPException, Query, Request, Path, Depends
+from fastapi import APIRouter, HTTPException, Query, Request, Path
 from fastapi.responses import JSONResponse
 
 from .faceprint_model import Faceprint, FaceprintDeleteResponse, FaceprintUpdate

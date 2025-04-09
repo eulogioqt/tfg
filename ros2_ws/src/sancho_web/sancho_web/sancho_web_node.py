@@ -3,9 +3,10 @@ from rclpy.node import Node
 
 from queue import Queue
 
-from .protocol import MessageType, PromptMessage, ResponseMessage, parse_message
+from .protocol import MessageType, JSONMessage, PromptMessage, ResponseMessage, FaceprintEventMessage, parse_message
 
 from ros2web_msgs.msg import R2WMessage
+from hri_msgs.msg import FaceprintEvent
 from hri_msgs.srv import SanchoPrompt
 
 # hacer que publique en /sancho_web/{message_type}? para que los nodos se subscriban solo a lo que le interese?
@@ -40,9 +41,17 @@ class SanchoWebNode(Node):
         super().__init__("sancho_web")
 
         self.web_queue = Queue()
-        
+        self.msg_queue = Queue()
+
         self.ros_pub = self.create_publisher(R2WMessage, "ros2web/ros", 10) # All publish here go to web
         self.web_sub = self.create_subscription(R2WMessage, "ros2web/web", self.web_callback, 10) # All received here comes from web
+
+        self.faceprint_event_sub = self.create_subscription(FaceprintEvent, "recognition/event", self.faceprint_event_callback, 10)
+        self.event_map = {
+            FaceprintEvent.CREATE: FaceprintEventMessage.Event.CREATE,
+            FaceprintEvent.UPDATE: FaceprintEventMessage.Event.UPDATE,
+            FaceprintEvent.DELETE: FaceprintEventMessage.Event.DELETE,
+        }
 
         self.sancho_prompt_client = self.create_client(SanchoPrompt, "sancho_ai/prompt")
         while not self.sancho_prompt_client.wait_for_service(timeout_sec=1.0):
@@ -53,6 +62,12 @@ class SanchoWebNode(Node):
     def web_callback(self, msg):
         self.web_queue.put([msg.key, msg.value])
 
+    def faceprint_event_callback(self, msg):
+        if msg.origin != FaceprintEvent.ORIGIN_WEB: # Si el origen del evento es la web, no mandar a la web
+            event = self.event_map.get(msg.event)
+            message = FaceprintEventMessage(event, msg.name)
+            self.msg_queue.put(message)
+
 class SanchoWeb:
     
     def __init__(self):
@@ -60,15 +75,21 @@ class SanchoWeb:
 
     def spin(self):
         while True:
-            if self.node.web_queue.qsize() > 0: # ROS messages
+            if self.node.web_queue.qsize() > 0: # Web messages received
                 [key, value] = self.node.web_queue.get()
 
-                response_json = self.on_protocol_message(value)
+                response_json = self.on_web_message(value)
                 self.node.ros_pub.publish(R2WMessage(key=key, value=response_json))
+
+            if self.node.msg_queue.qsize() > 0: # ROS messages to send
+                message: JSONMessage = self.node.msg_queue.get()
+
+                message_json = message.to_json()
+                self.node.ros_pub.publish(R2WMessage(value=message_json)) # no key means broadcast
 
             rclpy.spin_once(self.node)
 
-    def on_protocol_message(self, msg):
+    def on_web_message(self, msg):
         type, data = parse_message(msg)
         print(f"Mensaje recibido: {type}")
 

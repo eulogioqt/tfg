@@ -68,12 +68,15 @@ class Server(StoppableNode):
     def spin(self):
         if self.node.ros_queue.qsize() > 0: # ROS messages
             [key, value] = self.node.ros_queue.get()
-            client = self.ws.get_client(key)
 
             message = Message(value)
             message_json = message.to_json()
 
-            self.ws.send_message(client, message_json)
+            if key:
+                client = self.ws.get_client(key)
+                self.ws.send_message(client, message_json)
+            else:
+                self.ws.broadcast_message(message_json)
 
         for topic in self.node.broadcast_topics.keys(): # Broadcast topics
             data = self.node.broadcast_topics[topic]
