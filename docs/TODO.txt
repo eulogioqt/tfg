@@ -80,3 +80,13 @@ Event update:
 Cuando algo cambia en ROS (por ejemplo, una persona nueva), el nodo "web" lo publica por WebSocket con un mensaje tipo "BD_INFO" o "NEW_PERSON".
 La web no recibe todos los datos por el WebSocket, solo la notificación.
 Al recibirla, la web vuelve a llamar al API REST para traer los datos actualizados.
+
+THOUGHTS:
+en el add_class, mandar tambien la imagen codificada jpg blabla etc para que aprenda la cara y el score, para que no se creen sin mas sin cara
+poner un minimo tamaño de cara para reconocer o detectar, de resolucion en general, ya no solo por almacenar si no porque es un mierdon sino
+poner ya lo de que se publique en el frontend bien el faceprint event y hacer lo consecuente
+poner a las cosas del frontend de la api que compruebe que la peticion va bien y eso no a pelo y ya
+que cada cierto tiempo haga un get all
+hacer un context para el chat
+hacer un context para los faceprints y que todo esto funciona independientemente de que estes en esa pagina o no, o que 
+solo funcione cuando estas ahi pero el context guarde eso al menos.. preguntar a chatgpt por esto y por tener muchos contexts asi que pasa

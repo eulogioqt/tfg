@@ -62,7 +62,8 @@ class HumanFaceDetector(Node):
         if self.get_faces:
             positions, scores, _ = self.get_faces(frame_equalized)
             positions_msg, scores_msg = self.br.detector_to_msg(positions, scores)
-            self.get_logger().info("Faces detected: " + str(len(positions_msg)))
+            if len(positions_msg) > 0:
+                self.get_logger().info("Faces detected: " + str(len(positions_msg)))
 
             response.positions = positions_msg
             response.scores = scores_msg

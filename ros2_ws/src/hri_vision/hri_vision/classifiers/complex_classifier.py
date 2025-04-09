@@ -195,7 +195,9 @@ class ComplexClassifier:
         '''
 
         faceprint = self.db.get_by_name(class_name)
-        if faceprint and face_score > faceprint.get("face_score", 0):
+        is_best_face = faceprint and face_score > faceprint.get("face_score", 0)
+        
+        if is_best_face:
             target_size = (128, 128)
             resized = face#cv2.resize(face, target_size, interpolation=cv2.INTER_AREA)
 
@@ -207,6 +209,8 @@ class ComplexClassifier:
                 "face": face_base64, 
                 "face_score": face_score 
             })
+        
+        return is_best_face
 
     def save(self):
         '''Saves the learned data to a file.'''
