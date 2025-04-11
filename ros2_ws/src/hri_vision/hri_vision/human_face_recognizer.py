@@ -180,6 +180,7 @@ class HumanFaceRecognizer(Node):
         return response
 
     def save_data(self):
+        self.get_logger().info("guardando dataton")
         self.classifier.save()
 
 def main(args=None):

@@ -96,3 +96,12 @@ que cada cierto tiempo haga un get all
 hacer un context para el chat
 hacer un context para los faceprints y que todo esto funciona independientemente de que estes en esa pagina o no, o que 
 solo funcione cuando estas ahi pero el context guarde eso al menos.. preguntar a chatgpt por esto y por tener muchos contexts asi que pasa
+
+
+TODO:
+TOASTS DE AÑADIDO O ELIMINADO O RENOMBRADO GENTE TANTO POR LA WEB O POR EVENTO
+HACER YA UN NOTION
+GUARDAR EN LA BD DATOS DE ULTIMA VEZ VISTO VECES VISTO DIAS VISTOS COSAS ASI
+RECARGAR
+PAGINACION
+MEJOR FRONTEND

@@ -210,7 +210,6 @@ class HRILogic():
                     "features": features,
                     "position": pos
                 }))) # Refinamos la clase
-                self.node.get_logger().info(message.data)
 
                 if output < 0:
                     self.node.get_logger().info(">> ERROR: Al refinar una clase")

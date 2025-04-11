@@ -210,6 +210,8 @@ class ComplexClassifier:
                 "face_score": face_score 
             })
         
+            self.save()
+            
         return is_best_face
 
     def save(self):
