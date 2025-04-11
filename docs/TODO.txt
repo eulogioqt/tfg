@@ -1,3 +1,9 @@
+MEDIR LA PROFUNDIDAD SABIENDO EL TAMAÑO PROMEDIO DE UNA CABEZA
+INTENTAR SACAR EDAD TAMBIEN
+
+
+
+
 A FUTURO METER LOS PAQUETES _MSGS EN EL PROPIO PAQUETE SI SE PUEDE
 
 - Hacer un context para el Chat y que ahi se maneje todo sobre eso, el cargado del historial de los distintos chats

@@ -8,45 +8,22 @@ import ChatHeader from "./components/ChatHeader";
 import { useWebSocket } from "../../contexts/WebSocketContext";
 import { useEventBus } from "../../contexts/EventBusContext";
 import { useWindowSize, BREAKPOINTS } from "../../hooks/useWindowSize";
-import { v4 as uuidv4 } from "uuid";
+import { useChat } from "../../contexts/ChatContext";
 
 // Poner que cuando el chat no tiene mensajes el text area y demas este en medio
 // Hacer un chatcontext o un collapsedcontext si se extiende todo demasiado y hay muchas cosas que ir pasando
 // al menos collapsedcontext por el momento
 const ChatPage = () => {
-    const { sendMessage, isConnected } = useWebSocket();
+    const { messages, clearMessages, addMessage, handleSend } = useChat();
     const { subscribe } = useEventBus();
     const { width } = useWindowSize();
 
-    const [messages, setMessages] = useState([]);
-    const [isReplying, setIsReplying] = useState(false);
     const [collapsed, setCollapsed] = useState(width < BREAKPOINTS.MD);
 
     const chatAreaRef = useRef(null);
 
-    const addMessage = (text, id, isHuman) => {
-        setMessages((oldMessages) => [...oldMessages, { text, id, isHuman }]);
-        setIsReplying(isHuman);
-    };
-
-    const handleSend = (inputMessage) => {
-        if (inputMessage.length > 0) {
-            const id = uuidv4();
-            const messageWithId = {
-                type: "PROMPT",
-                data: {
-                    id: id,
-                    value: inputMessage,
-                },
-            };
-
-            sendMessage(messageWithId);
-            addMessage(inputMessage, id, true);
-        }
-    };
-
     const handleNewChat = () => {
-        setMessages([]);
+        clearMessages();
         chatAreaRef.current?.clear();
         if (width < BREAKPOINTS.MD) setCollapsed(true);
     };

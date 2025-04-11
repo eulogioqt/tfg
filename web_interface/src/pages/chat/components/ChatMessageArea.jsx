@@ -3,9 +3,13 @@ import ChatMessage from "./ChatMessage";
 
 const ChatMessageArea = ({ messages }) => {
     const messagesEndRef = useRef(null);
+    const firstScrollRef = useRef(false);
 
     useEffect(() => {
-        if (messagesEndRef.current) messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: firstScrollRef.current ? "smooth" : "auto" });
+            firstScrollRef.current = true;
+        }
     }, [messages]);
 
     return (

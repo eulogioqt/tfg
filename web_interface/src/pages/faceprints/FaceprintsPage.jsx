@@ -44,7 +44,7 @@ const FaceprintsPage = () => {
                 const response = await faceprints.getById(e.name);
                 if (isResponseOk(response))
                     addFaceprint(response.data);
-            } else if (e.event == FACEPRINT_EVENT.UPDATE) {
+            } else if (e.event == FACEPRINT_EVENT.UPDATE) { // Ahora mismo este por lo de las fotos peta...
                 const response = await faceprints.getById(e.name);
                 if (isResponseOk(response))
                     updateFaceprint(e.name, response.data);
@@ -67,7 +67,7 @@ const FaceprintsPage = () => {
             deleteFaceprint(name);
     };
 
-    const handleUpdate = async (oldName) => {
+    const handleUpdate = async (oldName, newName) => {
         if (newName.trim() === "") return;
 
         if (newName.trim() != oldName.trim()) {
@@ -138,7 +138,7 @@ const FaceprintsPage = () => {
                                         {editingName === person.name ? (
                                             <button
                                                 className="btn btn-success btn-sm me-2"
-                                                onClick={() => handleUpdate(person.name)}
+                                                onClick={() => handleUpdate(person.name, newName)}
                                             >
                                                 Guardar
                                             </button>
