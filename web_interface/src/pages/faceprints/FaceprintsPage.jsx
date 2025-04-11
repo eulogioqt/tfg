@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
+
 import { useAPI } from "../../contexts/APIContext";
+import { useEventBus } from "../../contexts/EventBusContext";
+import { FACEPRINT_EVENT } from "../../contexts/WebSocketContext";
 
 // hacer esta pagina mas chula
 // poner los spinner de cargando cuando este cargando
@@ -13,44 +16,72 @@ import { useAPI } from "../../contexts/APIContext";
 // preguntar ideas a chatgpt pa hacer esto ultimo super mega pro
 
 const FaceprintsPage = () => {
-    const { faceprints } = useAPI();
+    const { faceprints, isResponseOk } = useAPI();
+    const { subscribe } = useEventBus();
+
     const [data, setData] = useState([]);
     const [editingName, setEditingName] = useState(null);
     const [newName, setNewName] = useState("");
 
+    const setFaceprints = (faceprints) => setData(faceprints);
+    const addFaceprint = (faceprint) => setData(data => [...data, faceprint]);
+    const updateFaceprint = (name, faceprint) => setData(data => data.map((item) => (item.name === name ? faceprint : item)));
+    const deleteFaceprint = (name) => setData(data => data.filter((item) => item.name != name));
+
     useEffect(() => {
         const fetchData = async () => {
             const response = await faceprints.getAll();
-            if (response.status >= 200 && response.status < 300) {
-                const data = response.data.sort((a, b) => a.learning_date - b.learning_date);
-                setData(data);
-                console.log(data);
-            }
+            if (isResponseOk(response))
+                setFaceprints(response.data)
         };
+
         fetchData();
     }, []);
 
+    useEffect(() => {
+        const processEvent = async (e) => {
+            if (e.event == FACEPRINT_EVENT.CREATE) {
+                const response = await faceprints.getById(e.name);
+                if (isResponseOk(response))
+                    addFaceprint(response.data);
+            } else if (e.event == FACEPRINT_EVENT.UPDATE) {
+                const response = await faceprints.getById(e.name);
+                if (isResponseOk(response))
+                    updateFaceprint(e.name, response.data);
+            } else if (e.event == FACEPRINT_EVENT.DELETE) {
+                const response = await faceprints.delete(e.name);
+                if (isResponseOk(response))
+                    deleteFaceprint(e.name);
+            }
+        };
+
+        const unsubscribe = subscribe("ROS_MESSAGE_FACEPRINT_EVENT", processEvent);
+        return () => unsubscribe();
+    }, [])
+
     const handleDelete = async (name) => {
         if (!window.confirm(`¿Seguro que deseas eliminar a ${name}?`)) return;
-        await faceprints.delete(name);
-        setData(data.filter((item) => item.name !== name));
-    };
 
-    const startEditing = (name) => {
-        setEditingName(name);
-        setNewName(name);
+        const response = await faceprints.delete(name);
+        if (isResponseOk(response))
+            deleteFaceprint(name);
     };
 
     const handleUpdate = async (oldName) => {
         if (newName.trim() === "") return;
 
         if (newName.trim() != oldName.trim()) {
-            // Solo si ha cambiado
-            const updated = await faceprints.update(oldName, { name: newName });
-            setData(data.map((item) => (item.name === oldName ? updated.data : item)));
+            const response = await faceprints.update(oldName, { name: newName });
+            if (isResponseOk(response))
+                updateFaceprint(oldName, response.data);
         }
 
         setEditingName(null);
+    };
+
+    const startEditing = (name) => {
+        setEditingName(name);
+        setNewName(name);
     };
 
     return (
@@ -71,7 +102,7 @@ const FaceprintsPage = () => {
                     </thead>
                     <tbody>
                         {data &&
-                            data.map((person) => (
+                            data.sort((a, b) => a.learning_date - b.learning_date).map((person) => (
                                 <tr key={person.name}>
                                     <td>
                                         <img

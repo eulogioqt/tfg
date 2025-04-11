@@ -6,10 +6,16 @@ import { useToast } from "./ToastContext";
 
 const WebSocketContext = createContext();
 
-const MESSAGE_TYPE = {
+export const MESSAGE_TYPE = {
     RESPONSE: "RESPONSE",
-    //FACEPRINT_EVENT: "FACEPRINT_EVENT",
+    FACEPRINT_EVENT: "FACEPRINT_EVENT",
 };
+
+export const FACEPRINT_EVENT = {
+    CREATE: "CREATE",
+    UPDATE: "UPDATE",
+    DELETE: "DELETE"
+}
 
 export const WebSocketProvider = ({ children }) => {
     const { publish } = useEventBus();
@@ -73,11 +79,7 @@ export const WebSocketProvider = ({ children }) => {
             publish(`ROS_MESSAGE_${event.type}`, event.data);
         } else {
             console.log("Tipo de mensaje desconocido:", event.type, event.data);
-            showToast(
-                "Mensaje no reconocido",
-                "Se ha recibido un mensaje con tipo " + event.type + ", no reconocido",
-                "red"
-            );
+            showToast("Mensaje no reconocido", "Se ha recibido un mensaje con tipo " + event.type + ", no reconocido", "red");
         }
     };
 

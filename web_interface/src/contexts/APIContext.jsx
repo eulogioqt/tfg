@@ -1,5 +1,6 @@
 import { useContext, createContext, useState, useEffect } from "react";
 import axios from "axios";
+import { useToast } from "./ToastContext";
 
 const APIContext = createContext();
 
@@ -7,6 +8,8 @@ const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:7654";
 console.log("BASE_URL:", BASE_URL);
 
 export const APIProvider = ({ children }) => {
+    const { showToast } = useToast();
+
     const [loadCount, setLoadCount] = useState(0);
     const [authToken, setAuthToken] = useState(undefined);
 
@@ -35,6 +38,7 @@ export const APIProvider = ({ children }) => {
         } catch (error) {
             console.log("Error en la peticion (error, data):", error.response, data);
             setLoading(false);
+            showToast("Error en la petición", error.response.data.details, "red");
             return error.response;
         }
     };
@@ -45,6 +49,8 @@ export const APIProvider = ({ children }) => {
         put: (url, data, headers = undefined) => requestHandler("put", url, data, headers),
         delete: (url, headers = undefined) => requestHandler("delete", url, undefined, headers),
     };
+
+    const isResponseOk = (response) => response.status >= 200 && response.status < 300;
 
     const createEndpointMethods = (entity, extraEndpoints) => ({
         getAll: (params = "", version = "v1") =>
@@ -69,6 +75,7 @@ export const APIProvider = ({ children }) => {
             value={{
                 faceprints: faceprintsAPI,
 
+                isResponseOk: isResponseOk,
                 setAuthToken: setAuthToken,
                 axios: apiMethods,
             }}
