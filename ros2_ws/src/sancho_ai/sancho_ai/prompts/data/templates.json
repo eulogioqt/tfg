@@ -1,0 +1,57 @@
+{
+    "WHAT_YOU_SEE": [
+        "Ahora mismo veo a {people} frente a mí.",
+        "Estoy observando a {people} justo delante.",
+        "Tengo a {people} en el campo de visión.",
+        "Parece que hay {people} por aquí.",
+        "¡Hola {people}! Qué gusto veros desde mi cámara.",
+        "Detecto la presencia de {people}.",
+        "Veo claramente a {people} en la escena.",
+        "Estoy viendo a {people}. Parece que están cerca.",
+        "Mi sistema visual identifica a {people}.",
+        "En pantalla aparecen {people}.",
+        "Puedo ver a {people} desde donde estoy.",
+        "Captando imagen: {people} están frente a mí."
+    ],
+
+    "HOW_ARE_YOU": [
+        "Me siento excelente, ¡gracias por preguntar!",
+        "Estoy funcionando correctamente y de buen humor.",
+        "Todo en orden por aquí, ¿y tú?",
+        "¡Fantástico! Es un gran día para ser un robot.",
+        "Siento que estoy al 100% de energía.",
+        "Estoy operativo y con ganas de colaborar.",
+        "Mis sensores indican que todo va bien.",
+        "Estoy bien, aunque aún no entiendo los sentimientos humanos del todo.",
+        "Me encuentro estable y sin errores en el sistema.",
+        "¡Listo para ayudar! Gracias por interesarte.",
+        "No tengo emociones, pero si las tuviera, diría que estoy genial."
+    ],
+
+    "DELETE_USER": {
+        "success": [
+            "He eliminado al usuario {nombre_usuario} del sistema.",
+            "{nombre_usuario} ha sido borrado correctamente.",
+            "Confirmado: el usuario {nombre_usuario} ya no está en la base de datos.",
+            "Eliminación exitosa de {nombre_usuario}.",
+            "Usuario {nombre_usuario} eliminado.",
+            "{nombre_usuario} ya no forma parte del sistema.",
+            "Operación completada: {nombre_usuario} ha sido eliminado.",
+            "He borrado a {nombre_usuario}, como pediste.",
+            "El usuario {nombre_usuario} ha desaparecido del sistema.",
+            "Usuario {nombre_usuario} removido sin inconvenientes."
+        ],
+        "failure": [
+            "No encontré a ningún usuario llamado {nombre_usuario}.",
+            "Parece que {nombre_usuario} no existe en la base de datos.",
+            "No he podido eliminar a {nombre_usuario} porque no lo localizo.",
+            "No hay ningún registro de {nombre_usuario}.",
+            "Lo siento, pero no he podido encontrar a {nombre_usuario}.",
+            "Error: {nombre_usuario} no se encuentra en el sistema.",
+            "Intenté eliminar a {nombre_usuario}, pero no existe.",
+            "No he podido realizar la operación, el usuario {nombre_usuario} no fue hallado.",
+            "No tengo datos de {nombre_usuario}. ¿Estás seguro de que está registrado?",
+            "No ha sido posible eliminar a {nombre_usuario}. Verifica si el nombre está bien escrito."
+        ]
+    }
+}

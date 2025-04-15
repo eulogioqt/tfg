@@ -39,3 +39,30 @@
 # En la bd de caras tambien poner logs de caras y salga la fecha en la que esta y mucha info en plan asi
 
 # https://chatgpt.com/c/67dac8c1-affc-800f-91d3-02cb7a121d57
+
+
+
+# quiza el articulo se podria hacer sobre esto, al menos en el tfg estara:
+
+# opciones sobre llms
+# 0. Procesar con palabras clave
+
+# A. Embeddings para detectar la intencion
+    # A.1 Con una frase que explique todo (json con command: description)
+    # A.2 Con ejemplos (json con command: [examples])
+
+# B. Prompt para detectar la intencion, y prompt para generar la respuesta 
+# (json con {command, description, arguments}, prompt system chetao para intencion y otro para generar respuesta)
+
+# C. Prompt para detectar la intencion, y lista de templates para generar la respuesta
+# (json con {command, description, arguments}, prompt sstem chetoa para intencion y coger uno random de la lista de templates)
+
+# D. Prompt para detectar la intencion y generar el template
+# (json con {command, description, arguments}, prompt system unico con todo lo de B en uno, mas lo que se quiera)
+
+# medir gasto de tokens, tiempo, eficiencia...
+
+# Extra: implementacion con ros y ros2web
+# llm_tools
+# como hacer pruebas a tu mierdon este
+# sistema para hacer todo esto solo definiendo los comandos argumentso y demas

@@ -6,13 +6,13 @@ from llm_msgs.srv import Prompt, Embedding
 
 from dotenv import load_dotenv
 
-from .api.openai_provider import OpenAIProvider
+from .providers.openai_provider import OpenAIProvider
 
 class LLMNode(Node):
     def __init__(self):
         super().__init__('llm_node')
 
-        self._load_dotenv()
+        load_dotenv()
         self.provider_map = self._load_providers()
 
         self.prompt_srv = self.create_service(Prompt, 'llm_tools/prompt', self.handle_prompt)
@@ -23,10 +23,10 @@ class LLMNode(Node):
     def handle_prompt(self, request, response):
         provider = self.get_provider(request.provider.lower())
         result = provider.prompt(
-            user_input=request.user_input,
             model=request.model,
             prompt_system=request.prompt_system,
             messages_json=request.messages_json,
+            user_input=request.user_input,
             parameters_json=request.parameters_json
         )
         response.response = result
@@ -36,8 +36,8 @@ class LLMNode(Node):
     def handle_embedding(self, request, response):
         provider = self.get_provider(request.provider.lower())
         result = provider.embedding(
-            user_input=request.user_input,
-            model=request.model
+            model=request.model,
+            user_input=request.user_input
         )
         response.embedding = result
 
@@ -65,9 +65,6 @@ class LLMNode(Node):
             raise RuntimeError("No LLM providers available")
 
         return providers
-
-    def _load_dotenv(self):
-        load_dotenv()
 
 def main(args=None):
     rclpy.init(args=args)

@@ -1,5 +1,5 @@
 string provider
-string user_input
 string model
+string user_input
 ---
 float32[] embedding

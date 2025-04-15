@@ -1,0 +1,19 @@
+[
+    {
+      "name": "DELETE_USER",
+      "description": "Eliminar o borrar a un usuario del sistema.",
+      "arguments": {
+        "nombre_usuario": "Nombre del usuario a eliminar (si se menciona)."
+      }
+    },
+    {
+      "name": "WHAT_YOU_SEE",
+      "description": "Saber qué está observando el robot o qué se ve por la cámara.",
+      "arguments": {}
+    },
+    {
+      "name": "HOW_ARE_YOU",
+      "description": "Conocer el estado emocional o físico del robot.",
+      "arguments": {}
+    }
+  ]

@@ -8,7 +8,7 @@ class OpenAIProvider(LLMProvider):
     def __init__(self, api_key):
         self.client = openai.OpenAI(api_key=api_key)
     
-    def embedding(self, user_input, model):
+    def embedding(self, model, user_input):
         if not model:
             model = "text-embedding-3-small"
 
@@ -17,8 +17,8 @@ class OpenAIProvider(LLMProvider):
             input=[user_input]
         ).data[0].embedding
 
-    def prompt(self, user_input, model, prompt_system, messages_json, parameters_json):       
-        messages = [{"role": "user", "content": user_input}]
+    def prompt(self, model, prompt_system, messages_json, user_input, parameters_json):       
+        messages = []
 
         if not model: 
             model = "gpt-3.5-turbo"
@@ -27,9 +27,14 @@ class OpenAIProvider(LLMProvider):
             messages.append({"role": "system", "content": prompt_system})
 
         if messages_json:
-            messages.extend(json.loads(messages_json))
+            messages.extend(json.loads(messages_json)) 
 
-        parameters = json.loads(parameters_json) if parameters_json else { "temperature": 0.0 }
+        if user_input:
+            messages.append({"role": "user", "content": user_input})
+
+        parameters = json.loads(parameters_json) if parameters_json else {}
+        parameters.setdefault("temperature", 0.0)
+        parameters.setdefault("max_tokens", 60)
 
         response = self.client.chat.completions.create(
             model=model,
