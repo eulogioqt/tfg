@@ -1,4 +1,5 @@
 import json
+
 from .prompt import Prompt
 
 PROMPT_TEMPLATE = """

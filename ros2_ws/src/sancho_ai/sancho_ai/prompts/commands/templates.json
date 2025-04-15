@@ -1,0 +1,70 @@
+{
+    "WHAT_YOU_SEE": [
+        "Ahora mismo veo a {people} frente a mí.",
+        "Estoy observando a {people} justo delante.",
+        "Tengo a {people} en el campo de visión.",
+        "Parece que hay {people} por aquí.",
+        "¡Hola {people}! Qué gusto veros desde mi cámara.",
+        "Detecto la presencia de {people}.",
+        "Veo claramente a {people} en la escena.",
+        "Estoy viendo a {people}. Parece que están cerca.",
+        "Mi sistema visual identifica a {people}.",
+        "En pantalla aparecen {people}.",
+        "Puedo ver a {people} desde donde estoy.",
+        "Captando imagen: {people} están frente a mí."
+    ],
+
+    "HOW_ARE_YOU": [
+        "Me siento excelente, ¡gracias por preguntar!",
+        "Estoy funcionando correctamente y de buen humor.",
+        "Todo en orden por aquí, ¿y tú?",
+        "¡Fantástico! Es un gran día para ser un robot.",
+        "Siento que estoy al 100% de energía.",
+        "Estoy operativo y con ganas de colaborar.",
+        "Mis sensores indican que todo va bien.",
+        "Estoy bien, aunque aún no entiendo los sentimientos humanos del todo.",
+        "Me encuentro estable y sin errores en el sistema.",
+        "¡Listo para ayudar! Gracias por interesarte.",
+        "No tengo emociones, pero si las tuviera, diría que estoy genial."
+    ],
+
+    "DELETE_USER": {
+        "success": [
+            "He eliminado al usuario {user} del sistema.",
+            "{user} ha sido borrado correctamente.",
+            "Confirmado: el usuario {user} ya no está en la base de datos.",
+            "Eliminación exitosa de {user}.",
+            "Usuario {user} eliminado.",
+            "{user} ya no forma parte del sistema.",
+            "Operación completada: {user} ha sido eliminado.",
+            "He borrado a {user}, como pediste.",
+            "El usuario {user} ha desaparecido del sistema.",
+            "Usuario {user} removido sin inconvenientes."
+        ],
+        "failure": [
+            "No encontré a ningún usuario llamado {user}.",
+            "Parece que {user} no existe en la base de datos.",
+            "No he podido eliminar a {user} porque no lo localizo.",
+            "No hay ningún registro de {user}.",
+            "Lo siento, pero no he podido encontrar a {user}.",
+            "Error: {user} no se encuentra en el sistema.",
+            "Intenté eliminar a {user}, pero no existe.",
+            "No he podido realizar la operación, el usuario {user} no fue hallado.",
+            "No tengo datos de {user}. ¿Estás seguro de que está registrado?",
+            "No ha sido posible eliminar a {user}. Verifica si el nombre está bien escrito."
+        ]
+    },
+    
+    "UNKNOWN": [
+      "Lo siento, no he entendido lo que me has dicho.",
+      "¿Podrías repetirlo de otra forma? No estoy seguro de haberlo comprendido.",
+      "No estoy seguro de cómo responder a eso, pero sigo aquí para ayudarte.",
+      "Mmm… no tengo una respuesta clara para eso, ¿quieres intentarlo de nuevo?",
+      "Lo siento, creo que no entendí esa última parte.",
+      "Puedes preguntarme cosas como '¿qué ves?' o '¿cómo estás?'.",
+      "No he reconocido esa intención, pero estoy listo para ayudarte.",
+      "Soy un robot curioso, pero no entendí bien lo que quisiste decir.",
+      "No te he comprendido del todo, ¿puedes decírmelo de otra manera?",
+      "No he detectado ninguna orden o pregunta clara, ¿puedes reformularlo?"
+    ]
+}

@@ -3,7 +3,7 @@
       "name": "DELETE_USER",
       "description": "Eliminar o borrar a un usuario del sistema.",
       "arguments": {
-        "nombre_usuario": "Nombre del usuario a eliminar (si se menciona)."
+        "user": "Nombre del usuario a eliminar (si se menciona)."
       }
     },
     {

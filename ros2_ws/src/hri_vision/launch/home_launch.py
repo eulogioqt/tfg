@@ -49,6 +49,12 @@ def generate_launch_description():
             output='screen'
         ),
         Node(
+            package='llm_tools',
+            executable='llm',
+            name='llm',
+            output='screen'
+        ),
+        Node(
             package='sancho_ai',
             executable='sancho_ai',
             name='sancho_ai',

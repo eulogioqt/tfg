@@ -42,22 +42,25 @@
 
 
 
+
+
+
 # quiza el articulo se podria hacer sobre esto, al menos en el tfg estara:
 
 # opciones sobre llms
-# 0. Procesar con palabras clave
+# 0. Procesar con palabras clave (simple ai)
 
-# A. Embeddings para detectar la intencion
+# A. Embeddings para detectar la intencion (embeddings ai)
     # A.1 Con una frase que explique todo (json con command: description)
     # A.2 Con ejemplos (json con command: [examples])
 
-# B. Prompt para detectar la intencion, y prompt para generar la respuesta 
+# B. Prompt para detectar la intencion, y prompt para generar la respuesta (classification hri ai)
 # (json con {command, description, arguments}, prompt system chetao para intencion y otro para generar respuesta)
 
-# C. Prompt para detectar la intencion, y lista de templates para generar la respuesta
+# C. Prompt para detectar la intencion, y lista de templates para generar la respuesta (classification templates ai)
 # (json con {command, description, arguments}, prompt sstem chetoa para intencion y coger uno random de la lista de templates)
 
-# D. Prompt para detectar la intencion y generar el template
+# D. Prompt para detectar la intencion y generar el template (unified ai)
 # (json con {command, description, arguments}, prompt system unico con todo lo de B en uno, mas lo que se quiera)
 
 # medir gasto de tokens, tiempo, eficiencia...

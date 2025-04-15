@@ -10,7 +10,7 @@ from .providers.openai_provider import OpenAIProvider
 
 class LLMNode(Node):
     def __init__(self):
-        super().__init__('llm_node')
+        super().__init__('llm')
 
         load_dotenv()
         self.provider_map = self._load_providers()

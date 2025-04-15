@@ -2,11 +2,15 @@ import rclpy
 from rclpy.node import Node
 
 from hri_msgs.srv import SanchoPrompt
-from llm_msgs.srv import Prompt
+
+from .ais.ai import AI
+
+from .ais.simple_ai import SimpleAI
+from .ais.classification_templates_ai import ClassificationTemplatesAI
 
 class SanchoAINode(Node):
 
-    def __init__(self, sancho_ai: "SanchoAI"):
+    def __init__(self, sancho_ai: AI):
         super().__init__("sancho_ai")
 
         self.sancho_ai = sancho_ai
@@ -18,23 +22,10 @@ class SanchoAINode(Node):
         response.text = self.sancho_ai.on_message(request.text)
         return response
 
-class SanchoAI:
-    
-    def __init__(self):
-        self.node = SanchoAINode(self)
-
-    def spin(self):
-        while True:
-            rclpy.spin_once(self.node)
-
-    def on_message(self, message):
-        return message[::-1]
-
-
 def main(args=None):
     rclpy.init(args=args)
 
-    sancho_ai = SanchoAI()
+    sancho_ai = ClassificationTemplatesAI()
 
     sancho_ai.spin()
     rclpy.shutdown()
