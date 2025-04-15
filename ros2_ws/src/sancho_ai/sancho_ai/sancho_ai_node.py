@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 
 from hri_msgs.srv import SanchoPrompt
+from llm_msgs.srv import Prompt
 
 class SanchoAINode(Node):
 
