@@ -7,7 +7,7 @@ class LLMEngine(ServiceEngine):
     def __init__(self, node):
         super().__init__(node)
 
-        self.prompt_cli = self.create_client(Prompt, "llm_tools/prompt"),
+        self.prompt_cli = self.create_client(Prompt, "llm_tools/prompt")
 
         self.node.get_logger().info("Prompt Engine initializated succesfully")
 

@@ -23,7 +23,7 @@ class SanchoAINode(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    node = SanchoAINode(AIType.SIMPLE)
+    node = SanchoAINode(AIType.CLASSIFICATION_TEMPLATES)
 
     rclpy.spin(node)
     rclpy.shutdown()

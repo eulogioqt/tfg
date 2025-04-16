@@ -27,6 +27,7 @@ class ClassificationTemplatesAI(TemplateAI):
             parameters_json=classification_prompt.get_parameters()
         )
 
+        self.node.get_logger().info(classification_response_json)
         classification_response = json.loads(classification_response_json)
         intent = classification_response["intent"]
 
@@ -44,6 +45,6 @@ class ClassificationTemplatesAI(TemplateAI):
 
             response = self.delete_user(user, result)
         else:
-            response = self.unknown_message
+            response = self.unknown_message()
 
         return response

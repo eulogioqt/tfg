@@ -21,9 +21,6 @@ class LLMNode(Node):
         self.get_logger().info(f"LLM Node initializated succesfully with providers: {list(self.provider_map.keys())}")
 
     def handle_prompt(self, request, response):
-        response.response = json.dumps({"intent": "DELETE_USER", "arguments": {"user": "mojoncito"}})
-        self.get_logger().info("HA LLLEGADO, RESPONMDIENDO")
-        return response
         provider = self.get_provider(request.provider.lower())
         result = provider.prompt(
             model=request.model,
