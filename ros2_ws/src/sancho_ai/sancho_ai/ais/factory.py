@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Type
 
-from .ai import AI
+from .interfaces.ai import AI
 from .simple_ai import SimpleAI
 from .classification_templates_ai import ClassificationTemplatesAI
 
