@@ -25,7 +25,7 @@ class ClassificationPrompt(Prompt):
         self.user_input = user_input
 
         current_dir = os.path.dirname(__file__)
-        commands_path = os.path.join(current_dir, '..', '..', 'commands', 'commands.json')
+        commands_path = os.path.join(current_dir, 'commands', 'commands.json')
 
         with open(commands_path, 'r', encoding='utf-8') as f:
             self.intents_definitions_data = json.load(f)
@@ -43,7 +43,7 @@ class ClassificationPrompt(Prompt):
         return f"Usuario: {self.user_input}"
 
     def get_parameters(self):
-        return {
+        return json.dumps({
             "temperature": 0.0,
             "max_tokens": 1024 # De sobra para que de el JSON bien
-        }
+        })

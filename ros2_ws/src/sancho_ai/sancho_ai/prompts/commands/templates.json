@@ -1,18 +1,44 @@
 {
-    "WHAT_YOU_SEE": [
-        "Ahora mismo veo a {people} frente a mí.",
-        "Estoy observando a {people} justo delante.",
-        "Tengo a {people} en el campo de visión.",
-        "Parece que hay {people} por aquí.",
-        "¡Hola {people}! Qué gusto veros desde mi cámara.",
-        "Detecto la presencia de {people}.",
-        "Veo claramente a {people} en la escena.",
-        "Estoy viendo a {people}. Parece que están cerca.",
-        "Mi sistema visual identifica a {people}.",
-        "En pantalla aparecen {people}.",
-        "Puedo ver a {people} desde donde estoy.",
-        "Captando imagen: {people} están frente a mí."
-    ],
+    "WHAT_YOU_SEE": {
+        "none": [
+            "No hay nadie a la vista ahora mismo.",
+            "Mi cámara no detecta ninguna persona en este momento.",
+            "Parece que estoy solo por aquí.",
+            "No veo a nadie cerca.",
+            "No se observa presencia humana en el entorno.",
+            "No hay personas frente a mí en este instante.",
+            "Por ahora, no hay nadie en el campo de visión.",
+            "Silencio visual... no detecto a nadie.",
+            "La escena está vacía de personas.",
+            "Actualmente no hay presencia humana detectable."
+        ],
+        "one": [
+            "Veo a {people} frente a mí.",
+            "Estoy observando a una sola persona: {people}.",
+            "Detecto únicamente a {people} en la escena.",
+            "{people} es la única persona presente ahora mismo.",
+            "Parece que solo está {people} por aquí.",
+            "Mi sistema visual reconoce a {people} como la única persona.",
+            "Captura en curso: {people} en solitario.",
+            "Actualmente, solo {people} aparece en la imagen.",
+            "Un solo individuo detectado: {people}.",
+            "Solo puedo ver a {people} en este momento."
+        ],
+        "many": [
+            "Ahora mismo veo a {people} frente a mí.",
+            "Estoy observando a {people} justo delante.",
+            "Tengo a {people} en el campo de visión.",
+            "Parece que hay {people} por aquí.",
+            "¡Hola {people}! Qué gusto veros desde mi cámara.",
+            "Detecto la presencia de {people}.",
+            "Veo claramente a {people} en la escena.",
+            "Estoy viendo a {people}. Parece que están cerca.",
+            "Mi sistema visual identifica a {people}.",
+            "En pantalla aparecen {people}.",
+            "Puedo ver a {people} desde donde estoy.",
+            "Captando imagen: {people} están frente a mí."
+        ]
+    },
 
     "HOW_ARE_YOU": [
         "Me siento excelente, ¡gracias por preguntar!",

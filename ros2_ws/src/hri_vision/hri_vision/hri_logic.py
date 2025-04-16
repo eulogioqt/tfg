@@ -312,7 +312,6 @@ class HRILogic():
 
         return result_training.result, result_training.message
 
-    # Services
     def get_actual_people(self, request, response):
         actual_people_time = self.get_actual_people_time()
         actual_people_json = json.dumps(actual_people_time)

@@ -89,14 +89,7 @@ class HumanFaceRecognizer(Node):
             if updated:
                 self.send_faceprint_event(FaceprintEvent.UPDATE, classified, FaceprintEvent.ORIGIN_ROS) # Podria hacer que en el update se mandasen tambien que fields se han cambiado...
 
-            self.get_logger().info(f"{classified} FACE SIZE: {size}") # hacer que el score guardado sea size / 256 por el score  real o algo o poner un minimo
-            self.get_logger().info(f"{classified} FACE SIZE: {size}")
-            self.get_logger().info(f"{classified} FACE SIZE: {size}")
-            self.get_logger().info(f"{classified} FACE SIZE: {size}")
-            self.get_logger().info(f"{classified} FACE SIZE: {size}")
-            self.get_logger().info(f"{classified} FACE SIZE: {size}")
-            self.get_logger().info(f"{classified} FACE SIZE: {size}")
-            self.get_logger().info(f"{classified} FACE SIZE: {size}")
+            #self.get_logger().info(f"{classified} FACE SIZE: {size}") # hacer que el score guardado sea size / 256 por el score  real o algo o poner un minimo
 
         face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg = (
             self.br.recognizer_to_msg(face_aligned, features, classified, distance, pos)
@@ -180,7 +173,6 @@ class HumanFaceRecognizer(Node):
         return response
 
     def save_data(self):
-        self.get_logger().info("guardando dataton")
         self.classifier.save()
 
 def main(args=None):

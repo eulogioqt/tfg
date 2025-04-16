@@ -3,17 +3,14 @@ from rclpy.node import Node
 
 from hri_msgs.srv import SanchoPrompt
 
-from .ais.ai import AI
-
-from .ais.simple_ai import SimpleAI
-from .ais.classification_templates_ai import ClassificationTemplatesAI
+from .ais.factory import create_sancho_ai, AIType
 
 class SanchoAINode(Node):
 
-    def __init__(self, sancho_ai: AI):
+    def __init__(self, type):
         super().__init__("sancho_ai")
 
-        self.sancho_ai = sancho_ai
+        self.sancho_ai = create_sancho_ai(type)
         self.prompt_serv = self.create_service(SanchoPrompt, "sancho_ai/prompt", self.prompt_service)
 
         self.get_logger().info("SanchoAI Node initializated succesfully")
@@ -25,7 +22,7 @@ class SanchoAINode(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    sancho_ai = ClassificationTemplatesAI()
+    node = SanchoAINode(AIType.CLASSIFICATION_TEMPLATES)
 
-    sancho_ai.spin()
+    rclpy.spin(node)
     rclpy.shutdown()
