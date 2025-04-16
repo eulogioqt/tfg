@@ -1,5 +1,4 @@
 import json
-import random
 
 from .template_ai import TemplateAI
 
@@ -40,7 +39,8 @@ class ClassificationTemplatesAI(TemplateAI):
             response = self.what_you_see(actual_people)
         elif intent == COMMANDS.DELETE_USER:
             user = classification_response["arguments"]["user"]
-            result = random.choice(["failure", "success"])
+            result = self.hri_engine.delete_request(user)
+            result = "success" if result >= 0 else "failure"
 
             response = self.delete_user(user, result)
         else:

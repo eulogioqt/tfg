@@ -1,8 +1,10 @@
 import rclpy
-from rclpy import Node
+from rclpy.node import Node
+from rclpy.client import Client
 
 from rclpy.executors import SingleThreadedExecutor
 from threading import Thread, Event
+
 
 class ServiceEngine:
     
@@ -16,7 +18,7 @@ class ServiceEngine:
 
         return client
 
-    def call_service(self, client, request):
+    def call_service(self, client: Client, request):
         done_event = Event()
         result_holder = {}
 

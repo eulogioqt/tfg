@@ -16,14 +16,15 @@ class SimpleAI(TemplateAI):
     def on_message(self, message: str):
         if 'como estas' in message:  # Busca en Wikipedia lo que le digas
             response = self.how_are_you()
-        elif 'quien soy' == message or 'que ves' in message:
+        elif 'quien soy' == message or 'que ves' in message or 'quien ves' in message:
             actual_people_json = self.hri_engine.get_actual_people_request()
             actual_people = json.loads(actual_people_json)
 
             response = self.what_you_see(actual_people)
         elif message.startswith('borra a'):
             user = message[(len("borra a") + 1):]
-            result = "success"
+            result = self.hri_engine.delete_request(user)
+            result = "success" if result >= 0 else "failure"
 
             response = self.delete_user(user, result)
         else: 

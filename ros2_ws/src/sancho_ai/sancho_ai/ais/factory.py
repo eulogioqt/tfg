@@ -1,17 +1,21 @@
 from enum import Enum
 from typing import Type
 
-from .interfaces.ai import AI
+from .ai import AI
+
+from .dummy_ai import DummyAI
 from .simple_ai import SimpleAI
 from .classification_templates_ai import ClassificationTemplatesAI
 
 
 class AIType(str, Enum):
+    DUMMY = "DUMMY"
     SIMPLE = "SIMPLE"
     CLASSIFICATION_TEMPLATES = "CLASSIFICATION_TEMPLATES"
 
 
 AI_CLASSES: dict[AIType, Type[AI]] = {
+    AIType.DUMMY: DummyAI,
     AIType.SIMPLE: SimpleAI,
     AIType.CLASSIFICATION_TEMPLATES: ClassificationTemplatesAI
 }

@@ -5,6 +5,7 @@ from hri_msgs.srv import SanchoPrompt
 
 from .ais.factory import create_sancho_ai, AIType
 
+
 class SanchoAINode(Node):
 
     def __init__(self, type):
@@ -22,7 +23,7 @@ class SanchoAINode(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    node = SanchoAINode(AIType.CLASSIFICATION_TEMPLATES)
+    node = SanchoAINode(AIType.SIMPLE)
 
     rclpy.spin(node)
     rclpy.shutdown()
