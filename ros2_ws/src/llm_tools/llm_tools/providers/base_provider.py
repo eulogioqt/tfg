@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class LLMProvider(ABC):
+class BaseProvider(ABC):
 
     @abstractmethod
     def embedding(self, prompt, model):
