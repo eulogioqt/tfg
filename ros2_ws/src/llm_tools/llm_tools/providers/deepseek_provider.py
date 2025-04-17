@@ -4,6 +4,7 @@ from .base_provider import BaseProvider
 
 from ..constants import MODELS
 
+
 class DeepSeekProvider(BaseProvider):
     def __init__(self, api_key):
         self.llm = HFTextGenerationProvider([MODELS.LLM.DEEPSEEK.DEEPSEEK_CHAT], api_key)

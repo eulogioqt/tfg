@@ -5,11 +5,12 @@ from .base_provider import BaseProvider
 from ..prompt_formatters import OpenAIFormatter
 from ..constants import MODELS
 
+
 class OpenAIProvider(BaseProvider):
 
     def __init__(self, api_key):
-        self.client = openai.OpenAI(api_key=api_key)
         self.formatter = OpenAIFormatter()
+        self.client = openai.OpenAI(api_key=api_key)
     
     def embedding(self, model, user_input):
         if not model:

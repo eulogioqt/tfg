@@ -4,6 +4,7 @@ from .base_provider import BaseProvider
 
 from ..constants import MODELS
 
+
 class QwenProvider(BaseProvider):
     def __init__(self, api_key):
         self.llm = HFTextGenerationProvider([MODELS.LLM.QWEN.QWEN_7B], api_key)
