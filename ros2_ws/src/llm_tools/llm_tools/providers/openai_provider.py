@@ -24,10 +24,10 @@ class OpenAIProvider(BaseProvider):
 
         messages = self.formatter.format(prompt_system, messages_json, user_input)
         parameters = json.loads(parameters_json) if parameters_json else {}
-
-        final_parameters = {}
-        final_parameters["temperature"] = parameters.get("temperature", 0.0)
-        final_parameters["max_tokens"] = parameters.get("max_tokens", 60)
+        final_parameters = {
+            "temperature": parameters.get("temperature", 0.0),
+            "max_tokens": parameters.get("max_tokens", 60)
+        }
 
         response = self.client.chat.completions.create(model=model, messages=messages, **final_parameters)
         return response.choices[0].message.content
