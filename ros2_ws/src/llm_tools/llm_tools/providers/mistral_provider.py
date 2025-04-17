@@ -1,17 +1,16 @@
 import json
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
-from sentence_transformers import SentenceTransformer
 
 from .llm_provider import LLMProvider
-from ..constants import LLAMA_LLM_MODEL, LLAMA_EMBEDDING_MODEL
-import sys
-class LLaMAProvider(LLMProvider):
+from ..constants import MISTRAL_LLM_MODEL
+
+class MistralProvider(LLMProvider):
 
     def __init__(self, api_key):
         self.device = 0 if torch.cuda.is_available() else -1
 
-        llm_model_name = LLAMA_LLM_MODEL.MISTRAL_7B
+        llm_model_name = MISTRAL_LLM_MODEL.MISTRAL_7B
         tokenizer = AutoTokenizer.from_pretrained(llm_model_name.value, token=api_key)
         model = AutoModelForCausalLM.from_pretrained(
             llm_model_name.value,
@@ -20,22 +19,18 @@ class LLaMAProvider(LLMProvider):
             token=api_key
         )
 
-        self.client_embeddings = SentenceTransformer(LLAMA_EMBEDDING_MODEL.MINI_LM_L6_V2.value)
         self.client = {
-            LLAMA_LLM_MODEL.MISTRAL_7B: pipeline("text-generation", model=model, tokenizer=tokenizer)
+            MISTRAL_LLM_MODEL.MISTRAL_7B: pipeline("text-generation", model=model, tokenizer=tokenizer)
         }
 
     def embedding(self, model, user_input):
-        if not model:
-            model = LLAMA_EMBEDDING_MODEL.MINI_LM_L6_V2
-
-        return self.client_embeddings.encode([user_input])[0].tolist()
+        return NotImplementedError()
     
     def prompt(self, node, model, prompt_system, messages_json, user_input, parameters_json):
         full_prompt = ""
 
         if not model:
-            model = LLAMA_LLM_MODEL.MISTRAL_7B
+            model = MISTRAL_LLM_MODEL.MISTRAL_7B
 
         if prompt_system:
             full_prompt += f"[INST] <<SYS>>\n{prompt_system}\n<</SYS>>\n"
