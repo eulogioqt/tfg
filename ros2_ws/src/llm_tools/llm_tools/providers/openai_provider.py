@@ -2,6 +2,7 @@ import json
 import openai
 
 from .llm_provider import LLMProvider
+from ..constants import OPENAI_EMBEDDING_MODEL, OPENAI_LLM_MODEL
 
 class OpenAIProvider(LLMProvider):
 
@@ -10,18 +11,15 @@ class OpenAIProvider(LLMProvider):
     
     def embedding(self, model, user_input):
         if not model:
-            model = "text-embedding-3-small"
+            model = OPENAI_EMBEDDING_MODEL.SMALL_3
 
-        return self.client.embeddings.create(
-            model=model,
-            input=[user_input]
-        ).data[0].embedding
+        return self.client.embeddings.create(model=model, input=[user_input]).data[0].embedding
 
     def prompt(self, model, prompt_system, messages_json, user_input, parameters_json):       
         messages = []
 
         if not model: 
-            model = "gpt-3.5-turbo"
+            model = OPENAI_LLM_MODEL.GPT_3_5_TURBO
 
         if prompt_system: 
             messages.append({"role": "system", "content": prompt_system})
@@ -33,13 +31,10 @@ class OpenAIProvider(LLMProvider):
             messages.append({"role": "user", "content": user_input})
 
         parameters = json.loads(parameters_json) if parameters_json else {}
-        parameters.setdefault("temperature", 0.0)
-        parameters.setdefault("max_tokens", 60)
 
-        response = self.client.chat.completions.create(
-            model=model,
-            messages=messages,
-            **parameters
-        )
+        final_parameters = {}
+        final_parameters["temperature"] = parameters.get("temperature", 0.0)
+        final_parameters["max_tokens"] = parameters.get("max_tokens", 60)
 
+        response = self.client.chat.completions.create(model=model, messages=messages, **final_parameters)
         return response.choices[0].message.content

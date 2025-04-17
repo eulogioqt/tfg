@@ -7,7 +7,8 @@ from llm_msgs.srv import Prompt, Embedding
 from dotenv import load_dotenv
 
 from .providers.openai_provider import OpenAIProvider
-import json
+from .providers.llama_provider import LLaMAProvider
+
 class LLMNode(Node):
     def __init__(self):
         super().__init__('llm')
@@ -23,6 +24,7 @@ class LLMNode(Node):
     def handle_prompt(self, request, response):
         provider = self.get_provider(request.provider.lower())
         result = provider.prompt(
+            self,
             model=request.model,
             prompt_system=request.prompt_system,
             messages_json=request.messages_json,
@@ -56,9 +58,16 @@ class LLMNode(Node):
         providers = {}
 
         openai_key = os.getenv("OPENAI_API_KEY")
+        if openai_key:
+            providers["openai"] = OpenAIProvider(api_key=openai_key)
+        else:
+            self.get_logger().warn("OPENAI_API_KEY not defined")
 
-        if openai_key: providers["openai"] = OpenAIProvider(api_key=openai_key)
-        else: self.get_logger().warn("OPENAI_API_KEY not defined")
+        hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
+        if hugging_face_key:
+            providers["llama"] = LLaMAProvider(api_key=hugging_face_key)
+        else:
+            self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
 
         if not providers:
             self.get_logger().error("Couldn't load any LLM provider. Closing node.")

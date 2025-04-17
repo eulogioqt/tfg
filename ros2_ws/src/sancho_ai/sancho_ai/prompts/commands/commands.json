@@ -1,19 +1,48 @@
 [
-    {
-      "name": "DELETE_USER",
-      "description": "Eliminar o borrar a un usuario del sistema.",
-      "arguments": {
-        "user": "Nombre del usuario a eliminar (si se menciona)."
+  {
+    "name": "DELETE_USER",
+    "description": "Eliminar o borrar a un usuario del sistema.",
+    "arguments": {
+      "user": "Nombre del usuario a eliminar (si se menciona)."
+    },
+    "examples": [
+      {
+        "input": "borra al usuario Pedro",
+        "output": {
+          "intent": "DELETE_USER",
+          "arguments": {
+            "user": "Pedro"
+          }
+        }
       }
-    },
-    {
-      "name": "WHAT_YOU_SEE",
-      "description": "Saber qué está observando el robot o qué se ve por la cámara.",
-      "arguments": {}
-    },
-    {
-      "name": "HOW_ARE_YOU",
-      "description": "Conocer el estado emocional o físico del robot.",
-      "arguments": {}
-    }
-  ]
+    ]
+  },
+  {
+    "name": "WHAT_YOU_SEE",
+    "description": "Saber qué está observando el robot o qué se ve por la cámara.",
+    "arguments": {},
+    "examples": [
+      {
+        "input": "qué estás viendo ahora mismo",
+        "output": {
+          "intent": "WHAT_YOU_SEE",
+          "arguments": {}
+        }
+      }
+    ]
+  },
+  {
+    "name": "HOW_ARE_YOU",
+    "description": "Conocer el estado emocional o físico del robot.",
+    "arguments": {},
+    "examples": [
+      {
+        "input": "cómo te encuentras hoy",
+        "output": {
+          "intent": "HOW_ARE_YOU",
+          "arguments": {}
+        }
+      }
+    ]
+  }
+]

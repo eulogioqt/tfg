@@ -3,21 +3,28 @@ import json
 
 from .prompt import Prompt
 
-# Mejorar esto a futuro, en ingles y demas, no tan simple, estudiarlo bien, ahora solo estoy probando
 PROMPT_TEMPLATE = """
-Eres un clasificador de intenciones para un robot conversacional.
-Tu tarea es analizar una frase del usuario y devolver un objeto JSON con esta estructura:
+You are an intent classifier for a conversational robot.
+Your task is to analyze the user's input and return a JSON object in this format:
 
-{{
-  "intent": string,  // uno de los códigos de intención definidos abajo o "UNKNOWN"
-  "arguments": dict  // los argumentos que correspondan o un objeto vacío
-}}
+{
+  "intent": string,   // One of the intent codes listed below, or "UNKNOWN"
+  "arguments": object // Relevant arguments (if any), or an empty object {}
+}
 
-Estas son las intenciones válidas y su definición:
+Valid intents:
 {intents_definitions}
 
-Tu respuesta debe ser SIEMPRE un JSON. Si no reconoces ninguna intención, pon "intent": "UNKNOWN".
-No expliques nada. Solo responde el JSON sin formato adicional.
+If the input doesn't match any known intent, respond with:
+{
+  "intent": "UNKNOWN",
+  "arguments": {}
+}
+
+Examples:
+{examples_section}
+
+Important: Only return valid JSON. No explanations. No markdown. No extra text.
 """
 
 class ClassificationPrompt(Prompt):
@@ -28,22 +35,42 @@ class ClassificationPrompt(Prompt):
         commands_path = os.path.join(current_dir, 'commands', 'commands.json')
 
         with open(commands_path, 'r', encoding='utf-8') as f:
-            self.intents_definitions_data = json.load(f)
+            self.commands = json.load(f)
 
-        self.intents_definitions_str = json.dumps(
-            self.intents_definitions_data,
-            indent=2,
-            ensure_ascii=False
-        )
+        self.intents_definitions_str = self._format_intents()
+        self.examples_str = self._format_examples()
+
+    def _format_intents(self):
+        lines = []
+        for cmd in self.commands:
+            line = f"- {cmd['name']}: {cmd['description']}"
+            args = cmd.get("arguments", {})
+            if args:
+                arg_list = ", ".join([f'"{arg}": {desc}' for arg, desc in args.items()])
+                line += f" (arguments: {{{arg_list}}})"
+            lines.append(line)
+        return "\n".join(lines)
+
+    def _format_examples(self):
+        examples = []
+        for cmd in self.commands:
+            for example in cmd.get("examples", []):
+                input_text = example["input"]
+                output_json = json.dumps(example["output"], ensure_ascii=False)
+                examples.append(f'Input: "{input_text}"\nOutput: {output_json}')
+ 
+        examples.append('Input: "me gusta mucho el fútbol"\nOutput: {"intent": "UNKNOWN", "arguments": {}}')
+        return "\n\n".join(examples)
 
     def get_prompt_system(self):
-        return PROMPT_TEMPLATE.replace("{intents_definitions}", self.intents_definitions_str)
+        return PROMPT_TEMPLATE.replace("{intents_definitions}", self.intents_definitions_str)\
+                              .replace("{examples_section}", self.examples_str)
 
     def get_user_prompt(self):
-        return f"Usuario: {self.user_input}"
+        return self.user_input
 
     def get_parameters(self):
         return json.dumps({
             "temperature": 0.0,
-            "max_tokens": 1024 # De sobra para que de el JSON bien
+            "max_tokens": 512
         })
