@@ -6,8 +6,12 @@ from llm_msgs.srv import Prompt, Embedding
 
 from dotenv import load_dotenv
 
+from .providers.base_provider import BaseProvider
 from .providers.openai_provider import OpenAIProvider
-from .providers.llama_provider import LLaMAProvider
+from .providers.mistral_provider import MistralProvider
+
+# IMPORTANTISIMO
+# METER A FUTURO SISTEMA DE STREAMING EN TODOS LOS PROVIDERS O ALGO ASI, IMPLEMENTARLO CON UN ACTION Y DEMAS
 
 class LLMNode(Node):
     def __init__(self):
@@ -22,9 +26,8 @@ class LLMNode(Node):
         self.get_logger().info(f"LLM Node initializated succesfully with providers: {list(self.provider_map.keys())}")
 
     def handle_prompt(self, request, response):
-        provider = self.get_provider(request.provider.lower())
+        provider = self.provider_map["mistral"] #self.get_provider(request.provider.lower())
         result = provider.prompt(
-            self,
             model=request.model,
             prompt_system=request.prompt_system,
             messages_json=request.messages_json,
@@ -45,7 +48,7 @@ class LLMNode(Node):
 
         return response
 
-    def get_provider(self, provider_name: str):
+    def get_provider(self, provider_name: str) -> BaseProvider:
         provider = self.provider_map.get(provider_name)
         if not provider:
             fallback = list(self.provider_map.keys())[0]
@@ -57,15 +60,16 @@ class LLMNode(Node):
     def _load_providers(self):
         providers = {}
 
-        openai_key = os.getenv("OPENAI_API_KEY")
-        if openai_key:
-            providers["openai"] = OpenAIProvider(api_key=openai_key)
-        else:
-            self.get_logger().warn("OPENAI_API_KEY not defined")
+        if False:
+            openai_key = os.getenv("OPENAI_API_KEY")
+            if openai_key:
+                providers["openai"] = OpenAIProvider(api_key=openai_key)
+            else:
+                self.get_logger().warn("OPENAI_API_KEY not defined")
 
         hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
         if hugging_face_key:
-            providers["llama"] = LLaMAProvider(api_key=hugging_face_key)
+            providers["mistral"] = MistralProvider(api_key=hugging_face_key)
         else:
             self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
 

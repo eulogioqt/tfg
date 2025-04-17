@@ -1,23 +1,28 @@
 import json
-
+from transformers import PreTrainedTokenizerBase
 from .prompt_formatter import PromptFormatter
 
+
 class HFFormatter(PromptFormatter):
+    def __init__(self, tokenizer: PreTrainedTokenizerBase):
+        self.tokenizer = tokenizer
+
     def format(self, prompt_system: str, messages_json: str, user_input: str) -> str:
-        full_prompt = ""
+        messages = []
 
         if prompt_system:
-            full_prompt += f"[INST] <<SYS>>\n{prompt_system}\n<</SYS>>\n"
+            messages.append({"role": "system", "content": prompt_system})
 
         if messages_json:
-            for msg in json.loads(messages_json):
-                if msg["role"] == "user":
-                    full_prompt += f"[INST] {msg['content']} [/INST]\n"
-                elif msg["role"] == "assistant":
-                    full_prompt += f"{msg['content']}\n"
+            messages.extend(json.loads(messages_json))
 
         if user_input:
-            full_prompt += f"\nInput: {user_input}"
+            messages.append({"role": "user", "content": user_input})
 
-        full_prompt += "\n[/INST]"
-        return full_prompt
+        formatted_prompt = self.tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True
+        )
+
+        return formatted_prompt

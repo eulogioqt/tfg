@@ -9,7 +9,7 @@ from ..llm_engine import LLMEngine
 from ..prompts.classification_prompt import ClassificationPrompt
 from ..prompts.commands.commands import COMMANDS
 
-from llm_tools.constants import PROVIDER, MODELS
+#from llm_tools.constants import PROVIDER, MODELS
 
 class ClassificationTemplatesAI(TemplateAI):
 
@@ -24,8 +24,8 @@ class ClassificationTemplatesAI(TemplateAI):
         classification_prompt = ClassificationPrompt(message)
 
         classification_response_json = self.llm_engine.prompt_request(
-            provider=PROVIDER.LLAMA,
-            model=MODELS.LLM.LLAMA.MISTRAL_7B,
+            #provider=PROVIDER.LLAMA,
+            #model=MODELS.LLM.LLAMA.MISTRAL_7B,
             prompt_system=classification_prompt.get_prompt_system(),
             user_input=classification_prompt.get_user_prompt(),
             parameters_json=classification_prompt.get_parameters()

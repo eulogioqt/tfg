@@ -12,16 +12,13 @@ class PROVIDER(str, Enum):
     E5 = "e5"
     BAAI = "baai"
 
-
+# hacer el research para tener lo ultimo de lo ultmo, por ejemplo qwen tiene uno mas moderno
 class MODELS:
     class LLM:
         class OPENAI(str, Enum):
             GPT_3_5_TURBO = "gpt-3.5-turbo"
             GPT_4 = "gpt-4"
             GPT_4O = "gpt-4o"
-
-        class LLAMA(str, Enum):
-            LLAMA3_8B = "meta-llama/Meta-Llama-3-8B-Instruct"
 
         class MISTRAL(str, Enum):
             MISTRAL_7B = "mistralai/Mistral-7B-Instruct-v0.1"
@@ -32,6 +29,7 @@ class MODELS:
 
         class QWEN(str, Enum):
             QWEN_7B = "Qwen/Qwen1.5-7B-Chat"
+            #Qwen/Qwen2.5-Omni-7B
 
         class DEEPSEEK(str, Enum):
             DEEPSEEK_CHAT = "deepseek-ai/deepseek-llm-7b-chat"

@@ -8,7 +8,7 @@ from ..constants import MODELS
 
 
 class GeminiProvider(BaseProvider):
-    def __init__(self, api_key: str):
+    def __init__(self, api_key):
         genai.configure(api_key=api_key)
 
         self.formatter = GeminiFormatter()
