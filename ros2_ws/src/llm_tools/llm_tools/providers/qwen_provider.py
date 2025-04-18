@@ -1,17 +1,7 @@
-from .hf_text_generation_provider import HFTextGenerationProvider
-from .hf_embedding_provider import HFEmbeddingProvider
-from .base_provider import BaseProvider
-
-from ..models import MODELS
+from .hf_embd_text_provider import HFEmbdTextProvider
+from ..models import PROVIDER
 
 
-class QwenProvider(BaseProvider):
-    def __init__(self, api_key):
-        self.llm = HFTextGenerationProvider([MODELS.LLM.QWEN.QWEN_7B], api_key)
-        self.embedder = HFEmbeddingProvider([MODELS.EMBEDDING.QWEN.QWEN_EMBED])
-
-    def prompt(self, *args, **kwargs):
-        return self.llm.prompt(*args, **kwargs)
-
-    def embedding(self, *args, **kwargs):
-        return self.embedder.embedding(*args, **kwargs)
+class QwenProvider(HFEmbdTextProvider):
+    def __init__(self, models=None, api_key=None):
+        super().__init__(PROVIDER.QWEN, models, api_key)

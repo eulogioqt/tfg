@@ -5,9 +5,11 @@ from ..models import MODELS
 
 
 class PhiProvider(HFTextGenerationProvider):
-    def __init__(self, api_key):
+    def __init__(self, models=None, api_key=None):
         super().__init__(
-            model_enum_list=[MODELS.LLM.PHI.PHI_2],
+            models=models,
             api_key=api_key,
-            formatters={MODELS.LLM.PHI.PHI_2: PhiFormatter}
+            model_formatters={
+                MODELS.LLM.PHI.PHI_2: PhiFormatter
+            }
         )

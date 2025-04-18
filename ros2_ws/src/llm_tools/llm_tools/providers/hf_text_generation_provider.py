@@ -1,5 +1,6 @@
-import torch
+import gc
 import json
+import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from .base_provider import BaseProvider
@@ -7,32 +8,23 @@ from ..prompt_formatters import HFChatTemplateFormatter
 
 
 class HFTextGenerationProvider(BaseProvider):
-    def __init__(self, model_enum_list, api_key, formatters=None):
+    def __init__(self, models=None, api_key=None, model_formatters=None):
+        self.api_key = api_key
+        self.model_formatters = model_formatters
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.models = {}
         self.tokenizers = {}
         self.formatters = {}
-        self.default_model = model_enum_list[0]
 
-        for model_enum in model_enum_list:
-            tokenizer = AutoTokenizer.from_pretrained(model_enum.value, token=api_key)
-            model = AutoModelForCausalLM.from_pretrained(
-                model_enum.value,
-                torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-                device_map="auto" if torch.cuda.is_available() else None,
-                token=api_key
-            )
-
-            self.models[model_enum] = model
-            self.tokenizers[model_enum] = tokenizer
-            self.formatters[model_enum] = (formatters or {}).get(model_enum, HFChatTemplateFormatter)(tokenizer)
+        if models:
+            self.load(models)
 
     def embedding(self, *args, **kwargs):
         raise NotImplementedError("This provider does not support embeddings.")
 
     def prompt(self, model, prompt_system, messages_json, user_input, parameters_json):
-        model = model or self.default_model
+        model = model or self.models.values()[0]
         if model not in self.models:
             raise ValueError(f"Model {model} not loaded in provider.")
 
@@ -53,3 +45,30 @@ class HFTextGenerationProvider(BaseProvider):
         response = tokenizer.decode(new_tokens, skip_special_tokens=True)
 
         return response
+
+    def load(self, models):
+        for model in models:
+            tokenizer = AutoTokenizer.from_pretrained(model.value, token=self.api_key)
+            model = AutoModelForCausalLM.from_pretrained(
+                model.value,
+                torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+                device_map="auto" if torch.cuda.is_available() else None,
+                token=self.api_key
+            )
+
+            self.models[model] = model
+            self.tokenizers[model] = tokenizer
+            self.formatters[model] = (self.model_formatters or {}).get(model, HFChatTemplateFormatter)(tokenizer)
+
+    def unload(self, models):
+        if not models:
+            models = list(self.models.keys())
+
+        for model in models:
+            del self.models[model]
+            del self.tokenizers[model]
+            del self.formatters[model]
+
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()

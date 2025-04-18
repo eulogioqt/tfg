@@ -15,14 +15,7 @@ class GeminiProvider(BaseProvider):
         self.client = {
             MODELS.LLM.GEMINI.GEMINI_FLASH: genai.GenerativeModel(MODELS.LLM.GEMINI.GEMINI_FLASH.value)
         }
-        test_response = self.prompt(
-            model="",
-            prompt_system="Esto es un pedazo de prompt system",
-            messages_json="",
-            user_input="Qué pasa picha, soy Joaquín",
-            parameters_json=json.dumps({"temperature": 0.0, "max_tokens": 60})
-        )
-        print(f"\nRESPONSE:\n{test_response}\n")
+
     def embedding(self, *args, **kwargs):
         raise NotImplementedError("This provider does not support embeddings.")
 

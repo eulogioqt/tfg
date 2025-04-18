@@ -12,8 +12,7 @@ class PROVIDER(str, Enum):
     E5 = "e5"
     BAAI = "baai"
 
-# hacer el research para tener lo ultimo de lo ultmo, por ejemplo qwen tiene uno mas moderno
-class MODELS:
+class MODELS: # hacer el research para tener lo ultimo de lo ultmo, por ejemplo qwen tiene uno mas moderno
     class LLM:
         class OPENAI(str, Enum):
             GPT_3_5_TURBO = "gpt-3.5-turbo"
@@ -45,7 +44,7 @@ class MODELS:
             LARGE_3 = "text-embedding-3-large"
 
         class QWEN(str, Enum):
-            QWEN_EMBED = "Qwen/Qwen1.5-7B-Chat"
+            QWEN_EMBED = "Alibaba-NLP/gte-Qwen2-7B-instruct"
 
         class DEEPSEEK(str, Enum):
             DEEP_EMBED = "deepseek-ai/deepseek-coder-6.7b-instruct"

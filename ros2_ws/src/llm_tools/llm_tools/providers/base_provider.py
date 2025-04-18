@@ -10,3 +10,13 @@ class BaseProvider(ABC):
     @abstractmethod
     def prompt(self, user_input, model, prompt_system, messages_json, parameters_json): 
         pass
+
+    @abstractmethod
+    def load(self, models):
+        pass
+
+    @abstractmethod
+    def unload(self, models):
+        pass
+
+    # get default embeddings model y get default prompt model?

@@ -13,6 +13,9 @@ from .providers.phi_provider import PhiProvider
 from .providers.qwen_provider import QwenProvider
 from .providers.deepseek_provider import DeepSeekProvider
 from .providers.gemini_provider import GeminiProvider
+from .providers.e5_provider import E5Provider
+from .providers.sbert_provider import SBERTProvider
+from .providers.baai_provider import BAAIProvider
 
 # IMPORTANTISIMO
 # METER A FUTURO SISTEMA DE STREAMING EN TODOS LOS PROVIDERS O ALGO ASI, IMPLEMENTARLO CON UN ACTION Y DEMAS
@@ -25,6 +28,9 @@ from .providers.gemini_provider import GeminiProvider
 
 # refactor si necesario
 # pyl
+
+# refactorizar para que no pida token si no es necesario en los modelos de hugging face
+# forma de saber cuales tienen embeddings y cuales tienen prompt y cuales los dos
 
 class LLMNode(Node):
     def __init__(self):
@@ -92,23 +98,42 @@ class LLMNode(Node):
             else:
                 self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
 
-            hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
-            if hugging_face_key:
-                providers["qwen"] = QwenProvider(api_key=hugging_face_key)
-            else:
-                self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
-
-            hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
-            if hugging_face_key:
-                providers["deepseek"] = DeepSeekProvider(api_key=hugging_face_key)
-            else:
-                self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
-
-        gemini_key = os.getenv("GEMINI_API_KEY")
-        if gemini_key:
-            providers["gemini"] = GeminiProvider(api_key=gemini_key)
+        hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
+        if hugging_face_key:
+            providers["qwen"] = QwenProvider(api_key=hugging_face_key)
         else:
-            self.get_logger().warn("GEMINI_API_KEY not defined")
+            self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
+
+        hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
+        if hugging_face_key:
+            providers["deepseek"] = DeepSeekProvider(api_key=hugging_face_key)
+        else:
+            self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
+
+        hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
+        if hugging_face_key:
+            providers["sbert"] = SBERTProvider(api_key=hugging_face_key)
+        else:
+            self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
+
+        hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
+        if hugging_face_key:
+            providers["e5"] = E5Provider(api_key=hugging_face_key)
+        else:
+            self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
+
+        hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
+        if hugging_face_key:
+            providers["baai"] = BAAIProvider(api_key=hugging_face_key)
+        else:
+            self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
+
+        if False:
+            gemini_key = os.getenv("GEMINI_API_KEY")
+            if gemini_key:
+                providers["gemini"] = GeminiProvider(api_key=gemini_key)
+            else:
+                self.get_logger().warn("GEMINI_API_KEY not defined")
 
         if not providers:
             self.get_logger().error("Couldn't load any LLM provider. Closing node.")
