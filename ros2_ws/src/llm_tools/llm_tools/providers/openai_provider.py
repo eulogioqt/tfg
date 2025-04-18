@@ -1,16 +1,16 @@
 import json
 import openai
 
-from .base_provider import BaseProvider
+from .api_provider import APIProvider
 from ..prompt_formatters import OpenAIFormatter
 from ..models import MODELS
 
 
-class OpenAIProvider(BaseProvider):
+class OpenAIProvider(APIProvider):
 
     def __init__(self, api_key):
-        self.formatter = OpenAIFormatter()
         self.client = openai.OpenAI(api_key=api_key)
+        self.formatter = OpenAIFormatter()
     
     def embedding(self, model, user_input):
         if not model:

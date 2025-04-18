@@ -15,11 +15,12 @@ class HFEmbeddingProvider(BaseProvider):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.models = {}
+        
         if models:
             self.load(models)
 
-    def embedding(self, model, user_input):
-        model = model or self.models.keys()[0]
+    def embedding(self, user_input, model):
+        model = model or list(self.models.keys())[0]
         if model not in self.models:
             raise ValueError(f"Model {model} not loaded in embedding provider.")
         
@@ -29,15 +30,15 @@ class HFEmbeddingProvider(BaseProvider):
         raise NotImplementedError("This provider does not support prompts.")
 
     def load(self, models):
-        for model in models:
-            self.models[model] = SentenceTransformer(model.value, use_auth_token=self.api_key, device=self.device)
+        for model_enum in models:
+            self.models[model_enum] = SentenceTransformer(model_enum.value, use_auth_token=self.api_key, device=self.device)
 
-    def unload(self, models):
+    def unload(self, models=None):
         if not models:
             models = list(self.models.keys())
 
-        for model in models:
-            del self.models[model]
+        for model_enum in models:
+            del self.models[model_enum]
 
         gc.collect()
         if torch.cuda.is_available():

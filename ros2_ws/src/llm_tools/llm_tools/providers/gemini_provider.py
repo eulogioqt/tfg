@@ -1,20 +1,20 @@
 import json
 import google.generativeai as genai
 
-from .base_provider import BaseProvider
+from .api_provider import APIProvider
 from ..prompt_formatters import GeminiFormatter
 
 from ..models import MODELS
 
 
-class GeminiProvider(BaseProvider):
+class GeminiProvider(APIProvider):
     def __init__(self, api_key):
         genai.configure(api_key=api_key)
 
-        self.formatter = GeminiFormatter()
         self.client = {
             MODELS.LLM.GEMINI.GEMINI_FLASH: genai.GenerativeModel(MODELS.LLM.GEMINI.GEMINI_FLASH.value)
         }
+        self.formatter = GeminiFormatter()
 
     def embedding(self, *args, **kwargs):
         raise NotImplementedError("This provider does not support embeddings.")

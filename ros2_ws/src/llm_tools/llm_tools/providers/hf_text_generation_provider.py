@@ -24,7 +24,7 @@ class HFTextGenerationProvider(BaseProvider):
         raise NotImplementedError("This provider does not support embeddings.")
 
     def prompt(self, model, prompt_system, messages_json, user_input, parameters_json):
-        model = model or self.models.values()[0]
+        model = model or list(self.models.keys())[0]
         if model not in self.models:
             raise ValueError(f"Model {model} not loaded in provider.")
 
@@ -47,27 +47,27 @@ class HFTextGenerationProvider(BaseProvider):
         return response
 
     def load(self, models):
-        for model in models:
-            tokenizer = AutoTokenizer.from_pretrained(model.value, token=self.api_key)
+        for model_enum in models:
+            tokenizer = AutoTokenizer.from_pretrained(model_enum.value, token=self.api_key)
             model = AutoModelForCausalLM.from_pretrained(
-                model.value,
+                model_enum.value,
                 torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
                 device_map="auto" if torch.cuda.is_available() else None,
                 token=self.api_key
             )
 
-            self.models[model] = model
-            self.tokenizers[model] = tokenizer
-            self.formatters[model] = (self.model_formatters or {}).get(model, HFChatTemplateFormatter)(tokenizer)
+            self.models[model_enum] = model
+            self.tokenizers[model_enum] = tokenizer
+            self.formatters[model_enum] = (self.model_formatters or {}).get(model_enum, HFChatTemplateFormatter)(tokenizer)
 
-    def unload(self, models):
+    def unload(self, models=None):
         if not models:
             models = list(self.models.keys())
 
-        for model in models:
-            del self.models[model]
-            del self.tokenizers[model]
-            del self.formatters[model]
+        for model_enum in models:
+            del self.models[model_enum]
+            del self.tokenizers[model_enum]
+            del self.formatters[model_enum]
 
         gc.collect()
         if torch.cuda.is_available():

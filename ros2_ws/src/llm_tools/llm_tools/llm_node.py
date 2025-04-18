@@ -1,4 +1,5 @@
 import os
+import json
 import rclpy
 
 from rclpy.node import Node
@@ -16,6 +17,8 @@ from .providers.gemini_provider import GeminiProvider
 from .providers.e5_provider import E5Provider
 from .providers.sbert_provider import SBERTProvider
 from .providers.baai_provider import BAAIProvider
+
+from .models import MODELS, PROVIDER
 
 # IMPORTANTISIMO
 # METER A FUTURO SISTEMA DE STREAMING EN TODOS LOS PROVIDERS O ALGO ASI, IMPLEMENTARLO CON UN ACTION Y DEMAS
@@ -79,61 +82,74 @@ class LLMNode(Node):
     def _load_providers(self):
         providers = {}
 
-        if False:
-            openai_key = os.getenv("OPENAI_API_KEY")
-            if openai_key:
-                providers["openai"] = OpenAIProvider(api_key=openai_key)
-            else:
-                self.get_logger().warn("OPENAI_API_KEY not defined")
+        openai_key = os.getenv("OPENAI_API_KEY")
+        hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
+        gemini_key = os.getenv("GEMINI_API_KEY")
+     
+        prompt_system = "Solo puedes responder en formato json SOLO EL JSON SIN NADA MAS, PARA PARSEAR. Tienes que coger el texto del usuario y ponerlo en formato json como quieras siempre."
+        user_input = "Hola me llamo luis suarez, y tu?"
+        temperature = 0.0
+        max_tokens = 100
 
-            hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
-            if hugging_face_key:
-                providers["mistral"] = MistralProvider(api_key=hugging_face_key)
-            else:
-                self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
+        def test(provider: BaseProvider, models=None):
+            print(f"\n\n🧪 Testing {provider.__class__.__name__}")
             
-            hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
-            if hugging_face_key:
-                providers["phi"] = PhiProvider(api_key=hugging_face_key)
-            else:
-                self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
+            if models:
+                print(f"📦 Loading models: {[model.value for model in models]}")
+                provider.load(models)
+            
+            try:
+                print("🧠 Testing prompt()...")
+                result = provider.prompt(
+                    user_input=user_input,
+                    model=None,
+                    prompt_system=prompt_system,
+                    messages_json=None,
+                    parameters_json=json.dumps({
+                        "temperature": temperature,
+                        "max_tokens": max_tokens
+                    })
+                )
+                print("📤 Prompt result:", result)
+            except Exception as e:
+                print(f"⚠️ Prompt not supported: {str(e)}")
 
-        hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
-        if hugging_face_key:
-            providers["qwen"] = QwenProvider(api_key=hugging_face_key)
-        else:
-            self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
+            try:
+                print("🔎 Testing embedding()...")
+                result = provider.embedding(user_input=user_input, model=None)
+                print("📏 Embedding length:", len(result))
+            except Exception as e:
+                print(f"⚠️ Embedding not supported: {str(e)}")
 
-        hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
-        if hugging_face_key:
-            providers["deepseek"] = DeepSeekProvider(api_key=hugging_face_key)
-        else:
-            self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
+            print("🧹 Unloading models...")
+            provider.unload()
 
-        hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
-        if hugging_face_key:
-            providers["sbert"] = SBERTProvider(api_key=hugging_face_key)
-        else:
-            self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
+        #providers["openai"] = OpenAIProvider(api_key=openai_key)
+        #test(providers["openai"])
 
-        hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
-        if hugging_face_key:
-            providers["e5"] = E5Provider(api_key=hugging_face_key)
-        else:
-            self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
+        providers["mistral"] = MistralProvider(api_key=hugging_face_key)
+        test(providers["mistral"], [MODELS.LLM.MISTRAL.MISTRAL_7B])
 
-        hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
-        if hugging_face_key:
-            providers["baai"] = BAAIProvider(api_key=hugging_face_key)
-        else:
-            self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
+        providers["phi"] = PhiProvider()
+        test(providers["phi"], [MODELS.LLM.PHI.PHI_2])
 
-        if False:
-            gemini_key = os.getenv("GEMINI_API_KEY")
-            if gemini_key:
-                providers["gemini"] = GeminiProvider(api_key=gemini_key)
-            else:
-                self.get_logger().warn("GEMINI_API_KEY not defined")
+        providers["qwen"] = QwenProvider()
+        test(providers["qwen"], [MODELS.LLM.QWEN.QWEN_7B, MODELS.EMBEDDING.QWEN.QWEN_EMBED])
+
+        providers["deepseek"] = DeepSeekProvider()
+        test(providers["deepseek"], [MODELS.LLM.DEEPSEEK.DEEPSEEK_CHAT, MODELS.EMBEDDING.DEEPSEEK.DEEP_EMBED])
+
+        providers["sbert"] = SBERTProvider()
+        test(providers["sbert"],  [MODELS.EMBEDDING.SBERT.MINI_LM_L6_V2])
+
+        providers["e5"] = E5Provider()
+        test(providers["e5"],  [MODELS.EMBEDDING.E5.E5_LARGE_V2])
+
+        providers["baai"] = BAAIProvider()
+        test(providers["baai"],  [MODELS.EMBEDDING.BAAI.BGE_BASE_EN])
+
+        providers["gemini"] = GeminiProvider(api_key=gemini_key)
+        test(providers["gemini"])
 
         if not providers:
             self.get_logger().error("Couldn't load any LLM provider. Closing node.")

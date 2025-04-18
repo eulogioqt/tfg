@@ -23,15 +23,19 @@ class HFEmbdTextProvider(BaseProvider):
         return self.embedder.embedding(*args, **kwargs)
 
     def load(self, models):
-        for model in models:
-            if isinstance(model, self.llm_models):
-                self.llm.load([model])
-            elif isinstance(model, self.embedder_models):
-                self.embedder.load([model])
+        for model_enum in models:
+            if isinstance(model_enum, self.llm_models):
+                self.llm.load([model_enum])
+            elif isinstance(model_enum, self.embedder_models):
+                self.embedder.load([model_enum])
 
-    def unload(self, models):
-        for model in models:
-            if isinstance(model, self.llm_models):
-                self.llm.unload([model])
-            elif isinstance(model, self.embedder_models):
-                self.embedder.unload([model])
+    def unload(self, models=None):
+        if not models:
+            models = list(self.llm.models.keys()) + list(self.embedder.models.keys())
+
+        for model_enum in models:
+            if isinstance(model_enum, self.llm_models):
+                self.llm.unload([model_enum])
+            elif isinstance(model_enum, self.embedder_models):
+                self.embedder.unload([model_enum])
+                

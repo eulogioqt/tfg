@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 class BaseProvider(ABC):
 
     @abstractmethod
-    def embedding(self, prompt, model):
+    def embedding(self, user_input, model):
         pass
 
     @abstractmethod
