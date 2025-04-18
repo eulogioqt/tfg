@@ -3,7 +3,7 @@ import json
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from .base_provider import BaseProvider
-from llm_tools.prompt_formatters import HFFormatter
+from ..prompt_formatters import HFChatTemplateFormatter
 
 
 class HFTextGenerationProvider(BaseProvider):
@@ -26,7 +26,7 @@ class HFTextGenerationProvider(BaseProvider):
 
             self.models[model_enum] = model
             self.tokenizers[model_enum] = tokenizer
-            self.formatters[model_enum] = (formatters or {}).get(model_enum, HFFormatter)(tokenizer)
+            self.formatters[model_enum] = (formatters or {}).get(model_enum, HFChatTemplateFormatter)(tokenizer)
 
     def embedding(self, *args, **kwargs):
         raise NotImplementedError("This provider does not support embeddings.")

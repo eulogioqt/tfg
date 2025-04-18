@@ -3,7 +3,7 @@ from transformers import PreTrainedTokenizerBase
 from .prompt_formatter import PromptFormatter
 
 
-class HFFormatter(PromptFormatter):
+class HFChatTemplateFormatter(PromptFormatter):
     def __init__(self, tokenizer: PreTrainedTokenizerBase):
         self.tokenizer = tokenizer
 
