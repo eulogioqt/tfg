@@ -1,0 +1,4 @@
+string provider
+string model
+string message
+bool success

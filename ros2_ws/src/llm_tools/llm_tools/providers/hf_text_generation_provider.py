@@ -48,9 +48,9 @@ class HFTextGenerationProvider(BaseProvider):
 
     def load(self, models):
         for model_enum in models:
-            tokenizer = AutoTokenizer.from_pretrained(model_enum.value, token=self.api_key)
+            tokenizer = AutoTokenizer.from_pretrained(model_enum, token=self.api_key)
             model = AutoModelForCausalLM.from_pretrained(
-                model_enum.value,
+                model_enum,
                 torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
                 device_map="auto" if torch.cuda.is_available() else None,
                 token=self.api_key

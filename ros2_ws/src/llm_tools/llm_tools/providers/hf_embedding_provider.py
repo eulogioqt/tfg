@@ -31,7 +31,7 @@ class HFEmbeddingProvider(BaseProvider):
 
     def load(self, models):
         for model_enum in models:
-            self.models[model_enum] = SentenceTransformer(model_enum.value, use_auth_token=self.api_key, device=self.device)
+            self.models[model_enum] = SentenceTransformer(model_enum, use_auth_token=self.api_key, device=self.device)
 
     def unload(self, models=None):
         if not models:

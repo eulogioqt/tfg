@@ -12,7 +12,7 @@ class GeminiProvider(APIProvider):
         genai.configure(api_key=api_key)
 
         self.client = {
-            MODELS.LLM.GEMINI.GEMINI_FLASH: genai.GenerativeModel(MODELS.LLM.GEMINI.GEMINI_FLASH.value)
+            MODELS.LLM.GEMINI.GEMINI_FLASH: genai.GenerativeModel(MODELS.LLM.GEMINI.GEMINI_FLASH)
         }
         self.formatter = GeminiFormatter()
 

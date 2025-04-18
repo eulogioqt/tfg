@@ -1,9 +1,12 @@
-string provider         # "openai", "gemini", etc.
-string model            # "gpt-3.5-turbo", "gpt-4", etc.
-string prompt_system    # Mensaje del sistema, puede estar vacío
-string messages_json    # Lista de mensajes anteriores como JSON (user/assistant)
-string user_input       # Frase del usuario actual
-string parameters_json  # Opciones adicionales tipo temperature, top_p...
-
+string provider
+string model
+string prompt_system
+string messages_json # cambiar esto a un mensaje propio de ros que sea content y role algo asi para cada msg
+string user_input
+string parameters_json # cambiar esto a temperature y max_tokens
 ---
 string response
+string provider_used
+string model_used
+string message
+bool success
