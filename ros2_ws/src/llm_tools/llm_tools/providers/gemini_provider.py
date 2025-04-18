@@ -15,7 +15,14 @@ class GeminiProvider(BaseProvider):
         self.client = {
             MODELS.LLM.GEMINI.GEMINI_FLASH: genai.GenerativeModel(MODELS.LLM.GEMINI.GEMINI_FLASH.value)
         }
-
+        test_response = self.prompt(
+            model="",
+            prompt_system="Esto es un pedazo de prompt system",
+            messages_json="",
+            user_input="Qué pasa picha, soy Joaquín",
+            parameters_json=json.dumps({"temperature": 0.0, "max_tokens": 60})
+        )
+        print(f"\nRESPONSE:\n{test_response}\n")
     def embedding(self, *args, **kwargs):
         raise NotImplementedError("This provider does not support embeddings.")
 
@@ -23,14 +30,15 @@ class GeminiProvider(BaseProvider):
         if not model:
             model = MODELS.LLM.GEMINI.GEMINI_FLASH
 
-        formatted = self.formatter.format(prompt_system, messages_json, user_input)
-        chat = self.client[model].start_chat(history=formatted["history"])
+        messages = self.formatter.format(prompt_system, messages_json, user_input)
+        chat = self.client[model].start_chat(history=messages)
 
         parameters = json.loads(parameters_json) if parameters_json else {}
-        temperature = parameters.get("temperature", 0.0)
+        final_parameters = {
+            "temperature": parameters.get("temperature", 0.0),
+            "max_output_tokens": parameters.get("max_tokens", 60)
+        }
 
-        response = chat.send_message(formatted["history"][-1]["parts"][0], generation_config={
-            "temperature": temperature
-        })
+        response = chat.send_message(messages[-1]["parts"][0], generation_config=final_parameters)
 
         return response.text.strip()

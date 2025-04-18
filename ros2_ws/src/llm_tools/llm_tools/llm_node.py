@@ -12,6 +12,7 @@ from .providers.mistral_provider import MistralProvider
 from .providers.phi_provider import PhiProvider
 from .providers.qwen_provider import QwenProvider
 from .providers.deepseek_provider import DeepSeekProvider
+from .providers.gemini_provider import GeminiProvider
 
 # IMPORTANTISIMO
 # METER A FUTURO SISTEMA DE STREAMING EN TODOS LOS PROVIDERS O ALGO ASI, IMPLEMENTARLO CON UN ACTION Y DEMAS
@@ -97,11 +98,17 @@ class LLMNode(Node):
             else:
                 self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
 
-        hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
-        if hugging_face_key:
-            providers["deepseek"] = DeepSeekProvider(api_key=hugging_face_key)
+            hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
+            if hugging_face_key:
+                providers["deepseek"] = DeepSeekProvider(api_key=hugging_face_key)
+            else:
+                self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
+
+        gemini_key = os.getenv("GEMINI_API_KEY")
+        if gemini_key:
+            providers["gemini"] = GeminiProvider(api_key=gemini_key)
         else:
-            self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
+            self.get_logger().warn("GEMINI_API_KEY not defined")
 
         if not providers:
             self.get_logger().error("Couldn't load any LLM provider. Closing node.")

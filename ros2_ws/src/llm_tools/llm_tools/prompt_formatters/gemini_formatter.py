@@ -1,22 +1,23 @@
 import json
-
 from .prompt_formatter import PromptFormatter
+
 
 class GeminiFormatter(PromptFormatter):
     def format(self, prompt_system: str, messages_json: str, user_input: str) -> dict:
-        history = []
+        messages = []
+
+        if prompt_system:
+            messages.append({"role": "user", "parts": [prompt_system.strip()]})
+            messages.append({"role": "model", "parts": ["Understood."]})
 
         if messages_json:
             for msg in json.loads(messages_json):
                 if msg["role"] == "user":
-                    history.append({"role": "user", "parts": [msg["content"]]})
+                    messages.append({"role": "user", "parts": [msg["content"]]})
                 elif msg["role"] == "assistant":
-                    history.append({"role": "model", "parts": [msg["content"]]})
+                    messages.append({"role": "model", "parts": [msg["content"]]})
 
         if user_input:
-            history.append({"role": "user", "parts": [user_input]})
+            messages.append({"role": "user", "parts": [user_input.strip()]})
 
-        return {
-            "system_instruction": prompt_system,
-            "history": history
-        }
+        return messages

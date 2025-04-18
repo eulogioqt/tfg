@@ -30,4 +30,5 @@ class OpenAIProvider(BaseProvider):
         }
 
         response = self.client.chat.completions.create(model=model, messages=messages, **final_parameters)
+        
         return response.choices[0].message.content

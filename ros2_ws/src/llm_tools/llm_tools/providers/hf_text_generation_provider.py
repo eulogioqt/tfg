@@ -28,15 +28,6 @@ class HFTextGenerationProvider(BaseProvider):
             self.tokenizers[model_enum] = tokenizer
             self.formatters[model_enum] = (formatters or {}).get(model_enum, HFFormatter)(tokenizer)
 
-        test_response = self.prompt(
-            model="",
-            prompt_system="Esto es un pedazo de prompt system",
-            messages_json="",
-            user_input="Qué pasa picha, soy Joaquín",
-            parameters_json=json.dumps({"temperature": 0.0, "max_tokens": 60})
-        )
-        print(f"\nRESPONSE:\n{test_response}\n")
-
     def embedding(self, *args, **kwargs):
         raise NotImplementedError("This provider does not support embeddings.")
 
@@ -56,7 +47,7 @@ class HFTextGenerationProvider(BaseProvider):
             "max_new_tokens": parameters.get("max_tokens", 60),
             "do_sample": parameters.get("temperature", 0.0) > 0.0
         }
-        print(f"\nPROMPT:\n{tokenizer.decode(model_inputs[0])}\n")
+
         generated_ids = model_obj.generate(model_inputs, **final_parameters)
         new_tokens = generated_ids[0][model_inputs.shape[1]:]
         response = tokenizer.decode(new_tokens, skip_special_tokens=True)
