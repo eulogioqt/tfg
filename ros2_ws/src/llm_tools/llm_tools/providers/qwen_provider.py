@@ -3,5 +3,5 @@ from ..models import PROVIDER
 
 
 class QwenProvider(HFEmbdTextProvider):
-    def __init__(self, models=None, api_key=None):
-        super().__init__(PROVIDER.QWEN, models, api_key)
+    def __init__(self, models=None):
+        super().__init__(PROVIDER.QWEN, models)
