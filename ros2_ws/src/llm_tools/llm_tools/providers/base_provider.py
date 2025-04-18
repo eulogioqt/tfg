@@ -19,4 +19,8 @@ class BaseProvider(ABC):
     def unload(self, models):
         pass
 
+    @abstractmethod
+    def get_active_models(self):
+        pass
+
     # get default embeddings model y get default prompt model?

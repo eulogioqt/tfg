@@ -35,7 +35,7 @@ class HFEmbeddingProvider(BaseProvider):
 
     def unload(self, models=None):
         if not models:
-            models = list(self.models.keys())
+            models = self.get_active_models()
 
         for model_enum in models:
             del self.models[model_enum]
@@ -43,3 +43,6 @@ class HFEmbeddingProvider(BaseProvider):
         gc.collect()
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
+
+    def get_active_models(self):
+        return list(self.models.keys())

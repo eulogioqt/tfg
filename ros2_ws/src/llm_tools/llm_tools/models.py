@@ -17,7 +17,7 @@ class SmartStrEnum(str, Enum):
     def __repr__(self):
         return self.value
 
-class PROVIDER(str, SmartStrEnum):
+class PROVIDER(SmartStrEnum):
     OPENAI = "openai"
     MISTRAL = "mistral"
     PHI = "phi"

@@ -35,3 +35,6 @@ class GeminiProvider(APIProvider):
         response = chat.send_message(messages[-1]["parts"][0], generation_config=final_parameters)
 
         return response.text.strip(), model
+
+    def get_active_models(self):
+        return list(self.client.keys())

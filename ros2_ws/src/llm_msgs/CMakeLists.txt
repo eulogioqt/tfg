@@ -17,6 +17,7 @@ find_package(std_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/ProviderModel.msg"
+  "msg/LoadProviderModel.msg"
   "msg/LoadUnloadResult.msg"
   
   "srv/Prompt.srv"
