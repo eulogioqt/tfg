@@ -4,7 +4,7 @@ from rclpy.node import Node
 from llm_msgs.msg import LoadUnloadResult, ProviderModel
 from llm_msgs.srv import GetModels, Prompt, Embedding, LoadModel, UnloadModel
 
-from .models import PROVIDER
+from .models import PROVIDER, MODELS
 
 from .providers.openai_provider import OpenAIProvider
 from .providers.mistral_provider import MistralProvider
@@ -43,7 +43,8 @@ class LLMNode(Node):
         
         self.provider_map = {}
 
-        self.get_srv = self.create_service(GetModels, 'llm_tools/get_models', self.handle_get_models)
+        self.get_all_srv = self.create_service(GetModels, 'llm_tools/get_all_models', self.handle_get_all_models)
+        self.get_available_srv = self.create_service(GetModels, 'llm_tools/get_available_models', self.handle_get_available_models)
         self.prompt_srv = self.create_service(Prompt, 'llm_tools/prompt', self.handle_prompt)
         self.embedding_srv = self.create_service(Embedding, 'llm_tools/embedding', self.handle_embedding)
         self.load_model_srv = self.create_service(LoadModel, 'llm_tools/load_model', self.handle_load_model)
@@ -51,19 +52,51 @@ class LLMNode(Node):
 
         self.get_logger().info("LLM Node initializated succesfully")
 
-    def handle_get_models(self, request, response): # añadir un get avaiaalble y un get all, y dividorlos en embeddings y llm
+    def handle_get_all_models(self, request, response):
         provider_names = request.providers
         if not provider_names:
             provider_names = list(PROVIDER)
 
-        self.get_logger().info(f"📖 Get Models service for providers: {provider_names}")
+        self.get_logger().info(f"📖 Get Available Models service for providers: {provider_names}")
         
-        response.items = []
+        response.llm_models = []
+        response.embedding_models = []
+        response.providers = []
+        for provider_name in provider_names:
+            if hasattr(MODELS.LLM, provider_name.upper()):
+                llm_models = list(getattr(MODELS.LLM, provider_name.upper()))
+                response.llm_models.append(ProviderModel(provider=provider_name, models=llm_models))
+
+            if hasattr(MODELS.EMBEDDING, provider_name.upper()):
+                embedding_models = list(getattr(MODELS.EMBEDDING, provider_name.upper()))
+                response.embedding_models.append(ProviderModel(provider=provider_name, models=embedding_models))
+                
+            response.providers.append(provider_name)
+
+        return response
+
+    def handle_get_available_models(self, request, response):
+        provider_names = request.providers
+        if not provider_names:
+            provider_names = list(PROVIDER)
+
+        self.get_logger().info(f"📖 Get Available Models service for providers: {provider_names}")
+        
+        response.llm_models = []
+        response.embedding_models = []
+        response.providers = []
         for provider_name in provider_names:
             if provider_name in self.provider_map:
                 provider = self.provider_map.get(provider_name)
                 models = provider.get_active_models()
-                response.items.append(ProviderModel(provider=provider_name, models=models))
+
+                llm_models = [m for m in models if m in list(getattr(MODELS.LLM, provider_name.upper(), []))]
+                response.llm_models.append(ProviderModel(provider=provider_name, models=llm_models))
+
+                embedding_models = [m for m in models if m in list(getattr(MODELS.EMBEDDING, provider_name.upper(), []))]
+                response.embedding_models.append(ProviderModel(provider=provider_name, models=embedding_models))
+                
+                response.providers.append(provider_name)
 
         return response
 

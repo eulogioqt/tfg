@@ -19,7 +19,8 @@ class TestNode(Node):
 
         load_dotenv()
 
-        self.cli_get = self.create_client(GetModels, 'llm_tools/get_models')
+        self.cli_get_all = self.create_client(GetModels, 'llm_tools/get_all_models')
+        self.cli_get_available = self.create_client(GetModels, 'llm_tools/get_available_models')
         self.cli_prompt = self.create_client(Prompt, 'llm_tools/prompt')
         self.cli_embedding = self.create_client(Embedding, 'llm_tools/embedding')
         self.cli_load = self.create_client(LoadModel, 'llm_tools/load_model')
@@ -39,6 +40,9 @@ class TestNode(Node):
         return future.result()
 
     def run_tests(self):
+        # 0. Mostrar todo
+        self.show_all_models()
+
         # 1. Mostrar estado inicial
         self.get_logger().info("🔍 Estado inicial:")
         self.show_models()
@@ -90,13 +94,35 @@ class TestNode(Node):
         for r in res.results:
             self.get_logger().info(f"🧹 {r.provider}: {r.message}")
 
-    def show_models(self):
-        if not self.wait_for_service(self.cli_get):
+    def show_all_models(self):
+        if not self.wait_for_service(self.cli_get_all):
             return
         req = GetModels.Request()
-        res = self.call_sync(self.cli_get, req)
-        for item in res.items:
+        res = self.call_sync(self.cli_get_all, req)
+
+        self.get_logger().info(f"📖 Providers: {res.providers}")
+        self.get_logger().info(f"📖 LLM Models:")
+        for item in res.llm_models:
             self.get_logger().info(f"📖 {item.provider}: {item.models}")
+        self.get_logger().info(f"📖 Embedding Models:")
+        for item in res.embedding_models:
+            self.get_logger().info(f"📖 {item.provider}: {item.models}")
+        self.get_logger().info("\n")
+
+    def show_models(self):
+        if not self.wait_for_service(self.cli_get_available):
+            return
+        req = GetModels.Request()
+        res = self.call_sync(self.cli_get_available, req)
+
+        self.get_logger().info(f"📖 Providers: {res.providers}")
+        self.get_logger().info(f"📖 LLM Models:")
+        for item in res.llm_models:
+            self.get_logger().info(f"📖 {item.provider}: {item.models}")
+        self.get_logger().info(f"📖 Embedding Models:")
+        for item in res.embedding_models:
+            self.get_logger().info(f"📖 {item.provider}: {item.models}")
+        self.get_logger().info("\n")
 
     def test_provider(self, provider, llm_models, emb_models):
         for model in llm_models:
