@@ -24,7 +24,7 @@ class HFEmbeddingProvider(BaseProvider):
         if model not in self.models:
             raise ValueError(f"Model {model} not loaded in embedding provider.")
         
-        return self.models[model].encode([user_input])[0].tolist()
+        return self.models[model].encode([user_input])[0].tolist(), model
 
     def prompt(self, *args, **kwargs):
         raise NotImplementedError("This provider does not support prompts.")

@@ -16,7 +16,7 @@ class OpenAIProvider(APIProvider):
         if not model:
             model = MODELS.EMBEDDING.OPENAI.SMALL_3
 
-        return self.client.embeddings.create(model=model, input=[user_input]).data[0].embedding
+        return self.client.embeddings.create(model=model, input=[user_input]).data[0].embedding, model
 
     def prompt(self, model, prompt_system, messages_json, user_input, parameters_json):       
         if not model: 
@@ -31,4 +31,4 @@ class OpenAIProvider(APIProvider):
 
         response = self.client.chat.completions.create(model=model, messages=messages, **final_parameters)
         
-        return response.choices[0].message.content
+        return response.choices[0].message.content, model

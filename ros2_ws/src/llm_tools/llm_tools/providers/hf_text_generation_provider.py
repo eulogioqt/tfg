@@ -44,7 +44,7 @@ class HFTextGenerationProvider(BaseProvider):
         new_tokens = generated_ids[0][model_inputs.shape[1]:]
         response = tokenizer.decode(new_tokens, skip_special_tokens=True)
 
-        return response
+        return response, model
 
     def load(self, models):
         for model_enum in models:

@@ -1,13 +1,10 @@
-import os
 import rclpy
 
 from rclpy.node import Node
+from llm_msgs.msg import LoadUnloadResult
 from llm_msgs.srv import Prompt, Embedding, LoadModel, UnloadModel
 
-from dotenv import load_dotenv
-
-from .providers.base_provider import BaseProvider
-from .models import MODELS, PROVIDER, PROVIDER_CLASS_MAP
+from .models import PROVIDER_CLASS_MAP
 
 # IMPORTANTISIMO
 # METER A FUTURO SISTEMA DE STREAMING EN TODOS LOS PROVIDERS O ALGO ASI, IMPLEMENTARLO CON UN ACTION Y DEMAS
@@ -19,10 +16,8 @@ from .models import MODELS, PROVIDER, PROVIDER_CLASS_MAP
 # poner algo para que si no cabe el modelo descargue los otros
 
 class LLMNode(Node):
-
     def __init__(self):
         super().__init__('llm')
-        
         self.provider_map = {}
 
         self.prompt_srv = self.create_service(Prompt, 'llm_tools/prompt', self.handle_prompt)
@@ -30,68 +25,112 @@ class LLMNode(Node):
         self.load_model_srv = self.create_service(LoadModel, 'llm_tools/load_model', self.handle_load_model)
         self.unload_model_srv = self.create_service(UnloadModel, 'llm_tools/unload_model', self.handle_unload_model)
 
-        self.get_logger().info(f"LLM Node initializated succesfully")
+        self.get_logger().info("LLM Node initializated succesfully")
 
     def handle_prompt(self, request, response):
-        provider = self.get_provider(request.provider)
-        result = provider.prompt(
-            model=request.model,
-            prompt_system=request.prompt_system,
-            messages_json=request.messages_json,
-            user_input=request.user_input,
-            parameters_json=request.parameters_json
-        )
-        response.response = result
+        try:
+            provider_name, provider = self._get_provider(request.provider)
+            result, model_used = provider.prompt(
+                model=request.model,
+                prompt_system=request.prompt_system,
+                messages_json=request.messages_json,
+                user_input=request.user_input,
+                parameters_json=request.parameters_json
+            )
+
+            response.response = result
+            self._fill_response(response, True, "OK", provider_name, model_used)
+        except Exception as e:
+            response.response = ""
+            self._fill_response(response, False, str(e), request.provider, request.model)
 
         return response
 
     def handle_embedding(self, request, response):
-        provider = self.get_provider(request.provider)
-        result = provider.embedding(
-            model=request.model,
-            user_input=request.user_input
-        )
-        response.embedding = result
+        try:
+            provider_name, provider = self._get_provider(request.provider)
+            result, model_used = provider.embedding(
+                model=request.model,
+                user_input=request.user_input
+            )
+
+            response.embedding = result
+            self._fill_response(response, True, "OK", provider_name, model_used)
+        except Exception as e:
+            response.embedding = []
+            self._fill_response(response, False, str(e), request.provider, request.model)
 
         return response
 
     def handle_load_model(self, request, response):
+        response.results = []
         for item in request.items:
-            provider = self.provider_map.get(item.provider)
-            if not provider:
-                provider_class = PROVIDER_CLASS_MAP[item.provider]
-                provider = provider_class(**({"api_key": item.api_key} if item.api_key else {}))
-            
-            self.provider_map[item.provider] = provider.load(item.models)
+            result = LoadUnloadResult(provider=item.provider)
+            try:
+                provider = self._try_load_provider(item.provider, item.api_key)
+                provider.load(item.models)
+
+                self._fill_result(result, True, "Models loaded succesfully")
+            except Exception as e:
+                self._fill_result(result, False, f"Error loading models: {str(e)}")
+
+            response.results.append(result)
+
+        return response
 
     def handle_unload_model(self, request, response):
+        response.results = []
         for item in request.items:
-            provider = self.provider_map.get(request.provider)
+            result = LoadUnloadResult(provider=item.provider)
+            provider = self.provider_map.get(item.provider)
             if provider:
-                provider.unload(request.models)
+                try:
+                    provider.unload(item.models)
 
-    def get_provider(self, provider_name: str) -> BaseProvider:
-        provider = self.provider_map.get(provider_name)
-        if not provider:
-            fallback = list(self.provider_map.keys())[0]
-            provider = self.provider_map[fallback]
-            self.get_logger().warn(f"Provider '{provider_name}' not available. Using '{fallback}' as fallback.")
+                    self._fill_result(result, True, "Models unloaded succesfully")
+                except Exception as e:
+                    self._fill_result(result, False, f"Error unloading models: {str(e)}")
+            else:
+                self._fill_result(result, False, f"Provider '{item.provider}' not found.")
 
-        return provider
+            response.results.append(result)
+
+        return response
+
+    def _get_provider(self, requested_name):
+        if requested_name in self.provider_map:
+            return requested_name, self.provider_map[requested_name]
+
+        if not self.provider_map:
+            raise ValueError("No providers are loaded")
+
+        fallback_name, fallback_provider = next(iter(self.provider_map.items()))
+        self.get_logger().warn(f"[WARN] Provider '{requested_name}' not found. Using fallback '{fallback_name}' instead.")
+        
+        return fallback_name, fallback_provider
+
+    def _try_load_provider(self, name, api_key=""):
+        if name not in self.provider_map:
+            if name not in PROVIDER_CLASS_MAP:
+                raise ValueError(f"Provider '{name}' is not supported.")
+            
+            provider_class = PROVIDER_CLASS_MAP[name]
+            self.provider_map[name] = provider_class(api_key=api_key) if api_key else provider_class()
+
+        return self.provider_map[name]
+
+    def _fill_response(self, response, success, message, provider, model):
+        response.success = success
+        response.message = message
+        response.provider_used = provider
+        response.model_used = model
     
-    def load_api_keys():
-        load_dotenv()
-
-        return {
-            PROVIDER.OPENAI: os.getenv("OPENAI_API_KEY"),
-            PROVIDER.GEMINI: os.getenv("GEMINI_API_KEY"),
-            PROVIDER.MISTRAL: os.getenv("HUGGING_FACE_API_KEY")
-        }
+    def _fill_result(self, result, success, message):
+        result.success = success
+        result.message = message
 
 def main(args=None):
     rclpy.init(args=args)
-
-    llm_node = LLMNode()
-
-    rclpy.spin(llm_node)
+    node = LLMNode()
+    rclpy.spin(node)
     rclpy.shutdown()
