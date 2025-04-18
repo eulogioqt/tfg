@@ -1,4 +1,4 @@
 string id
 string text
 ---
-string text
+string text # Poner con que modelo ha sido respondido el provider y eso

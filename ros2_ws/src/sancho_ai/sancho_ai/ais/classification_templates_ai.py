@@ -9,7 +9,10 @@ from ..llm_engine import LLMEngine
 from ..prompts.classification_prompt import ClassificationPrompt
 from ..prompts.commands.commands import COMMANDS
 
-#from llm_tools.constants import PROVIDER, MODELS
+from llm_tools.models import PROVIDER, MODELS
+
+# poner todo el tema de los if intent == noseque en una funcion a parte, y q los metodos estos definan la forma de clasificar
+# y ya luego esa funcion hace lo q tenga q hacer q es smp lo mismo sabe
 
 class ClassificationTemplatesAI(TemplateAI):
 
@@ -24,8 +27,8 @@ class ClassificationTemplatesAI(TemplateAI):
         classification_prompt = ClassificationPrompt(message)
 
         classification_response_json = self.llm_engine.prompt_request(
-            #provider=PROVIDER.LLAMA,
-            #model=MODELS.LLM.LLAMA.MISTRAL_7B,
+            provider=PROVIDER.DEEPSEEK,
+            model=MODELS.LLM.DEEPSEEK.DEEPSEEK_CHAT,
             prompt_system=classification_prompt.get_prompt_system(),
             user_input=classification_prompt.get_user_prompt(),
             parameters_json=classification_prompt.get_parameters()

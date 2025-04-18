@@ -1,3 +1,3 @@
 string provider
-string api_key
 string[] models
+string api_key

@@ -4,8 +4,6 @@ from rclpy.node import Node
 from llm_msgs.msg import LoadUnloadResult, ProviderModel
 from llm_msgs.srv import GetModels, Prompt, Embedding, LoadModel, UnloadModel
 
-from .models import PROVIDER, MODELS
-
 from .providers.openai_provider import OpenAIProvider
 from .providers.mistral_provider import MistralProvider
 from .providers.phi_provider import PhiProvider
@@ -16,28 +14,30 @@ from .providers.sbert_provider import SBERTProvider
 from .providers.e5_provider import E5Provider
 from .providers.baai_provider import BAAIProvider
 
-PROVIDER_CLASS_MAP = {
-    PROVIDER.OPENAI: OpenAIProvider,
-    PROVIDER.MISTRAL: MistralProvider,
-    PROVIDER.PHI: PhiProvider,
-    PROVIDER.QWEN: QwenProvider,
-    PROVIDER.DEEPSEEK: DeepSeekProvider,
-    PROVIDER.GEMINI: GeminiProvider,
-    PROVIDER.SBERT: SBERTProvider,
-    PROVIDER.E5: E5Provider,
-    PROVIDER.BAAI: BAAIProvider,
-}
+from .models import PROVIDER, MODELS
 
 # IMPORTANTISIMO
 # METER A FUTURO SISTEMA DE STREAMING EN TODOS LOS PROVIDERS O ALGO ASI, IMPLEMENTARLO CON UN ACTION Y DEMAS
 
 # ver si hay mas modernos como el caso del qwen y eso de cada uno
-# forma de saber cuales tienen embeddings y cuales tienen prompt y cuales los dos
 
 # hacer que con parametros de ros tmb se pueda elegir que cargar y demas a parte del service
 # poner algo para que si no cabe el modelo descargue los otros
 
 class LLMNode(Node):
+
+    PROVIDER_CLASS_MAP = {
+        PROVIDER.OPENAI: OpenAIProvider,
+        PROVIDER.MISTRAL: MistralProvider,
+        PROVIDER.PHI: PhiProvider,
+        PROVIDER.QWEN: QwenProvider,
+        PROVIDER.DEEPSEEK: DeepSeekProvider,
+        PROVIDER.GEMINI: GeminiProvider,
+        PROVIDER.SBERT: SBERTProvider,
+        PROVIDER.E5: E5Provider,
+        PROVIDER.BAAI: BAAIProvider,
+    }
+
     def __init__(self):
         super().__init__('llm')
         
@@ -153,10 +153,10 @@ class LLMNode(Node):
                 provider = self._try_load_provider(item.provider, item.api_key)
                 provider.load(item.models)
 
-                self._fill_result(result, True, "Models loaded succesfully")
-                self.get_logger().info("✅ Models loaded succesfully")
+                self._fill_result(result, item.models, True, "Models loaded succesfully")
+                self.get_logger().info(f"✅ Models {item.models} from provider {item.provider} loaded succesfully")
             except Exception as e:
-                self._fill_result(result, False, f"Error loading models: {str(e)}")
+                self._fill_result(result, [], False, f"Error loading models: {str(e)}")
                 self.get_logger().info(f"❌ Load models service failed: {str(e)}")
 
             response.results.append(result)
@@ -174,12 +174,12 @@ class LLMNode(Node):
                 try:
                     provider.unload(item.models)
                     self._fill_result(result, True, "Models unloaded succesfully")
-                    self.get_logger().info("✅ Models unloaded succesfully")
+                    self.get_logger().info(f"✅ Models {item.models} from provider {item.provider} unloaded succesfully")
                 except Exception as e:
-                    self._fill_result(result, False, f"Error unloading models: {str(e)}")
+                    self._fill_result(result, item.models, False, f"Error unloading models: {str(e)}")
                     self.get_logger().info(f"❌ Unload models service failed: {str(e)}")
             else:
-                self._fill_result(result, False, f"Provider '{item.provider}' not found.")
+                self._fill_result(result, [], False, f"Provider '{item.provider}' not found.")
                 self.get_logger().info(f"❌ Load models service failed: Provider '{item.provider}' not found.")
 
             response.results.append(result)
@@ -200,10 +200,10 @@ class LLMNode(Node):
 
     def _try_load_provider(self, name, api_key=""):
         if name not in self.provider_map:
-            if name not in PROVIDER_CLASS_MAP:
+            if name not in self.PROVIDER_CLASS_MAP:
                 raise ValueError(f"Provider '{name}' is not supported.")
             
-            provider_class = PROVIDER_CLASS_MAP[name]
+            provider_class = self.PROVIDER_CLASS_MAP[name]
             self.provider_map[name] = provider_class(api_key=api_key) if api_key else provider_class()
 
         return self.provider_map[name]
@@ -214,7 +214,8 @@ class LLMNode(Node):
         response.provider_used = provider
         response.model_used = model
     
-    def _fill_result(self, result, success, message):
+    def _fill_result(self, result, models, success, message):
+        result.models = models
         result.success = success
         result.message = message
 
