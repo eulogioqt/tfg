@@ -1,6 +1,6 @@
-from .hf_text_generation_provider import HFTextGenerationProvider
+from .hf_llm_provider import HFLLMProvider
 
 
-class MistralProvider(HFTextGenerationProvider):
+class MistralProvider(HFLLMProvider):
     def __init__(self, models=None, api_key=None):
         super().__init__(models, api_key)

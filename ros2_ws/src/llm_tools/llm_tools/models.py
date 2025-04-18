@@ -1,14 +1,5 @@
 from enum import Enum
 
-from .providers.openai_provider import OpenAIProvider
-from .providers.mistral_provider import MistralProvider
-from .providers.phi_provider import PhiProvider
-from .providers.qwen_provider import QwenProvider
-from .providers.deepseek_provider import DeepSeekProvider
-from .providers.gemini_provider import GeminiProvider
-from .providers.sbert_provider import SBERTProvider
-from .providers.e5_provider import E5Provider
-from .providers.baai_provider import BAAIProvider
 
 class SmartStrEnum(str, Enum):
     def __str__(self):
@@ -27,18 +18,6 @@ class PROVIDER(SmartStrEnum):
     SBERT = "sbert"
     E5 = "e5"
     BAAI = "baai"
-
-PROVIDER_CLASS_MAP = {
-    PROVIDER.OPENAI: OpenAIProvider,
-    PROVIDER.MISTRAL: MistralProvider,
-    PROVIDER.PHI: PhiProvider,
-    PROVIDER.QWEN: QwenProvider,
-    PROVIDER.DEEPSEEK: DeepSeekProvider,
-    PROVIDER.GEMINI: GeminiProvider,
-    PROVIDER.SBERT: SBERTProvider,
-    PROVIDER.E5: E5Provider,
-    PROVIDER.BAAI: BAAIProvider,
-}
 
 class MODELS: # hacer el research para tener lo ultimo de lo ultmo, por ejemplo qwen tiene uno mas moderno
     class LLM:

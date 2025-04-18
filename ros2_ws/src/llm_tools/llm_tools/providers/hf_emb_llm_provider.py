@@ -1,17 +1,16 @@
-from .hf_text_generation_provider import HFTextGenerationProvider
+from .hf_llm_provider import HFLLMProvider
 from .hf_embedding_provider import HFEmbeddingProvider
 from .base_provider import BaseProvider
 
 from ..models import MODELS, PROVIDER
 
 
-class HFEmbdTextProvider(BaseProvider):
+class HFEmbLLMProvider(BaseProvider):
     def __init__(self, provider: PROVIDER, models=None, api_key=None, model_formatters=None):
         self.llm_models = list(getattr(MODELS.LLM, provider.upper()))
         self.embedder_models = list(getattr(MODELS.EMBEDDING, provider.upper()))
-        print("llm",self.llm_models)
-        print("embd",self.embedder_models)
-        self.llm = HFTextGenerationProvider(api_key=api_key, model_formatters=model_formatters)
+        
+        self.llm = HFLLMProvider(api_key=api_key, model_formatters=model_formatters)
         self.embedder = HFEmbeddingProvider(api_key=api_key)
 
         if models:

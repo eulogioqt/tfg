@@ -4,7 +4,29 @@ from rclpy.node import Node
 from llm_msgs.msg import LoadUnloadResult, ProviderModel
 from llm_msgs.srv import GetModels, Prompt, Embedding, LoadModel, UnloadModel
 
-from .models import PROVIDER, PROVIDER_CLASS_MAP
+from .models import PROVIDER
+
+from .providers.openai_provider import OpenAIProvider
+from .providers.mistral_provider import MistralProvider
+from .providers.phi_provider import PhiProvider
+from .providers.qwen_provider import QwenProvider
+from .providers.deepseek_provider import DeepSeekProvider
+from .providers.gemini_provider import GeminiProvider
+from .providers.sbert_provider import SBERTProvider
+from .providers.e5_provider import E5Provider
+from .providers.baai_provider import BAAIProvider
+
+PROVIDER_CLASS_MAP = {
+    PROVIDER.OPENAI: OpenAIProvider,
+    PROVIDER.MISTRAL: MistralProvider,
+    PROVIDER.PHI: PhiProvider,
+    PROVIDER.QWEN: QwenProvider,
+    PROVIDER.DEEPSEEK: DeepSeekProvider,
+    PROVIDER.GEMINI: GeminiProvider,
+    PROVIDER.SBERT: SBERTProvider,
+    PROVIDER.E5: E5Provider,
+    PROVIDER.BAAI: BAAIProvider,
+}
 
 # IMPORTANTISIMO
 # METER A FUTURO SISTEMA DE STREAMING EN TODOS LOS PROVIDERS O ALGO ASI, IMPLEMENTARLO CON UN ACTION Y DEMAS
@@ -29,24 +51,27 @@ class LLMNode(Node):
 
         self.get_logger().info("LLM Node initializated succesfully")
 
-    def handle_get_models(self, request, response):
+    def handle_get_models(self, request, response): # añadir un get avaiaalble y un get all, y dividorlos en embeddings y llm
         provider_names = request.providers
         if not provider_names:
             provider_names = list(PROVIDER)
+
+        self.get_logger().info(f"📖 Get Models service for providers: {provider_names}")
         
         response.items = []
         for provider_name in provider_names:
-            if provider_name in self.provider_map: # Active ones
+            if provider_name in self.provider_map:
                 provider = self.provider_map.get(provider_name)
                 models = provider.get_active_models()
-
                 response.items.append(ProviderModel(provider=provider_name, models=models))
 
         return response
 
     def handle_prompt(self, request, response):
+        self.get_logger().info(f"📖 Prompt service for provider='{request.provider}', model='{request.model}'")
+
         try:
-            provider_name, provider = self._get_provider(request.provider)
+            provider_name, provider = self._get_provider(request.provider)            
             result, model_used = provider.prompt(
                 model=request.model,
                 prompt_system=request.prompt_system,
@@ -57,13 +82,17 @@ class LLMNode(Node):
 
             response.response = result
             self._fill_response(response, True, "OK", provider_name, model_used)
+            self.get_logger().info(f"✅ Prompt done using provider='{provider_name}', model='{model_used}'")
         except Exception as e:
             response.response = ""
             self._fill_response(response, False, str(e), request.provider, request.model)
+            self.get_logger().info(f"❌ Prompt service failed: {str(e)}")
 
         return response
 
     def handle_embedding(self, request, response):
+        self.get_logger().info(f"📖 Embedding service for provider='{request.provider}', model='{request.model}'")
+        
         try:
             provider_name, provider = self._get_provider(request.provider)
             result, model_used = provider.embedding(
@@ -73,13 +102,17 @@ class LLMNode(Node):
 
             response.embedding = result
             self._fill_response(response, True, "OK", provider_name, model_used)
+            self.get_logger().info(f"✅ Embedding done using provider='{provider_name}', model='{model_used}'")
         except Exception as e:
             response.embedding = []
             self._fill_response(response, False, str(e), request.provider, request.model)
+            self.get_logger().info(f"❌ Embedding service failed: {str(e)}")
 
         return response
 
     def handle_load_model(self, request, response):
+        self.get_logger().info(f"📖 Load model service for items: {[{'provider': i.provider, 'models': i.models} for i in request.items]}'")
+
         response.results = []
         for item in request.items:
             result = LoadUnloadResult(provider=item.provider)
@@ -88,14 +121,18 @@ class LLMNode(Node):
                 provider.load(item.models)
 
                 self._fill_result(result, True, "Models loaded succesfully")
+                self.get_logger().info("✅ Models loaded succesfully")
             except Exception as e:
                 self._fill_result(result, False, f"Error loading models: {str(e)}")
+                self.get_logger().info(f"❌ Load models service failed: {str(e)}")
 
             response.results.append(result)
 
         return response
 
     def handle_unload_model(self, request, response):
+        self.get_logger().info(f"📖 Unload model service for items: {[{'provider': i.provider, 'models': i.models} for i in request.items]}'")
+        
         response.results = []
         for item in request.items:
             result = LoadUnloadResult(provider=item.provider)
@@ -103,12 +140,14 @@ class LLMNode(Node):
             if provider:
                 try:
                     provider.unload(item.models)
-
                     self._fill_result(result, True, "Models unloaded succesfully")
+                    self.get_logger().info("✅ Models unloaded succesfully")
                 except Exception as e:
                     self._fill_result(result, False, f"Error unloading models: {str(e)}")
+                    self.get_logger().info(f"❌ Unload models service failed: {str(e)}")
             else:
                 self._fill_result(result, False, f"Provider '{item.provider}' not found.")
+                self.get_logger().info(f"❌ Load models service failed: Provider '{item.provider}' not found.")
 
             response.results.append(result)
 

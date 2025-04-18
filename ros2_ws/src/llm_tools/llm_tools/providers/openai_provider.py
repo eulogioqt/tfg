@@ -9,7 +9,7 @@ from ..models import MODELS
 class OpenAIProvider(APIProvider):
 
     def __init__(self, api_key):
-        #self.client = openai.OpenAI(api_key=api_key)
+        self.client = openai.OpenAI(api_key=api_key)
         self.formatter = OpenAIFormatter()
     
     def embedding(self, model, user_input):
@@ -33,5 +33,5 @@ class OpenAIProvider(APIProvider):
         
         return response.choices[0].message.content, model
         
-    def get_active_models():
+    def get_active_models(self):
         return list(MODELS.LLM.OPENAI) + list(MODELS.EMBEDDING.OPENAI)

@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'sancho_ai = sancho_ai.sancho_ai_node:main',
+            'test = sancho_ai.test_node:main',
         ],
     },
 )
