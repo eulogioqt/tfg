@@ -9,9 +9,21 @@ from dotenv import load_dotenv
 from .providers.base_provider import BaseProvider
 from .providers.openai_provider import OpenAIProvider
 from .providers.mistral_provider import MistralProvider
+from .providers.phi_provider import PhiProvider
+from .providers.qwen_provider import QwenProvider
+from .providers.deepseek_provider import DeepSeekProvider
 
 # IMPORTANTISIMO
 # METER A FUTURO SISTEMA DE STREAMING EN TODOS LOS PROVIDERS O ALGO ASI, IMPLEMENTARLO CON UN ACTION Y DEMAS
+
+# mañana, probar gemini
+# probar los de embeddings
+# ver si hay mas modernos como el caso del qwen y eso de cada uno
+# ver si meter otros y si quitar phi y eso
+# hacer un service para elegir que se va a cargar y que no, que si no es un folloncete
+
+# refactor si necesario
+# pyl
 
 class LLMNode(Node):
     def __init__(self):
@@ -26,7 +38,7 @@ class LLMNode(Node):
         self.get_logger().info(f"LLM Node initializated succesfully with providers: {list(self.provider_map.keys())}")
 
     def handle_prompt(self, request, response):
-        provider = self.provider_map["mistral"] #self.get_provider(request.provider.lower())
+        provider = self.provider_map.values()[0] #self.get_provider(request.provider.lower())
         result = provider.prompt(
             model=request.model,
             prompt_system=request.prompt_system,
@@ -67,9 +79,27 @@ class LLMNode(Node):
             else:
                 self.get_logger().warn("OPENAI_API_KEY not defined")
 
+            hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
+            if hugging_face_key:
+                providers["mistral"] = MistralProvider(api_key=hugging_face_key)
+            else:
+                self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
+            
+            hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
+            if hugging_face_key:
+                providers["phi"] = PhiProvider(api_key=hugging_face_key)
+            else:
+                self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
+
+            hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
+            if hugging_face_key:
+                providers["qwen"] = QwenProvider(api_key=hugging_face_key)
+            else:
+                self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
+
         hugging_face_key = os.getenv("HUGGING_FACE_API_KEY")
         if hugging_face_key:
-            providers["mistral"] = MistralProvider(api_key=hugging_face_key)
+            providers["deepseek"] = DeepSeekProvider(api_key=hugging_face_key)
         else:
             self.get_logger().warn("HUGGING_FACE_API_KEY not defined")
 

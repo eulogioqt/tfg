@@ -19,4 +19,4 @@ class HFFormatter(PromptFormatter):
         if user_input:
             messages.append({"role": "user", "content": user_input})
             
-        return self.tokenizer.apply_chat_template(messages, return_tensors="pt")
+        return self.tokenizer.apply_chat_template(messages, add_generation_prompt=True, return_tensors="pt")

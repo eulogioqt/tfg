@@ -1,5 +1,5 @@
 from .hf_embedding_provider import HFEmbeddingProvider
-from llm_tools.constants import MODELS
+from ..models import MODELS
 
 
 class BAAIProvider(HFEmbeddingProvider):

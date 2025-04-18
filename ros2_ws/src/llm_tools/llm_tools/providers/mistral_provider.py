@@ -1,5 +1,5 @@
-from ..constants import MODELS
 from .hf_text_generation_provider import HFTextGenerationProvider
+from ..models import MODELS
 
 
 class MistralProvider(HFTextGenerationProvider):

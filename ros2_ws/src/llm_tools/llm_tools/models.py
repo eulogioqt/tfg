@@ -45,10 +45,10 @@ class MODELS:
             LARGE_3 = "text-embedding-3-large"
 
         class QWEN(str, Enum):
-            QWEN_EMBED = "Qwen/Qwen1.5-7B-Chat-Embedding"
+            QWEN_EMBED = "Qwen/Qwen1.5-7B-Chat"
 
         class DEEPSEEK(str, Enum):
-            DEEPSEEK_EMBED = "deepseek-ai/deepseek-embedding"
+            DEEP_EMBED = "deepseek-ai/deepseek-coder-6.7b-instruct"
 
         class SBERT(str, Enum):
             MINI_LM_L6_V2 = "sentence-transformers/all-MiniLM-L6-v2"
@@ -56,6 +56,6 @@ class MODELS:
         class E5(str, Enum):
             E5_LARGE_V2 = "intfloat/e5-large-v2"
 
-        class BAAI(str, Enum):
+        class BAAI(str, Enum): # interesante, de beijing
             BGE_M3 = "BAAI/bge-m3"
             BGE_BASE_EN = "BAAI/bge-base-en-v1.5"

@@ -2,7 +2,7 @@ from .hf_text_generation_provider import HFTextGenerationProvider
 from .hf_embedding_provider import HFEmbeddingProvider
 from .base_provider import BaseProvider
 
-from ..constants import MODELS
+from ..models import MODELS
 
 
 class QwenProvider(BaseProvider):

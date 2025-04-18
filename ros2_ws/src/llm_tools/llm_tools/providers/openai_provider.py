@@ -3,7 +3,7 @@ import openai
 
 from .base_provider import BaseProvider
 from ..prompt_formatters import OpenAIFormatter
-from ..constants import MODELS
+from ..models import MODELS
 
 
 class OpenAIProvider(BaseProvider):
