@@ -24,6 +24,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/Embedding.srv"
   "srv/LoadModel.srv"
   "srv/UnloadModel.srv"
+  "srv/GetModels.srv"
 )
 
 if(BUILD_TESTING)
