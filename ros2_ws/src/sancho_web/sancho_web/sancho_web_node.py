@@ -9,31 +9,6 @@ from ros2web_msgs.msg import R2WMessage
 from hri_msgs.msg import FaceprintEvent
 from hri_msgs.srv import SanchoPrompt
 
-# hacer que publique en /sancho_web/{message_type}? para que los nodos se subscriban solo a lo que le interese?
-# por ejemplo /sancho_web/prompt y sancho_ai se subscribe y cuando haga la respuesta publica en donde sea para que lo pille sancho_web y lo mande pa ros2web
-"""
-✅ Recomendación: modelo centralizado con sancho_web como pasarela
-¿Cómo?
-
-    sancho_web recibe de la web y publica en /sancho_web/web/{message_type} → ✔️ Muy buena idea, ¡eso mantenlo!
-
-    Los demás nodos se subscriben solo a esos topics
-
-    Los nodos que quieren enviar algo a la web → publican en /faceprint_events, /log_events, etc.
-
-    sancho_web está suscrito a esos topics, formatea los mensajes con el protocolo, y los manda a ros2web/ros
-
-Con eso consigues:
-🎯 Ventajas:
-
-    Cada nodo solo habla en su "idioma ROS"
-
-    Solo sancho_web conoce el protocolo web, el JSON, los MessageType, etc.
-
-    Puedes registrar, transformar, o incluso cachear mensajes salientes
-
-    Si algún día cambias el sistema de comunicación web, solo tocas ese nodo
-"""
 
 class SanchoWebNode(Node):
 

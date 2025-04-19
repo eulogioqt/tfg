@@ -4,6 +4,7 @@ from rclpy.node import Node
 from abc import ABC, abstractmethod
 from ros2web_msgs.srv import R2WSubscribe
 
+
 class DynamicSubscribableNode(Node, ABC):
 
     def __init__(self, node_name):

@@ -4,8 +4,7 @@ import json
 from datetime import datetime
 from threading import RLock
 
-# a esta clase se le pueden hacer test unitarios jeje
-# guardar el json en la forma shiquitita comprimida pa que ocupe menos cuando ya deje de testear, ahora pa test esta bien
+
 class FaceprintsDatabase:
     def __init__(self, db_path='faceprints_db.json'):
         self.db_path = db_path

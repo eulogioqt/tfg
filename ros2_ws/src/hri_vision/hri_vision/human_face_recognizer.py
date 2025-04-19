@@ -14,6 +14,7 @@ from .aligners.aligner_dlib import align_face
 from .encoders.encoder_facenet import encode_face
 from .classifiers.complex_classifier import ComplexClassifier
 
+
 class HumanFaceRecognizer(Node):
 
     def __init__(self, use_database = True):

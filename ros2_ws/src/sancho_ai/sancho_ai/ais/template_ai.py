@@ -5,6 +5,7 @@ import random
 from .ai import AI
 from ..prompts.commands.commands import COMMANDS
 
+
 class TemplateAI(AI):
 
     def __init__(self):

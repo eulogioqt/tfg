@@ -1,9 +1,9 @@
 string provider
 string model
 string prompt_system
-string messages_json # cambiar esto a un mensaje propio de ros que sea content y role algo asi para cada msg
+string messages_json
 string user_input
-string parameters_json # cambiar esto a temperature y max_tokens
+string parameters_json
 ---
 string response
 string provider_used

@@ -11,31 +11,6 @@ from hri_msgs.srv import Detection, Recognition, Training, GetString
 from .hri_bridge import HRIBridge
 from .api.gui import get_name, ask_if_name, mark_face
 
-# refactorizar esta vaina
-# tema de que se congele si te pide el nombre o lo que sea
-# revisar que a veces estas mirando pa otro lao y cierras la ventana y te pilla una foto antigua
-
-# tema hacerlo mejor tipo quiza que todo el proceos se haga en otro lao y haya un sitio donde se vaya cogiendo
-# la info que se publica de deteccion y reconocimiento y entonces solo coja siempre el ultimo frame asin fluido
-# y con la ultima info de reconocimiento y deteccion se pinte. Entonces tendriamos la camara fluida y con esa info,
-# no que ahora va lentita
-
-# para la bd investigar y ver como hacer. Yo creo que el classifier deberia manejar todo el tema bd o incluso otro nodo para la bd
-# con ros pero que luego hubiese un api rest cuyas peticiones usen el nodo de ros para acceder a esa bd tambien, o por lo contrario
-# que lo haga externamente, pero que sea un diseño asin epico
-
-# para lo de que se queda pillado si te esta preguntando el nombre, pues poner que en vez de quitarse el video ponga "sin señal" o se quede el ultimo frame y ya
-
-# revisar tema prints y logs que es un caos
-# en la interfaz web poner de nuevo lo de ver la gente conectada
-# hacer algo para cuando borrar que esto lo detecte
-# algo tipo un topic informativo de la bd y si publica que se ha borrado pues borra aqui tmb
-
-# al publicar el actual people es un stringify del json, quiza en el r2wsubscribe o lo q sea meter un argumento de json parse q si es true sabes
-# q lo q esta publicnado es json y lo parsee
-# la idea es que llegue todo a la web en json y no dependiendo ed una cosa u otra lo jsonice o no, pensar esto bien
-
-# en el recognizer y eso importar todo al principio o algo asi para que no de un lagazo en el primer reconocimiento
 
 class HRILogicNode(Node):
 

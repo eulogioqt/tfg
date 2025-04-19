@@ -1,9 +1,6 @@
 import dlib
 import cv2
-if(dlib.DLIB_USE_CUDA):
-    print("Usando cuda")
-else:
-    print("No usando cuda")
+
 cnn_face_detector = dlib.cnn_face_detection_model_v1('install/hri_vision/share/hri_vision/models/mmod_human_face_detector.dat')
 
 def get_faces(frame, verbose=False):

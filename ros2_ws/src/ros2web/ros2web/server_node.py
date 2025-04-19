@@ -13,28 +13,6 @@ from .r2w_bridge import R2WBridge
 
 from ros2web_msgs.msg import R2WMessage
 
-# añadir lo de autosubscribirse a topics
-# documentar todo y el protocolo aunque sea basico
-# añadir algo para cuando entra y sale un usuario
-# hacer un service para subscribirse al topic que se le pase. Un mensaje R2WSubscription con topic y nombre (mensaje para subscribirse a topics)
-# ponerlo tambien como argumentos de un launch
-# no me mola que el stoppable node el que lo hereda es el wrapper del nodo no el node
-# hacer AutosubscriptableNode para el node real y wrappear el service y todo eso ahi
-# hacer que si el topic aun no esta disponible lo intenta cada cierto tiempo hasta que este
-
-# coger todo el codigo y refactorizarlo y documentarlo hasta dejarlo perfecto cuando este todo hecho
-# generar una documentacion para la memoria o algo asi de calidad, donde se describa bien tipo
-# el websocketserver tiene esto esto y esto
-# el httpserver esto y estas funciones "publicas" y asi con todo perfectisimo sabe o no sabe o si sabe
-
-# hacer alguna forma para autorserializar o que el usuario al menos pueda (lo de bridge de ros_to_r2w)
-# en esta conversacion pone que se puede "https://chatgpt.com/c/67ed892c-cf14-800f-b877-2e727bcfafa8"
-# hacer que eso sea el por defecto y si no que el usuario pueda definir formas de serializar mensajes
-# especificos, como las imagenes a jpg codificarlas y todo el rollo para que vaya mas rapido...
-
-# hacer un paquete para el tema llms
-
-# en el refactor hacer mas carpetas dentro de los paquetes aunque no sean paquetes
 
 class ServerNode(DynamicSubscribableNode):
 

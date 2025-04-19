@@ -16,13 +16,6 @@ from .providers.baai_provider import BAAIProvider
 
 from .models import PROVIDER, MODELS
 
-# IMPORTANTISIMO
-# METER A FUTURO SISTEMA DE STREAMING EN TODOS LOS PROVIDERS O ALGO ASI, IMPLEMENTARLO CON UN ACTION Y DEMAS
-
-# ver si hay mas modernos como el caso del qwen y eso de cada uno
-
-# hacer que con parametros de ros tmb se pueda elegir que cargar y demas a parte del service
-# poner algo para que si no cabe el modelo descargue los otros
 
 class LLMNode(Node):
 

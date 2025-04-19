@@ -2,13 +2,13 @@ import rclpy
 from abc import ABC, abstractmethod
 
 
-class StoppableNode(ABC): # No me gusta que stoppablenode y quien hereda de esto no es el nodo si no el wrapper
+class StoppableNode(ABC):
 
     def __init__(self):
         self.run_node = True
 
     def stop(self):
-        self.run_node = False # probar a poner el run_node en el init de aqui a ver si vale
+        self.run_node = False
 
     def run(self):
         try:

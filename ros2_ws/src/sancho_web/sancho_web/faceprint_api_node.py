@@ -8,6 +8,7 @@ from hri_msgs.srv import GetString, Training
 from .faceprint_service.app import app
 from .faceprint_service.v1 import set_api_node
 
+
 class APIClientNode(Node):
     def __init__(self):
         super().__init__('api_client_node')

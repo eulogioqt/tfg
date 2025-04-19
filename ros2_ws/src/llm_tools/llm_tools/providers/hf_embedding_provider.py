@@ -5,9 +5,6 @@ from sentence_transformers import SentenceTransformer
 
 from .base_provider import BaseProvider
 
-# hacer a futuro que usando esto de hugging face se puedan poner todos los modelos
-# algo tipo que el usuario lo defina en un yaml o un json o algo del proyecto
-# ya vere como hacerlo eso es mas a futuro pero vonva
 
 class HFEmbeddingProvider(BaseProvider):
     def __init__(self, models=None, api_key=None):

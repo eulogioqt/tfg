@@ -11,8 +11,6 @@ from ..prompts.commands.commands import COMMANDS
 
 from llm_tools.models import PROVIDER, MODELS
 
-# poner todo el tema de los if intent == noseque en una funcion a parte, y q los metodos estos definan la forma de clasificar
-# y ya luego esa funcion hace lo q tenga q hacer q es smp lo mismo sabe
 
 class ClassificationTemplatesAI(TemplateAI):
 
@@ -26,15 +24,16 @@ class ClassificationTemplatesAI(TemplateAI):
     def on_message(self, message):
         classification_prompt = ClassificationPrompt(message)
 
+        self.node.get_logger().info(f"User: {message}")
         classification_response_json = self.llm_engine.prompt_request(
-            provider=PROVIDER.DEEPSEEK,
+            provider=PROVIDER.DEEPSEEK, # que esto devuelva el provider y el modelo por si quiero ponerlo por ahi en la web
             model=MODELS.LLM.DEEPSEEK.DEEPSEEK_CHAT,
             prompt_system=classification_prompt.get_prompt_system(),
             user_input=classification_prompt.get_user_prompt(),
             parameters_json=classification_prompt.get_parameters()
         )
 
-        self.node.get_logger().info(classification_response_json)
+        self.node.get_logger().info(f"Assistant: {classification_response_json}")
         classification_response = json.loads(classification_response_json)
         intent = classification_response["intent"]
 

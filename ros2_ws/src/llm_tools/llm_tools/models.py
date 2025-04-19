@@ -19,7 +19,7 @@ class PROVIDER(SmartStrEnum):
     E5 = "e5"
     BAAI = "baai"
 
-class MODELS: # hacer el research para tener lo ultimo de lo ultmo, por ejemplo qwen tiene uno mas moderno
+class MODELS:
     class LLM:
         class OPENAI(SmartStrEnum):
             GPT_3_5_TURBO = "gpt-3.5-turbo"

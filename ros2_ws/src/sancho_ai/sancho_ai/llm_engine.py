@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from llm_msgs.srv import Prompt, LoadModel
 from llm_msgs.msg import LoadProviderModel
 
-from llm_tools.models import PROVIDER, MODELS
+from llm_tools.models import PROVIDER, MODELS # es buena idea esto? arreglar ya que no completa
 
 
 class LLMEngine(ServiceEngine):

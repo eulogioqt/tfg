@@ -5,6 +5,7 @@ import webbrowser
 from flask import Flask, send_from_directory
 from werkzeug.serving import make_server
 
+
 class HTTPServer:
     def __init__(self, host="localhost", port=8080):
         self.host = host

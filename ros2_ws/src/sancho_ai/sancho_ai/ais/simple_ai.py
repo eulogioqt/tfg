@@ -5,6 +5,7 @@ from .template_ai import TemplateAI
 from ..service_engine import ServiceEngine
 from ..hri_engine import HRIEngine
 
+
 class SimpleAI(TemplateAI):
 
     def __init__(self):
@@ -14,7 +15,7 @@ class SimpleAI(TemplateAI):
         self.hri_engine = HRIEngine(self.node)
 
     def on_message(self, message: str):
-        if 'como estas' in message:  # Busca en Wikipedia lo que le digas
+        if 'como estas' in message: 
             response = self.how_are_you()
         elif 'quien soy' == message or 'que ves' in message or 'quien ves' in message:
             actual_people_json = self.hri_engine.get_actual_people_request()

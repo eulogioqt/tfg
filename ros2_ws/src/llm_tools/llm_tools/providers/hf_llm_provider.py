@@ -7,7 +7,7 @@ from .base_provider import BaseProvider
 from ..prompt_formatters import HFChatTemplateFormatter
 
 
-class HFLLMProvider(BaseProvider): # cambiar a hf_llm_provider
+class HFLLMProvider(BaseProvider):
     def __init__(self, models=None, api_key=None, model_formatters=None):
         self.api_key = api_key
         self.model_formatters = model_formatters

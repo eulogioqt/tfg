@@ -3,6 +3,7 @@ import json
 from enum import Enum
 from abc import ABC, abstractmethod
 
+
 ##### CLIENT MESSAGES #####
 class PromptMessage():
     def __init__(self, msg):

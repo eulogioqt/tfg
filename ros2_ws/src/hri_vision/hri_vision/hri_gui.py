@@ -9,6 +9,7 @@ from hri_msgs.msg import FaceGuiRequest
 from hri_msgs.srv import FaceGuiResponse
 from .hri_bridge import HRIBridge
 
+
 class HRIGuiNode(Node):
     def __init__(self, gui):
         super().__init__("hri_gui")

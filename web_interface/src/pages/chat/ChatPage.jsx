@@ -5,14 +5,10 @@ import ChatFooter from "./components/ChatFooter";
 import ChatMessageArea from "./components/ChatMessageArea";
 import ChatHeader from "./components/ChatHeader";
 
-import { useWebSocket } from "../../contexts/WebSocketContext";
 import { useEventBus } from "../../contexts/EventBusContext";
 import { useWindowSize, BREAKPOINTS } from "../../hooks/useWindowSize";
 import { useChat } from "../../contexts/ChatContext";
 
-// Poner que cuando el chat no tiene mensajes el text area y demas este en medio
-// Hacer un chatcontext o un collapsedcontext si se extiende todo demasiado y hay muchas cosas que ir pasando
-// al menos collapsedcontext por el momento
 const ChatPage = () => {
     const { messages, clearMessages, addMessage, handleSend } = useChat();
     const { subscribe } = useEventBus();

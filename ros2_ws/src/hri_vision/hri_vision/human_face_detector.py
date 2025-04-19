@@ -7,6 +7,7 @@ from hri_msgs.srv import Detection
 
 from .hri_bridge import HRIBridge
 
+
 class HumanFaceDetector(Node):
 
     def __init__(self):

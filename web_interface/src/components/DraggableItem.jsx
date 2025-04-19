@@ -1,11 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useWindowSize, BREAKPOINTS } from "../hooks/useWindowSize";
 
-// Hacer que funcione como lo de youtube que se va a a esquinas y todo eso
-// Si pongo el raton encima que se oscurezca un poco y salga el boton de cerrar y el de poner en grande
-// En el en grande que sea otro route y se pueda luego volver a donde estabas guardado donde estabas (o que se ponga el componetne en grande)
-// El cerrar si lo cierras en algun lado el boton para volver a ponerlo en la pantalla
-
 const DraggableItem = ({ children }) => {
     const { width, height } = useWindowSize();
 

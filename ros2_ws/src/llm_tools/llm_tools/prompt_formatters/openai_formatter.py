@@ -2,6 +2,7 @@ import json
 
 from .prompt_formatter import PromptFormatter
 
+
 class OpenAIFormatter(PromptFormatter):
     def format(self, prompt_system: str, messages_json: str, user_input: str) -> list:
         messages = []

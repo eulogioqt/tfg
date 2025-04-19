@@ -1,6 +1,7 @@
 from typing import Optional, Dict
 from fastapi import Request, HTTPException
 
+
 class APIUtils:
     _admin_key = ""
 

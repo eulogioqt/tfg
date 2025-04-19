@@ -7,6 +7,7 @@ from std_msgs.msg import String
 
 from rosidl_runtime_py.convert import message_to_ordereddict
 
+
 class R2WBridge():
 
     def __init__(self):
