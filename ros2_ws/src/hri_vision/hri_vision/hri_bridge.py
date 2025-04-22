@@ -1,3 +1,6 @@
+import cv2
+import base64
+
 from std_msgs.msg import String
 from cv_bridge import CvBridge
 
@@ -39,6 +42,23 @@ class HRIBridge:
 
         return img_msg
 
+    def cv2_to_base64(self, image, quality=50): #ros2utils
+        """Transforms an Image in cv2 format to base64 from JPEG
+        
+        Args:
+            image (Image-CV2): The image
+            quality (int): The quality of the JPEG encode
+        
+        Returns:
+            image_base64 (str): The base64 of the image
+        """
+
+        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), quality]
+        _, jpeg = cv2.imencode('.jpg', image, encode_param)
+        image_base64 = base64.b64encode(jpeg.tobytes()).decode('utf-8')
+
+        return image_base64
+    
     def detector_to_msg(self, positions, scores):
         """Transforms detector service response to ROS2 msgs format
 

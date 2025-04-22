@@ -1,5 +1,7 @@
+import cv2
 import time
 import json
+import base64
 from queue import Queue
 
 import rclpy
@@ -109,7 +111,7 @@ class HRILogic():
                 self.recognition_request(frame_msg, positions_msg[i], scores_msg[i])        # Recognition
             face_aligned, features, classified, distance, pos = \
                 self.node.br.msg_to_recognizer(face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg)
-     
+
             if distance < self.LOWER_BOUND: # No sabe quien es (en teoria nunca lo ha visto), pregunta por el nombre
                 classified = None
                 if scores[i] >= 1 and self.ask_unknowns: # Si la imagen es buena, pregunta por el nombre, para que no coja una imagen mala
@@ -118,9 +120,12 @@ class HRILogic():
                     if classified is not None:
                         self.actual_people[classified] = time.time()
 
+                        face_aligned_base64 = self.node.br.cv2_to_base64(face_aligned)
                         already_known, message = self.training_request(String(data="add_class"), String(data=json.dumps({
                             "class_name": classified,
-                            "features": features
+                            "features": features,
+                            "face": face_aligned_base64,
+                            "score": scores[i]
                         }))) # Añadimos clase (en teoria es alguien nuevo)
                         self.node.get_logger().info(message.data)
 
@@ -156,9 +161,12 @@ class HRILogic():
                         if classified is not None:
                             self.actual_people[classified] = time.time()
 
+                            face_aligned_base64 = self.node.br.cv2_to_base64(face_aligned)
                             already_known, message = self.training_request(String(data="add_class"), String(data=json.dumps({
                                 "class_name": classified,
-                                "features": features
+                                "features": features,
+                                "face": face_aligned_base64,
+                                "score": scores[i]
                             }))) # Añadimos clase (en teoria es alguien nuevo)
                             self.node.get_logger().info(message.data)
                             

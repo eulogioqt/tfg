@@ -100,15 +100,17 @@ class ComplexClassifier:
         self.save()
         return result, message
 
-    def add_class(self, class_name, features):
+    def add_class(self, class_name, features, face, score):
         '''Adds a new class with a unique feature vector.
 
         Args:
             class_name (str): The class.
             features (Array: float): The feature vector.
+            face (str): Base64 face image.
+            score (float): Score of the detection
         '''
 
-        already_known = self.db.add(class_name, features) is None
+        already_known = self.db.add(class_name, features, face, score) is None
 
         if already_known:
             _, message = self.add_features(class_name, features)

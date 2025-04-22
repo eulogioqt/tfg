@@ -23,15 +23,15 @@ class FaceprintsDatabase:
         with self._lock:
             return self.faceprints.get(name)
 
-    def add(self, name, features):
+    def add(self, name, features, face, score):
         with self._lock:
             if name in self.faceprints:
                 return None  # Ya existe
 
             new_faceprint = {
                 'name': name,
-                'face': '',
-                'face_score': 0,
+                'face': face,
+                'face_score': score,
                 'features': [features],
                 'size': [1],
                 'learning_date': datetime.now().timestamp()

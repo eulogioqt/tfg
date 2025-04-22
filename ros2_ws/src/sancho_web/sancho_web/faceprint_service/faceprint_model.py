@@ -8,6 +8,10 @@ class Faceprint(BaseModel):
     learning_date: str = Field(default=str(datetime.now().timestamp()), example="1712345678")
     face: str = Field(example="data:image/jpeg;base64,...")
 
+class FaceprintCreate(BaseModel):
+    name: str = Field(example="Juan")
+    face: str = Field(example="data:image/jpeg;base64,...")
+
 class FaceprintUpdate(BaseModel):
     name: str = Field(example="Juan")
 
