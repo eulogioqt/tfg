@@ -3,7 +3,8 @@ import rclpy
 import uvicorn
 
 from rclpy.node import Node
-from hri_msgs.srv import GetString, Training
+from hri_msgs.srv import Detection, Recognition, Training, GetString
+from hri_vision.hri_bridge import HRIBridge
 
 from .faceprint_service.app import app
 from .faceprint_service.v1 import set_api_node
@@ -17,10 +18,19 @@ class APIClientNode(Node):
         while not self.get_faceprint_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('Get All service not available, waiting again...')
 
+        self.detection_client = self.create_client(Detection, 'detection')
+        while not self.detection_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('Detection service not available, waiting again...')
+        
+        self.recognition_client = self.create_client(Recognition, 'recognition')
+        while not self.recognition_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('Recognition service not available, waiting again...')
+
         self.training_client = self.create_client(Training, 'recognition/training')
         while not self.training_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('Training service not available, waiting again...')
 
+        self.br = HRIBridge()
         self.get_logger().info("ROS Client Node initializated succesfully")
 
     def spin(self):
@@ -36,7 +46,31 @@ class APIClientNode(Node):
         result_get_all = future_get_all.result()
 
         return json.loads(result_get_all.text)
-    
+
+    # Demasiada replica de hri logic, no?
+    def detection_request(self, frame_msg):
+        detection_request = Detection.Request()
+        detection_request.frame = frame_msg
+
+        future_detection = self.detection_client.call_async(detection_request)
+        rclpy.spin_until_future_complete(self, future_detection)
+        result_detection = future_detection.result()
+
+        return result_detection.positions, result_detection.scores
+
+    def recognition_request(self, frame_msg, position_msg, score_msg):
+        recognition_request = Recognition.Request()
+        recognition_request.frame = frame_msg
+        recognition_request.position = position_msg
+        recognition_request.score = score_msg
+
+        future_recognition = self.recognition_client.call_async(recognition_request)
+        rclpy.spin_until_future_complete(self, future_recognition)
+        result_recognition = future_recognition.result()
+
+        return (result_recognition.face_aligned, result_recognition.features,
+                result_recognition.classified, result_recognition.distance, result_recognition.pos)    
+
     def training_request(self, cmd_type_msg, args_msg):
         training_request = Training.Request()
         training_request.cmd_type = cmd_type_msg

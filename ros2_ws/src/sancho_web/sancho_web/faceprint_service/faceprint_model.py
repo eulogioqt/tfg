@@ -10,7 +10,7 @@ class Faceprint(BaseModel):
 
 class FaceprintCreate(BaseModel):
     name: str = Field(example="Juan")
-    face: str = Field(example="data:image/jpeg;base64,...")
+    image: str = Field(example="data:image/jpeg;base64,...")
 
 class FaceprintUpdate(BaseModel):
     name: str = Field(example="Juan")

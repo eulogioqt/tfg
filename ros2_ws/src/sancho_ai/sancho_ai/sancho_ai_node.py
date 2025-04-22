@@ -5,7 +5,9 @@ from hri_msgs.srv import SanchoPrompt
 
 from .ais.factory import create_sancho_ai, AIType
 
-
+# meter comandos de dime cual es la ultima persona que has visto
+# de que diga cuanta gente conoce
+# lo ideal seguramente sea en el contexto meterle toda esta info si son demasiados comandos y dejar comando solo para lo que haga acciones
 class SanchoAINode(Node):
 
     def __init__(self, type):
