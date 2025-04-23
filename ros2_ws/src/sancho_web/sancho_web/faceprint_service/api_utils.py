@@ -87,17 +87,3 @@ class APIUtils:
     async def delete(cls, client, url):
         response = await client.delete(url, headers={"Accept" : "application/json", "Authorization": f"Bearer {cls.get_admin_key()}"})
         return response.json()
-        
-    @classmethod
-    def add_keywords_query(cls, query, keywords):
-        if keywords:
-            keyword_list = keywords.split(' ')
-            keyword_conditions = []
-            for keyword in keyword_list:
-                keyword = keyword.strip()
-                if keyword:
-                    keyword_conditions.append({"title": {"$regex": keyword, "$options": "i"}})
-                    keyword_conditions.append({"content": {"$regex": keyword, "$options": "i"}})
-                    keyword_conditions.append({"description": {"$regex": keyword, "$options": "i"}})
-            if keyword_conditions:
-                query["$or"] = keyword_conditions

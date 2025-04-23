@@ -103,7 +103,7 @@ async def create_faceprint(
         update_data = faceprint_create.model_dump(exclude_defaults=True)
         name = update_data["name"]
         image_base64 = update_data["image"]
-        image_cv2 = image_base64
+        image_cv2 = api_node.br.base64_to_cv2(image_base64)
         image_msg = api_node.br.cv2_to_imgmsg(image_cv2)
         
         positions_msg, scores_msg = api_node.detection_request(image_msg)
@@ -138,7 +138,7 @@ async def create_faceprint(
                     if already_known < 0:
                         raise HTTPException(status_code=400, detail=message)
                     elif already_known == 1:
-                        raise HTTPException(status_code=400, detail=f"Ya te conocía {classified}, pero he reforzado mi aprendizaje.")
+                        raise HTTPException(status_code=208, detail=f"Ya te conocía {classified}, pero he reforzado mi aprendizaje.")
                     elif already_known == 0:
                         updated_item = api_node.get_faceprint_request(json.dumps({ "name": name }))
                         

@@ -48,6 +48,7 @@ class APIClientNode(Node):
         return json.loads(result_get_all.text)
 
     # Demasiada replica de hri logic, no?
+    # Ademas cuando lo haga con el llm lo mismo, mas replica aun porque por ahi va por websocket a sancho ai....
     def detection_request(self, frame_msg):
         detection_request = Detection.Request()
         detection_request.frame = frame_msg

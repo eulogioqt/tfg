@@ -66,9 +66,7 @@ export const APIProvider = ({ children }) => {
         ...extraEndpoints,
     });
 
-    const faceprintsAPI = createEndpointMethods("faceprints", {
-        create: () => alert("Method not available"),
-    });
+    const faceprintsAPI = createEndpointMethods("faceprints");
 
     return (
         <APIContext.Provider

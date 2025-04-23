@@ -52,6 +52,8 @@ const FaceprintsPage = () => {
         return () => unsubscribe();
     }, []);
 
+    const handleCreate = async (name, face) => {};
+
     const handleDelete = async (name) => {
         if (!window.confirm(`¿Seguro que deseas eliminar a ${name}?`)) return;
 
@@ -67,9 +69,7 @@ const FaceprintsPage = () => {
         if (newName.trim() !== oldName.trim()) {
             const response = await faceprints.update(oldName, { name: newName });
             if (isResponseOk(response)) {
-                setData((prev) =>
-                    prev.map((item) => (item.name === oldName ? response.data : item))
-                );
+                setData((prev) => prev.map((item) => (item.name === oldName ? response.data : item)));
             }
         }
 
@@ -84,9 +84,14 @@ const FaceprintsPage = () => {
         <div className="container mt-5">
             <div className="d-flex justify-content-between align-items-center mb-4 pt-4">
                 <h2>Base de Datos de Rostros Reconocidos</h2>
-                <button className="btn btn-outline-secondary" onClick={fetchData}>
-                    <i className="bi bi-arrow-clockwise me-2" /> Recargar
-                </button>
+                <div>
+                    <button className="btn btn-primary me-2" onClick={() => alert("Not implemented")}>
+                        <i className="bi bi-database-add me-2" /> Añadir cara
+                    </button>
+                    <button className="btn btn-outline-secondary" onClick={fetchData}>
+                        <i className="bi bi-arrow-clockwise me-2" /> Recargar
+                    </button>
+                </div>
             </div>
 
             {loading ? (
@@ -189,10 +194,7 @@ const FaceprintsPage = () => {
                                         key={index}
                                         className={`page-item ${currentPage === index + 1 ? "active" : ""}`}
                                     >
-                                        <button
-                                            className="page-link"
-                                            onClick={() => setCurrentPage(index + 1)}
-                                        >
+                                        <button className="page-link" onClick={() => setCurrentPage(index + 1)}>
                                             {index + 1}
                                         </button>
                                     </li>

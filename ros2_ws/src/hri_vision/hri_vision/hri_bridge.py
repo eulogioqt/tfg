@@ -1,5 +1,7 @@
+import re
 import cv2
 import base64
+import numpy as np
 
 from std_msgs.msg import String
 from cv_bridge import CvBridge
@@ -58,7 +60,30 @@ class HRIBridge:
         image_base64 = base64.b64encode(jpeg.tobytes()).decode('utf-8')
 
         return image_base64
-    
+
+    def base64_to_cv2(image_base64):
+        """Transforms an base64 from JPEG format to Image in cv2
+        
+        Args:
+            image (str): The base64 of the image
+            quality (int): The quality of the JPEG encode
+        
+        Returns:
+            image_base64 (Image-CV2): The image
+        """
+
+        match = re.match(r"data:image/[^;]+;base64,(.*)", image_base64)
+        if not match:
+            raise ValueError("Formato base64 inválido o no es una imagen válida.")
+        
+        image_data = base64.b64decode(match.group(1))
+        np_arr = np.frombuffer(image_data, np.uint8)
+        img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
+        if img is None:
+            raise ValueError("No se pudo decodificar la imagen.")
+        return img
+
     def detector_to_msg(self, positions, scores):
         """Transforms detector service response to ROS2 msgs format
 
