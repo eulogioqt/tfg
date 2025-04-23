@@ -31,7 +31,7 @@ const NewFaceprintModal = ({ handleClose, isOpen }) => {
     };
 
     const uploadFace = async () => {
-        const trimmedName = name.trim(); // igual que strip() en Python
+        const trimmedName = name.trim();
 
         if (!selectedImage) {
             showToast("Imagen requerida", "Por favor, selecciona una imagen.", "red");
@@ -57,7 +57,7 @@ const NewFaceprintModal = ({ handleClose, isOpen }) => {
                 setSelectedImage(undefined);
                 setName("");
             } else {
-                const errorText = response.data?.detail || "Error inesperado";
+                const errorText = response && response.data?.detail || "Error inesperado";
                 showToast("Error", errorText, "red");
             }
         } catch (error) {

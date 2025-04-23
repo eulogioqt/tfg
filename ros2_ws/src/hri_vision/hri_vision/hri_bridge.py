@@ -61,7 +61,7 @@ class HRIBridge:
 
         return image_base64
 
-    def base64_to_cv2(image_base64):
+    def base64_to_cv2(self, image_base64):
         """Transforms an base64 from JPEG format to Image in cv2
         
         Args:

@@ -9,9 +9,9 @@ from .v1 import router as v1_router
 load_dotenv()
 
 app = FastAPI(
-    docs_url="/api/articles/docs",  # Documentación Swagger
-    redoc_url="/api/articles/redoc",  # Documentación Redoc
-    openapi_url="/api/articles/openapi.json"  # OpenAPI Schema
+    docs_url="/api/faceprints/docs",  # Documentación Swagger
+    redoc_url="/api/faceprints/redoc",  # Documentación Redoc
+    openapi_url="/api/faceprints/openapi.json"  # OpenAPI Schema
 )
 app.title = "Faceprints Service"
 app.version = "1.0.0"

@@ -103,6 +103,7 @@ async def create_faceprint(
         update_data = faceprint_create.model_dump(exclude_defaults=True)
         name = update_data["name"]
         image_base64 = update_data["image"]
+        print(image_base64)
         image_cv2 = api_node.br.base64_to_cv2(image_base64)
         image_msg = api_node.br.cv2_to_imgmsg(image_cv2)
         
