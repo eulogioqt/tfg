@@ -35,7 +35,6 @@ export const APIProvider = ({ children }) => {
         } catch (error) {
             console.log("Error en la peticion (error, data):", error.response, data);
             setLoading(false);
-            if (!error.response) throw new Error("No se pudo realizar la petición a la API")
             return error.response;
         }
     };

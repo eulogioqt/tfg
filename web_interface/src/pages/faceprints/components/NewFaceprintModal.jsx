@@ -7,7 +7,7 @@ import { useAPI } from "../../../contexts/APIContext";
 
 // poner que mientras esta respondiendo haya un cargando o algo spinning para que no puedas salir en toda la pantalla o como chatgpt crea que es mejor
 // que cuando se añada como te responde con la persona y no hay evento por el origin.web ese pues se añada del tiron sabe
-const NewFaceprintModal = ({ handleClose, isOpen }) => {
+const NewFaceprintModal = ({ handleClose, isOpen, addFaceprint }) => {
     const { showToast } = useToast();
     const { faceprints } = useAPI();
 
@@ -54,12 +54,21 @@ const NewFaceprintModal = ({ handleClose, isOpen }) => {
             });
 
             if (response.status >= 200 && response.status < 300) {
-                showToast("Éxito", "La cara ha sido procesada correctamente.", "green");
+                if (response.status === 208)
+                    showToast(
+                        "Persona conocida",
+                        `Ya te conocía ${response.data["name"]}, pero he reforzado mi aprendizaje`,
+                        "blue"
+                    );
+                else showToast("Éxito", "La cara ha sido procesada y aprendida correctamente.", "green");
+
+                addFaceprint(response.data);
+
                 handleClose();
                 setSelectedImage(undefined);
                 setName("");
             } else {
-                const errorText = response && response.data?.detail || "Error inesperado";
+                const errorText = (response && response.data?.detail) || "Error inesperado";
                 showToast("Error", errorText, "red");
             }
         } catch (error) {
@@ -69,9 +78,17 @@ const NewFaceprintModal = ({ handleClose, isOpen }) => {
     };
 
     return (
-        <SimpleModal name={"upload-face"} title="Subir nueva cara" handleClose={handleClose} isOpen={isOpen} zIndex={100}>
+        <SimpleModal
+            name={"upload-face"}
+            title="Subir nueva cara"
+            handleClose={handleClose}
+            isOpen={isOpen}
+            zIndex={100}
+        >
             <div className="mb-3">
-                <label htmlFor="nameInput" className="form-label">Nombre</label>
+                <label htmlFor="nameInput" className="form-label">
+                    Nombre
+                </label>
                 <input
                     type="text"
                     className="form-control"

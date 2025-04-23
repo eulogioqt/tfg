@@ -21,11 +21,19 @@ const FaceprintsPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const perPage = 5;
 
+    const deleteFaceprint = (name) => setData((prev) => prev.filter((item) => item.name !== name));
+    const addFaceprint = (fc) => setData((prev) => [...prev, fc]);
+    const updateFaceprint = (name, fc) => setData((prev) => prev.map((item) => (item.name === name ? fc : item)));
+
     const fetchData = async () => {
         setLoading(true);
 
         const response = await faceprints.getAll();
-        if (isResponseOk(response)) setData(response.data);
+        if (isResponseOk(response)) {
+            setData(response.data);
+        } else {
+            showToast("Error", "No se han podido cargar los datos", "red");
+        }
 
         setLoading(false);
     };
@@ -39,14 +47,13 @@ const FaceprintsPage = () => {
             if (e.event === FACEPRINT_EVENT.CREATE || e.event === FACEPRINT_EVENT.UPDATE) {
                 const response = await faceprints.getById(e.name);
                 if (isResponseOk(response)) {
-                    setData((prev) =>
-                        e.event === FACEPRINT_EVENT.CREATE
-                            ? [...prev, response.data]
-                            : prev.map((item) => (item.name === e.name ? response.data : item))
-                    );
+                    if (e.event === FACEPRINT_EVENT.CREATE) addFaceprint(response.data);
+                    else updateFaceprint(e.name, response.data);
+                } else {
+                    showToast("Error", response.data.detail, "red");
                 }
             } else if (e.event === FACEPRINT_EVENT.DELETE) {
-                setData((prev) => prev.filter((item) => item.name !== e.name));
+                deleteFaceprint(e.name);
             }
         };
 
@@ -59,7 +66,9 @@ const FaceprintsPage = () => {
 
         const response = await faceprints.delete(name);
         if (isResponseOk(response)) {
-            setData((prev) => prev.filter((item) => item.name !== name));
+            deleteFaceprint(name);
+        } else {
+            showToast("Error", response.data.detail, "red");
         }
     };
 
@@ -69,7 +78,9 @@ const FaceprintsPage = () => {
         if (newName.trim() !== oldName.trim()) {
             const response = await faceprints.update(oldName, { name: newName });
             if (isResponseOk(response)) {
-                setData((prev) => prev.map((item) => (item.name === oldName ? response.data : item)));
+                updateFaceprint(oldName, response.data);
+            } else {
+                showToast("Error", response.data.detail, "red");
             }
         }
 
@@ -82,7 +93,11 @@ const FaceprintsPage = () => {
 
     return (
         <>
-            <NewFaceprintModal isOpen={isOpenFaceModal} handleClose={() => setIsOpenFaceModal(false)}/>
+            <NewFaceprintModal
+                isOpen={isOpenFaceModal}
+                handleClose={() => setIsOpenFaceModal(false)}
+                addFaceprint={addFaceprint}
+            />
 
             <div className="container mt-5">
                 <div className="d-flex justify-content-between align-items-center mb-4 pt-4">

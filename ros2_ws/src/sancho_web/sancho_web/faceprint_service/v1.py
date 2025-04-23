@@ -138,13 +138,11 @@ async def create_faceprint(
                     }))) # Añadimos clase (en teoria es alguien nuevo)
                     if already_known < 0:
                         raise HTTPException(status_code=400, detail=message)
-                    elif already_known == 1:
-                        raise HTTPException(status_code=208, detail=f"Ya te conocía {classified}, pero he reforzado mi aprendizaje.")
-                    elif already_known == 0:
+                    else: # Añade vector de característica
                         updated_item = api_node.get_faceprint_request(json.dumps({ "name": name }))
                         
                         return JSONResponse(
-                            status_code=200,
+                            status_code=(208 if already_known == 1 else 200),
                             content=updated_item,
                             headers={"Content-Type": "application/json"}
                         )
