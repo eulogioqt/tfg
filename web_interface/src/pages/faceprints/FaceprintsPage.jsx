@@ -54,8 +54,6 @@ const FaceprintsPage = () => {
         return () => unsubscribe();
     }, []);
 
-    const handleCreate = async (name, face) => {};
-
     const handleDelete = async (name) => {
         if (!window.confirm(`¿Seguro que deseas eliminar a ${name}?`)) return;
 

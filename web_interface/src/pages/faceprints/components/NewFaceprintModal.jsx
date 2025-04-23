@@ -5,6 +5,8 @@ import SimpleModal from "../../../components/SimpleModal";
 import { useToast } from "../../../contexts/ToastContext";
 import { useAPI } from "../../../contexts/APIContext";
 
+// poner que mientras esta respondiendo haya un cargando o algo spinning para que no puedas salir en toda la pantalla o como chatgpt crea que es mejor
+// que cuando se añada como te responde con la persona y no hay evento por el origin.web ese pues se añada del tiron sabe
 const NewFaceprintModal = ({ handleClose, isOpen }) => {
     const { showToast } = useToast();
     const { faceprints } = useAPI();
