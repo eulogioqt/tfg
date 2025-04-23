@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from "react";
 
 const ChatTextArea = forwardRef(({ onSend }, ref) => {
+    // podria hacer un objeto normal que le paso el id y hace las cosas segun el id como los toast y eso de bootstrap
     const [value, setValue] = useState("");
     const textAreaRef = useRef(null);
 

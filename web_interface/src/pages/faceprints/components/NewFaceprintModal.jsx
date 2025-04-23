@@ -1,18 +1,22 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 
 import SimpleModal from "../../../components/SimpleModal";
 
 import { useToast } from "../../../contexts/ToastContext";
 import { useAPI } from "../../../contexts/APIContext";
+import { useLoadingScreen } from "../../../components/LoadingScreen";
 
 // poner que mientras esta respondiendo haya un cargando o algo spinning para que no puedas salir en toda la pantalla o como chatgpt crea que es mejor
 // que cuando se añada como te responde con la persona y no hay evento por el origin.web ese pues se añada del tiron sabe
 const NewFaceprintModal = ({ handleClose, isOpen, addFaceprint }) => {
     const { showToast } = useToast();
     const { faceprints } = useAPI();
+    const { withLoading } = useLoadingScreen();
 
     const [selectedImage, setSelectedImage] = useState(undefined);
     const [name, setName] = useState("");
+
+    const fileInputRef = useRef(null);
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
@@ -48,25 +52,33 @@ const NewFaceprintModal = ({ handleClose, isOpen, addFaceprint }) => {
         try {
             const base64Image = await convertToBase64(selectedImage);
 
-            const response = await faceprints.create({
-                name: trimmedName,
-                image: base64Image,
-            });
+            const response = await withLoading(() =>
+                faceprints.create({
+                    name: trimmedName,
+                    image: base64Image,
+                })
+            );
 
             if (response.status >= 200 && response.status < 300) {
                 if (response.status === 208)
                     showToast(
                         "Persona conocida",
-                        `Ya te conocía ${response.data["name"]}, pero he reforzado mi aprendizaje`,
+                        `Ya te conocía ${response.data.name}, pero he reforzado mi aprendizaje.`,
                         "blue"
                     );
-                else showToast("Éxito", "La cara ha sido procesada y aprendida correctamente.", "green");
+                else
+                    showToast(
+                        "Éxito",
+                        `La cara ha sido procesada y se ha aprendido a ${response.data.name} correctamente.`,
+                        "green"
+                    );
 
                 addFaceprint(response.data);
 
                 handleClose();
-                setSelectedImage(undefined);
                 setName("");
+                setSelectedImage(undefined);
+                if (fileInputRef.current) fileInputRef.current.value = null;
             } else {
                 const errorText = (response && response.data?.detail) || "Error inesperado";
                 showToast("Error", errorText, "red");
@@ -104,6 +116,7 @@ const NewFaceprintModal = ({ handleClose, isOpen, addFaceprint }) => {
                     Seleccionar imagen
                 </label>
                 <input
+                    ref={fileInputRef}
                     type="file"
                     className="form-control visually-hidden"
                     id="fileInput"

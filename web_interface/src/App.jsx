@@ -6,6 +6,7 @@ import ChatPage from "./pages/chat/ChatPage";
 import FaceprintsPage from "./pages/faceprints/FaceprintsPage";
 
 import WebSocketVideoViewer from "./components/WebSocketVideoViewer";
+import LoadingScreen from "./components/LoadingScreen";
 
 const App = () => {
     const wrap = (page) => (
@@ -18,6 +19,7 @@ const App = () => {
     return (
         <Router>
             <WebSocketVideoViewer />
+            <LoadingScreen />
 
             <Routes>
                 <Route path="/" element={wrap(<HomePage />)} />

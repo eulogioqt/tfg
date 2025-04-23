@@ -12,7 +12,13 @@ export default class R2WSocket {
         };
 
         this.socket.onmessage = (event) => {
-            const r2w_message = JSON.parse(event.data);
+            let r2w_message;
+            try {
+                r2w_message = JSON.parse(event.data);
+            } catch (e) {
+                console.log("ERROR ON JSON PARSE ON R2WSocket", e);
+                console.log("ORIGINAL MESSAGE", event.data);
+            }            
             
             if (r2w_message.type === R2W_MESSAGE_TYPE.MESSAGE) {
                 const message = JSON.parse(r2w_message.data); // Ver si cambiar esto para que ya venga parseado del nodo ros

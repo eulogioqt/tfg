@@ -3,14 +3,20 @@ import React, { useEffect, useState } from "react";
 import { useAPI } from "../../contexts/APIContext";
 import { useEventBus } from "../../contexts/EventBusContext";
 import { useToast } from "../../contexts/ToastContext";
+import { useLoadingScreen } from "../../components/LoadingScreen";
 
 import { FACEPRINT_EVENT } from "../../contexts/WebSocketContext";
 import NewFaceprintModal from "./components/NewFaceprintModal";
 
+// cambiar el borrar por modal
+// darle una vuelta a lo de ORIGIN_WEB y de paso ponerlo con constantes y no con cosas de los mensajes de ros
+// el problema es que si hay dos clientes conectados y uno borra una cara, a los otros clientes no les va a salir
+// por lo de ros noseque... Quiza habría que guardar el origen para que tenga la ip y el puerto o algo asi...
 const FaceprintsPage = () => {
     const { showToast } = useToast();
     const { faceprints, isResponseOk } = useAPI();
     const { subscribe } = useEventBus();
+    const { withLoading } = useLoadingScreen();
 
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -47,13 +53,18 @@ const FaceprintsPage = () => {
             if (e.event === FACEPRINT_EVENT.CREATE || e.event === FACEPRINT_EVENT.UPDATE) {
                 const response = await faceprints.getById(e.name);
                 if (isResponseOk(response)) {
-                    if (e.event === FACEPRINT_EVENT.CREATE) addFaceprint(response.data);
-                    else updateFaceprint(e.name, response.data);
+                    if (e.event === FACEPRINT_EVENT.CREATE) {
+                        addFaceprint(response.data);
+                        showToast("Nueva persona aprendida", "Se ha aprendido a la persona " + e.name, "green");
+                    } else {
+                        updateFaceprint(e.name, response.data);
+                    }
                 } else {
                     showToast("Error", response.data.detail, "red");
                 }
             } else if (e.event === FACEPRINT_EVENT.DELETE) {
                 deleteFaceprint(e.name);
+                showToast("Persona eliminada", "Se ha eliminado a la persona " + e.name, "green");
             }
         };
 
@@ -62,11 +73,12 @@ const FaceprintsPage = () => {
     }, []);
 
     const handleDelete = async (name) => {
-        if (!window.confirm(`¿Seguro que deseas eliminar a ${name}?`)) return;
+        if (!window.confirm(`¿Seguro que deseas eliminar a ${name}?`)) return; // cambiar por modal
 
-        const response = await faceprints.delete(name);
+        const response = await withLoading(() => faceprints.delete(name));
         if (isResponseOk(response)) {
             deleteFaceprint(name);
+            showToast("Persona eliminada", "Has eliminado a la persona " + name + " satisfactoriamente", "green");
         } else {
             showToast("Error", response.data.detail, "red");
         }
@@ -76,9 +88,11 @@ const FaceprintsPage = () => {
         if (newName.trim() === "") return;
 
         if (newName.trim() !== oldName.trim()) {
-            const response = await faceprints.update(oldName, { name: newName });
+            const response = await withLoading(() => faceprints.update(oldName, { name: newName }));
+
             if (isResponseOk(response)) {
                 updateFaceprint(oldName, response.data);
+                showToast("Persona editada", "Has editado a la persona " + newName + " satisfactoriamente", "green");
             } else {
                 showToast("Error", response.data.detail, "red");
             }
