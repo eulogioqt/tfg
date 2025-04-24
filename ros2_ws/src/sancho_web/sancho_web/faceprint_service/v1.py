@@ -2,10 +2,11 @@ import json
 
 from typing import Optional, List
 from fastapi import APIRouter, HTTPException, Query, Request, Path
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 
 from .faceprint_model import Faceprint, FaceprintCreate, FaceprintUpdate, FaceprintDeleteResponse
 from .api_utils import APIUtils
+from ..faceprint_database_interface import FaceprintDatabaseInterface
 
 from dotenv import load_dotenv
 from std_msgs.msg import String
@@ -17,10 +18,10 @@ router = APIRouter()
 endpoint_name = "faceprints"
 version = "v1"
 
-api_node = None
-def set_api_node(node):
-    global api_node
-    api_node = node
+faceprint_interface: FaceprintDatabaseInterface = None
+def set_api_node(interface):
+    global faceprint_interface
+    faceprint_interface = interface
 
 @router.get("", tags=["Faceprints CRUD endpoints"], response_model=List[Faceprint])
 async def get_faceprints(
@@ -35,27 +36,10 @@ async def get_faceprints(
     APIUtils.check_accept_json(request)
 
     try:
-        #token = request.headers.get("Authorization")
-        #if not token:
-        #    raise HTTPException(status_code=400, detail="Inicia sesión para realizar esta acción")
+        response = faceprint_interface.get_all_faceprints()
         
-        #query = build_query(email=email)
-        #projection = APIUtils.build_projection(fields)
-        #sort_criteria = APIUtils.build_sort_criteria(sort)
-
-        faceprints = api_node.get_faceprint_request()
-        
-        total_count = len(faceprints)
-
-        if hateoas:
-            for faceprint in faceprints:
-                faceprint["href"] = f"/api/{version}/{endpoint_name}/{faceprint['name']}"
-
-        return JSONResponse(
-            status_code=200,
-            content=faceprints,
-            headers={"Accept-Encoding": "gzip", "X-Total-Count": str(total_count)}
-        )
+        return response.to_fastapi()
+    
     except HTTPException as e:
         raise e 
     except Exception as e:
@@ -70,22 +54,10 @@ async def get_faceprint_by_name(
     APIUtils.check_accept_json(request)
     
     try:
-        #token = request.headers.get("Authorization")
-        #if not token:
-        #    raise HTTPException(status_code=400, detail="Inicia sesión para realizar esta acción")
+        response = faceprint_interface.get_faceprint(name)
 
-        #projection = APIUtils.build_projection(fields)
-
-        #marker = DatabaseConnection.read_document("marker", id, projection)
-        faceprint = api_node.get_faceprint_request(json.dumps({ "name": name }))
-        if faceprint is None:
-            return JSONResponse(status_code=404, content={"detail": f"Faceprint con nombre {name} no encontrado"})
-        
-        return JSONResponse(
-            status_code=200,
-            content=faceprint,
-            headers={"Content-Type": "application/json", "X-Total-Count": "1"}
-        )
+        return response.to_fastapi()
+    
     except HTTPException as e:
         raise e 
     except Exception as e:
@@ -103,55 +75,11 @@ async def create_faceprint(
         update_data = faceprint_create.model_dump(exclude_defaults=True)
         name = update_data["name"]
         image_base64 = update_data["image"]
-
-        image_cv2 = api_node.br.base64_to_cv2(image_base64)
-        image_msg = api_node.br.cv2_to_imgmsg(image_cv2, encoding="bgr8")
         
-        positions_msg, scores_msg = api_node.detection_request(image_msg)
-        positions, scores = api_node.br.msg_to_detector(positions_msg, scores_msg)
+        response = faceprint_interface.create_faceprint(name, image_base64)
 
-        if len(positions) == 0:
-            raise HTTPException(status_code=400, detail=f"No se ha detectado ningún rostro en la imagen.")
-        elif len(positions) > 1:
-            raise HTTPException(status_code=400, detail=f"Se ha detectado más de un rostro en la imagen. Solo debe haber uno.")
-        else:
-            position = positions_msg[0]
-            score = scores_msg[0]
+        return response.to_fastapi()
 
-            if score < 1:
-                raise HTTPException(status_code=400, detail=f"La puntuación de la detección ha sido demasiado baja ({score:.2f} < 1). Por favor, envía una imagen mejor")
-            else:
-                face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg = \
-                    api_node.recognition_request(image_msg, position, score)
-                face_aligned, features, classified, distance, pos = \
-                    api_node.br.msg_to_recognizer(face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg)
-                
-                LOWER_BOUND = 0.75
-                MIDDLE_BOUND = 0.80
-                if distance < LOWER_BOUND:
-                    face_aligned_base64 = api_node.br.cv2_to_base64(face_aligned)
-                    already_known, message = api_node.training_request(String(data="add_class"), String(data=json.dumps({
-                        "class_name": name,
-                        "features": features,
-                        "face": face_aligned_base64,
-                        "score": score
-                    }))) # Añadimos clase (en teoria es alguien nuevo)
-                    if already_known < 0:
-                        raise HTTPException(status_code=400, detail=message)
-                    else: # Añade vector de característica
-                        updated_item = api_node.get_faceprint_request(json.dumps({ "name": name }))
-                        
-                        return JSONResponse(
-                            status_code=(208 if already_known == 1 else 200),
-                            content=updated_item,
-                            headers={"Content-Type": "application/json"}
-                        )
-                    
-                elif distance < MIDDLE_BOUND:
-                    raise HTTPException(status_code=400, detail=f"Nunca pensé que pasase esto MIDDLE BOUND.")
-                else:
-                    raise HTTPException(status_code=400, detail=f"Ya te conozco {classified}, esta función es para personas nuevas.")
-        
     except HTTPException as e:
         raise e
     except Exception as e:
@@ -167,38 +95,11 @@ async def update_faceprint(
     APIUtils.check_content_type_json(request)
 
     try:
-        #token = request.headers.get("Authorization")
-        #if not token:
-        #    raise HTTPException(status_code=400, detail="Inicia sesión para realizar esta acción")
-
-        #decoded_token = auth.verify_id_token(token.split(" ")[1], clock_skew_seconds=10)
-        #email = decoded_token.get("email")
-
-        #existing_item = DatabaseConnection.read_document(endpoint_name, id)
-
-        #if existing_item.get("email") != email:
-        #    raise HTTPException(status_code=403, detail="No puedes editar este item, no eres el propietario")
-
         update_data = faceprint_update.model_dump(exclude_defaults=True)
-        new_name = update_data["name"]
-        if new_name is None:
-            raise HTTPException(status_code=400, detail=f"No has incluido un campo name.")
+        response = faceprint_interface.update_faceprint(name, update_data)
 
-        result, message = api_node.training_request(String(data="rename_class"), String(data=json.dumps({
-            "class_name": name,
-            "new_name": new_name,
-        })))
-        if result <= 0:
-            raise HTTPException(status_code=400, detail=message)
-        
-        updated_item = api_node.get_faceprint_request(json.dumps({ "name": new_name }))
-        return JSONResponse(
-            status_code=200,
-            content=updated_item,
-            headers={"Content-Type": "application/json"}
-        )
-    #except auth.ExpiredIdTokenError:
-    #    raise HTTPException(status_code=401, detail="Su sesión ha caducado. Por favor, inicia sesión de nuevo")
+        return response.to_fastapi()
+    
     except HTTPException as e:
         raise e
     except Exception as e:
@@ -213,25 +114,10 @@ async def delete_faceprint(
     APIUtils.check_accept_json(request)
 
     try:
-        #token = request.headers.get("Authorization")
-        #if not token:
-        #    raise HTTPException(status_code=400, detail="Inicia sesión para realizar esta acción")
+        response = faceprint_interface.delete_faceprint(name)
 
-        #decoded_token = auth.verify_id_token(token.split(" ")[1], clock_skew_seconds=10)
-        #email = decoded_token.get("email")
-
-        result, message = api_node.training_request(String(data="delete_class"), String(data=json.dumps({
-            "class_name": name
-        })))
-        if result <= 0:
-            raise HTTPException(status_code=400, detail=message)
-
-        return JSONResponse(
-            status_code=200,
-            content=f"Faceprint con nombre {name} elliminado correctamente."
-        )
-    #except auth.ExpiredIdTokenError:
-    #    raise HTTPException(status_code=401, detail="Su sesión ha caducado. Por favor, inicia sesión de nuevo")
+        return response.to_fastapi()
+    
     except HTTPException as e:
         raise e
     except Exception as e:
