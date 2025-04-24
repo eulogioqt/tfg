@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse, Response
 
 from .faceprint_model import Faceprint, FaceprintCreate, FaceprintUpdate, FaceprintDeleteResponse
 from .api_utils import APIUtils
-from ..faceprint_database_interface import FaceprintDatabaseInterface
+from ..interfaces import FaceprintAPIInterface
 
 from dotenv import load_dotenv
 from std_msgs.msg import String
@@ -18,8 +18,8 @@ router = APIRouter()
 endpoint_name = "faceprints"
 version = "v1"
 
-faceprint_interface: FaceprintDatabaseInterface = None
-def set_api_node(interface):
+faceprint_interface: FaceprintAPIInterface = None
+def set_faceprint_api(interface):
     global faceprint_interface
     faceprint_interface = interface
 
