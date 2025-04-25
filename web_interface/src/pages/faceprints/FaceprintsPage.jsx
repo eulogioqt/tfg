@@ -7,6 +7,8 @@ import { useLoadingScreen } from "../../components/LoadingScreen";
 
 import { FACEPRINT_EVENT } from "../../contexts/WebSocketContext";
 import NewFaceprintModal from "./components/NewFaceprintModal";
+import ActionModal from "../../components/ActionModal";
+import ConfirmDeleteFaceModal from "./components/ConfirmDeleteFaceModal";
 
 // cambiar el borrar por modal
 // darle una vuelta a lo de ORIGIN_WEB y de paso ponerlo con constantes y no con cosas de los mensajes de ros
@@ -22,7 +24,9 @@ const FaceprintsPage = () => {
     const [loading, setLoading] = useState(true);
     const [editingName, setEditingName] = useState(null);
     const [newName, setNewName] = useState("");
+
     const [isOpenFaceModal, setIsOpenFaceModal] = useState(false);
+    const [deleteModalName, setDeleteModalName] = useState(undefined);
 
     const [currentPage, setCurrentPage] = useState(1);
     const perPage = 5;
@@ -73,8 +77,6 @@ const FaceprintsPage = () => {
     }, []);
 
     const handleDelete = async (name) => {
-        if (!window.confirm(`¿Seguro que deseas eliminar a ${name}?`)) return; // cambiar por modal
-
         const response = await withLoading(() => faceprints.delete(name));
         if (isResponseOk(response)) {
             deleteFaceprint(name);
@@ -111,6 +113,12 @@ const FaceprintsPage = () => {
                 isOpen={isOpenFaceModal}
                 handleClose={() => setIsOpenFaceModal(false)}
                 addFaceprint={addFaceprint}
+            />
+
+            <ConfirmDeleteFaceModal
+                name={deleteModalName}
+                handleClose={() => setDeleteModalName(undefined)}
+                action={() => handleDelete(deleteModalName)}
             />
 
             <div className="container mt-5">
@@ -206,7 +214,7 @@ const FaceprintsPage = () => {
                                                     )}
                                                     <button
                                                         className="btn btn-outline-danger btn-sm"
-                                                        onClick={() => handleDelete(person.name)}
+                                                        onClick={() => setDeleteModalName(person.name)}
                                                     >
                                                         <i className="bi bi-trash" />
                                                     </button>
