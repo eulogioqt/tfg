@@ -14,7 +14,9 @@ from .aligners.aligner_dlib import align_face
 from .encoders.encoder_facenet import encode_face
 from .classifiers.complex_classifier import ComplexClassifier
 
-
+# esta bien que aqui se lancen los eventos de faceprint, ya que aqui se hace todo de los faceprints
+# tmb esta  bien que en el recognizer se guarde una cara mejor si es el caso, esta bien asi, solo que hay que usar constantes
+# lo que si hace falta un poco de refactor
 class HumanFaceRecognizer(Node):
 
     def __init__(self, use_database = True):

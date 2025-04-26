@@ -1,7 +1,6 @@
-import cv2
+import os
 import time
 import json
-import base64
 from queue import Queue
 
 import rclpy
@@ -10,6 +9,7 @@ from sensor_msgs.msg import Image
 from std_msgs.msg import String
 from hri_msgs.srv import Detection, Recognition, Training, GetString
 
+from .database.system_database import SystemDatabase, CONSTANTS
 from .hri_bridge import HRIBridge
 from .api.gui import get_name, ask_if_name, mark_face
 
@@ -23,6 +23,9 @@ class HRILogicNode(Node):
 
         self.hri_logic = hri_logic
         self.data_queue = Queue(maxsize = 1) # Queremos que olvide frames antiguos, siempre a por los mas nuevos
+        
+        self.db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "database/system.db"))
+        self.db = SystemDatabase()
 
         self.get_actual_people_service = self.create_service(GetString, 'logic/get/actual_people', self.hri_logic.get_actual_people)
 
@@ -198,22 +201,6 @@ class HRILogic():
         self.node.publisher_people.publish(String(data=actual_people_json))
         self.node.publisher_recognition.publish(self.node.br.cv2_to_imgmsg(frame, "bgr8"))
 
-    def get_actual_people_time(self):
-        actual_people_time = {}
-        for key, value in self.actual_people.items():
-            actual_people_time[key] = time.time() - value
-        return actual_people_time
-
-    def read_text(self, text):
-        """Reads text with speech to text
-        
-        Args:
-            text (str): Text to be readed.
-        """
-        
-        print(f"[SANCHO] {text}")
-        self.node.input_tts.publish(String(data=text))
-
     # Clients
     def detection_request(self, frame_msg):
         """Makes a detection request to the detection service.
@@ -288,12 +275,25 @@ class HRILogic():
 
         return result_training.result, result_training.message
 
+    # Services
     def get_actual_people(self, request, response):
         actual_people_time = self.get_actual_people_time()
         actual_people_json = json.dumps(actual_people_time)
         response.text = actual_people_json
+
         return response
 
+    # Utils
+    def get_actual_people_time(self):
+        actual_people_time = {}
+        for key, value in self.actual_people.items():
+            actual_people_time[key] = time.time() - value
+        return actual_people_time
+
+    def read_text(self, text):
+        print(f"[SANCHO] {text}")
+        self.node.input_tts.publish(String(data=text))
+        
 def main(args=None):
     rclpy.init(args=args)
 

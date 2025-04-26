@@ -9,22 +9,14 @@ from ..database.faceprints_database import FaceprintsDatabase
 
 class ComplexClassifier:
 
-    def __init__(self, use_database = False):
-        '''Inits classifier
+    def __init__(self):
+        '''Inits classifier'''
 
-        Args:
-            use_database (str): If True, uses and stores new data into database.
-        '''
-
-        self.use_database = use_database
         self.db_path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "database/faceprints_db.json"))
         self.db = FaceprintsDatabase(self.db_path)
 
-        if self.use_database:
-            self.load()
-            self.print_people()
-        else:
-            print("No se está usando base de datos. Todo lo aprendido se perderá.")
+        self.load()
+        self.print_people()
 
     def classify_face(self, new_features):
         '''Given a feature vector, gives the closest class.
@@ -202,14 +194,12 @@ class ComplexClassifier:
     def save(self):
         '''Saves the learned data to a file.'''
         
-        if self.use_database:
-            self.db.save()
+        self.db.save()
 
     def load(self):
         '''Loads the learned data from a file.'''
         
-        if self.use_database:
-            self.db.load()
+        self.db.load()
 
     def get_people(self):
         '''Get all people names.
