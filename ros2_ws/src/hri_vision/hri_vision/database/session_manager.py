@@ -6,10 +6,14 @@ class SessionManager:
     def __init__(self, db: SystemDatabase, timeout_seconds: int = 5):
         self.db = db
         self.timeout_seconds = timeout_seconds
+
+        self.actual_people = {}
         self.active_sessions = {}  # person_name -> SessionData
 
     def process_detection(self, name: str, score_face: float, score_classification: float, face_image_base64: Optional[str] = None):
         now = datetime.now().timestamp()
+
+        self.actual_people[name] = now
 
         if name not in self.active_sessions:
             self.active_sessions[name] = {
@@ -29,6 +33,15 @@ class SessionManager:
 
         session['last_detection_time'] = now
         self._check_timeouts()
+
+    def get_all_last_seen(self):
+        actual_people_time = {}
+        for key, value in self.actual_people.items():
+            actual_people_time[key] = datetime.now().timestamp() - value
+        return actual_people_time
+    
+    def get_last_seen(self, name):
+        return datetime.now().timestamp() - self.actual_people.get(name, 0)
 
     def _check_timeouts(self):
         now = datetime.now().timestamp()
@@ -54,3 +67,4 @@ class SessionManager:
         }
 
         self.db.create_session_with_detections(session_data)
+

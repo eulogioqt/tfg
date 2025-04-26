@@ -10,6 +10,8 @@ from std_msgs.msg import String
 from hri_msgs.srv import Detection, Recognition, Training, GetString
 
 from .database.system_database import SystemDatabase, CONSTANTS
+from .database.session_manager import SessionManager
+
 from .hri_bridge import HRIBridge
 from .api.gui import get_name, ask_if_name, mark_face
 
@@ -24,9 +26,6 @@ class HRILogicNode(Node):
         self.hri_logic = hri_logic
         self.data_queue = Queue(maxsize = 1) # Queremos que olvide frames antiguos, siempre a por los mas nuevos
         
-        self.db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "database/system.db"))
-        self.db = SystemDatabase()
-
         self.get_actual_people_service = self.create_service(GetString, 'logic/get/actual_people', self.hri_logic.get_actual_people)
 
         self.subscription_camera = self.create_subscription(Image, 'camera/color/image_raw', self.frame_callback, 1)
@@ -78,7 +77,10 @@ class HRILogic():
         self.show_distance = show_distance
         self.show_score = show_score
 
-        self.actual_people = {}
+        self.db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "database/system.db"))
+        self.db = SystemDatabase()
+        self.sessions = SessionManager(self.db, timeout_seconds=10)
+
         self.node = HRILogicNode(self)
     
     def spin(self):
@@ -114,7 +116,7 @@ class HRILogic():
                     self.read_text("¿Cual es tu nombre?")
                     classified = get_name(face_aligned) # Poner aqui una lista o si no que meta un nuevo a mano, pero por si ya es que seleccione
                     if classified is not None:
-                        self.actual_people[classified] = time.time()
+                        self.sessions.process_detection(classified, scores[i], distance)
 
                         face_aligned_base64 = self.node.br.cv2_to_base64(face_aligned)
                         already_known, message = self.training_request(String(data="add_class"), String(data=json.dumps({
@@ -139,7 +141,7 @@ class HRILogic():
                     self.read_text("Creo que eres " + classified + ", ¿es cierto?")
                     answer = ask_if_name(face_aligned, classified)
                     if answer: # Si dice que si es esa persona
-                        self.actual_people[classified] = time.time()
+                        self.sessions.process_detection(classified, scores[i], distance)
 
                         output, message = self.training_request(String(data="add_features"), String(data=json.dumps({
                             "class_name": classified,
@@ -155,7 +157,7 @@ class HRILogic():
                         self.read_text("Entonces, ¿Cual es tu nombre?")
                         classified = get_name(face_aligned)
                         if classified is not None:
-                            self.actual_people[classified] = time.time()
+                            self.sessions.process_detection(classified, scores[i], distance)
 
                             face_aligned_base64 = self.node.br.cv2_to_base64(face_aligned)
                             already_known, message = self.training_request(String(data="add_class"), String(data=json.dumps({
@@ -176,13 +178,13 @@ class HRILogic():
                                 self.node.get_logger().info(">> ERROR: Algo salio mal al agregar una nueva clase")
 
             elif distance < self.UPPER_BOUND: # Sabe que es alguien pero lo detecta un poco raro
-                self.actual_people[classified] = time.time()
+                self.sessions.process_detection(classified, scores[i], distance)
                 #classifier.addFeatures(classified, features)
             else: # Reconoce perfectamente
-                if classified not in self.actual_people or (time.time() - self.actual_people[classified]) > 30:
+                if self.sessions.get_last_seen(classified) > 30:
                     self.read_text("Bienvenido de vuelta " + classified)
 
-                self.actual_people[classified] = time.time()
+                self.sessions.process_detection(classified, scores[i], distance)
                 
                 output, message = self.training_request(String(data="refine_class"), String(data=json.dumps({
                     "class_name": classified,
@@ -196,7 +198,7 @@ class HRILogic():
             mark_face(frame, positions[i], distance, self.MIDDLE_BOUND, self.UPPER_BOUND, classified=classified, 
                       drawRectangle=self.draw_rectangle, score=scores[i], showDistance=self.show_distance, showScore=self.show_score)
 
-        actual_people_time = self.get_actual_people_time()
+        actual_people_time = self.sessions.get_all_last_seen()
         actual_people_json = json.dumps(actual_people_time)
         self.node.publisher_people.publish(String(data=actual_people_json))
         self.node.publisher_recognition.publish(self.node.br.cv2_to_imgmsg(frame, "bgr8"))
@@ -277,19 +279,13 @@ class HRILogic():
 
     # Services
     def get_actual_people(self, request, response):
-        actual_people_time = self.get_actual_people_time()
+        actual_people_time = self.sessions.get_all_last_seen()
         actual_people_json = json.dumps(actual_people_time)
         response.text = actual_people_json
 
         return response
 
     # Utils
-    def get_actual_people_time(self):
-        actual_people_time = {}
-        for key, value in self.actual_people.items():
-            actual_people_time[key] = time.time() - value
-        return actual_people_time
-
     def read_text(self, text):
         print(f"[SANCHO] {text}")
         self.node.input_tts.publish(String(data=text))
