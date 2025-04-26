@@ -85,12 +85,12 @@ class HumanFaceRecognizer(Node):
         
         features = encode_face(face_aligned)
         classified, distance, pos = self.classifier.classify_face(features)
-        if score >= 1 and distance >= 0.9: # Si la cara es buena y estamos seguro de que es esa persona
+
+        UPPER_BOUND = 0.9
+        if score >= 1 and distance >= UPPER_BOUND: # Si la cara es buena y estamos seguro de que es esa persona
             updated = self.classifier.save_face(classified, face_aligned, score) # lo bueno de asi es que siempre tiene una cara reciente
             if updated:
                 self.send_faceprint_event(FaceprintEvent.UPDATE, classified, FaceprintEvent.ORIGIN_ROS) # Podria hacer que en el update se mandasen tambien que fields se han cambiado...
-
-            #self.get_logger().info(f"{classified} FACE SIZE: {size}") # hacer que el score guardado sea size / 256 por el score  real o algo o poner un minimo
 
         face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg = (
             self.br.recognizer_to_msg(face_aligned, features, classified, distance, pos)
@@ -121,8 +121,8 @@ class HumanFaceRecognizer(Node):
         Returns:
             Training.srv: Response object with result code and message.
                 result = -1 → error
-                result = 0  → success (new class added or generic success)
-                result = 1  → class already existed (only meaningful for cmd_type == "add_class")
+                result = 0  → something not totally ok
+                result = 1  → success class already existed (only meaningful for cmd_type == "add_class")
         """
 
         try:
@@ -141,7 +141,8 @@ class HumanFaceRecognizer(Node):
             result, message = -1, f"Error executing {cmd_type}: {e}"
 
         if result >= 0 and "class_name" in args: # Send faceprint event
-            event = self.faceprint_event_map.get(cmd_type)
+            cmd = "add_features" if cmd_type == "add_class" and result == 1 else cmd_type
+            event = self.faceprint_event_map.get(cmd)
             if event is not None:
                 self.send_faceprint_event(event, args["class_name"], origin)
 

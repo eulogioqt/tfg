@@ -14,7 +14,7 @@ const ConfirmDeleteFaceModal = ({ name, handleClose, action }) => {
             buttonColor={"danger"}
         >
             <span style={{ display: name ? "block" : "none" }}>
-                ¿Estás seguro de que quieres eliminar el rostro de {name}?
+                ¿Estás seguro de que quieres eliminar el rostro de <b>{name}</b>?
             </span>
         </ActionModal>
     );

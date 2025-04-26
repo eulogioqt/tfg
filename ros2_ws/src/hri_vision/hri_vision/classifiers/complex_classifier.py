@@ -4,7 +4,7 @@ import json
 import base64
 
 from ..api.utils import normalized_cosine_similarity_distance
-from ..database.db_manager import FaceprintsDatabase
+from ..database.faceprints_database import FaceprintsDatabase
 
 
 class ComplexClassifier:
@@ -23,6 +23,8 @@ class ComplexClassifier:
         if self.use_database:
             self.load()
             self.print_people()
+        else:
+            print("No se está usando base de datos. Todo lo aprendido se perderá.")
 
     def classify_face(self, new_features):
         '''Given a feature vector, gives the closest class.

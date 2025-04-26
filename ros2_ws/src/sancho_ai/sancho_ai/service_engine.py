@@ -5,8 +5,10 @@ from rclpy.client import Client
 from rclpy.executors import SingleThreadedExecutor
 from threading import Thread, Event
 
+from abc import ABC
 
-class ServiceEngine:
+
+class ServiceEngine(ABC):
     
     def __init__(self, node: Node):
         self.node = node

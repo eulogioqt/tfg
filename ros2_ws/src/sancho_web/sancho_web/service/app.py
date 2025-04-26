@@ -4,7 +4,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
-from .v1 import router as v1_router
+from .v1_faceprints import router as v1_faceprints
 
 load_dotenv()
 
@@ -26,4 +26,4 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(v1_router, prefix="/api/v1/faceprints")
+app.include_router(v1_faceprints, prefix="/api/v1/faceprints")

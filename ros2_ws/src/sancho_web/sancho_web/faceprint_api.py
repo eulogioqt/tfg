@@ -59,7 +59,7 @@ class FaceprintAPI(FaceprintAPIInterface):
                         "face": face_aligned_base64,
                         "score": score
                     }))) # Añadimos clase (en teoria es alguien nuevo)
-                    if already_known < 0:
+                    if already_known <= 0:
                         return HTTPException(detail=message)
                     else: # Añade vector de característica
                         updated_item_json = self.node.get_faceprint_request(json.dumps({ "name": name }))

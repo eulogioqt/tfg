@@ -2,7 +2,7 @@ import rclpy
 import uvicorn
 
 from .service.app import app
-from .service.v1 import set_faceprint_api
+from .service.v1_faceprints import set_faceprint_api
 
 from .faceprint_api import FaceprintAPI
 

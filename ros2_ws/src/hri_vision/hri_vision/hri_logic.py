@@ -96,13 +96,6 @@ class HRILogic():
         """
 
         frame = self.node.br.imgmsg_to_cv2(frame_msg, "bgr8")
-        
-        # people_json_msg = self.get_people_request() # Obtiene las personas existentes
-        # people = json.loads(people_json_msg.data)
-
-        # deleted_classes = [person for person in self.actual_people.keys() if person not in people]
-        # for person in deleted_classes:
-        #    self.actual_people.pop(person)
 
         positions_msg, scores_msg = self.detection_request(frame_msg)                   # Detection
         positions, scores = self.node.br.msg_to_detector(positions_msg, scores_msg)
