@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime
 from enum import Enum
-from typing import List
+
 
 class CONSTANTS(str, Enum):
     ACTION_ADD_CLASS = "add_class"
@@ -55,7 +55,7 @@ class SystemDatabase:
         self.conn.commit()
 
     # ----------------- LOGS -----------------
-    def create_log(self, action, person_name, origin):
+    def create_log(self, action, person_name, origin = CONSTANTS.ORIGIN_ROS):
         timestamp = datetime.now().timestamp()
         self.cursor.execute('''
             INSERT INTO logs (timestamp, action, person_name, origin)
@@ -68,7 +68,7 @@ class SystemDatabase:
         rows = self.cursor.fetchall()
         return [dict(row) for row in rows]
 
-    def get_log_by_name(self, person_name):
+    def get_logs_by_name(self, person_name):
         self.cursor.execute('SELECT * FROM logs WHERE person_name = ?', (person_name,))
         rows = self.cursor.fetchall()
         return [dict(row) for row in rows]
@@ -86,7 +86,7 @@ class SystemDatabase:
             result.append(session_dict)
         return result
 
-    def get_session_by_name(self, person_name):
+    def get_sessions_by_name(self, person_name):
         self.cursor.execute('SELECT * FROM sessions WHERE person_name = ?', (person_name,))
         sessions = self.cursor.fetchall()
         result = []

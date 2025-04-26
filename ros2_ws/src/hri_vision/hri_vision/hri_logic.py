@@ -1,5 +1,4 @@
 import os
-import time
 import json
 from queue import Queue
 
@@ -7,7 +6,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from std_msgs.msg import String
-from hri_msgs.srv import Detection, Recognition, Training, GetString
+from hri_msgs.srv import Detection, Recognition, Training, CreateLog, GetString
 
 from .database.system_database import SystemDatabase, CONSTANTS
 from .database.session_manager import SessionManager
@@ -26,7 +25,10 @@ class HRILogicNode(Node):
         self.hri_logic = hri_logic
         self.data_queue = Queue(maxsize = 1) # Queremos que olvide frames antiguos, siempre a por los mas nuevos
         
-        self.get_actual_people_service = self.create_service(GetString, 'logic/get/actual_people', self.hri_logic.get_actual_people)
+        self.get_actual_people_service = self.create_service(GetString, 'logic/get/actual_people', self.hri_logic.get_actual_people_service)
+        self.create_log_service = self.create_client(CreateLog, 'logic/create_log', self.hri_logic.create_log_service)
+        self.get_logs_service = self.create_client(GetString, 'logic/get/logs', self.hri_logic.get_logs_service)
+        self.get_sessions_service = self.create_client(GetString, 'logic/get/sessions', self.hri_logic.get_sessions_service)
 
         self.subscription_camera = self.create_subscription(Image, 'camera/color/image_raw', self.frame_callback, 1)
 
@@ -78,7 +80,7 @@ class HRILogic():
         self.show_score = show_score
 
         self.db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "database/system.db"))
-        self.db = SystemDatabase()
+        self.db = SystemDatabase(self.db_path)
         self.sessions = SessionManager(self.db, timeout_seconds=10)
 
         self.node = HRILogicNode(self)
@@ -131,8 +133,10 @@ class HRILogic():
 
                         if already_known == 1:
                             self.read_text("Perdona " + classified + ", no te había reconocido bien")
+                            self.db.create_log(CONSTANTS.ACTION_ADD_FEATURES, classified)
                         elif already_known == 0:
                             self.read_text("Bienvenido " + classified + ", no te conocía")
+                            self.db.create_log(CONSTANTS.ACTION_ADD_CLASS, classified)
                         else:
                             self.node.get_logger().info(">> ERROR: Algo salio mal al agregar una nueva clase")
 
@@ -151,6 +155,7 @@ class HRILogic():
 
                         if output >= 0:
                             self.read_text("Gracias " + classified + ", me gusta confirmar que estoy reconociendo bien")
+                            self.db.create_log(CONSTANTS.ACTION_ADD_FEATURES, classified)
                         else:
                             self.node.get_logger().info(">> ERROR: Algo salio mal al agregar features a una clase")
                     else: # Si dice que no, le pregunta el nombre
@@ -172,8 +177,10 @@ class HRILogic():
 
                             if already_known == 1:
                                 self.read_text(classified + ", no me marees, por favor.")
+                                self.db.create_log(CONSTANTS.ACTION_ADD_FEATURES, classified)
                             elif already_known == 0:
                                 self.read_text("Encantando de conocerte " + classified + ", perdona por confundirte")
+                                self.db.create_log(CONSTANTS.ACTION_ADD_CLASS, classified)
                             else:
                                 self.node.get_logger().info(">> ERROR: Algo salio mal al agregar una nueva clase")
 
@@ -278,10 +285,45 @@ class HRILogic():
         return result_training.result, result_training.message
 
     # Services
-    def get_actual_people(self, request, response):
+    def get_actual_people_service(self, request, response):
         actual_people_time = self.sessions.get_all_last_seen()
         actual_people_json = json.dumps(actual_people_time)
         response.text = actual_people_json
+
+        return response
+
+    def create_log_service(self, request, response):
+        try:
+            self.db.create_log(request.action, request.person_name, request.origin)
+            success = True
+            message = "OK"
+        except Exception as e:
+            success = False
+            message = str(e)
+        
+        response.success = success
+        response.message = message
+
+        return response
+
+    def get_logs_service(self, request, response):
+        return self._handle_get_list(request, response, self.db.get_all_logs, self.db.get_logs_by_name)
+
+    def get_sessions_service(self, request, response):
+        return self._handle_get_list(request, response, self.db.get_all_sessions, self.db.get_sessions_by_name)
+
+    def _handle_get_list(self, request, response, get_all_func, get_by_name_func):
+        args = request.args
+
+        if args:
+            args = json.loads(args)
+            name = args["name"]
+
+            items = get_by_name_func(name)
+            response.text = json.dumps(items)
+        else:
+            items = get_all_func()
+            response.text = json.dumps(items)
 
         return response
 

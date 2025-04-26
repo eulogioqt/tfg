@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 from .system_database import SystemDatabase
 
+
 class SessionManager:
     def __init__(self, db: SystemDatabase, timeout_seconds: int = 5):
         self.db = db
