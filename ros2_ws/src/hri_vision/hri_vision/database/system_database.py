@@ -1,6 +1,7 @@
 import sqlite3
 from datetime import datetime
 from enum import Enum
+from typing import List
 
 class CONSTANTS(str, Enum):
     ACTION_ADD_CLASS = "add_class"
@@ -55,7 +56,7 @@ class SystemDatabase:
 
     # ----------------- LOGS -----------------
     def create_log(self, action, person_name, origin):
-        timestamp = datetime.utcnow().isoformat()
+        timestamp = datetime.now().timestamp()
         self.cursor.execute('''
             INSERT INTO logs (timestamp, action, person_name, origin)
             VALUES (?, ?, ?, ?)
@@ -97,6 +98,20 @@ class SystemDatabase:
             result.append(session_dict)
         return result
 
+    # ----------------- DETECTIONS -----------------
+    def get_detections_by_session(self, session_id):
+        self.cursor.execute('SELECT timestamp, score_face, score_classification, face_image_base64 FROM detections WHERE session_id = ?', (session_id,))
+        rows = self.cursor.fetchall()
+        return [
+            [
+                row['timestamp'],
+                row['score_face'],
+                row['score_classification'],
+                row['face_image_base64'] if row['face_image_base64'] is not None else ""
+            ]
+            for row in rows
+        ]
+
     # ----------------- SAVE SESSION + DETECTIONS -----------------
     def create_session_with_detections(self, session_dict):
         """
@@ -105,12 +120,7 @@ class SystemDatabase:
             'start_time': str,
             'end_time': str,
             'detections': [
-                {
-                    'timestamp': str,
-                    'score_face': float,
-                    'score_classification': float,
-                    'face_image_base64': str or None
-                },
+                [timestamp: str, score_face: float, score_classification: float, face_image_base64: str or ""],
                 ...
             ]
         }
@@ -131,10 +141,11 @@ class SystemDatabase:
                 VALUES (?, ?, ?, ?, ?)
             ''', (
                 session_id,
-                detection['timestamp'],
-                detection.get('score_face'),
-                detection.get('score_classification'),
-                detection.get('face_image_base64')
+                detection[0],  # timestamp
+                detection[1],  # score_face
+                detection[2],  # score_classification
+                detection[3] if detection[3] != "" else None  # face_image_base64
             ))
 
         self.conn.commit()
+
