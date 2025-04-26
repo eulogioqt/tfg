@@ -1,15 +1,11 @@
-import json
-
 from typing import Optional, List
 from fastapi import APIRouter, HTTPException, Query, Request, Path
-from fastapi.responses import JSONResponse, Response
 
 from .faceprint_model import Faceprint, FaceprintCreate, FaceprintUpdate, FaceprintDeleteResponse
 from .api_utils import APIUtils
 from ..interfaces import FaceprintAPIInterface
 
 from dotenv import load_dotenv
-from std_msgs.msg import String
 
 load_dotenv()
 
@@ -26,7 +22,6 @@ def set_faceprint_api(interface):
 @router.get("", tags=["Faceprints CRUD endpoints"], response_model=List[Faceprint])
 async def get_faceprints(
     request: Request,
-    name: Optional[str] = Query(None, description="Nombre de la persona"),
     fields: Optional[str] = Query(None, description="Campos específicos a devolver"),
     sort: Optional[str] = Query(None, description="Campos por los que ordenar, separados por comas"),
     offset: int = Query(default=0, description="Índice de inicio para los resultados de la paginación"),

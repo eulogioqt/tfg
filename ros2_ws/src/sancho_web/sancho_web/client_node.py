@@ -2,45 +2,46 @@ import rclpy
 
 from rclpy.node import Node
 
-from hri_msgs.srv import Detection, Recognition, Training, GetString
+from hri_msgs.srv import Detection, Recognition, Training, CreateLog, GetString
+
 from hri_vision.hri_bridge import HRIBridge
+from hri_vision.database.system_database import CONSTANTS
 
 
 class ClientNode(Node):
     def __init__(self):
         super().__init__('api_client_node')
 
-        self.get_faceprint_client = self.create_client(GetString, 'recognition/get_faceprint')
-        while not self.get_faceprint_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('Get All service not available, waiting again...')
+        self.get_faceprint_client = self.create_client_wait(GetString, 'recognition/get_faceprint')
+        self.detection_client = self.create_client_wait(Detection, 'detection')
+        self.recognition_client = self.create_client_wait(Recognition, 'recognition')
+        self.training_client = self.create_client_wait(Training, 'recognition/training')
 
-        self.detection_client = self.create_client(Detection, 'detection')
-        while not self.detection_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('Detection service not available, waiting again...')
-        
-        self.recognition_client = self.create_client(Recognition, 'recognition')
-        while not self.recognition_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('Recognition service not available, waiting again...')
+        self.create_log_client = self.create_client_wait(CreateLog, 'logic/create_log')
+        self.get_logs_client = self.create_client_wait(GetString, 'logic/get/logs')
 
-        self.training_client = self.create_client(Training, 'recognition/training')
-        while not self.training_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('Training service not available, waiting again...')
+        self.get_sessions_client = self.create_client_wait(GetString, 'logic/get/sessions')
 
         self.br = HRIBridge()
         self.get_logger().info("ROS Client Node initializated succesfully")
 
+    def create_client_wait(self, srv_type, srv_name):
+        client = self.create_client(srv_type, srv_name)
+        while not client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info(f'{srv_name} service not available, waiting again...')
+
+        return client
+
     def get_faceprint_request(self, args_msg=""):
-        get_all_request = GetString.Request()
-        get_all_request.args = args_msg
+        get_faceprint_request = GetString.Request()
+        get_faceprint_request.args = args_msg
 
-        future_get_all = self.get_faceprint_client.call_async(get_all_request)
-        rclpy.spin_until_future_complete(self, future_get_all)
-        result_get_all = future_get_all.result()
+        future_get_faceprint = self.get_faceprint_client.call_async(get_faceprint_request)
+        rclpy.spin_until_future_complete(self, future_get_faceprint)
+        result_get_faceprint = future_get_faceprint.result()
 
-        return result_get_all.text
+        return result_get_faceprint.text
 
-    # Demasiada replica de hri logic, no?
-    # Ademas cuando lo haga con el llm lo mismo, mas replica aun porque por ahi va por websocket a sancho ai....
     def detection_request(self, frame_msg):
         detection_request = Detection.Request()
         detection_request.frame = frame_msg
@@ -75,3 +76,35 @@ class ClientNode(Node):
         result_training = future_training.result()
 
         return result_training.result, result_training.message.data
+
+    def create_log_request(self, action, person_name):
+        create_log_request = CreateLog.Request()
+        create_log_request.action = action
+        create_log_request.person_name = person_name
+        create_log_request.origin = CONSTANTS.ORIGIN_WEB
+
+        future_create_log = self.create_log_client.call_async(create_log_request)
+        rclpy.spin_until_future_complete(self, future_create_log)
+        result_create_log = future_create_log.result()
+
+        return result_create_log.success, result_create_log.message
+    
+    def get_logs_request(self, args_msg=""):
+        get_logs_request = GetString.Request()
+        get_logs_request.args = args_msg
+
+        future_get_logs = self.get_faceprint_client.call_async(get_logs_request)
+        rclpy.spin_until_future_complete(self, future_get_logs)
+        result_get_logs = future_get_logs.result()
+
+        return result_get_logs.text
+    
+    def get_sessions_request(self, args_msg=""):
+        get_sessions_request = GetString.Request()
+        get_sessions_request.args = args_msg
+
+        future_get_sessions = self.get_faceprint_client.call_async(get_sessions_request)
+        rclpy.spin_until_future_complete(self, future_get_sessions)
+        result_get_sessions = future_get_sessions.result()
+
+        return result_get_sessions.text

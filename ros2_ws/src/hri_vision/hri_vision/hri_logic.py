@@ -26,9 +26,9 @@ class HRILogicNode(Node):
         self.data_queue = Queue(maxsize = 1) # Queremos que olvide frames antiguos, siempre a por los mas nuevos
         
         self.get_actual_people_service = self.create_service(GetString, 'logic/get/actual_people', self.hri_logic.get_actual_people_service)
-        self.create_log_service = self.create_client(CreateLog, 'logic/create_log', self.hri_logic.create_log_service)
-        self.get_logs_service = self.create_client(GetString, 'logic/get/logs', self.hri_logic.get_logs_service)
-        self.get_sessions_service = self.create_client(GetString, 'logic/get/sessions', self.hri_logic.get_sessions_service)
+        self.create_log_service = self.create_service(CreateLog, 'logic/create_log', self.hri_logic.create_log_service)
+        self.get_logs_service = self.create_service(GetString, 'logic/get/logs', self.hri_logic.get_logs_service)
+        self.get_sessions_service = self.create_service(GetString, 'logic/get/sessions', self.hri_logic.get_sessions_service)
 
         self.subscription_camera = self.create_subscription(Image, 'camera/color/image_raw', self.frame_callback, 1)
 

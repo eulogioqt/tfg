@@ -23,7 +23,7 @@ setup(
     entry_points={
         'console_scripts': [
             'sancho_web = sancho_web.sancho_web_node:main',
-            'faceprint_api = sancho_web.faceprint_api_node:main'
+            'api_rest = sancho_web.api_rest_node:main'
         ],
     },
 )

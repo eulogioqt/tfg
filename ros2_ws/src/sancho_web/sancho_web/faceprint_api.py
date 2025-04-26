@@ -2,14 +2,13 @@ import json
 
 from std_msgs.msg import String
 
-from .client_node import ClientNode
 from .interfaces import FaceprintAPIInterface, HTTPException, JSONResponse
 
 
 class FaceprintAPI(FaceprintAPIInterface):
 
-    def __init__(self):
-        self.node = ClientNode()
+    def __init__(self, node):
+        self.node = node
 
     def get_all_faceprints(self):
         faceprints_json = self.node.get_faceprint_request()

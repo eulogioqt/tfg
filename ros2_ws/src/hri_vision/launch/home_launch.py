@@ -44,8 +44,8 @@ def generate_launch_description():
         ),
         Node(
             package='sancho_web',
-            executable='faceprint_api',
-            name='faceprint_api',
+            executable='api_rest',
+            name='api_rest',
             output='screen'
         ),
         Node(
