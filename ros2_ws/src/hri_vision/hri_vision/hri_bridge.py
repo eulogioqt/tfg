@@ -149,7 +149,7 @@ class HRIBridge:
 
         face_aligned_msg = self.cv2_to_imgmsg(face_aligned, "bgr8")
         features_msg = [float(feature) for feature in features]
-        classified_name_msg = classified_name
+        classified_name_msg = str(classified_name)
         distance_msg = float(distance)
         pos_msg = pos
 

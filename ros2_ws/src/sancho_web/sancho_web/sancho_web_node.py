@@ -40,7 +40,7 @@ class SanchoWebNode(Node):
     def faceprint_event_callback(self, msg):
         if msg.origin != FaceprintEvent.ORIGIN_WEB: # Si el origen del evento es la web, no mandar a la web
             event = self.event_map.get(msg.event)
-            message = FaceprintEventMessage(event, msg.name)
+            message = FaceprintEventMessage(event, msg.id)
             self.msg_queue.put(message)
 
 class SanchoWeb:

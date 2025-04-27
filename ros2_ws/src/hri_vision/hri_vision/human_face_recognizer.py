@@ -81,11 +81,12 @@ class HumanFaceRecognizer(Node):
         face_aligned = align_face(frame, position)
         
         features = encode_face(face_aligned)
-        classified_id, distance, pos = self.classifier.classify_face(features)
-        classified_name = self.classifier.db.get_by_id(classified_id)["name"]
+        faceprint, distance, pos = self.classifier.classify_face(features)
+        classified_id = faceprint["id"] if faceprint else None
+        classified_name = faceprint["name"] if faceprint else None
 
         UPPER_BOUND = 0.9 # IMPORTANTE: QUE DEVUELVA SI SE HA CAMBIADO LA CARA PARA HACER UN LOG
-        if score >= 1 and distance >= UPPER_BOUND: # Si la cara es buena y estamos seguro de que es esa persona
+        if faceprint and score >= 1 and distance >= UPPER_BOUND: # Si la cara es buena y estamos seguro de que es esa persona
             face_updated = self.classifier.save_face(classified_id, face_aligned, score) # lo bueno de asi es que siempre tiene una cara reciente
             if face_updated:
                 self.send_faceprint_event(FaceprintEvent.UPDATE, classified_id, FaceprintEvent.ORIGIN_ROS) # Podria hacer que en el update se mandasen tambien que fields se han cambiado...
@@ -94,11 +95,11 @@ class HumanFaceRecognizer(Node):
 
         face_aligned_msg, features_msg, classified_name_msg, distance_msg, pos_msg = (
             self.br.recognizer_to_msg(face_aligned, features, classified_name, distance, pos)
-        )
+        )   
 
         response.face_aligned = face_aligned_msg
         response.features = features_msg
-        response.classified_id = classified_id
+        response.classified_id = str(classified_id)
         response.classified_name = classified_name_msg
         response.distance = distance_msg
         response.pos = pos_msg
@@ -150,7 +151,7 @@ class HumanFaceRecognizer(Node):
                 self.send_faceprint_event(event, id, origin)
 
         response.result = result
-        response.message = String(data=message)
+        response.message = String(data=str(message))
 
         return response
 

@@ -6,5 +6,5 @@ uint8 UPDATE=1
 uint8 DELETE=2
 
 uint8 event
-uint8 id
+string id
 uint8 origin

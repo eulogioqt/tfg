@@ -42,16 +42,16 @@ class FaceprintEventMessage(JSONMessage):
         UPDATE = "UPDATE"
         DELETE = "DELETE"
 
-    def __init__(self, event, name):
+    def __init__(self, event, id):
         self.event = event
-        self.name = name
+        self.id = id
     
     def to_dict(self):
         return {
             "type": MessageType.FACEPRINT_EVENT,
             "data": {
                 "event": self.event,
-                "name": self.name
+                "id": self.id
             }
         }
     

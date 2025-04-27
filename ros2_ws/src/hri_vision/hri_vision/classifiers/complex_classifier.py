@@ -24,17 +24,16 @@ class ComplexClassifier:
             new_features (Array: float): Feature vector.
         
         Returns:
-            closest_class_id (str): The id of the closest class.
+            closest_faceprint (dict): The faceprint.
             closes_distance (float): The normalized cosine distance to the closest_class.
             position (int): The position of the vector in the array of vectors of the class that
                 was the closest to the given vector.
         '''
 
-        closest_class_id = None
+        closest_faceprint = None
         closest_distance = 0
         position = 0
         for faceprint in self.db.get_all():
-            class_id = faceprint["id"]
             feature_list = faceprint["features"]
 
             for i in range(0, len(feature_list)):
@@ -42,10 +41,10 @@ class ComplexClassifier:
 
                 if distance > closest_distance:
                     closest_distance = distance
-                    closest_class_id = class_id
+                    closest_faceprint = faceprint
                     position = i
 
-        return closest_class_id, closest_distance, position
+        return closest_faceprint, closest_distance, position
 
     def refine_class(self, class_id, features, position):
         '''Makes a certain feature vector more precise by averaging with a new feature vector.
@@ -57,7 +56,7 @@ class ComplexClassifier:
         '''
 
         faceprint = self.db.get_by_id(class_id)
-        
+   
         new_size = faceprint["size"][position] + 1
         faceprint["size"][position] = new_size
 
@@ -152,8 +151,8 @@ class ComplexClassifier:
         '''
 
         faceprint = self.db.get_by_id(class_id)
-        is_best_face = faceprint and face_score > faceprint.get("face_score", 0)
-        
+        is_best_face = faceprint is not None and face_score > faceprint.get("face_score", 0)
+
         if is_best_face:
             target_size = (128, 128)
             resized = face#cv2.resize(face, target_size, interpolation=cv2.INTER_AREA)

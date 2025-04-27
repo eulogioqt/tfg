@@ -64,7 +64,7 @@ class FaceprintsDatabase:
         with self._lock:
             id = self.next_id
             self.next_id = self.next_id + 1
-            return id
+            return str(id)
 
     def save(self):
         with self._lock:

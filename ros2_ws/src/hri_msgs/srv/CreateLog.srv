@@ -1,5 +1,5 @@
 string action
-uint8 faceprint_id
+string faceprint_id
 string origin
 ---
 bool success

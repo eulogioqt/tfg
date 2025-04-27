@@ -112,12 +112,13 @@ class HRILogic():
                 self.recognition_request(frame_msg, positions_msg[i], scores_msg[i])        # Recognition
             face_aligned, features, classified_name, distance, pos = \
                 self.node.br.msg_to_recognizer(face_aligned_msg, features_msg, classified_name_msg, distance_msg, pos_msg)
-
+ 
             if face_updated:
                 self.create_log(CONSTANTS.ACTION_UPDATE_FACE, classified_id)
 
             if distance < self.LOWER_BOUND: # No sabe quien es (en teoria nunca lo ha visto), pregunta por el nombre
                 classified_name = None
+                classified_id = None
                 if scores[i] >= 1 and self.ask_unknowns: # Si la imagen es buena, pregunta por el nombre, para que no coja una imagen mala
                     self.read_text("¿Cual es tu nombre?")
                     classified_name = get_name(face_aligned) # Poner aqui una lista o si no que meta un nuevo a mano, pero por si ya es que seleccione
@@ -151,13 +152,13 @@ class HRILogic():
                             "class_id": classified_id,
                             "features": features,
                         }))) # Añadimos otro vector distinto de features a la clase
-                        self.node.get_logger().info(message.data)
+                        self.node.get_logger().info(message)
 
                         if output >= 0:
                             self.read_text("Gracias " + classified_name + ", me gusta confirmar que estoy reconociendo bien")
                             self.create_log(CONSTANTS.ACTION_ADD_FEATURES, classified_id)
                         else:
-                            self.node.get_logger().info(">> ERROR: Algo salio mal al agregar features a una clase")
+                            self.node.get_logger().info(f">> ERROR: Algo salio mal al agregar features a una clase")
                     else: # Si dice que no, le pregunta el nombre
                         self.read_text("Entonces, ¿Cual es tu nombre?")
                         classified_name = get_name(face_aligned)
@@ -189,7 +190,7 @@ class HRILogic():
                     self.read_text("Bienvenido de vuelta " + classified_name)
 
                 self.sessions.process_detection(classified_id, scores[i], distance)
-                
+
                 output, message = self.training_request(String(data="refine_class"), String(data=json.dumps({
                     "class_id": classified_id,
                     "features": features,
@@ -197,7 +198,7 @@ class HRILogic():
                 }))) # Refinamos la clase
 
                 if output < 0:
-                    self.node.get_logger().info(">> ERROR: Al refinar una clase")
+                    self.node.get_logger().info(F">> ERROR: Al refinar una clase: {message}")
 
             mark_face(frame, positions[i], distance, self.MIDDLE_BOUND, self.UPPER_BOUND, classified=classified_name, 
                       drawRectangle=self.draw_rectangle, score=scores[i], showDistance=self.show_distance, showScore=self.show_score)
@@ -239,7 +240,8 @@ class HRILogic():
         Returns:
             face_aligned (Image-ROS2): The face aligned horizontally.
             features (float[]): Features vector of the face.
-            classified (String): Class of the recognized face.
+            classified_id (int): Class id.
+            classified_name (str): Class of the recognized face.
             distance (float): Recognition score.
             pos (int): Position of the vector with the best distance.
         """
@@ -253,8 +255,9 @@ class HRILogic():
         rclpy.spin_until_future_complete(self.node, future_recognition)
         result_recognition = future_recognition.result()
 
-        return (result_recognition.face_aligned, result_recognition.features, result_recognition.classified,
-                result_recognition.distance, result_recognition.pos, result_recognition.face_updated)    
+        return (result_recognition.face_aligned, result_recognition.features, result_recognition.classified_id,
+                result_recognition.classified_name, result_recognition.distance, result_recognition.pos, 
+                result_recognition.face_updated)    
 
     def training_request(self, cmd_type_msg, args_msg):
         """Makes a training request to the training service.
@@ -279,7 +282,7 @@ class HRILogic():
         rclpy.spin_until_future_complete(self.node, future_training)
         result_training = future_training.result()
 
-        return result_training.result, result_training.message
+        return result_training.result, result_training.message.data
 
     # Services
     def get_actual_people_service(self, request, response):
