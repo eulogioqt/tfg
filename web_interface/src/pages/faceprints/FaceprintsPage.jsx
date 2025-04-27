@@ -19,16 +19,16 @@ const FaceprintsPage = () => {
     const [newName, setNewName] = useState("");
 
     const [isOpenFaceModal, setIsOpenFaceModal] = useState(false);
-    const [deleteModalName, setDeleteModalName] = useState(undefined);
+    const [deleteModalId, setDeleteModalId] = useState(undefined);
 
     const [currentPage, setCurrentPage] = useState(1);
     const perPage = 5;
 
-    const handleDelete = async (name) => await doDeleteFaceprint(name);
-    const handleUpdate = async (oldName, newName) => {
+    const handleDelete = async (id) => await doDeleteFaceprint(id);
+    const handleUpdate = async (id, oldName, newName) => {
         if (newName.trim() === "") return;
         if (newName.trim() !== oldName.trim()) {
-            await doUpdateFaceprint(oldName, newName);
+            await doUpdateFaceprint(id, newName);
         }
         setEditingName(null);
     };
@@ -46,9 +46,9 @@ const FaceprintsPage = () => {
             />
 
             <ConfirmDeleteFaceModal
-                name={deleteModalName}
-                handleClose={() => setDeleteModalName(undefined)}
-                action={() => handleDelete(deleteModalName)}
+                id={deleteModalId}
+                handleClose={() => setDeleteModalId(undefined)}
+                action={() => handleDelete(deleteModalId)}
             />
 
             <div className="container mt-5">
@@ -75,6 +75,7 @@ const FaceprintsPage = () => {
                                 <thead className="table-dark">
                                     <tr>
                                         <th>Imagen</th>
+                                        <th>id</th>
                                         <th>Score</th>
                                         <th>Nombre</th>
                                         <th>Features</th>
@@ -86,13 +87,13 @@ const FaceprintsPage = () => {
                                 <tbody>
                                     {pageData.length === 0 ? (
                                         <tr>
-                                            <td colSpan="7" className="text-center py-3">
+                                            <td colSpan="8" className="text-center py-3">
                                                 No se han encontrado datos.
                                             </td>
                                         </tr>
                                     ) : (
                                         pageData.map((person) => (
-                                            <tr key={person.name}>
+                                            <tr key={person.id}>
                                                 <td>
                                                     <img
                                                         src={`data:image/jpg;base64,${person.face}`}
@@ -107,6 +108,7 @@ const FaceprintsPage = () => {
                                                         height={64}
                                                     />
                                                 </td>
+                                                <td>{person.id}</td>
                                                 <td>{person.face_score.toFixed(2)}</td>
                                                 <td>
                                                     {editingName === person.name ? (
@@ -127,7 +129,9 @@ const FaceprintsPage = () => {
                                                     {editingName === person.name ? (
                                                         <button
                                                             className="btn btn-success btn-sm me-2"
-                                                            onClick={() => handleUpdate(person.name, newName)}
+                                                            onClick={() =>
+                                                                handleUpdate(person.id, person.name, newName)
+                                                            }
                                                         >
                                                             Guardar
                                                         </button>
@@ -144,7 +148,7 @@ const FaceprintsPage = () => {
                                                     )}
                                                     <button
                                                         className="btn btn-outline-danger btn-sm"
-                                                        onClick={() => setDeleteModalName(person.name)}
+                                                        onClick={() => setDeleteModalId(person.id)}
                                                     >
                                                         <i className="bi bi-trash" />
                                                     </button>

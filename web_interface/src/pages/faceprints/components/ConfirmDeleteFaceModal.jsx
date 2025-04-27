@@ -2,19 +2,19 @@ import React from "react";
 
 import ActionModal from "../../../components/ActionModal";
 
-const ConfirmDeleteFaceModal = ({ name, handleClose, action }) => {
+const ConfirmDeleteFaceModal = ({ id, handleClose, action }) => {
     return (
         <ActionModal
             name={"confirm-delete-faceprint"}
             title={"Eliminar rostro"}
-            isOpen={name !== undefined}
+            isOpen={id !== undefined}
             handleClose={handleClose}
             action={action}
             buttonText={"Borrar"}
             buttonColor={"danger"}
         >
-            <span style={{ display: name ? "block" : "none" }}>
-                ¿Estás seguro de que quieres eliminar el rostro de <b>{name}</b>?
+            <span style={{ display: id ? "block" : "none" }}>
+                ¿Estás seguro de que quieres eliminar el rostro de la persona con id <b>{id}</b>?
             </span>
         </ActionModal>
     );

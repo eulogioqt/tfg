@@ -19,8 +19,8 @@ export const FaceprintsProvider = ({ children }) => {
     const [loadingFaceprints, setLoadingFaceprints] = useState(true);
 
     const addFaceprint = (fc) => setFaceprints((prev) => [...prev, fc]);
-    const updateFaceprint = (name, fc) => setFaceprints((prev) => prev.map((item) => (item.name === name ? fc : item)));
-    const deleteFaceprint = (name) => setFaceprints((prev) => prev.filter((item) => item.name !== name));
+    const updateFaceprint = (id, fc) => setFaceprints((prev) => prev.map((item) => (item.id === id ? fc : item)));
+    const deleteFaceprint = (id) => setFaceprints((prev) => prev.filter((item) => item.id !== id));
 
     const fetchFaceprintsData = async () => {
         setLoadingFaceprints(true);
@@ -42,20 +42,25 @@ export const FaceprintsProvider = ({ children }) => {
     useEffect(() => {
         const processEvent = async (e) => {
             if (e.event === FACEPRINT_EVENT.CREATE || e.event === FACEPRINT_EVENT.UPDATE) {
-                const response = await faceprints.getById(e.name);
+                const response = await faceprints.getById(e.id);
                 if (isResponseOk(response)) {
                     if (e.event === FACEPRINT_EVENT.CREATE) {
                         addFaceprint(response.data);
-                        showToast("Nueva persona aprendida", "Se ha aprendido a la persona " + e.name, "green");
+
+                        const name = response.data.name;
+                        showToast("Nueva persona aprendida", "Se ha aprendido a la persona " + name, "green");
                     } else {
-                        updateFaceprint(e.name, response.data);
+                        updateFaceprint(e.id, response.data);
                     }
                 } else {
                     showToast("Error", response.data.detail, "red");
                 }
             } else if (e.event === FACEPRINT_EVENT.DELETE) {
-                deleteFaceprint(e.name);
-                showToast("Persona eliminada", "Se ha eliminado a la persona " + e.name, "green");
+                const faceprint = faceprintsData.find((item) => item.id == e.id);
+                const name = faceprint ? faceprint.name : `con id ${e.id}`;
+
+                deleteFaceprint(e.id);
+                showToast("Persona eliminada", "Se ha eliminado a la persona " + name, "green");
             }
         };
 
@@ -90,20 +95,23 @@ export const FaceprintsProvider = ({ children }) => {
         }
     };
 
-    const doUpdateFaceprint = async (oldName, newName) => {
-        const response = await withLoading(() => faceprints.update(oldName, { name: newName }));
+    const doUpdateFaceprint = async (id, newName) => {
+        const response = await withLoading(() => faceprints.update(id, { name: newName }));
         if (isResponseOk(response)) {
-            updateFaceprint(oldName, response.data);
+            updateFaceprint(id, response.data);
             showToast("Persona editada", "Has editado a la persona " + newName + " satisfactoriamente", "green");
         } else {
             showToast("Error", response.data.detail, "red");
         }
     };
 
-    const doDeleteFaceprint = async (name) => {
-        const response = await withLoading(() => faceprints.delete(name));
+    const doDeleteFaceprint = async (id) => {
+        const response = await withLoading(() => faceprints.delete(id));
         if (isResponseOk(response)) {
-            deleteFaceprint(name);
+            const faceprint = faceprintsData.find((item) => item.id == id);
+            const name = faceprint ? faceprint.name : `con id ${id}`;
+
+            deleteFaceprint(id);
             showToast("Persona eliminada", "Has eliminado a la persona " + name + " satisfactoriamente", "green");
         } else {
             showToast("Error", response.data.detail, "red");
