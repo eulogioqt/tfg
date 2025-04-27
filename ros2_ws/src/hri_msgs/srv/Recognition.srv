@@ -7,4 +7,5 @@ float32[] features
 std_msgs/String classified
 float32 distance
 int32 pos
+bool face_updated
 float32 recognition_time

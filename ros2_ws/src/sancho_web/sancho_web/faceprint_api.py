@@ -44,11 +44,14 @@ class FaceprintAPI(FaceprintAPIInterface):
             if score < 1:
                 return HTTPException(detail=f"La puntuación de la detección ha sido demasiado baja ({score:.2f} < 1). Por favor, envía una imagen mejor")
             else:
-                face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg = \
+                face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg, face_updated = \
                     self.node.recognition_request(image_msg, position, score)
                 face_aligned, features, classified, distance, pos = \
                     self.node.br.msg_to_recognizer(face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg)
                 
+                if face_updated:
+                    self.node.create_log_request(CONSTANTS.ACTION_UPDATE_FACE, classified)
+
                 LOWER_BOUND = 0.75
                 MIDDLE_BOUND = 0.80
                 if distance < LOWER_BOUND:

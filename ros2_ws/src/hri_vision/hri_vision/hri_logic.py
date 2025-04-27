@@ -107,10 +107,13 @@ class HRILogic():
         positions_msg, scores_msg = self.detection_request(frame_msg)                   # Detection
         positions, scores = self.node.br.msg_to_detector(positions_msg, scores_msg)
         for i in range(len(positions)):
-            face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg = \
+            face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg, face_updated = \
                 self.recognition_request(frame_msg, positions_msg[i], scores_msg[i])        # Recognition
             face_aligned, features, classified, distance, pos = \
                 self.node.br.msg_to_recognizer(face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg)
+
+            if face_updated:
+                self.create_log(CONSTANTS.ACTION_UPDATE_FACE, classified)
 
             if distance < self.LOWER_BOUND: # No sabe quien es (en teoria nunca lo ha visto), pregunta por el nombre
                 classified = None
@@ -256,8 +259,8 @@ class HRILogic():
         rclpy.spin_until_future_complete(self.node, future_recognition)
         result_recognition = future_recognition.result()
 
-        return (result_recognition.face_aligned, result_recognition.features,
-                result_recognition.classified, result_recognition.distance, result_recognition.pos)
+        return (result_recognition.face_aligned, result_recognition.features, result_recognition.classified,
+                result_recognition.distance, result_recognition.pos, result_recognition.face_updated)    
 
     def training_request(self, cmd_type_msg, args_msg):
         """Makes a training request to the training service.

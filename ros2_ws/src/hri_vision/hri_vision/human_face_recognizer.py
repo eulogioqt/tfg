@@ -85,9 +85,11 @@ class HumanFaceRecognizer(Node):
 
         UPPER_BOUND = 0.9 # IMPORTANTE: QUE DEVUELVA SI SE HA CAMBIADO LA CARA PARA HACER UN LOG
         if score >= 1 and distance >= UPPER_BOUND: # Si la cara es buena y estamos seguro de que es esa persona
-            updated = self.classifier.save_face(classified, face_aligned, score) # lo bueno de asi es que siempre tiene una cara reciente
-            if updated:
+            face_updated = self.classifier.save_face(classified, face_aligned, score) # lo bueno de asi es que siempre tiene una cara reciente
+            if face_updated:
                 self.send_faceprint_event(FaceprintEvent.UPDATE, classified, FaceprintEvent.ORIGIN_ROS) # Podria hacer que en el update se mandasen tambien que fields se han cambiado...
+        else:
+            face_updated = False
 
         face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg = (
             self.br.recognizer_to_msg(face_aligned, features, classified, distance, pos)
@@ -98,6 +100,7 @@ class HumanFaceRecognizer(Node):
         response.classified = classified_msg
         response.distance = distance_msg
         response.pos = pos_msg
+        response.face_updated = face_updated 
 
         recognition_time = time.time() - start_recognition
         response.recognition_time = recognition_time

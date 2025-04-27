@@ -62,8 +62,8 @@ class ClientNode(Node):
         rclpy.spin_until_future_complete(self, future_recognition)
         result_recognition = future_recognition.result()
 
-        return (result_recognition.face_aligned, result_recognition.features,
-                result_recognition.classified, result_recognition.distance, result_recognition.pos)    
+        return (result_recognition.face_aligned, result_recognition.features, result_recognition.classified,
+                result_recognition.distance, result_recognition.pos, result_recognition.face_updated)    
 
     def training_request(self, cmd_type_msg, args_msg):
         training_request = Training.Request()
