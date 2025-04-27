@@ -83,6 +83,11 @@ class FaceprintAPI(FaceprintAPIInterface):
         if new_name is None:
             return HTTPException(detail="No has incluido el campo name.")
 
+        item_json = self.node.get_faceprint_request(json.dumps({ "name": name }))
+        item = json.loads(item_json)
+        if not item:
+            return HTTPException(detail=f"No existe ningun rostro con el nombre {name}")
+
         result, message = self.node.training_request(String(data="rename_class"), String(data=json.dumps({
             "class_name": name,
             "new_name": new_name,
@@ -90,16 +95,24 @@ class FaceprintAPI(FaceprintAPIInterface):
         if result <= 0:
             return HTTPException(detail=message)
         
+        self.node.create_log_request(CONSTANTS.ACTION_UPDATE_FACE, name)
         updated_item_json = self.node.get_faceprint_request(json.dumps({ "name": new_name }))
         updated_item = json.loads(updated_item_json)
 
         return JSONResponse(content=updated_item)
 
     def delete_faceprint(self, name):
+        item_json = self.node.get_faceprint_request(json.dumps({ "name": name }))
+        item = json.loads(item_json)
+        if not item:
+            return HTTPException(detail=f"No existe ningun rostro con el nombre {name}")
+    
         result, message = self.node.training_request(String(data="delete_class"), String(data=json.dumps({
             "class_name": name
         })))
         if result <= 0:
             return HTTPException(detail=message)
+
+        self.node.create_log_request(CONSTANTS.ACTION_DELETE_CLASS, name)
 
         return JSONResponse(content=f"Faceprint con nombre {name} elliminado correctamente.")
