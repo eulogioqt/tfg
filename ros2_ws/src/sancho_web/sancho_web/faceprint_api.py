@@ -3,6 +3,7 @@ import json
 from std_msgs.msg import String
 
 from .interfaces import FaceprintAPIInterface, HTTPException, JSONResponse
+from hri_vision.hri_vision.database.system_database import CONSTANTS
 
 
 class FaceprintAPI(FaceprintAPIInterface):
@@ -58,11 +59,14 @@ class FaceprintAPI(FaceprintAPIInterface):
                         "face": face_aligned_base64,
                         "score": score
                     }))) # Añadimos clase (en teoria es alguien nuevo)
-                    if already_known <= 0:
+                    if already_known < 0: # Solo si es error
                         return HTTPException(detail=message)
                     else: # Añade vector de característica
                         updated_item_json = self.node.get_faceprint_request(json.dumps({ "name": name }))
                         updated_item = json.loads(updated_item_json)
+
+                        action = CONSTANTS.ACTION_ADD_FEATURES if already_known == 1 else CONSTANTS.ACTION_ADD_CLASS
+                        self.node.create_log_request(action, name)
 
                         return JSONResponse((208 if already_known == 1 else 200), updated_item)
                     
