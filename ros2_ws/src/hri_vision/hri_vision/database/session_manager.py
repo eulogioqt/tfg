@@ -49,7 +49,7 @@ class SessionManager:
         to_close = []
 
         for name, session in self.active_sessions.items():
-            if (now - session['last_detection_time']) > timedelta(seconds=self.timeout_seconds):
+            if (now - session['last_detection_time']) > self.timeout_seconds:
                 to_close.append(name)
 
         for name in to_close:

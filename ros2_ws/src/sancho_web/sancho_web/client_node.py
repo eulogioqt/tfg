@@ -93,7 +93,7 @@ class ClientNode(Node):
         get_logs_request = GetString.Request()
         get_logs_request.args = args_msg
 
-        future_get_logs = self.get_faceprint_client.call_async(get_logs_request)
+        future_get_logs = self.get_logs_client.call_async(get_logs_request)
         rclpy.spin_until_future_complete(self, future_get_logs)
         result_get_logs = future_get_logs.result()
 
@@ -103,7 +103,7 @@ class ClientNode(Node):
         get_sessions_request = GetString.Request()
         get_sessions_request.args = args_msg
 
-        future_get_sessions = self.get_faceprint_client.call_async(get_sessions_request)
+        future_get_sessions = self.get_sessions_client.call_async(get_sessions_request)
         rclpy.spin_until_future_complete(self, future_get_sessions)
         result_get_sessions = future_get_sessions.result()
 

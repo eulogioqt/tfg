@@ -19,12 +19,8 @@ from .classifiers.complex_classifier import ComplexClassifier
 # lo que si hace falta un poco de refactor
 class HumanFaceRecognizer(Node):
 
-    def __init__(self, use_database = True):
-        """Initializes the recognizer node.
-
-        Args:
-            use_database (str): If True will use database to load and store data.
-        """
+    def __init__(self):
+        """Initializes the recognizer node"""
 
         super().__init__("human_face_recognizer")
 
@@ -38,9 +34,8 @@ class HumanFaceRecognizer(Node):
 
         self.faceprint_event_pub = self.create_publisher(FaceprintEvent, "recognition/event", 10)
 
-        self.classifier = ComplexClassifier(use_database)
+        self.classifier = ComplexClassifier()
         self.save_db_timer = self.create_timer(10.0, self.save_data)
-        self.get_logger().info(f"Using database: {use_database}")
 
         self.training_dispatcher = {
             "refine_class": self.classifier.refine_class,
@@ -88,7 +83,7 @@ class HumanFaceRecognizer(Node):
         features = encode_face(face_aligned)
         classified, distance, pos = self.classifier.classify_face(features)
 
-        UPPER_BOUND = 0.9
+        UPPER_BOUND = 0.9 # IMPORTANTE: QUE DEVUELVA SI SE HA CAMBIADO LA CARA PARA HACER UN LOG
         if score >= 1 and distance >= UPPER_BOUND: # Si la cara es buena y estamos seguro de que es esa persona
             updated = self.classifier.save_face(classified, face_aligned, score) # lo bueno de asi es que siempre tiene una cara reciente
             if updated:

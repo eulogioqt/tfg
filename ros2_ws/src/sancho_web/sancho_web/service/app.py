@@ -1,4 +1,3 @@
-import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,11 +10,11 @@ from .v1_logs import router as v1_logs
 load_dotenv()
 
 app = FastAPI(
-    docs_url="/api/faceprints/docs",  # Documentación Swagger
-    redoc_url="/api/faceprints/redoc",  # Documentación Redoc
-    openapi_url="/api/faceprints/openapi.json"  # OpenAPI Schema
+    docs_url="/api/hri/docs",  # Documentación Swagger
+    redoc_url="/api/hri/redoc",  # Documentación Redoc
+    openapi_url="/api/hri/openapi.json"  # OpenAPI Schema
 )
-app.title = "Faceprints Service"
+app.title = "HRI Service"
 app.version = "1.0.0"
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(
@@ -29,5 +28,5 @@ app.add_middleware(
 )
 
 app.include_router(v1_faceprints, prefix="/api/v1/faceprints")
-app.include_router(v1_faceprints, prefix="/api/v1/sessions")
-app.include_router(v1_faceprints, prefix="/api/v1/logs")
+app.include_router(v1_sessions, prefix="/api/v1/sessions")
+app.include_router(v1_logs, prefix="/api/v1/logs")

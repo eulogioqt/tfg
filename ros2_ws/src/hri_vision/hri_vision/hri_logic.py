@@ -133,10 +133,10 @@ class HRILogic():
 
                         if already_known == 1:
                             self.read_text("Perdona " + classified + ", no te había reconocido bien")
-                            self.db.create_log(CONSTANTS.ACTION_ADD_FEATURES, classified)
+                            self.create_log(CONSTANTS.ACTION_ADD_FEATURES, classified)
                         elif already_known == 0:
                             self.read_text("Bienvenido " + classified + ", no te conocía")
-                            self.db.create_log(CONSTANTS.ACTION_ADD_CLASS, classified)
+                            self.create_log(CONSTANTS.ACTION_ADD_CLASS, classified)
                         else:
                             self.node.get_logger().info(">> ERROR: Algo salio mal al agregar una nueva clase")
 
@@ -155,7 +155,7 @@ class HRILogic():
 
                         if output >= 0:
                             self.read_text("Gracias " + classified + ", me gusta confirmar que estoy reconociendo bien")
-                            self.db.create_log(CONSTANTS.ACTION_ADD_FEATURES, classified)
+                            self.create_log(CONSTANTS.ACTION_ADD_FEATURES, classified)
                         else:
                             self.node.get_logger().info(">> ERROR: Algo salio mal al agregar features a una clase")
                     else: # Si dice que no, le pregunta el nombre
@@ -177,10 +177,10 @@ class HRILogic():
 
                             if already_known == 1:
                                 self.read_text(classified + ", no me marees, por favor.")
-                                self.db.create_log(CONSTANTS.ACTION_ADD_FEATURES, classified)
+                                self.create_log(CONSTANTS.ACTION_ADD_FEATURES, classified)
                             elif already_known == 0:
                                 self.read_text("Encantando de conocerte " + classified + ", perdona por confundirte")
-                                self.db.create_log(CONSTANTS.ACTION_ADD_CLASS, classified)
+                                self.create_log(CONSTANTS.ACTION_ADD_CLASS, classified)
                             else:
                                 self.node.get_logger().info(">> ERROR: Algo salio mal al agregar una nueva clase")
 
@@ -294,7 +294,7 @@ class HRILogic():
 
     def create_log_service(self, request, response):
         try:
-            self.db.create_log(request.action, request.person_name, request.origin)
+            self.create_log(request.action, request.person_name, request.origin)
             success = True
             message = "OK"
         except Exception as e:
@@ -329,9 +329,13 @@ class HRILogic():
 
     # Utils
     def read_text(self, text):
-        print(f"[SANCHO] {text}")
+        self.node.get_logger().info(f"[SANCHO] {text}")
         self.node.input_tts.publish(String(data=text))
-        
+    
+    def create_log(self, action, person_name, origin = CONSTANTS.ORIGIN_ROS):
+        self.node.get_logger().info(f"[LOG] Nuevo log de tipo {action} para {person_name} con origen {origin}")
+        self.db.create_log(action, person_name, origin)
+
 def main(args=None):
     rclpy.init(args=args)
 
