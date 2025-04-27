@@ -47,10 +47,14 @@ class SessionManager:
     def check_timeouts(self):
         now = datetime.now().timestamp()
 
+        to_close = []
         for name, session in self.active_sessions.items():
             last_detection_time = self._get_last_detection_time(session, now)
             if (now - last_detection_time) > self.timeout_seconds:
-                self._close_session(name)
+                to_close.append(name)
+        
+        for name in to_close:
+            self._close_session(name)
     
     def _close_session(self, name: str):
         session = self.active_sessions.pop(name, None)
@@ -66,5 +70,5 @@ class SessionManager:
 
         self.db.create_session_with_detections(session_data)
 
-    def _get_last_detection_time(session, default=0):
+    def _get_last_detection_time(self, session, default=0):
         return default if len(session['detections']) == 0 else session['detections'][-1][0]
