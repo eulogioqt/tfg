@@ -10,7 +10,7 @@ class FaceprintAPIInterface(ABC):
         pass
 
     @abstractmethod
-    def get_faceprint(self, name: str) -> APIResponse:
+    def get_faceprint(self, id: str) -> APIResponse:
         pass
 
     @abstractmethod
@@ -18,9 +18,9 @@ class FaceprintAPIInterface(ABC):
         pass
 
     @abstractmethod
-    def update_faceprint(self, name: str, faceprint: str) -> APIResponse:
+    def update_faceprint(self, id: str, faceprint: str) -> APIResponse:
         pass
 
     @abstractmethod
-    def delete_faceprint(self, name: str) -> APIResponse:
+    def delete_faceprint(self, id: str) -> APIResponse:
         pass

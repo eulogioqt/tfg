@@ -40,16 +40,16 @@ async def get_faceprints(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al buscar los faceprints: {str(e)}")
 
-@router.get("/{name}", tags=["Faceprints CRUD endpoints"], response_model=Faceprint)
-async def get_faceprint_by_name(
+@router.get("/{id}", tags=["Faceprints CRUD endpoints"], response_model=Faceprint)
+async def get_faceprint_by_id(
     request: Request,
-    name: str = Path(description="Nombre de la persona"),
+    id: str = Path(description="Id de la persona"),
     fields: Optional[str] = Query(None, description="Campos específicos a devolver")
 ):
     APIUtils.check_accept_json(request)
     
     try:
-        response = faceprint_interface.get_faceprint(name)
+        response = faceprint_interface.get_faceprint(id)
 
         return response.to_fastapi()
     
@@ -80,9 +80,9 @@ async def create_faceprint(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al actualizar el faceprint: {str(e)}")
 
-@router.put("/{name}", tags=["Faceprints CRUD endpoints"], response_model=Faceprint)
+@router.put("/{id}", tags=["Faceprints CRUD endpoints"], response_model=Faceprint)
 async def update_faceprint(
-    name: str,
+    id: str,
     faceprint_update: FaceprintUpdate,
     request: Request
 ):
@@ -91,7 +91,7 @@ async def update_faceprint(
 
     try:
         update_data = faceprint_update.model_dump(exclude_defaults=True)
-        response = faceprint_interface.update_faceprint(name, update_data)
+        response = faceprint_interface.update_faceprint(id, update_data)
 
         return response.to_fastapi()
     
@@ -101,15 +101,15 @@ async def update_faceprint(
         raise HTTPException(status_code=500, detail=f"Error al actualizar el faceprint: {str(e)}")
 
 
-@router.delete("/{name}", tags=["Faceprints CRUD endpoints"], response_model=FaceprintDeleteResponse)
+@router.delete("/{id}", tags=["Faceprints CRUD endpoints"], response_model=FaceprintDeleteResponse)
 async def delete_faceprint(
-    name: str,
+    id: str,
     request: Request
 ):
     APIUtils.check_accept_json(request)
 
     try:
-        response = faceprint_interface.delete_faceprint(name)
+        response = faceprint_interface.delete_faceprint(id)
 
         return response.to_fastapi()
     

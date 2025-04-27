@@ -124,22 +124,24 @@ class HRILogic():
                     classified_name = get_name(face_aligned) # Poner aqui una lista o si no que meta un nuevo a mano, pero por si ya es que seleccione
                     if classified_name is not None:
                         face_aligned_base64 = self.node.br.cv2_to_base64(face_aligned)
-                        result, classified_id = self.training_request(String(data="add_class"), String(data=json.dumps({
+                        result, message = self.training_request(String(data="add_class"), String(data=json.dumps({
                             "class_name": classified_name,
                             "features": features,
                             "face": face_aligned_base64,
                             "score": scores[i]
                         }))) # Añadimos clase (en teoria es alguien nuevo)
-                        self.node.get_logger().info(f"Nueva clase con id {classified_id}")
-                        self.sessions.process_detection(classified_id, scores[i], distance)
-
-                        distance = 1
 
                         if result >= 0:
+                            distance = 1
+                            classified_id = message
+
+                            self.node.get_logger().info(f"Nueva clase con id {classified_id}")
+                            self.sessions.process_detection(classified_id, scores[i], distance)
+
                             self.read_text("Bienvenido " + classified_name + ", no te conocía")
                             self.create_log(CONSTANTS.ACTION_ADD_CLASS, classified_id)
                         else:
-                            self.node.get_logger().info(">> ERROR: Algo salio mal al agregar una nueva clase")
+                            self.node.get_logger().info(f">> ERROR: Algo salio mal al agregar una nueva clase: {message}")
 
             elif distance < self.MIDDLE_BOUND: # Cree que es alguien, pide confirmacion
                 if scores[i] > 1 and self.ask_unknowns: # Pero solo si la foto es buena
@@ -164,22 +166,24 @@ class HRILogic():
                         classified_name = get_name(face_aligned)
                         if classified_name is not None:
                             face_aligned_base64 = self.node.br.cv2_to_base64(face_aligned)
-                            result, classified_id = self.training_request(String(data="add_class"), String(data=json.dumps({
+                            result, message = self.training_request(String(data="add_class"), String(data=json.dumps({
                                 "class_name": classified_name,
                                 "features": features,
                                 "face": face_aligned_base64,
                                 "score": scores[i]
                             }))) # Añadimos clase (en teoria es alguien nuevo)
-                            self.node.get_logger().info(f"Nueva clase con id {classified_id}")
-                            self.sessions.process_detection(classified_id, scores[i], distance)
-                                
-                            distance = 1
-                            
-                            if result >= 0:
+
+                            if result >= 0:                            
+                                distance = 1
+                                classified_id = message
+
+                                self.node.get_logger().info(f"Nueva clase con id {classified_id}")
+                                self.sessions.process_detection(classified_id, scores[i], distance)
+
                                 self.read_text("Encantando de conocerte " + classified_name + ", perdona por confundirte")
                                 self.create_log(CONSTANTS.ACTION_ADD_CLASS, classified_id)
                             else:
-                                self.node.get_logger().info(">> ERROR: Algo salio mal al agregar una nueva clase")
+                                self.node.get_logger().info(f">> ERROR: Algo salio mal al agregar una nueva clase: {message}")
 
             elif distance < self.UPPER_BOUND: # Sabe que es alguien pero lo detecta un poco raro
                 self.sessions.process_detection(classified_id, scores[i], distance)
@@ -317,9 +321,9 @@ class HRILogic():
 
         if args:
             args = json.loads(args)
-            name = args["name"]
+            id = args["id"]
 
-            items = get_by_name_func(name)
+            items = get_by_name_func(id)
             response.text = json.dumps(items)
         else:
             items = get_all_func()

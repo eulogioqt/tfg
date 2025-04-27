@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 
 class Faceprint(BaseModel):
+    id: str = Field(example="0")
     name: str = Field(example="Juan")
     features: str = Field(example='[0.1, 0.2, 0.3, ...]')
     size: str = Field(example='[13]')

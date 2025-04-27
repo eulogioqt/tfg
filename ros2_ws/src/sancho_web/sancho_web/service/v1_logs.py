@@ -41,9 +41,9 @@ async def get_logs(
         raise HTTPException(status_code=500, detail=f"Error al buscar los logs: {str(e)}")
 
 @router.get("/{name}", tags=["Logs CRUD endpoints"], response_model=Log)
-async def get_logs_by_name(
+async def get_logs_by_faceprint_id(
     request: Request,
-    name: str = Path(description="Nombre de la persona"),
+    faceprint_id: str = Path(description="Id de la persona"),
     fields: Optional[str] = Query(None, description="Campos específicos a devolver"),
     sort: Optional[str] = Query(None, description="Campos por los que ordenar, separados por comas"),
     offset: int = Query(default=0, description="Índice de inicio para los resultados de la paginación"),
@@ -53,7 +53,7 @@ async def get_logs_by_name(
     APIUtils.check_accept_json(request)
     
     try:
-        response = log_interface.get_log(name)
+        response = log_interface.get_log(faceprint_id)
 
         return response.to_fastapi()
     

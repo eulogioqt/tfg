@@ -15,8 +15,8 @@ class LogAPI(LogAPIInterface):
 
         return JSONResponse(content=faceprints)
 
-    def get_log(self, name):
-        faceprint_json = self.node.get_logs_request(json.dumps({ "name": name }))
+    def get_log(self, id):
+        faceprint_json = self.node.get_logs_request(json.dumps({ "id": id }))
         faceprint = json.loads(faceprint_json)
 
         return JSONResponse(content=faceprint)

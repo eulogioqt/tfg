@@ -5,7 +5,7 @@ from datetime import datetime
 
 class Session(BaseModel):
     id: int = Field(default=None, example=1)
-    person_name: str = Field(example="Juan")
+    faceprint_id: str = Field(example="0")
     start_time: str = Field(default_factory=str(datetime.now().timestamp()), example="1712345678")
     end_time: str = Field(default_factory=str(datetime.now().timestamp()), example="1712345678")
     detections: List[List[Union[str, float]]] = Field(

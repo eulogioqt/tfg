@@ -10,5 +10,5 @@ class LogAPIInterface(ABC):
         pass
 
     @abstractmethod
-    def get_log(self, name: str) -> APIResponse:
+    def get_log(self, faceprint_id: str) -> APIResponse:
         pass

@@ -41,9 +41,9 @@ async def get_sessions(
         raise HTTPException(status_code=500, detail=f"Error al buscar las sesiones: {str(e)}")
 
 @router.get("/{name}", tags=["Sessions CRUD endpoints"], response_model=Session)
-async def get_sessions_by_name(
+async def get_sessions_by_faceprint_id(
     request: Request,
-    name: str = Path(description="Nombre de la persona"),
+    faceprint_id: str = Path(description="id de la persona"),
     fields: Optional[str] = Query(None, description="Campos específicos a devolver"),
     sort: Optional[str] = Query(None, description="Campos por los que ordenar, separados por comas"),
     offset: int = Query(default=0, description="Índice de inicio para los resultados de la paginación"),
@@ -53,7 +53,7 @@ async def get_sessions_by_name(
     APIUtils.check_accept_json(request)
     
     try:
-        response = session_interface.get_session(name)
+        response = session_interface.get_session(faceprint_id)
 
         return response.to_fastapi()
     

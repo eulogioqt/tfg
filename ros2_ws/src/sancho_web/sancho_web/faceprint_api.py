@@ -17,12 +17,12 @@ class FaceprintAPI(FaceprintAPIInterface):
 
         return JSONResponse(content=faceprints)
 
-    def get_faceprint(self, name):
-        faceprint_json = self.node.get_faceprint_request(json.dumps({ "name": name }))
+    def get_faceprint(self, id):
+        faceprint_json = self.node.get_faceprint_request(json.dumps({ "id": id }))
 
         faceprint = json.loads(faceprint_json)
         if faceprint is None:
-            return HTTPException(status_code=404, detail=f"Faceprint con nombre {name} no encontrado")
+            return HTTPException(status_code=404, detail=f"Faceprint con id {id} no encontrado")
         
         return JSONResponse(content=faceprint)
 
@@ -42,77 +42,80 @@ class FaceprintAPI(FaceprintAPIInterface):
             score = scores[0]
 
             if score < 1:
-                return HTTPException(detail=f"La puntuación de la detección ha sido demasiado baja ({score:.2f} < 1). Por favor, envía una imagen mejor")
+                return HTTPException(detail=f"La puntuación de la detección ha sido demasiado baja ({score:.2f} < 1). Por favor, envía una imagen mejor.")
             else:
-                face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg, face_updated = \
+                face_aligned_msg, features_msg, classified_id, classified_name_msg, distance_msg, pos_msg, face_updated = \
                     self.node.recognition_request(image_msg, position, score)
-                face_aligned, features, classified, distance, pos = \
-                    self.node.br.msg_to_recognizer(face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg)
+                face_aligned, features, classified_name, distance, pos = \
+                    self.node.br.msg_to_recognizer(face_aligned_msg, features_msg, classified_name_msg, distance_msg, pos_msg)
                 
                 if face_updated:
-                    self.node.create_log_request(CONSTANTS.ACTION_UPDATE_FACE, classified)
+                    self.node.create_log_request(CONSTANTS.ACTION_UPDATE_FACE, classified_id)
 
                 LOWER_BOUND = 0.75
                 MIDDLE_BOUND = 0.80
                 if distance < LOWER_BOUND:
                     face_aligned_base64 = self.node.br.cv2_to_base64(face_aligned)
-                    already_known, message = self.node.training_request(String(data="add_class"), String(data=json.dumps({
+                    result, message = self.node.training_request(String(data="add_class"), String(data=json.dumps({
                         "class_name": name,
                         "features": features,
                         "face": face_aligned_base64,
                         "score": score
                     }))) # Añadimos clase (en teoria es alguien nuevo)
-                    if already_known < 0: # Solo si es error
+                    if result < 0: # Solo si es error
                         return HTTPException(detail=message)
                     else: # Añade vector de característica
-                        updated_item_json = self.node.get_faceprint_request(json.dumps({ "name": name }))
+                        classified_id = message
+
+                        updated_item_json = self.node.get_faceprint_request(json.dumps({ "id": classified_id }))
                         updated_item = json.loads(updated_item_json)
 
-                        action = CONSTANTS.ACTION_ADD_FEATURES if already_known == 1 else CONSTANTS.ACTION_ADD_CLASS
+                        action = CONSTANTS.ACTION_ADD_CLASS
                         self.node.create_log_request(action, name)
 
-                        return JSONResponse((208 if already_known == 1 else 200), updated_item)
+                        return JSONResponse(updated_item)
                     
                 elif distance < MIDDLE_BOUND:
                     return HTTPException(detail=f"Nunca pensé que pasase esto MIDDLE BOUND.")
                 else:
-                    return HTTPException(detail=f"Ya te conozco {classified}, esta función es para personas nuevas.")
+                    return HTTPException(detail=f"Ya te conozco {classified_name}, esta función es para personas nuevas.")
 
-    def update_faceprint(self, name, faceprint):
+    def update_faceprint(self, id, faceprint):
         new_name = faceprint["name"]
         if new_name is None:
             return HTTPException(detail="No has incluido el campo name.")
 
-        item_json = self.node.get_faceprint_request(json.dumps({ "name": name }))
+        item_json = self.node.get_faceprint_request(json.dumps({ "id": id }))
         item = json.loads(item_json)
         if not item:
-            return HTTPException(detail=f"No existe ningun rostro con el nombre {name}")
+            return HTTPException(detail=f"No existe ningun rostro con el id {id}")
 
         result, message = self.node.training_request(String(data="rename_class"), String(data=json.dumps({
-            "class_name": name,
+            "class_id": id,
             "new_name": new_name,
         })))
         if result <= 0:
             return HTTPException(detail=message)
         
-        self.node.create_log_request(CONSTANTS.ACTION_UPDATE_FACE, name)
-        updated_item_json = self.node.get_faceprint_request(json.dumps({ "name": new_name }))
+        self.node.create_log_request(CONSTANTS.ACTION_UPDATE_FACE, id)
+
+        updated_item_json = self.node.get_faceprint_request(json.dumps({ "id": id }))
         updated_item = json.loads(updated_item_json)
 
         return JSONResponse(content=updated_item)
 
-    def delete_faceprint(self, name):
-        item_json = self.node.get_faceprint_request(json.dumps({ "name": name }))
+    def delete_faceprint(self, id):
+        item_json = self.node.get_faceprint_request(json.dumps({ "id": id }))
         item = json.loads(item_json)
         if not item:
-            return HTTPException(detail=f"No existe ningun rostro con el nombre {name}")
+            return HTTPException(detail=f"No existe ningun rostro con el id {id}")
     
         result, message = self.node.training_request(String(data="delete_class"), String(data=json.dumps({
-            "class_name": name
+            "class_id": id
         })))
         if result <= 0:
             return HTTPException(detail=message)
 
-        self.node.create_log_request(CONSTANTS.ACTION_DELETE_CLASS, name)
+        self.node.create_log_request(CONSTANTS.ACTION_DELETE_CLASS, id)
 
-        return JSONResponse(content=f"Faceprint con nombre {name} elliminado correctamente.")
+        return JSONResponse(content=f"Faceprint con id {id} elliminado correctamente.")

@@ -10,5 +10,5 @@ class SessionAPIInterface(ABC):
         pass
 
     @abstractmethod
-    def get_session(self, name: str) -> APIResponse:
+    def get_session(self, faceprint_id: str) -> APIResponse:
         pass
