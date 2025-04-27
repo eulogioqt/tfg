@@ -8,10 +8,14 @@ from threading import RLock
 class FaceprintsDatabase:
     def __init__(self, db_path='faceprints_db.json'):
         self.db_path = db_path
-        self.faceprints = {}
         self._lock = RLock()
 
-    def get_all_names(self):
+        self.next_id = 0
+        self.faceprints = {}
+
+        self.load()
+
+    def get_all_ids(self):
         with self._lock:
             return list(self.faceprints.keys())
 
@@ -19,16 +23,15 @@ class FaceprintsDatabase:
         with self._lock:
             return list(self.faceprints.values())
 
-    def get_by_name(self, name):
+    def get_by_id(self, id):
         with self._lock:
-            return self.faceprints.get(name)
+            return self.faceprints.get(id)
 
     def add(self, name, features, face, score):
         with self._lock:
-            if name in self.faceprints:
-                return None  # Ya existe
-
+            id = self.get_next_id()
             new_faceprint = {
+                'id': id,
                 'name': name,
                 'face': face,
                 'face_score': score,
@@ -36,41 +39,42 @@ class FaceprintsDatabase:
                 'size': [1],
                 'learning_date': datetime.now().timestamp()
             }
-            self.faceprints[name] = new_faceprint
+            self.faceprints[id] = new_faceprint
 
             return new_faceprint
 
-    def update(self, name, new_data):
+    def update(self, id, new_data):
         with self._lock:
-            original_entry = self.get_by_name(name)
+            original_entry = self.get_by_id(id)
             if original_entry is None:
                 return None # No existe
-
-            new_name = new_data.get("name")
-            if new_name and new_name != name and new_name in self.faceprints:
-                return None # Estas intentando cambiar de nombre a otro que ya existe
 
             for key, value in new_data.items(): # Actualizamos los campos
                 if key in original_entry:
                     original_entry[key] = value
-            
-            if new_name and new_name != name: # Si son distintos, cambia nombre
-                self.faceprints[new_name] = original_entry
-                self.remove(name)
-            else:
-                self.faceprints[name] = original_entry
 
             return original_entry
 
-    def remove(self, name):
+    def remove(self, id):
         with self._lock:
-            if name in self.faceprints:
-                del self.faceprints[name]
+            if id in self.faceprints:
+                del self.faceprints[id]
+
+    def get_next_id(self):
+        with self._lock:
+            id = self.next_id
+            self.next_id = self.next_id + 1
+            return id
 
     def save(self):
         with self._lock:
+            database = {
+                "next_id": self.next_id,
+                "faceprints": self.faceprints
+            }
+
             with open(self.db_path, "w", encoding="utf-8") as f:
-                json.dump(self.faceprints, f, indent=4)
+                json.dump(database, f, indent=4)
 
     def load(self):
         with self._lock:
@@ -80,5 +84,8 @@ class FaceprintsDatabase:
                 self.save()
 
             with open(self.db_path, "r", encoding="utf-8") as f:
-                self.faceprints = json.load(f)
+                database = json.load(f)
+
+                self.next_id = database["next_id"]
+                self.faceprints = database["faceprints"]
 

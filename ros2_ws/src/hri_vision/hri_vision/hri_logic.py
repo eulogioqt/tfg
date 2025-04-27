@@ -84,7 +84,7 @@ class HRILogic():
         self.sessions = SessionManager(self.db, timeout_seconds=10)
 
         self.node = HRILogicNode(self)
-        self.node.create_timer(10, self.sessions.check_timeouts)
+        self.node.create_timer(10.0, self.sessions.check_timeouts)
     
     def spin(self):
         """Spins the logic node searching for new frames. If one is detected, process the frame."""
@@ -108,97 +108,90 @@ class HRILogic():
         positions_msg, scores_msg = self.detection_request(frame_msg)                   # Detection
         positions, scores = self.node.br.msg_to_detector(positions_msg, scores_msg)
         for i in range(len(positions)):
-            face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg, face_updated = \
+            face_aligned_msg, features_msg, classified_id, classified_name_msg, distance_msg, pos_msg, face_updated = \
                 self.recognition_request(frame_msg, positions_msg[i], scores_msg[i])        # Recognition
-            face_aligned, features, classified, distance, pos = \
-                self.node.br.msg_to_recognizer(face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg)
+            face_aligned, features, classified_name, distance, pos = \
+                self.node.br.msg_to_recognizer(face_aligned_msg, features_msg, classified_name_msg, distance_msg, pos_msg)
 
             if face_updated:
-                self.create_log(CONSTANTS.ACTION_UPDATE_FACE, classified)
+                self.create_log(CONSTANTS.ACTION_UPDATE_FACE, classified_id)
 
             if distance < self.LOWER_BOUND: # No sabe quien es (en teoria nunca lo ha visto), pregunta por el nombre
-                classified = None
+                classified_name = None
                 if scores[i] >= 1 and self.ask_unknowns: # Si la imagen es buena, pregunta por el nombre, para que no coja una imagen mala
                     self.read_text("¿Cual es tu nombre?")
-                    classified = get_name(face_aligned) # Poner aqui una lista o si no que meta un nuevo a mano, pero por si ya es que seleccione
-                    if classified is not None:
-                        self.sessions.process_detection(classified, scores[i], distance)
-
+                    classified_name = get_name(face_aligned) # Poner aqui una lista o si no que meta un nuevo a mano, pero por si ya es que seleccione
+                    if classified_name is not None:
                         face_aligned_base64 = self.node.br.cv2_to_base64(face_aligned)
-                        already_known, message = self.training_request(String(data="add_class"), String(data=json.dumps({
-                            "class_name": classified,
+                        result, classified_id = self.training_request(String(data="add_class"), String(data=json.dumps({
+                            "class_name": classified_name,
                             "features": features,
                             "face": face_aligned_base64,
                             "score": scores[i]
                         }))) # Añadimos clase (en teoria es alguien nuevo)
-                        self.node.get_logger().info(message.data)
+                        self.node.get_logger().info(f"Nueva clase con id {classified_id}")
+                        self.sessions.process_detection(classified_id, scores[i], distance)
 
                         distance = 1
 
-                        if already_known == 1:
-                            self.read_text("Perdona " + classified + ", no te había reconocido bien")
-                            self.create_log(CONSTANTS.ACTION_ADD_FEATURES, classified)
-                        elif already_known == 0:
-                            self.read_text("Bienvenido " + classified + ", no te conocía")
-                            self.create_log(CONSTANTS.ACTION_ADD_CLASS, classified)
+                        if result >= 0:
+                            self.read_text("Bienvenido " + classified_name + ", no te conocía")
+                            self.create_log(CONSTANTS.ACTION_ADD_CLASS, classified_id)
                         else:
                             self.node.get_logger().info(">> ERROR: Algo salio mal al agregar una nueva clase")
 
             elif distance < self.MIDDLE_BOUND: # Cree que es alguien, pide confirmacion
                 if scores[i] > 1 and self.ask_unknowns: # Pero solo si la foto es buena
-                    self.read_text("Creo que eres " + classified + ", ¿es cierto?")
-                    answer = ask_if_name(face_aligned, classified)
+                    self.read_text("Creo que eres " + classified_name + ", ¿es cierto?")
+                    answer = ask_if_name(face_aligned, f"{classified_name} (ID {classified_id})")
                     if answer: # Si dice que si es esa persona
-                        self.sessions.process_detection(classified, scores[i], distance)
+                        self.sessions.process_detection(classified_id, scores[i], distance)
 
                         output, message = self.training_request(String(data="add_features"), String(data=json.dumps({
-                            "class_name": classified,
+                            "class_id": classified_id,
                             "features": features,
                         }))) # Añadimos otro vector distinto de features a la clase
                         self.node.get_logger().info(message.data)
 
                         if output >= 0:
-                            self.read_text("Gracias " + classified + ", me gusta confirmar que estoy reconociendo bien")
-                            self.create_log(CONSTANTS.ACTION_ADD_FEATURES, classified)
+                            self.read_text("Gracias " + classified_name + ", me gusta confirmar que estoy reconociendo bien")
+                            self.create_log(CONSTANTS.ACTION_ADD_FEATURES, classified_id)
                         else:
                             self.node.get_logger().info(">> ERROR: Algo salio mal al agregar features a una clase")
                     else: # Si dice que no, le pregunta el nombre
                         self.read_text("Entonces, ¿Cual es tu nombre?")
-                        classified = get_name(face_aligned)
-                        if classified is not None:
-                            self.sessions.process_detection(classified, scores[i], distance)
-
+                        classified_name = get_name(face_aligned)
+                        if classified_name is not None:
                             face_aligned_base64 = self.node.br.cv2_to_base64(face_aligned)
-                            already_known, message = self.training_request(String(data="add_class"), String(data=json.dumps({
-                                "class_name": classified,
+                            result, classified_id = self.training_request(String(data="add_class"), String(data=json.dumps({
+                                "class_name": classified_name,
                                 "features": features,
                                 "face": face_aligned_base64,
                                 "score": scores[i]
                             }))) # Añadimos clase (en teoria es alguien nuevo)
-                            self.node.get_logger().info(message.data)
-                            
+                            self.node.get_logger().info(f"Nueva clase con id {classified_id}")
+                            self.sessions.process_detection(classified_id, scores[i], distance)
+                                
                             distance = 1
-
-                            if already_known == 1:
-                                self.read_text(classified + ", no me marees, por favor.")
-                                self.create_log(CONSTANTS.ACTION_ADD_FEATURES, classified)
-                            elif already_known == 0:
-                                self.read_text("Encantando de conocerte " + classified + ", perdona por confundirte")
-                                self.create_log(CONSTANTS.ACTION_ADD_CLASS, classified)
+                            
+                            if result >= 0:
+                                self.read_text("Encantando de conocerte " + classified_name + ", perdona por confundirte")
+                                self.create_log(CONSTANTS.ACTION_ADD_CLASS, classified_id)
                             else:
                                 self.node.get_logger().info(">> ERROR: Algo salio mal al agregar una nueva clase")
 
             elif distance < self.UPPER_BOUND: # Sabe que es alguien pero lo detecta un poco raro
-                self.sessions.process_detection(classified, scores[i], distance)
+                self.sessions.process_detection(classified_id, scores[i], distance)
                 #classifier.addFeatures(classified, features)
+                # ver si aqui refinar o que hacer
             else: # Reconoce perfectamente
-                if self.sessions.get_last_seen(classified) > 30:
-                    self.read_text("Bienvenido de vuelta " + classified)
+                if self.sessions.get_last_seen(classified_id) > 30:
+                    self.read_text("Bienvenido de vuelta " + classified_name)
 
-                self.sessions.process_detection(classified, scores[i], distance)
+                self.sessions.process_detection(classified_id, scores[i], distance)
                 
                 output, message = self.training_request(String(data="refine_class"), String(data=json.dumps({
-                    "class_name": classified,
+                    "class_id": classified_id,
                     "features": features,
                     "position": pos
                 }))) # Refinamos la clase
@@ -206,7 +199,7 @@ class HRILogic():
                 if output < 0:
                     self.node.get_logger().info(">> ERROR: Al refinar una clase")
 
-            mark_face(frame, positions[i], distance, self.MIDDLE_BOUND, self.UPPER_BOUND, classified=classified, 
+            mark_face(frame, positions[i], distance, self.MIDDLE_BOUND, self.UPPER_BOUND, classified=classified_name, 
                       drawRectangle=self.draw_rectangle, score=scores[i], showDistance=self.show_distance, showScore=self.show_score)
 
         actual_people_time = self.sessions.get_all_last_seen()
@@ -298,7 +291,7 @@ class HRILogic():
 
     def create_log_service(self, request, response):
         try:
-            self.create_log(request.action, request.person_name, request.origin)
+            self.create_log(request.action, request.faceprint_id, request.origin)
             success = True
             message = "OK"
         except Exception as e:
@@ -311,10 +304,10 @@ class HRILogic():
         return response
 
     def get_logs_service(self, request, response):
-        return self._handle_get_list(request, response, self.db.get_all_logs, self.db.get_logs_by_name)
+        return self._handle_get_list(request, response, self.db.get_all_logs, self.db.get_logs_by_faceprint_id)
 
     def get_sessions_service(self, request, response):
-        return self._handle_get_list(request, response, self.db.get_all_sessions, self.db.get_sessions_by_name)
+        return self._handle_get_list(request, response, self.db.get_all_sessions, self.db.get_sessions_by_faceprint_id)
 
     def _handle_get_list(self, request, response, get_all_func, get_by_name_func):
         args = request.args
@@ -336,9 +329,9 @@ class HRILogic():
         self.node.get_logger().info(f"[SANCHO] {text}")
         self.node.input_tts.publish(String(data=text))
     
-    def create_log(self, action, person_name, origin = CONSTANTS.ORIGIN_ROS):
-        self.node.get_logger().info(f"[LOG] Nuevo log de tipo {action} para {person_name} con origen {origin}")
-        self.db.create_log(action, person_name, origin)
+    def create_log(self, action, faceprint_id, origin = CONSTANTS.ORIGIN_ROS):
+        self.node.get_logger().info(f"[LOG] Nuevo log de tipo {action} para {faceprint_id} con origen {origin}")
+        self.db.create_log(action, faceprint_id, origin)
 
 def main(args=None):
     rclpy.init(args=args)

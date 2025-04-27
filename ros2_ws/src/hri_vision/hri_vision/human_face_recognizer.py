@@ -81,23 +81,25 @@ class HumanFaceRecognizer(Node):
         face_aligned = align_face(frame, position)
         
         features = encode_face(face_aligned)
-        classified, distance, pos = self.classifier.classify_face(features)
+        classified_id, distance, pos = self.classifier.classify_face(features)
+        classified_name = self.classifier.db.get_by_id(classified_id)["name"]
 
         UPPER_BOUND = 0.9 # IMPORTANTE: QUE DEVUELVA SI SE HA CAMBIADO LA CARA PARA HACER UN LOG
         if score >= 1 and distance >= UPPER_BOUND: # Si la cara es buena y estamos seguro de que es esa persona
-            face_updated = self.classifier.save_face(classified, face_aligned, score) # lo bueno de asi es que siempre tiene una cara reciente
+            face_updated = self.classifier.save_face(classified_id, face_aligned, score) # lo bueno de asi es que siempre tiene una cara reciente
             if face_updated:
-                self.send_faceprint_event(FaceprintEvent.UPDATE, classified, FaceprintEvent.ORIGIN_ROS) # Podria hacer que en el update se mandasen tambien que fields se han cambiado...
+                self.send_faceprint_event(FaceprintEvent.UPDATE, classified_id, FaceprintEvent.ORIGIN_ROS) # Podria hacer que en el update se mandasen tambien que fields se han cambiado...
         else:
             face_updated = False
 
-        face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg = (
-            self.br.recognizer_to_msg(face_aligned, features, classified, distance, pos)
+        face_aligned_msg, features_msg, classified_name_msg, distance_msg, pos_msg = (
+            self.br.recognizer_to_msg(face_aligned, features, classified_name, distance, pos)
         )
 
         response.face_aligned = face_aligned_msg
         response.features = features_msg
-        response.classified = classified_msg
+        response.classified_id = classified_id
+        response.classified_name = classified_name_msg
         response.distance = distance_msg
         response.pos = pos_msg
         response.face_updated = face_updated 
@@ -141,20 +143,21 @@ class HumanFaceRecognizer(Node):
             result, message = -1, f"Error executing {cmd_type}: {e}"
 
         if result >= 0 and "class_name" in args: # Send faceprint event
-            cmd = "add_features" if cmd_type == "add_class" and result == 1 else cmd_type
+            cmd = "add_features" if cmd_type == "add_class" else cmd_type            
             event = self.faceprint_event_map.get(cmd)
             if event is not None:
-                self.send_faceprint_event(event, args["class_name"], origin)
+                id = message if cmd_type == "add_class" else args["class_id"]
+                self.send_faceprint_event(event, id, origin)
 
         response.result = result
         response.message = String(data=message)
 
         return response
 
-    def send_faceprint_event(self, event, name, origin):
+    def send_faceprint_event(self, event, id, origin):
         faceprint_event = FaceprintEvent()
         faceprint_event.event = event
-        faceprint_event.name = name
+        faceprint_event.id = id
         faceprint_event.origin = origin
         
         self.faceprint_event_pub.publish(faceprint_event)
@@ -164,9 +167,9 @@ class HumanFaceRecognizer(Node):
 
         if args:
             args = json.loads(args)
-            name = args["name"]
+            id = args["id"]
 
-            faceprint = self.classifier.db.get_by_name(name)
+            faceprint = self.classifier.db.get_by_id(id)
             response.text = json.dumps(faceprint)
         else:
             faceprints = self.classifier.db.get_all()
@@ -175,7 +178,7 @@ class HumanFaceRecognizer(Node):
         return response
 
     def save_data(self):
-        self.classifier.save()
+        self.classifier.db.save()
 
 def main(args=None):
     rclpy.init(args=args)

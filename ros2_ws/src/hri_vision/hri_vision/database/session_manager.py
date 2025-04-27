@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Optional
 from .system_database import SystemDatabase
 
@@ -10,21 +10,21 @@ class SessionManager:
         self.time_between_detections = time_between_detections
 
         self.actual_people = {}
-        self.active_sessions = {}  # person_name -> SessionData
+        self.active_sessions = {}  # faceprint_id -> SessionData
 
-    def process_detection(self, name: str, score_face: float, score_classification: float, face_image_base64: Optional[str] = None):
+    def process_detection(self, faceprint_id: int, score_face: float, score_classification: float, face_image_base64: Optional[str] = None):
         now = datetime.now().timestamp()
 
-        self.actual_people[name] = now
+        self.actual_people[faceprint_id] = now
 
-        if name not in self.active_sessions:
-            self.active_sessions[name] = {
-                'person_name': name,
+        if faceprint_id not in self.active_sessions:
+            self.active_sessions[faceprint_id] = {
+                'faceprint_id': faceprint_id,
                 'start_time': now,
                 'detections': []
             }
 
-        session = self.active_sessions[name]
+        session = self.active_sessions[faceprint_id]
 
         last_detection_time = self._get_last_detection_time(session)
         if (now - last_detection_time) > self.time_between_detections:
@@ -41,28 +41,28 @@ class SessionManager:
             actual_people_time[key] = datetime.now().timestamp() - value
         return actual_people_time
     
-    def get_last_seen(self, name):
-        return datetime.now().timestamp() - self.actual_people.get(name, 0)
+    def get_last_seen(self, faceprint_id):
+        return datetime.now().timestamp() - self.actual_people.get(faceprint_id, 0)
 
     def check_timeouts(self):
         now = datetime.now().timestamp()
 
         to_close = []
-        for name, session in self.active_sessions.items():
+        for faceprint_id, session in self.active_sessions.items():
             last_detection_time = self._get_last_detection_time(session, now)
             if (now - last_detection_time) > self.timeout_seconds:
-                to_close.append(name)
+                to_close.append(faceprint_id)
         
-        for name in to_close:
-            self._close_session(name)
+        for faceprint_id in to_close:
+            self._close_session(faceprint_id)
     
-    def _close_session(self, name: str):
-        session = self.active_sessions.pop(name, None)
+    def _close_session(self, faceprint_id: int):
+        session = self.active_sessions.pop(faceprint_id, None)
         if session is None:
             return
 
         session_data = {
-            'person_name': session['person_name'],
+            'faceprint_id': session['faceprint_id'],
             'start_time': session['start_time'],
             'end_time': session['detections'][-1][0],
             'detections': session['detections']

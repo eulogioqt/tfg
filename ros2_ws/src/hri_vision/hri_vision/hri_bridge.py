@@ -129,54 +129,54 @@ class HRIBridge:
 
         return positions, scores
 
-    def recognizer_to_msg(self, face_aligned, features, classified, distance, pos):
+    def recognizer_to_msg(self, face_aligned, features, classified_name, distance, pos):
         """Transforms recognizer service response to ROS2 format
 
         Args:
             face_aligned (Image): The face of the person recognized aligned horizontally
             features (float[]): Features vector
-            classified (str): The class (name) of the face recognized
+            classified_name (str): The class (name) of the face recognized
             distance (float): Score of the recognition
             pos (int): Number of the vector inside the class that has been used to classify
 
         Returns:
             face_aligned_msg (Image-ROS2): face_aligned in ROS2 format
             features_msg (float[]): features in ROS2 format
-            classified_msg (String): classified in ROS2 format
+            classified_name:msg (String): classified in ROS2 format
             distance_msg (float): distance in ROS2 format
             pos_msg (int): pos in ROS2 format
         """
 
         face_aligned_msg = self.cv2_to_imgmsg(face_aligned, "bgr8")
         features_msg = [float(feature) for feature in features]
-        classified_msg = String(data=str(classified))
+        classified_name_msg = classified_name
         distance_msg = float(distance)
         pos_msg = pos
 
-        return face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg
+        return face_aligned_msg, features_msg, classified_name_msg, distance_msg, pos_msg
 
-    def msg_to_recognizer(self, face_aligned_msg, features_msg, classified_msg, distance_msg, pos_msg):
+    def msg_to_recognizer(self, face_aligned_msg, features_msg, classified_name_msg, distance_msg, pos_msg):
         """Transforms recognizer service response to ROS2 format
 
         Args:
             face_aligned_msg (Image-ROS2): face_aligned in ROS2 format
             features_msg (float[]): features in ROS2 format
-            classified_msg (String): classified in ROS2 format
+            classified_name_msg (String): classified in ROS2 format
             distance_msg (float): distance in ROS2 format
             pos_msg (int): pos in ROS2 format
 
         Returns:
             face_aligned (Image): The face of the person recognized aligned horizontally
             features (float[]): Features vector
-            classified (str): The class (name) of the face recognized
+            classified_name (str): The class (name) of the face recognized
             distance (float): Score of the recognition
             pos (int): Number of the vector inside the class that has been used to classify
         """
 
         face_aligned = self.imgmsg_to_cv2(face_aligned_msg, "bgr8")
         features = features_msg.tolist()
-        classified = None if classified_msg.data == "None" else classified_msg.data
+        classified_name = classified_name_msg
         distance = distance_msg
         pos = pos_msg
 
-        return face_aligned, features, classified, distance, pos
+        return face_aligned, features, classified_name, distance, pos

@@ -26,7 +26,7 @@ class SystemDatabase:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 timestamp TEXT NOT NULL,
                 action TEXT NOT NULL,
-                person_name TEXT NOT NULL,
+                faceprint_id INTEGER NOT NULL,
                 origin TEXT NOT NULL
             )
         ''')
@@ -34,7 +34,7 @@ class SystemDatabase:
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS sessions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                person_name TEXT NOT NULL,
+                faceprint_id INTEGER NOT NULL,
                 start_time TEXT NOT NULL,
                 end_time TEXT
             )
@@ -55,12 +55,12 @@ class SystemDatabase:
         self.conn.commit()
 
     # ----------------- LOGS -----------------
-    def create_log(self, action, person_name, origin = CONSTANTS.ORIGIN_ROS):
+    def create_log(self, action, faceprint_id, origin = CONSTANTS.ORIGIN_ROS):
         timestamp = datetime.now().timestamp()
         self.cursor.execute('''
-            INSERT INTO logs (timestamp, action, person_name, origin)
+            INSERT INTO logs (timestamp, action, faceprint_id, origin)
             VALUES (?, ?, ?, ?)
-        ''', (timestamp, action, person_name, origin))
+        ''', (timestamp, action, faceprint_id, origin))
         self.conn.commit()
 
     def get_all_logs(self):
@@ -68,8 +68,8 @@ class SystemDatabase:
         rows = self.cursor.fetchall()
         return [dict(row) for row in rows]
 
-    def get_logs_by_name(self, person_name):
-        self.cursor.execute('SELECT * FROM logs WHERE person_name = ?', (person_name,))
+    def get_logs_by_faceprint_id(self, faceprint_id):
+        self.cursor.execute('SELECT * FROM logs WHERE faceprint_id = ?', (faceprint_id,))
         rows = self.cursor.fetchall()
         return [dict(row) for row in rows]
 
@@ -86,8 +86,8 @@ class SystemDatabase:
             result.append(session_dict)
         return result
 
-    def get_sessions_by_name(self, person_name):
-        self.cursor.execute('SELECT * FROM sessions WHERE person_name = ?', (person_name,))
+    def get_sessions_by_faceprint_id(self, faceprint_id):
+        self.cursor.execute('SELECT * FROM sessions WHERE faceprint_id = ?', (faceprint_id,))
         sessions = self.cursor.fetchall()
         result = []
         for session in sessions:
@@ -116,7 +116,7 @@ class SystemDatabase:
     def create_session_with_detections(self, session_dict):
         """
         session_dict: {
-            'person_name': str,
+            'faceprint_id': int,
             'start_time': str,
             'end_time': str,
             'detections': [
@@ -126,10 +126,10 @@ class SystemDatabase:
         }
         """
         self.cursor.execute('''
-            INSERT INTO sessions (person_name, start_time, end_time)
+            INSERT INTO sessions (faceprint_id, start_time, end_time)
             VALUES (?, ?, ?)
         ''', (
-            session_dict['person_name'],
+            session_dict['faceprint_id'],
             session_dict['start_time'],
             session_dict['end_time']
         ))

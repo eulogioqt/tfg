@@ -15,7 +15,6 @@ class ComplexClassifier:
         self.db_path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "database/faceprints_db.json"))
         self.db = FaceprintsDatabase(self.db_path)
 
-        self.load()
         self.print_people()
 
     def classify_face(self, new_features):
@@ -25,17 +24,17 @@ class ComplexClassifier:
             new_features (Array: float): Feature vector.
         
         Returns:
-            closest_class (str): The name of the closest class.
+            closest_class_id (str): The id of the closest class.
             closes_distance (float): The normalized cosine distance to the closest_class.
             position (int): The position of the vector in the array of vectors of the class that
                 was the closest to the given vector.
         '''
 
-        closest_class = None
+        closest_class_id = None
         closest_distance = 0
         position = 0
         for faceprint in self.db.get_all():
-            class_name = faceprint["name"]
+            class_id = faceprint["id"]
             feature_list = faceprint["features"]
 
             for i in range(0, len(feature_list)):
@@ -43,21 +42,21 @@ class ComplexClassifier:
 
                 if distance > closest_distance:
                     closest_distance = distance
-                    closest_class = class_name
+                    closest_class_id = class_id
                     position = i
 
-        return closest_class, closest_distance, position
+        return closest_class_id, closest_distance, position
 
-    def refine_class(self, class_name, features, position):
+    def refine_class(self, class_id, features, position):
         '''Makes a certain feature vector more precise by averaging with a new feature vector.
 
         Args:
-            class_name (str): The class.
+            class_id (str): The class id.
             features (Array: float): The new feature vector.
             position (int): The position of the known feature vector we want to make more precise.
         '''
 
-        faceprint = self.db.get_by_name(class_name)
+        faceprint = self.db.get_by_id(class_id)
         
         new_size = faceprint["size"][position] + 1
         faceprint["size"][position] = new_size
@@ -65,33 +64,33 @@ class ComplexClassifier:
         faceprint["features"][position] = [(x * (new_size - 1) + y) / new_size for x, y in 
                                              zip(faceprint["features"][position], features)]
         
-        self.db.update(class_name, faceprint)
+        self.db.update(class_id, faceprint)
 
         result = 1
-        message = "La clase " + class_name + " ha sido refinada"
+        message = "La clase con id " + class_id + " ha sido refinada"
 
         return result, message
 
-    def add_features(self, class_name, features):
+    def add_features(self, class_id, features):
         '''Adds a new feature vector to the array of vectors that describes a class.
         
         Args:
-            class_name (str): The class.
+            class_id (str): The class id.
             features (Array: float): The new feature vector.
         '''
         
-        faceprint = self.db.get_by_name(class_name)
+        faceprint = self.db.get_by_id(class_id)
 
         faceprint["features"].append(features)
         faceprint["size"].append(1)
 
-        self.db.update(class_name, faceprint)
+        self.db.update(class_id, faceprint)
         
         result = 1
-        message = ("La clase " + class_name + " ahora tiene " + 
+        message = ("La clase con id " + class_id + " ahora tiene " + 
             str(len(faceprint["features"])) + " vectores de características independientes.")
 
-        self.save()
+        self.db.save()
         return result, message
 
     def add_class(self, class_name, features, face, score):
@@ -104,74 +103,55 @@ class ComplexClassifier:
             score (float): Score of the detection
         '''
 
-        already_known = self.db.add(class_name, features, face, score) is None
+        faceprint = self.db.add(class_name, features, face, score)
 
-        if already_known:
-            _, message = self.add_features(class_name, features)
-        else:
-            message = "Nueva clase aprendida: " + class_name
+        result = 1
+        message = faceprint["id"]
 
-        result = int(already_known)
-
-        self.save()
+        self.db.save()
         return result, message
 
-    def rename_class(self, class_name, new_name):
+    def rename_class(self, class_id, new_name):
         '''Renames a class.
 
         Args:
-            class_name (str): The actual class.
+            class_id (str): The class id.
             new_name (str): The new class name.
         '''
 
-        all_names = self.db.get_all_names()
-        if class_name == new_name:
-            result = 1
-            message = "Has intentado renombrar con el mismo nombre, no se ha cambiado nada"
-        elif class_name not in all_names:
-            result = 0 
-            message = "La clase " + class_name + " no existe."
-        elif new_name in all_names:
-            result = 0 
-            message = "La clase " + new_name + " ya existe."
-        else:
-            self.db.update(class_name, { "name": new_name })
-        
-            result = 1
-            message = "La clase " + class_name + " ha sido renombrada a " + new_name
+        self.db.update(class_id, { "name": new_name })
+    
+        result = 1
+        message = "La clase con id " + class_id + " ha sido renombrada a " + new_name
 
-        self.save()
+        self.db.save()
         return result, message
 
-    def delete_class(self, class_name):
+    def delete_class(self, class_id):
         '''Removes a class.
         
         Args:
-            class_name (str): The class.
+            class_id (str): The class id.
         '''
-        
-        if class_name in self.db.get_all_names():
-            self.db.remove(class_name)
+    
+        self.db.remove(class_id)
 
-            result = 1
-            message = "La clase " + class_name + " ha sido eliminada correctamente"
-        else:
-            result = -1
-            message = "La clase " + class_name + " no existe"
+        result = 1
+        message = "La clase con id " + class_id + " ha sido eliminada correctamente"
 
-        self.save()
+        self.db.save()
         return result, message
     
-    def save_face(self, class_name, face, face_score):
+    def save_face(self, class_id, face, face_score):
         '''Saves face image as a representation of the class
 
         Args:
-            class_name (str): The class.
+            class_id (str): The class id.
             face (cv2-Image): Cropped face image.
             face_score (float): Score of the detection.
         '''
 
-        faceprint = self.db.get_by_name(class_name)
+        faceprint = self.db.get_by_id(class_id)
         is_best_face = faceprint and face_score > faceprint.get("face_score", 0)
         
         if is_best_face:
@@ -182,37 +162,18 @@ class ComplexClassifier:
             _, jpeg = cv2.imencode('.jpg', resized, encode_param)
 
             face_base64 = base64.b64encode(jpeg.tobytes()).decode('utf-8')
-            self.db.update(class_name, { 
+            self.db.update(class_id, { 
                 "face": face_base64, 
                 "face_score": face_score 
             })
         
-            self.save()
+            self.db.save()
             
         return is_best_face
-
-    def save(self):
-        '''Saves the learned data to a file.'''
-        
-        self.db.save()
-
-    def load(self):
-        '''Loads the learned data from a file.'''
-        
-        self.db.load()
-
-    def get_people(self):
-        '''Get all people names.
-        
-        Returns:
-            str: JSON Array with all people names.
-        '''
-
-        return json.dumps(self.db.get_all_names())
     
     def print_people(self):
         '''Prints all known people'''
 
         print("Known people:")
-        for name in self.db.get_all_names():
-            print(f"- {name}")
+        for faceprint in self.db.get_all():
+            print(f"- [{faceprint['id']}] {faceprint['name']}")
