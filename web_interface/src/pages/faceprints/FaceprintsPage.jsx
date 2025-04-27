@@ -1,27 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
-import { useAPI } from "../../contexts/APIContext";
-import { useEventBus } from "../../contexts/EventBusContext";
-import { useToast } from "../../contexts/ToastContext";
-import { useLoadingScreen } from "../../components/LoadingScreen";
+import { useFaceprints } from "../../contexts/FaceprintsContext";
 
-import { FACEPRINT_EVENT } from "../../contexts/WebSocketContext";
 import NewFaceprintModal from "./components/NewFaceprintModal";
-import ActionModal from "../../components/ActionModal";
 import ConfirmDeleteFaceModal from "./components/ConfirmDeleteFaceModal";
 
-// cambiar el borrar por modal
-// darle una vuelta a lo de ORIGIN_WEB y de paso ponerlo con constantes y no con cosas de los mensajes de ros
-// el problema es que si hay dos clientes conectados y uno borra una cara, a los otros clientes no les va a salir
-// por lo de ros noseque... Quiza habría que guardar el origen para que tenga la ip y el puerto o algo asi...
 const FaceprintsPage = () => {
-    const { showToast } = useToast();
-    const { faceprints, isResponseOk } = useAPI();
-    const { subscribe } = useEventBus();
-    const { withLoading } = useLoadingScreen();
+    const {
+        doAddFaceprint,
+        doUpdateFaceprint,
+        doDeleteFaceprint,
+        fetchFaceprintsData,
+        loadingFaceprints,
+        faceprintsData,
+    } = useFaceprints();
 
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [editingName, setEditingName] = useState(null);
     const [newName, setNewName] = useState("");
 
@@ -31,79 +24,16 @@ const FaceprintsPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const perPage = 5;
 
-    const deleteFaceprint = (name) => setData((prev) => prev.filter((item) => item.name !== name));
-    const addFaceprint = (fc) => setData((prev) => [...prev, fc]);
-    const updateFaceprint = (name, fc) => setData((prev) => prev.map((item) => (item.name === name ? fc : item)));
-
-    const fetchData = async () => {
-        setLoading(true);
-
-        const response = await faceprints.getAll();
-        if (isResponseOk(response)) {
-            setData(response.data);
-        } else {
-            showToast("Error", "No se han podido cargar los datos", "red");
-        }
-
-        setLoading(false);
-    };
-
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-    useEffect(() => {
-        const processEvent = async (e) => {
-            if (e.event === FACEPRINT_EVENT.CREATE || e.event === FACEPRINT_EVENT.UPDATE) {
-                const response = await faceprints.getById(e.name);
-                if (isResponseOk(response)) {
-                    if (e.event === FACEPRINT_EVENT.CREATE) {
-                        addFaceprint(response.data);
-                        showToast("Nueva persona aprendida", "Se ha aprendido a la persona " + e.name, "green");
-                    } else {
-                        updateFaceprint(e.name, response.data);
-                    }
-                } else {
-                    showToast("Error", response.data.detail, "red");
-                }
-            } else if (e.event === FACEPRINT_EVENT.DELETE) {
-                deleteFaceprint(e.name);
-                showToast("Persona eliminada", "Se ha eliminado a la persona " + e.name, "green");
-            }
-        };
-
-        const unsubscribe = subscribe("ROS_MESSAGE_FACEPRINT_EVENT", processEvent);
-        return () => unsubscribe();
-    }, []);
-
-    const handleDelete = async (name) => {
-        const response = await withLoading(() => faceprints.delete(name));
-        if (isResponseOk(response)) {
-            deleteFaceprint(name);
-            showToast("Persona eliminada", "Has eliminado a la persona " + name + " satisfactoriamente", "green");
-        } else {
-            showToast("Error", response.data.detail, "red");
-        }
-    };
-
+    const handleDelete = async (name) => await doDeleteFaceprint(name);
     const handleUpdate = async (oldName, newName) => {
         if (newName.trim() === "") return;
-
         if (newName.trim() !== oldName.trim()) {
-            const response = await withLoading(() => faceprints.update(oldName, { name: newName }));
-
-            if (isResponseOk(response)) {
-                updateFaceprint(oldName, response.data);
-                showToast("Persona editada", "Has editado a la persona " + newName + " satisfactoriamente", "green");
-            } else {
-                showToast("Error", response.data.detail, "red");
-            }
+            await doUpdateFaceprint(oldName, newName);
         }
-
         setEditingName(null);
     };
 
-    const sortedData = [...data].sort((a, b) => a.learning_date - b.learning_date);
+    const sortedData = [...faceprintsData].sort((a, b) => a.learning_date - b.learning_date);
     const totalPages = Math.ceil(sortedData.length / perPage);
     const pageData = sortedData.slice((currentPage - 1) * perPage, currentPage * perPage);
 
@@ -112,7 +42,7 @@ const FaceprintsPage = () => {
             <NewFaceprintModal
                 isOpen={isOpenFaceModal}
                 handleClose={() => setIsOpenFaceModal(false)}
-                addFaceprint={addFaceprint}
+                doAddFaceprint={doAddFaceprint}
             />
 
             <ConfirmDeleteFaceModal
@@ -128,13 +58,13 @@ const FaceprintsPage = () => {
                         <button className="btn btn-primary me-2" onClick={() => setIsOpenFaceModal(true)}>
                             <i className="bi bi-database-add me-2" /> Añadir cara
                         </button>
-                        <button className="btn btn-outline-secondary" onClick={fetchData}>
+                        <button className="btn btn-outline-secondary" onClick={fetchFaceprintsData}>
                             <i className="bi bi-arrow-clockwise me-2" /> Recargar
                         </button>
                     </div>
                 </div>
 
-                {loading ? (
+                {loadingFaceprints ? (
                     <div className="text-center py-5">
                         <div className="spinner-border text-primary" role="status" />
                     </div>

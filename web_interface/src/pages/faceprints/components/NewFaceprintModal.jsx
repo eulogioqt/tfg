@@ -3,13 +3,9 @@ import React, { useRef, useState } from "react";
 import SimpleModal from "../../../components/SimpleModal";
 
 import { useToast } from "../../../contexts/ToastContext";
-import { useAPI } from "../../../contexts/APIContext";
-import { useLoadingScreen } from "../../../components/LoadingScreen";
 
-const NewFaceprintModal = ({ handleClose, isOpen, addFaceprint }) => {
+const NewFaceprintModal = ({ handleClose, isOpen, doAddFaceprint }) => {
     const { showToast } = useToast();
-    const { faceprints } = useAPI();
-    const { withLoading } = useLoadingScreen();
 
     const [selectedImage, setSelectedImage] = useState(undefined);
     const [name, setName] = useState("");
@@ -50,37 +46,12 @@ const NewFaceprintModal = ({ handleClose, isOpen, addFaceprint }) => {
         try {
             const base64Image = await convertToBase64(selectedImage);
 
-            const response = await withLoading(() =>
-                faceprints.create({
-                    name: trimmedName,
-                    image: base64Image,
-                })
-            );
+            await doAddFaceprint(trimmedName, base64Image);
+            handleClose();
 
-            if (response.status >= 200 && response.status < 300) {
-                if (response.status === 208)
-                    showToast(
-                        "Persona conocida",
-                        `Ya te conocía ${response.data.name}, pero he reforzado mi aprendizaje.`,
-                        "blue"
-                    );
-                else
-                    showToast(
-                        "Éxito",
-                        `La cara ha sido procesada y se ha aprendido a ${response.data.name} correctamente.`,
-                        "green"
-                    );
-
-                addFaceprint(response.data);
-
-                handleClose();
-                setName("");
-                setSelectedImage(undefined);
-                if (fileInputRef.current) fileInputRef.current.value = null;
-            } else {
-                const errorText = (response && response.data?.detail) || "Error inesperado";
-                showToast("Error", errorText, "red");
-            }
+            setName("");
+            setSelectedImage(undefined);
+            if (fileInputRef.current) fileInputRef.current.value = null;
         } catch (error) {
             const errorMsg = error?.response?.data?.detail || error?.message || "Error inesperado al subir la cara.";
             showToast("Error", errorMsg, "red");
