@@ -4,9 +4,10 @@ from .system_database import SystemDatabase
 
 
 class SessionManager:
-    def __init__(self, db: SystemDatabase, timeout_seconds: int = 5):
+    def __init__(self, db: SystemDatabase, timeout_seconds: int = 5, time_between_detections: int = 1):
         self.db = db
         self.timeout_seconds = timeout_seconds
+        self.time_between_detections = time_between_detections
 
         self.actual_people = {}
         self.active_sessions = {}  # person_name -> SessionData
@@ -20,20 +21,19 @@ class SessionManager:
             self.active_sessions[name] = {
                 'person_name': name,
                 'start_time': now,
-                'last_detection_time': now,
                 'detections': []
             }
 
         session = self.active_sessions[name]
-        session['detections'].append([
-            now,
-            score_face,
-            score_classification,
-            face_image_base64 or ""
-        ])
 
-        session['last_detection_time'] = now
-        self._check_timeouts()
+        last_detection_time = self._get_last_detection_time(session)
+        if (now - last_detection_time) > self.time_between_detections:
+            session['detections'].append([
+                now,
+                score_face,
+                score_classification,
+                face_image_base64 or ""
+            ])
 
     def get_all_last_seen(self):
         actual_people_time = {}
@@ -44,17 +44,14 @@ class SessionManager:
     def get_last_seen(self, name):
         return datetime.now().timestamp() - self.actual_people.get(name, 0)
 
-    def _check_timeouts(self):
+    def check_timeouts(self):
         now = datetime.now().timestamp()
-        to_close = []
 
         for name, session in self.active_sessions.items():
-            if (now - session['last_detection_time']) > self.timeout_seconds:
-                to_close.append(name)
-
-        for name in to_close:
-            self._close_session(name)
-
+            last_detection_time = self._get_last_detection_time(session, now)
+            if (now - last_detection_time) > self.timeout_seconds:
+                self._close_session(name)
+    
     def _close_session(self, name: str):
         session = self.active_sessions.pop(name, None)
         if session is None:
@@ -63,9 +60,11 @@ class SessionManager:
         session_data = {
             'person_name': session['person_name'],
             'start_time': session['start_time'],
-            'end_time': datetime.now().timestamp(),
+            'end_time': session['detections'][-1][0],
             'detections': session['detections']
         }
 
         self.db.create_session_with_detections(session_data)
 
+    def _get_last_detection_time(session, default=0):
+        return default if len(session['detections']) == 0 else session['detections'][-1][0]

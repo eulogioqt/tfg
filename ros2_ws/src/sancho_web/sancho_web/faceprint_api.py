@@ -3,7 +3,7 @@ import json
 from std_msgs.msg import String
 
 from .interfaces import FaceprintAPIInterface, HTTPException, JSONResponse
-from hri_vision.hri_vision.database.system_database import CONSTANTS
+from hri_vision.database.system_database import CONSTANTS
 
 
 class FaceprintAPI(FaceprintAPIInterface):

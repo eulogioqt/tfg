@@ -84,6 +84,7 @@ class HRILogic():
         self.sessions = SessionManager(self.db, timeout_seconds=10)
 
         self.node = HRILogicNode(self)
+        self.node.create_timer(10, self.sessions.check_timeouts)
     
     def spin(self):
         """Spins the logic node searching for new frames. If one is detected, process the frame."""
