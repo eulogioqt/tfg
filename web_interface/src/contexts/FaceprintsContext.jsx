@@ -78,18 +78,11 @@ export const FaceprintsProvider = ({ children }) => {
 
         if (isResponseOk(response)) {
             addFaceprint(response.data);
-            if (response.status === 208)
-                showToast(
-                    "Persona conocida",
-                    `Ya te conocía ${response.data.name}, pero he reforzado mi aprendizaje.`,
-                    "blue"
-                );
-            else
-                showToast(
-                    "Éxito",
-                    `La cara ha sido procesada y se ha aprendido a ${response.data.name} correctamente.`,
-                    "green"
-                );
+            showToast(
+                "Éxito",
+                `La cara ha sido procesada y se ha aprendido a ${response.data.name} correctamente.`,
+                "green"
+            );
         } else {
             showToast("Error", response.data.detail, "red");
         }

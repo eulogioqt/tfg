@@ -70,10 +70,9 @@ class FaceprintAPI(FaceprintAPIInterface):
                         updated_item_json = self.node.get_faceprint_request(json.dumps({ "id": classified_id }))
                         updated_item = json.loads(updated_item_json)
 
-                        action = CONSTANTS.ACTION_ADD_CLASS
-                        self.node.create_log_request(action, name)
+                        self.node.create_log_request(CONSTANTS.ACTION_ADD_CLASS, classified_id)
 
-                        return JSONResponse(updated_item)
+                        return JSONResponse(content=updated_item)
                     
                 elif distance < MIDDLE_BOUND:
                     return HTTPException(detail=f"Nunca pensé que pasase esto MIDDLE BOUND.")
@@ -97,7 +96,7 @@ class FaceprintAPI(FaceprintAPIInterface):
         if result <= 0:
             return HTTPException(detail=message)
         
-        self.node.create_log_request(CONSTANTS.ACTION_UPDATE_FACE, id)
+        self.node.create_log_request(CONSTANTS.ACTION_RENAME_CLASS, id)
 
         updated_item_json = self.node.get_faceprint_request(json.dumps({ "id": id }))
         updated_item = json.loads(updated_item_json)

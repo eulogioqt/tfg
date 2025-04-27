@@ -40,7 +40,7 @@ async def get_logs(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al buscar los logs: {str(e)}")
 
-@router.get("/{name}", tags=["Logs CRUD endpoints"], response_model=Log)
+@router.get("/{faceprint_id}", tags=["Logs CRUD endpoints"], response_model=Log)
 async def get_logs_by_faceprint_id(
     request: Request,
     faceprint_id: str = Path(description="Id de la persona"),

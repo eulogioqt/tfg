@@ -40,7 +40,7 @@ async def get_sessions(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al buscar las sesiones: {str(e)}")
 
-@router.get("/{name}", tags=["Sessions CRUD endpoints"], response_model=Session)
+@router.get("/{faceprint_id}", tags=["Sessions CRUD endpoints"], response_model=Session)
 async def get_sessions_by_faceprint_id(
     request: Request,
     faceprint_id: str = Path(description="id de la persona"),

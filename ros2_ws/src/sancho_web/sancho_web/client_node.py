@@ -78,10 +78,10 @@ class ClientNode(Node):
 
         return result_training.result, result_training.message.data
 
-    def create_log_request(self, action, person_name):
+    def create_log_request(self, action, faceprint_id):
         create_log_request = CreateLog.Request()
         create_log_request.action = action
-        create_log_request.person_name = person_name
+        create_log_request.faceprint_id = faceprint_id
         create_log_request.origin = CONSTANTS.ORIGIN_WEB
 
         future_create_log = self.create_log_client.call_async(create_log_request)
