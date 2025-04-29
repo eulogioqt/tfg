@@ -18,6 +18,7 @@ export const FaceprintsProvider = ({ children }) => {
     const [faceprintsData, setFaceprints] = useState([]);
     const [loadingFaceprints, setLoadingFaceprints] = useState(true);
 
+    const getFaceprint = (id) => faceprintsData.find((item) => item.id == id);
     const addFaceprint = (fc) => setFaceprints((prev) => [...prev, fc]);
     const updateFaceprint = (id, fc) => setFaceprints((prev) => prev.map((item) => (item.id === id ? fc : item)));
     const deleteFaceprint = (id) => setFaceprints((prev) => prev.filter((item) => item.id !== id));
@@ -114,9 +115,12 @@ export const FaceprintsProvider = ({ children }) => {
     return (
         <FaceprintsContext.Provider
             value={{
+                getFaceprint,
+
                 doAddFaceprint,
                 doUpdateFaceprint,
                 doDeleteFaceprint,
+                
                 fetchFaceprintsData,
 
                 loadingFaceprints,

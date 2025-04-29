@@ -12,7 +12,7 @@ const FaceprintItem = ({ faceprint }) => {
     }).format(learning_date);
 
     return (
-        <div className="p-0 col-6 col-md-4 col-lg-3 mb-5" onClick={() => navigate(`/faceprints/${faceprint.id}`)}>
+        <div className="p-0 col-6 col-md-4 col-lg-3 mb-5 " onClick={() => navigate(`/faceprints/${faceprint.id}`)}>
             <div className="d-flex clickable clickable-1 flex-column justify-content-center align-items-center">
                     <img
                         src={`data:image/jpg;base64,${faceprint.face}`}
