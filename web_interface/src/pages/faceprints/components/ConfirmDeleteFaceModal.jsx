@@ -14,7 +14,11 @@ const ConfirmDeleteFaceModal = ({ faceprint, isOpen, handleClose, action }) => {
             buttonColor={"danger"}
         >
             <span>
-                ¿Estás seguro de que quieres eliminar el rostro de <b>{faceprint.name}</b>?
+                ¿Estás seguro de que quieres eliminar el rostro de{" "}
+                <b>
+                    {faceprint.name} (ID {faceprint.id})
+                </b>
+                ?
             </span>
         </ActionModal>
     );

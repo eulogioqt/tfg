@@ -7,6 +7,7 @@ import { useFaceprints } from "../../contexts/FaceprintsContext";
 import { useAPI } from "../../contexts/APIContext";
 import { useToast } from "../../contexts/ToastContext";
 import SessionItem from "./components/SessionItem";
+import SessionList from "./components/SessionList";
 
 const FaceprintDetailPage = () => {
     const { id } = useParams();
@@ -15,7 +16,7 @@ const FaceprintDetailPage = () => {
     const { getFaceprint, doUpdateFaceprint, doDeleteFaceprint } = useFaceprints();
     const { faceprints, sessions, isResponseOk } = useAPI();
 
-    const [sessionList, setSessionList] = useState([]);
+    const [sessionList, setSessionList] = useState(undefined);
     const [faceprint, setFaceprint] = useState(undefined);
     const [isDeleteModalOpen, setisDeleteModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -35,15 +36,15 @@ const FaceprintDetailPage = () => {
                 }
             }
 
-            const sessionResponse = await sessions.getAll(`?faceprint_id=${faceprint.id}`)
+            setFaceprint(faceprint);
+            setNewName(faceprint.name);
+
+            const sessionResponse = await sessions.getAll(`?faceprint_id=${faceprint.id}`);
             if (isResponseOk(sessionResponse)) {
                 setSessionList(sessionResponse.data);
             } else {
-                showToast("Error al obtener sesiones", sessionResponse.data.detail, "red")
+                showToast("Error al obtener sesiones", sessionResponse.data.detail, "red");
             }
-
-            setFaceprint(faceprint);
-            setNewName(faceprint.name);
         };
 
         getActualFaceprint();
@@ -52,7 +53,7 @@ const FaceprintDetailPage = () => {
     const handleDelete = async (id) => {
         const response = await doDeleteFaceprint(id);
         if (isResponseOk(response)) navigate("/faceprints");
-    }
+    };
 
     const handleUpdate = async (id, oldName, newName) => {
         if (newName.trim() === "") return;
@@ -71,10 +72,13 @@ const FaceprintDetailPage = () => {
         );
     }
 
-    const learning_date = new Date(faceprint.learning_date * 1000)
-    const formattedDateStr = new Intl.DateTimeFormat('es-ES', {
-        hour: '2-digit', minute: '2-digit',
-        day: 'numeric', month: 'long', year: 'numeric'
+    const learning_date = new Date(faceprint.learning_date * 1000);
+    const formattedDateStr = new Intl.DateTimeFormat("es-ES", {
+        hour: "2-digit",
+        minute: "2-digit",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
     }).format(learning_date);
 
     return (
@@ -110,10 +114,16 @@ const FaceprintDetailPage = () => {
                                         value={newName}
                                         onChange={(e) => setNewName(e.target.value)}
                                     />
-                                    <button className="btn btn-success btn-sm me-2" onClick={() => handleUpdate(faceprint.id, faceprint.name, newName)}>
+                                    <button
+                                        className="btn btn-success btn-sm me-2"
+                                        onClick={() => handleUpdate(faceprint.id, faceprint.name, newName)}
+                                    >
                                         Guardar
                                     </button>
-                                    <button className="btn btn-outline-secondary btn-sm" onClick={() => setIsEditing(false)}>
+                                    <button
+                                        className="btn btn-outline-secondary btn-sm"
+                                        onClick={() => setIsEditing(false)}
+                                    >
                                         Cancelar
                                     </button>
                                 </>
@@ -169,9 +179,14 @@ const FaceprintDetailPage = () => {
 
                 <div className="mt-5">
                     <h4 className="mb-3">Actividad</h4>
-                    {sessionList.map((session) => (
-                        <SessionItem key={session.id} session={session}/>
-                    ))}
+
+                    {!sessionList ? (
+                        <div className="text-center py-5">
+                            <div className="spinner-border text-primary" role="status" />
+                        </div>
+                    ) : (
+                        <SessionList faceprint={faceprint} sessions={sessionList} />
+                    )}
                 </div>
             </div>
         </>

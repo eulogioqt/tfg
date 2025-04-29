@@ -3,7 +3,11 @@ import React from "react";
 const SessionItem = ({ session }) => {
     const formatDateTime = (timestamp) => {
         const date = new Date(timestamp * 1000);
-        return date.toLocaleDateString() + " " + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        return (
+            date.toLocaleDateString() +
+            " " +
+            date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+        );
     };
 
     const formatDuration = (start, end) => {
@@ -19,24 +23,25 @@ const SessionItem = ({ session }) => {
     };
 
     return (
-        <div className="card shadow-sm p-3 mb-3">
+        <div className="card shadow-sm p-3 mb-2">
             <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
-                <div>
-                    <div className="mb-1">
+                <div className="text-muted small">
+                    <div>
                         <strong>Inicio:</strong> {formatDateTime(session.start_time)}
                     </div>
-                    <div className="mb-1">
+                    <div>
                         <strong>Fin:</strong> {formatDateTime(session.end_time)}
                     </div>
-                    <div className="small text-muted">ID sesión: {session.id}</div>
                 </div>
 
-                <div className="text-md-end mt-3 mt-md-0">
-                    <div className="mb-1">
-                        <strong>Duración:</strong> {formatDuration(session.start_time, session.end_time)}
-                    </div>
-                    <div>
-                        <strong>Detecciones:</strong> {session.detections.length}
+                <div className="text-md-end">
+                    <div className="text-muted small">
+                        <div>
+                            <strong>Duración:</strong> {formatDuration(session.start_time, session.end_time)}
+                        </div>
+                        <div>
+                            <strong>Detecciones:</strong> {session.detections.length}
+                        </div>
                     </div>
                 </div>
             </div>

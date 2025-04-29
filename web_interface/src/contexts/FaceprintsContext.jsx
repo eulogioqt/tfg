@@ -58,7 +58,7 @@ export const FaceprintsProvider = ({ children }) => {
                 }
             } else if (e.event === FACEPRINT_EVENT.DELETE) {
                 const faceprint = faceprintsData.find((item) => item.id == e.id);
-                const name = faceprint ? faceprint.name : `con id ${e.id}`;
+                const name = faceprint ? `${faceprint.name} (ID ${faceprint.id})` : `con id ${e.id}`;
 
                 deleteFaceprint(e.id);
                 showToast("Persona eliminada", "Se ha eliminado a la persona " + name, "green");
@@ -107,7 +107,7 @@ export const FaceprintsProvider = ({ children }) => {
         const response = await withLoading(() => faceprints.delete(id));
         if (isResponseOk(response)) {
             const faceprint = faceprintsData.find((item) => item.id == id);
-            const name = faceprint ? faceprint.name : `con id ${id}`;
+            const name = faceprint ? `${faceprint.name} (ID ${faceprint.id})` : `con id ${id}`;
 
             deleteFaceprint(id);
             showToast("Persona eliminada", "Has eliminado a la persona " + name + " satisfactoriamente", "green");
