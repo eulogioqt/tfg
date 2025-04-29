@@ -87,6 +87,8 @@ export const FaceprintsProvider = ({ children }) => {
         } else {
             showToast("Error", response.data.detail, "red");
         }
+
+        return response;
     };
 
     const doUpdateFaceprint = async (id, newName) => {

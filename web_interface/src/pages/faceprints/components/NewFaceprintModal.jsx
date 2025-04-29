@@ -4,10 +4,15 @@ import SimpleModal from "../../../components/SimpleModal";
 
 import { useToast } from "../../../contexts/ToastContext";
 import { useCamera } from "../../../hooks/useCamera";
+import { useNavigate } from "react-router-dom";
+import { useAPI } from "../../../contexts/APIContext";
 
 const NewFaceprintModal = ({ handleClose, isOpen, doAddFaceprint }) => {
     const { videoRef, isActive: usingCamera, startCamera, stopCamera, takePhoto } = useCamera();
     const { showToast } = useToast();
+    const { isResponseOk } = useAPI();
+
+    const navigate = useNavigate();
 
     const [name, setName] = useState("");
     const [selectedImage, setSelectedImage] = useState(undefined);
@@ -56,8 +61,10 @@ const NewFaceprintModal = ({ handleClose, isOpen, doAddFaceprint }) => {
 
         try {
             const base64Image = await convertToBase64(selectedImage);
-            await doAddFaceprint(trimmedName, base64Image);
+            const response = await doAddFaceprint(trimmedName, base64Image);
+
             cleanAndClose();
+            if (isResponseOk(response)) navigate(`/faceprints/${response.data.id}`)
         } catch (error) {
             const errorMsg = error?.response?.data?.detail || error?.message || "Error inesperado al subir la cara.";
             showToast("Error", errorMsg, "red");

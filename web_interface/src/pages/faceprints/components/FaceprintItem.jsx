@@ -17,7 +17,7 @@ const FaceprintItem = ({ faceprint }) => {
                     <img
                         src={`data:image/jpg;base64,${faceprint.face}`}
                         alt={faceprint.name}
-                        className="rounded"
+                        className="rounded mb-2"
                         width={196}
                         height={196}
                     />

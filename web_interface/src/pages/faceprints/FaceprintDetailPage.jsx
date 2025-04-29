@@ -140,7 +140,7 @@ const FaceprintDetailPage = () => {
                             </div>
                             <div className="col-md-6">
                                 <div className="bg-secondary-subtle p-3 rounded">
-                                    <h6 className="text-muted mb-1">Confianza de detección</h6>
+                                    <h6 className="text-muted mb-1">Puntuación de la imagen</h6>
                                     <p className="fw-bold mb-0">{faceprint.face_score.toFixed(2)}</p>
                                 </div>
                             </div>
