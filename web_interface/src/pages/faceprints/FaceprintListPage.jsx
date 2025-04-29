@@ -3,36 +3,20 @@ import React, { useState } from "react";
 import { useFaceprints } from "../../contexts/FaceprintsContext";
 
 import NewFaceprintModal from "./components/NewFaceprintModal";
-import ConfirmDeleteFaceModal from "./components/ConfirmDeleteFaceModal";
 import FaceprintItem from "./components/FaceprintItem";
 
 const FaceprintListPage = () => {
     const {
         doAddFaceprint,
-        doUpdateFaceprint,
-        doDeleteFaceprint,
         fetchFaceprintsData,
         loadingFaceprints,
         faceprintsData,
     } = useFaceprints();
 
-    const [editingId, setEditingId] = useState(null);
-    const [newName, setNewName] = useState("");
-
     const [isOpenFaceModal, setIsOpenFaceModal] = useState(false);
-    const [deleteModalId, setDeleteModalId] = useState(undefined);
 
     const [currentPage, setCurrentPage] = useState(1);
     const perPage = 12;
-
-    const handleDelete = async (id) => await doDeleteFaceprint(id);
-    const handleUpdate = async (id, oldName, newName) => {
-        if (newName.trim() === "") return;
-        if (newName.trim() !== oldName.trim()) {
-            await doUpdateFaceprint(id, newName);
-        }
-        setEditingId(null);
-    };
 
     const sortedData = [...faceprintsData].sort((a, b) => a.learning_date - b.learning_date);
     const totalPages = Math.ceil(sortedData.length / perPage);
@@ -44,12 +28,6 @@ const FaceprintListPage = () => {
                 isOpen={isOpenFaceModal}
                 handleClose={() => setIsOpenFaceModal(false)}
                 doAddFaceprint={doAddFaceprint}
-            />
-
-            <ConfirmDeleteFaceModal
-                id={deleteModalId}
-                handleClose={() => setDeleteModalId(undefined)}
-                action={() => handleDelete(deleteModalId)}
             />
 
             <div className="container mt-5">

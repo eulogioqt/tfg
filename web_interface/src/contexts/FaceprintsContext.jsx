@@ -97,6 +97,8 @@ export const FaceprintsProvider = ({ children }) => {
         } else {
             showToast("Error", response.data.detail, "red");
         }
+
+        return response;
     };
 
     const doDeleteFaceprint = async (id) => {
@@ -110,6 +112,8 @@ export const FaceprintsProvider = ({ children }) => {
         } else {
             showToast("Error", response.data.detail, "red");
         }
+
+        return response;
     };
 
     return (
@@ -120,7 +124,7 @@ export const FaceprintsProvider = ({ children }) => {
                 doAddFaceprint,
                 doUpdateFaceprint,
                 doDeleteFaceprint,
-                
+
                 fetchFaceprintsData,
 
                 loadingFaceprints,
