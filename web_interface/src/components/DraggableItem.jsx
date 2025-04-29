@@ -4,7 +4,6 @@ import { useWindowSize, BREAKPOINTS } from "../hooks/useWindowSize";
 const DraggableItem = ({ children, childrenWidth, childrenHeight }) => {
     const { width, height } = useWindowSize();
 
-    const [showClose, setShowClose] = useState(false);
     const [isClosed, setIsClosed] = useState(false);
     const [position, setPosition] = useState({ x: 32, y: 32 });
 
@@ -62,8 +61,6 @@ const DraggableItem = ({ children, childrenWidth, childrenHeight }) => {
         window.addEventListener("mousemove", handleMouseMove);
         window.addEventListener("mouseup", handleMouseUp);
 
-        setTimeout(() => setShowClose(true), 1000);
-
         return () => {
             window.removeEventListener("mousemove", handleMouseMove);
             window.removeEventListener("mouseup", handleMouseUp);
@@ -82,16 +79,17 @@ const DraggableItem = ({ children, childrenWidth, childrenHeight }) => {
                         top: position.y,
                         left: position.x,
                         cursor: draggingRef.current ? "grabbing" : "move",
-                        userSelect: "none"
+                        userSelect: "none",
                     }}
-                >   
-                    <div 
-                        style={{ 
-                            position: "fixed", 
-                            top: (position.y + 5),
-                            left: (position.x + childrenWidth - 30)}
-                    }>
-                        {showClose && <button
+                >
+                    <div
+                        style={{
+                            position: "fixed",
+                            top: position.y + 5,
+                            left: position.x + (childrenWidth ? childrenWidth : 0) - 30,
+                        }}
+                    >
+                        <button
                             className="btn btn-danger p-0 m-0"
                             onClick={() => setIsClosed(true)}
                             style={{
@@ -103,7 +101,7 @@ const DraggableItem = ({ children, childrenWidth, childrenHeight }) => {
                             }}
                         >
                             <i className="bi bi-x" style={{ color: "white", fontSize: 20 }}></i>
-                        </button>}
+                        </button>
                     </div>
 
                     {children}
