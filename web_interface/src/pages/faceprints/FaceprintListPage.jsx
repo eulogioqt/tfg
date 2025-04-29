@@ -6,7 +6,7 @@ import NewFaceprintModal from "./components/NewFaceprintModal";
 import ConfirmDeleteFaceModal from "./components/ConfirmDeleteFaceModal";
 import FaceprintItem from "./components/FaceprintItem";
 
-const FaceprintsPage = () => {
+const FaceprintListPage = () => {
     const {
         doAddFaceprint,
         doUpdateFaceprint,
@@ -102,4 +102,4 @@ const FaceprintsPage = () => {
     );
 };
 
-export default FaceprintsPage;
+export default FaceprintListPage;
