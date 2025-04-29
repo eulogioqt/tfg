@@ -1,6 +1,6 @@
 import React from "react";
 
-const SessionItem = ({ session }) => {
+const SessionItem = ({ session, onClick }) => {
     const formatDateTime = (timestamp) => {
         const date = new Date(timestamp * 1000);
         return (
@@ -23,7 +23,7 @@ const SessionItem = ({ session }) => {
     };
 
     return (
-        <div className="card shadow-sm p-3 mb-2">
+        <div className="card shadow-sm p-3 mb-2 clickable clickable-05" onClick={onClick}>
             <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                 <div className="text-muted small">
                     <div>

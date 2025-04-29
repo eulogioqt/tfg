@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import ConfirmDeleteFaceModal from "./components/ConfirmDeleteFaceModal";
-
 import { useFaceprints } from "../../contexts/FaceprintsContext";
 import { useAPI } from "../../contexts/APIContext";
 import { useToast } from "../../contexts/ToastContext";
-import SessionItem from "./components/SessionItem";
+
+import ConfirmDeleteFaceModal from "./components/ConfirmDeleteFaceModal";
 import SessionList from "./components/SessionList";
 
 const FaceprintDetailPage = () => {

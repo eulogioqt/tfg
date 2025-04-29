@@ -81,7 +81,7 @@ class HRILogic():
 
         self.db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "database/system.db"))
         self.db = SystemDatabase(self.db_path)
-        self.sessions = SessionManager(self.db, timeout_seconds=10)
+        self.sessions = SessionManager(self.db, timeout_seconds=20.0, time_between_detections=0.0)
 
         self.node = HRILogicNode(self)
         self.node.create_timer(10.0, self.sessions.check_timeouts)
@@ -190,7 +190,7 @@ class HRILogic():
                 #classifier.addFeatures(classified, features)
                 # ver si aqui refinar o que hacer
             else: # Reconoce perfectamente
-                if self.sessions.get_last_seen(classified_id) > 30:
+                if self.sessions.get_last_seen(classified_id) > 60:
                     self.read_text("Bienvenido de vuelta " + classified_name)
 
                 self.sessions.process_detection(classified_id, scores[i], distance)

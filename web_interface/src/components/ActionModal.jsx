@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 const ActionModal = ({
     name,
@@ -17,6 +17,11 @@ const ActionModal = ({
         handleClose();
     };
 
+    useEffect(() => {
+        document.body.style.overflow = isOpen ? "hidden" : "";
+        return () => (document.body.style.overflow = "");
+    }, [isOpen]);
+
     return (
         <div
             id={name + "-"}
@@ -25,7 +30,7 @@ const ActionModal = ({
             style={{ display: isOpen ? "block" : "none", backgroundColor: "rgb(0.5,0.5,0.5,0.5)", zIndex: zIndex }}
             tabIndex="-1"
         >
-            <div className={"modal-dialog modal-" + size} role="document" onClick={(e) => e.stopPropagation()}>
+            <div className={"my-5 modal-dialog modal-" + size} role="document" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-content">
                     <div className="modal-header">
                         <h5 className="modal-title" id={name + "-modal-label"}>

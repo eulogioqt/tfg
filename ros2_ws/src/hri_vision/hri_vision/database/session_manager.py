@@ -4,7 +4,7 @@ from .system_database import SystemDatabase
 
 
 class SessionManager:
-    def __init__(self, db: SystemDatabase, timeout_seconds: int = 5, time_between_detections: int = 1):
+    def __init__(self, db: SystemDatabase, timeout_seconds: float = 5, time_between_detections: float = 1):
         self.db = db
         self.timeout_seconds = timeout_seconds
         self.time_between_detections = time_between_detections

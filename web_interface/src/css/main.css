@@ -50,6 +50,7 @@
 }
 
 .clickable,
+.clickable-05,
 .clickable-07,
 .clickable-1,
 .clickable-2 {
@@ -60,6 +61,10 @@
 
 .clickable:hover {
     transform: scale(1.5);
+}
+
+.clickable-05:hover {
+    transform: scale(1.05);
 }
 
 .clickable-07:hover {
