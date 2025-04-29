@@ -6,6 +6,7 @@ import ConfirmDeleteFaceModal from "./components/ConfirmDeleteFaceModal";
 import { useFaceprints } from "../../contexts/FaceprintsContext";
 import { useAPI } from "../../contexts/APIContext";
 import { useToast } from "../../contexts/ToastContext";
+import SessionItem from "./components/SessionItem";
 
 const FaceprintDetailPage = () => {
     const { id } = useParams();
@@ -14,6 +15,7 @@ const FaceprintDetailPage = () => {
     const { getFaceprint, doUpdateFaceprint, doDeleteFaceprint } = useFaceprints();
     const { faceprints, sessions, isResponseOk } = useAPI();
 
+    const [sessionList, setSessionList] = useState([]);
     const [faceprint, setFaceprint] = useState(undefined);
     const [isDeleteModalOpen, setisDeleteModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -23,22 +25,25 @@ const FaceprintDetailPage = () => {
 
     useEffect(() => {
         const getActualFaceprint = async () => {
-            const faceprint = getFaceprint(id);
-
-            if (faceprint) {
-                setFaceprint(faceprint);
-                setNewName(faceprint.name);
-            } else {
+            let faceprint = getFaceprint(id);
+            if (!faceprint) {
                 const response = await faceprints.getById(id);
                 if (isResponseOk(response)) {
-                    setFaceprint(response.data);
-                    setNewName(response.data.name);
+                    faceprint = response.data;
                 } else {
-                    showToast("Error", response.data.detail, "red");
+                    showToast("Error al obtener faceprint", response.data.detail, "red");
                 }
             }
 
-            const sessions = sessions.getById()
+            const sessionResponse = await sessions.getAll(`?faceprint_id=${faceprint.id}`)
+            if (isResponseOk(sessionResponse)) {
+                setSessionList(sessionResponse.data);
+            } else {
+                showToast("Error al obtener sesiones", sessionResponse.data.detail, "red")
+            }
+
+            setFaceprint(faceprint);
+            setNewName(faceprint.name);
         };
 
         getActualFaceprint();
@@ -163,10 +168,10 @@ const FaceprintDetailPage = () => {
                 </div>
 
                 <div className="mt-5">
-                    <h4 className="mb-3">Resumen de actividad</h4>
-                    <div className="alert alert-info" role="alert">
-                        Próximamente: sesiones, detecciones, gráficas de actividad...
-                    </div>
+                    <h4 className="mb-3">Actividad</h4>
+                    {sessionList.map((session) => (
+                        <SessionItem key={session.id} session={session}/>
+                    ))}
                 </div>
             </div>
         </>
