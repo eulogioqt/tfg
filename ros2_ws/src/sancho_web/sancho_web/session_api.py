@@ -15,8 +15,8 @@ class SessionAPI(SessionAPIInterface):
 
         return JSONResponse(content=faceprints)
 
-    def get_session(self, name):
-        faceprint_json = self.node.get_sessions_request(json.dumps({ "id": id }))
+    def get_session(self, faceprint_id):
+        faceprint_json = self.node.get_sessions_request(json.dumps({ "id": faceprint_id }))
         faceprint = json.loads(faceprint_json)
 
         return JSONResponse(content=faceprint)
