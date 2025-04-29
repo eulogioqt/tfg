@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 import SessionItem from "./SessionItem";
+import Pagination from "../../../components/Pagination";
 
 const SessionList = ({ faceprint, sessions }) => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -23,17 +24,7 @@ const SessionList = ({ faceprint, sessions }) => {
             </div>
 
             {totalPages > 1 && (
-                <nav className="mt-4 d-flex justify-content-center">
-                    <ul className="pagination">
-                        {[...Array(totalPages)].map((_, index) => (
-                            <li key={index} className={`page-item ${currentPage === index + 1 ? "active" : ""}`}>
-                                <button className="page-link" onClick={() => setCurrentPage(index + 1)}>
-                                    {index + 1}
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                </nav>
+                <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
             )}
         </>
     );
