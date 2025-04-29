@@ -4,6 +4,7 @@ import { useFaceprints } from "../../contexts/FaceprintsContext";
 
 import NewFaceprintModal from "./components/NewFaceprintModal";
 import ConfirmDeleteFaceModal from "./components/ConfirmDeleteFaceModal";
+import FaceprintItem from "./components/FaceprintItem";
 
 const FaceprintsPage = () => {
     const {
@@ -15,14 +16,14 @@ const FaceprintsPage = () => {
         faceprintsData,
     } = useFaceprints();
 
-    const [editingName, setEditingName] = useState(null);
+    const [editingId, setEditingId] = useState(null);
     const [newName, setNewName] = useState("");
 
     const [isOpenFaceModal, setIsOpenFaceModal] = useState(false);
     const [deleteModalId, setDeleteModalId] = useState(undefined);
 
     const [currentPage, setCurrentPage] = useState(1);
-    const perPage = 5;
+    const perPage = 12;
 
     const handleDelete = async (id) => await doDeleteFaceprint(id);
     const handleUpdate = async (id, oldName, newName) => {
@@ -30,7 +31,7 @@ const FaceprintsPage = () => {
         if (newName.trim() !== oldName.trim()) {
             await doUpdateFaceprint(id, newName);
         }
-        setEditingName(null);
+        setEditingId(null);
     };
 
     const sortedData = [...faceprintsData].sort((a, b) => a.learning_date - b.learning_date);
@@ -70,94 +71,12 @@ const FaceprintsPage = () => {
                     </div>
                 ) : (
                     <>
-                        <div className="table-responsive">
-                            <table className="table table-striped table-hover align-middle">
-                                <thead className="table-dark">
-                                    <tr>
-                                        <th>Imagen</th>
-                                        <th>id</th>
-                                        <th>Score</th>
-                                        <th>Nombre</th>
-                                        <th>Features</th>
-                                        <th>Veces Promediado</th>
-                                        <th>Fecha de Registro</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {pageData.length === 0 ? (
-                                        <tr>
-                                            <td colSpan="8" className="text-center py-3">
-                                                No se han encontrado datos.
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        pageData.map((person) => (
-                                            <tr key={person.id}>
-                                                <td>
-                                                    <img
-                                                        src={`data:image/jpg;base64,${person.face}`}
-                                                        onError={(e) => {
-                                                            e.target.onerror = null;
-                                                            e.target.src =
-                                                                "https://t3.ftcdn.net/jpg/05/16/27/58/360_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg";
-                                                        }}
-                                                        alt="face"
-                                                        className="rounded"
-                                                        width={64}
-                                                        height={64}
-                                                    />
-                                                </td>
-                                                <td>{person.id}</td>
-                                                <td>{person.face_score.toFixed(2)}</td>
-                                                <td>
-                                                    {editingName === person.name ? (
-                                                        <input
-                                                            type="text"
-                                                            className="form-control"
-                                                            value={newName}
-                                                            onChange={(e) => setNewName(e.target.value)}
-                                                        />
-                                                    ) : (
-                                                        person.name
-                                                    )}
-                                                </td>
-                                                <td>{person.features.length} vectores</td>
-                                                <td>{person.size.join(", ")}</td>
-                                                <td>{new Date(person.learning_date * 1000).toLocaleString()}</td>
-                                                <td>
-                                                    {editingName === person.name ? (
-                                                        <button
-                                                            className="btn btn-success btn-sm me-2"
-                                                            onClick={() =>
-                                                                handleUpdate(person.id, person.name, newName)
-                                                            }
-                                                        >
-                                                            Guardar
-                                                        </button>
-                                                    ) : (
-                                                        <button
-                                                            className="btn btn-outline-primary btn-sm me-2"
-                                                            onClick={() => {
-                                                                setEditingName(person.name);
-                                                                setNewName(person.name);
-                                                            }}
-                                                        >
-                                                            <i className="bi bi-pencil" />
-                                                        </button>
-                                                    )}
-                                                    <button
-                                                        className="btn btn-outline-danger btn-sm"
-                                                        onClick={() => setDeleteModalId(person.id)}
-                                                    >
-                                                        <i className="bi bi-trash" />
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
+                        <div className="row">
+                            {pageData && pageData.length > 0 ? pageData.map((faceprint) => (
+                                <FaceprintItem key={faceprint.id} faceprint={faceprint}/>
+                            )) : (
+                                <p className="text-center text-secondary">No se encontraron rostros.</p>
+                            )}
                         </div>
 
                         {totalPages > 1 && (
