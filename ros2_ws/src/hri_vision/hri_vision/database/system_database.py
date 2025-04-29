@@ -68,6 +68,11 @@ class SystemDatabase:
         rows = self.cursor.fetchall()
         return [dict(row) for row in rows]
 
+    def get_log_by_id(self, id):
+        self.cursor.execute('SELECT * FROM logs WHERE id = ?', (id,))
+        row = self.cursor.fetchone()
+        return dict(row) if row else {}
+
     def get_logs_by_faceprint_id(self, faceprint_id):
         self.cursor.execute('SELECT * FROM logs WHERE faceprint_id = ?', (faceprint_id,))
         rows = self.cursor.fetchall()
@@ -85,6 +90,17 @@ class SystemDatabase:
             session_dict['detections'] = detections
             result.append(session_dict)
         return result
+
+    def get_session_by_id(self, id):
+        self.cursor.execute('SELECT * FROM sessions WHERE id = ?', (id,))
+        session = self.cursor.fetchone()
+        if session:
+            session_dict = dict(session)
+            detections = self.get_detections_by_session(session_dict['id'])
+            session_dict['detections'] = detections
+            return session_dict
+        else:
+            return {}
 
     def get_sessions_by_faceprint_id(self, faceprint_id):
         self.cursor.execute('SELECT * FROM sessions WHERE faceprint_id = ?', (faceprint_id,))

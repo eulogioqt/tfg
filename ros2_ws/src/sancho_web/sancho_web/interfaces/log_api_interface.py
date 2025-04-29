@@ -6,9 +6,9 @@ from .api_responses import APIResponse
 class LogAPIInterface(ABC):
 
     @abstractmethod
-    def get_all_logs(self) -> APIResponse:
+    def get_all_logs(self, faceprint_id: str = None) -> APIResponse:
         pass
 
     @abstractmethod
-    def get_log(self, faceprint_id: str) -> APIResponse:
+    def get_log_by_id(self, id: str) -> APIResponse:
         pass

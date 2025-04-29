@@ -311,20 +311,25 @@ class HRILogic():
         return response
 
     def get_logs_service(self, request, response):
-        return self._handle_get_list(request, response, self.db.get_all_logs, self.db.get_logs_by_faceprint_id)
+        return self._handle_get_list(request, response, self.db.get_all_logs, self.db.get_log_by_id, self.db.get_logs_by_faceprint_id)
 
     def get_sessions_service(self, request, response):
-        return self._handle_get_list(request, response, self.db.get_all_sessions, self.db.get_sessions_by_faceprint_id)
+        return self._handle_get_list(request, response, self.db.get_all_sessions, self.db.get_session_by_id, self.db.get_sessions_by_faceprint_id)
 
-    def _handle_get_list(self, request, response, get_all_func, get_by_name_func):
+    def _handle_get_list(self, request, response, get_all_func, get_by_id, get_by_faceprint_id):
         args = request.args
 
         if args:
             args = json.loads(args)
-            id = args["id"]
 
-            items = get_by_name_func(id)
-            response.text = json.dumps(items)
+            id = args.get("id", None)
+            faceprint_id = args.get("faceprint_id", None)
+            if id is not None:
+                item = get_by_id(id)
+                response.text = json.dumps(item)
+            elif faceprint_id is not None:
+                items = get_by_faceprint_id(faceprint_id)
+                response.text = json.dumps(items)
         else:
             items = get_all_func()
             response.text = json.dumps(items)

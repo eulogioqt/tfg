@@ -12,7 +12,7 @@ const FaceprintDetailPage = () => {
 
     const { showToast } = useToast();
     const { getFaceprint, doUpdateFaceprint, doDeleteFaceprint } = useFaceprints();
-    const { faceprints, isResponseOk } = useAPI();
+    const { faceprints, sessions, isResponseOk } = useAPI();
 
     const [faceprint, setFaceprint] = useState(undefined);
     const [isDeleteModalOpen, setisDeleteModalOpen] = useState(false);
@@ -37,6 +37,8 @@ const FaceprintDetailPage = () => {
                     showToast("Error", response.data.detail, "red");
                 }
             }
+
+            const sessions = sessions.getById()
         };
 
         getActualFaceprint();
@@ -63,6 +65,12 @@ const FaceprintDetailPage = () => {
             </div>
         );
     }
+
+    const learning_date = new Date(faceprint.learning_date * 1000)
+    const formattedDateStr = new Intl.DateTimeFormat('es-ES', {
+        hour: '2-digit', minute: '2-digit',
+        day: 'numeric', month: 'long', year: 'numeric'
+    }).format(learning_date);
 
     return (
         <>
@@ -129,7 +137,7 @@ const FaceprintDetailPage = () => {
                             <div className="col-md-6">
                                 <div className="bg-secondary-subtle p-3 rounded">
                                     <h6 className="text-muted mb-1">Fecha de registro</h6>
-                                    <p className="fw-bold mb-0">{new Date(faceprint.learning_date * 1000).toLocaleString()}</p>
+                                    <p className="fw-bold mb-0">{formattedDateStr}</p>
                                 </div>
                             </div>
                             <div className="col-md-6">

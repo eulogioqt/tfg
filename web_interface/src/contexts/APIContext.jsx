@@ -63,11 +63,23 @@ export const APIProvider = ({ children }) => {
     });
 
     const faceprintsAPI = createEndpointMethods("faceprints");
+    const sessionsAPI = createEndpointMethods("sessions", {
+        create: () => alert("Not implemented"),
+        update: () => alert("Not implemented"),
+        delete: () => alert("Not implemented"),
+    })
+    const logsAPI = createEndpointMethods("logs", {
+        create: () => alert("Not implemented"),
+        update: () => alert("Not implemented"),
+        delete: () => alert("Not implemented"),
+    })
 
     return (
         <APIContext.Provider
             value={{
                 faceprints: faceprintsAPI,
+                sessions: sessionsAPI,
+                logs: logsAPI,
 
                 isResponseOk: isResponseOk,
                 setAuthToken: setAuthToken,
