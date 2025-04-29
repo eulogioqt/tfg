@@ -46,7 +46,7 @@ const WebSocketVideoViewer = () => {
     const calculatedHeight = imgDimensions && (calculatedWidth * imgDimensions.height) / imgDimensions.width;
 
     return (
-        <DraggableItem>
+        <DraggableItem childrenWidth={calculatedWidth} childrenHeight={calculatedHeight}>
             {showVideo && imgDimensions && imageData && (
                 <img
                     className="border border-dark bg-dark border-4 rounded shadow-lg"

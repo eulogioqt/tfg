@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useWindowSize, BREAKPOINTS } from "../hooks/useWindowSize";
 
-const DraggableItem = ({ children }) => {
+const DraggableItem = ({ children, childrenWidth, childrenHeight }) => {
     const { width, height } = useWindowSize();
 
+    const [isClosed, setIsClosed] = useState(false);
     const [position, setPosition] = useState({ x: 32, y: 32 });
 
     const draggingRef = useRef(false);
@@ -67,20 +68,45 @@ const DraggableItem = ({ children }) => {
     }, []);
 
     return (
-        <div
-            onMouseDown={handleMouseDown}
-            style={{
-                zIndex: 40 * (width < BREAKPOINTS.MD ? 1 : 10),
-                objectFit: "contain",
-                position: "fixed",
-                top: position.y,
-                left: position.x,
-                cursor: draggingRef.current ? "grabbing" : "move",
-                userSelect: "none",
-            }}
-        >
-            {children}
-        </div>
+        <>
+            {!isClosed && (
+                <div
+                    onMouseDown={handleMouseDown}
+                    style={{
+                        zIndex: 40 * (width < BREAKPOINTS.MD ? 1 : 10),
+                        objectFit: "contain",
+                        position: "fixed",
+                        top: position.y,
+                        left: position.x,
+                        cursor: draggingRef.current ? "grabbing" : "move",
+                        userSelect: "none",
+                    }}
+                >   
+                    <div 
+                    style={{ 
+                        position: "fixed", 
+                        top: (position.y + 5),
+                        left: (position.x + childrenWidth - 30)}
+                    }>
+                        <button
+                            className="btn btn-danger p-0 m-0"
+                            onClick={() => setIsClosed(true)}
+                            style={{
+                                width: 25,
+                                height: 25,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}
+                        >
+                            <i className="bi bi-x" style={{ color: "white", fontSize: 20 }}></i>
+                        </button>
+                    </div>
+
+                    {children}
+                </div>
+            )}
+        </>
     );
 };
 
