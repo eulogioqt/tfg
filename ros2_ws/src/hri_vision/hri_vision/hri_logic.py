@@ -81,7 +81,7 @@ class HRILogic():
 
         self.db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "database/system.db"))
         self.db = SystemDatabase(self.db_path)
-        self.sessions = SessionManager(self.db, timeout_seconds=20.0, time_between_detections=0.0)
+        self.sessions = SessionManager(self.db, timeout_seconds=20.0, time_between_detections=0.5)
 
         self.node = HRILogicNode(self)
         self.node.create_timer(10.0, self.sessions.check_timeouts)

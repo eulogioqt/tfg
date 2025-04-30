@@ -144,8 +144,7 @@ class HumanFaceRecognizer(Node):
             result, message = -1, f"Error executing {cmd_type}: {e}"
 
         if result >= 0 and "class_name" in args: # Send faceprint event
-            cmd = "add_features" if cmd_type == "add_class" else cmd_type            
-            event = self.faceprint_event_map.get(cmd)
+            event = self.faceprint_event_map.get(cmd_type)
             if event is not None:
                 id = message if cmd_type == "add_class" else args["class_id"]
                 self.send_faceprint_event(event, id, origin)
