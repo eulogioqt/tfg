@@ -30,7 +30,7 @@ export const FaceprintsProvider = ({ children }) => {
         if (isResponseOk(response)) {
             setFaceprints(response.data);
         } else {
-            showToast("Error", "No se han podido cargar los datos", "red");
+            showToast("Error al cargar faceprints", "No se han podido cargar los datos", "red");
         }
 
         setLoadingFaceprints(false);

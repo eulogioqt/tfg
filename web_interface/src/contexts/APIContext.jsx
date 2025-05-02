@@ -46,7 +46,7 @@ export const APIProvider = ({ children }) => {
         delete: (url, headers = undefined) => requestHandler("delete", url, undefined, headers),
     };
 
-    const isResponseOk = (response) => response.status >= 200 && response.status < 300;
+    const isResponseOk = (response) => response && response.status >= 200 && response.status < 300;
 
     const createEndpointMethods = (entity, extraEndpoints) => ({
         getAll: (params = "", version = "v1") =>
