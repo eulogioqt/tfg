@@ -7,7 +7,11 @@ import sounddevice as sd
 class TTSModel(ABC):
 
     @abstractmethod
-    def get_freq(self) -> int:
+    def get_sample_rate(self) -> int:
+        pass
+    
+    @abstractmethod
+    def get_speakers(self) -> list[str]:
         pass
 
     @abstractmethod
