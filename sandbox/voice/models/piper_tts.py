@@ -11,9 +11,7 @@ class PiperTTS(TTSModel):
     def __init__(self, speaker="davefx"):
         self.speaker = speaker
 
-        use_cuda = torch.cuda.is_available()
-        print(f"Using CUDA: {use_cuda}")
-        self.model = PiperVoice.load(f"es_ES-{speaker}-medium.onnx", config_path=f"es_ES-{speaker}-medium.onnx.json", use_cuda=use_cuda)
+        self.model = PiperVoice.load(f"es_ES-{speaker}-medium.onnx", config_path=f"es_ES-{speaker}-medium.onnx.json")
 
         self.sample_rate = self.model.config.sample_rate
         self.speakers = ["davefx", "sharvard"]
