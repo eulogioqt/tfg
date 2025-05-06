@@ -7,7 +7,7 @@ import whisper
 from dotenv import load_dotenv
 from pyannote.audio import Inference
 
-from models import TTSModel, PiperTTS, XTTS, BarkTTS
+from models import TTSModel, PiperTTS, CSS10TTS, XTTS, Tacotron2TTS, BarkTTS, YourTTS
 
 load_dotenv()
 HUGGING_FACE_API_KEY = os.getenv("HUGGING_FACE_API_KEY")
@@ -77,7 +77,7 @@ def run_pipeline(audio_array, tts_model: TTSModel):
 
     duration = len(audio) / tts_model.get_sample_rate()
 
-    filename = f"audio_tts_{tts_model.__class__.__name__.lower()}_{tts_model.speaker}.wav"
+    filename = f"audio_tts_{tts_model.__class__.__name__.lower()}{f'_{tts_model.speaker}' if tts_model.speaker else ''}.wav"
     tts_model.save(audio, tts_model.get_sample_rate(), filename)
     tts_model.play(audio, tts_model.get_sample_rate(), wait=False)
 
@@ -96,19 +96,24 @@ def run_pipeline(audio_array, tts_model: TTSModel):
 if __name__ == "__main__":
     tts_model: TTSModel = None
 
-    TTS_ENGINE = input("TTS engine (piper/xtts/bark): ").strip().lower()
+    TTS_OPTIONS = {
+        "bark": BarkTTS,
+        "css10": CSS10TTS,
+        "piper": PiperTTS,
+        "tacotron2": Tacotron2TTS,
+        "xtts": XTTS,
+        "your_tts": YourTTS
+    }
 
-    if TTS_ENGINE == "piper":
-        tts_model = PiperTTS()
-    elif TTS_ENGINE == "xtts":
-        tts_model = XTTS()
-    elif TTS_ENGINE == "bark":
-        tts_model = BarkTTS()
-    else:
+    TTS_ENGINE = input(f"TTS engine ({'/'.join(TTS_OPTIONS.keys())}): ").strip().lower()
+    
+    if TTS_ENGINE not in TTS_OPTIONS:
         print("❌ Invalid TTS engine.")
         exit(1)
+    else:
+        tts_model = TTS_OPTIONS[TTS_ENGINE]()
 
-    file_path = "test.wav"# input("Enter path to audio file (or press Enter to record): ").strip()
+    file_path = "test.wav" # input("Enter path to audio file (or press Enter to record): ").strip()
     if file_path:
         if not os.path.isfile(file_path):
             print(f"❌ File not found: {file_path}")

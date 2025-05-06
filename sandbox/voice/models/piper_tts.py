@@ -2,7 +2,7 @@ import wave
 import numpy as np
 from piper import PiperVoice
 
-from tts_model import TTSModel
+from .tts_model import TTSModel
 
 
 class PiperTTS(TTSModel):
@@ -14,12 +14,6 @@ class PiperTTS(TTSModel):
 
         self.sample_rate = self.model.config.sample_rate
         self.speakers = ["davefx", "sharvard"]
-
-    def get_sample_rate(self) -> int:
-        return self.sample_rate
-
-    def get_speakers(self) -> list[str]:
-        return self.speakers
 
     def synthesize(self, text: str) -> np.ndarray:
         stream = self.model.synthesize_stream_raw(text)
