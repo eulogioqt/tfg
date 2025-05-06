@@ -43,7 +43,7 @@ async def send_video(websocket):
        # await asyncio.sleep(0.01) 
 
 async def main():
-    async with websockets.serve(send_video, "localhost", 8765):
+    async with websockets.serve(send_video, "0.0.0.0", 8765):
         url = f"http://localhost:{8765}"
         print(f"Running on {url}")  # Este mensaje es clave para que VSCode lo detecte
 
