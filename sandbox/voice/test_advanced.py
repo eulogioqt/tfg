@@ -3,7 +3,7 @@ import os
 import torch
 import sounddevice as sd
 import torchaudio
-import whisper
+from faster_whisper import WhisperModel
 from dotenv import load_dotenv
 from pyannote.audio import Inference
 
@@ -12,7 +12,7 @@ from models import TTSModel, PiperTTS, CSS10TTS, XTTS, Tacotron2TTS, BarkTTS, Yo
 load_dotenv()
 HUGGING_FACE_API_KEY = os.getenv("HUGGING_FACE_API_KEY")
 
-WHISPER_MODEL_SIZE = "medium"
+WHISPER_MODEL_SIZE = "large-v3"
 TARGET_SAMPLE_RATE = 16000
 RECORD_SECONDS = 5
 
@@ -42,15 +42,24 @@ def load_audio_file(filepath):
         waveform = torchaudio.functional.resample(torch.tensor(waveform), sample_rate, TARGET_SAMPLE_RATE).numpy()
     return waveform, TARGET_SAMPLE_RATE
 
+faster_whisper_model = WhisperModel(WHISPER_MODEL_SIZE, device="cuda", compute_type="float16")
 
 def transcribe_audio_whisper_array(audio_array):
-    print("🧠 Transcribing with Whisper...")
+    print("🧠 Transcribing with Faster-Whisper...")
     start = time.time()
-    model = whisper.load_model(WHISPER_MODEL_SIZE)
-    result = model.transcribe(audio=audio_array, language="es", fp16=torch.cuda.is_available())
+
+    # Save audio temp (porque FasterWhisper usa ruta o archivo, no array directo)
+    tmp_wav = "temp_input.wav"
+    torchaudio.save(tmp_wav, torch.tensor(audio_array).unsqueeze(0), 16000)
+
+    segments, info = faster_whisper_model.transcribe(tmp_wav, language="es")
+    text = " ".join([segment.text for segment in segments])
+
+    os.remove(tmp_wav)
+
     duration = time.time() - start
-    print(f"📝 {result['text']} ({duration:.2f}s)")
-    return result["text"], duration
+    print(f"📝 {text} ({duration:.2f}s)")
+    return text, duration
 
 
 def extract_speaker_embedding_from_array(audio_array):
@@ -123,11 +132,12 @@ if __name__ == "__main__":
         audio_data, _ = record_audio_in_memory()
 
     result = run_pipeline(audio_data, tts_model)
+    total_time = result["stt_time"] + result["tts_time"] + result["embedding_time"]
 
     print("\n✅ Final result:")
     print(f"Text: {result['text']}")
     print(f"STT time: {result['stt_time']:.2f} s")
     print(f"TTS synthesis time: {result['tts_time']:.2f} s")
-    print(f"Playback duration: {result['play_time']:.2f} s")
     print(f"Speaker embedding time: {result['embedding_time']:.2f} s")
     print(f"Embedding shape: {result['embedding'].shape}")
+    print(f"\nTotal time: {total_time:.2f}s")
