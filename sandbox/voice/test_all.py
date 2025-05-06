@@ -40,7 +40,8 @@ if __name__ == "__main__":
         filepath = os.path.join(output_dir, filename)
 
         tts_model.save(audio, tts_model.get_sample_rate(), filepath)
- 
+        tts_model.play(audio, tts_model.get_sample_rate())
+
         print(f"✅ Guardado: {filepath}")
 
     for tts_name, tts_time in times.items():

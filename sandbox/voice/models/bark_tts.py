@@ -1,3 +1,4 @@
+import torch
 import numpy as np
 import soundfile as sf
 from bark import generate_audio, preload_models, SAMPLE_RATE
@@ -10,7 +11,13 @@ class BarkTTS(TTSModel):
     def __init__(self, speaker="es_speaker_0"):
         self.speaker = speaker
 
-        preload_models()
+        use_gpu = torch.cuda.is_available()
+        preload_models(
+            text_use_gpu=use_gpu, 
+            fine_use_gpu=use_gpu, 
+            codec_use_gpu=use_gpu, 
+            coarse_use_gpu=use_gpu
+        )
 
         self.sample_rate = SAMPLE_RATE
         self.speakers = ["es_speaker_0"]
