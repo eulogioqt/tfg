@@ -18,7 +18,7 @@ class PiperTTS(TTSModel):
     def synthesize(self, text: str) -> np.ndarray:
         stream = self.model.synthesize_stream_raw(text)
         audio_bytes = b"".join(stream)
-        audio = np.frombuffer(audio_bytes, dtype=np.float32)
+        audio = np.frombuffer(audio_bytes, dtype=np.int16)
 
         return audio
     
@@ -27,4 +27,4 @@ class PiperTTS(TTSModel):
             wf.setnchannels(1)
             wf.setsampwidth(2) 
             wf.setframerate(sample_rate)
-            wf.writeframes(audio.astype(np.float32).tobytes())
+            wf.writeframes(audio.tobytes())
