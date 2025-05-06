@@ -73,14 +73,13 @@ class SanchoWeb:
 
             id = prompt.id
             message = prompt.value
-            resp = self.sancho_prompt_request(id, message)
+            resp = self.sancho_prompt_request(message)
             
             response = ResponseMessage(id, resp)
             return response.to_json()    
 
-    def sancho_prompt_request(self, id, text):
+    def sancho_prompt_request(self, text):
         sancho_prompt_request = SanchoPrompt.Request()
-        sancho_prompt_request.id = id
         sancho_prompt_request.text = text
 
         future_sancho_prompt = self.node.sancho_prompt_client.call_async(sancho_prompt_request)

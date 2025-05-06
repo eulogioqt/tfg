@@ -17,6 +17,8 @@ from .ais.factory import create_sancho_ai, AIType
 
 # ahora esta el template ai pero se pueden hacer otras o que a esta puedas pasarle el template tu opcionalmente o cosas asin o que las funciones
 # respondan con otro json y yo ese json ya lo uso para crear la respuesta o lo que sea, mas general sabe, me mola asi esta forma, mas parecido al MCP
+
+# hgacer todo lo de que en el chat de la web sea general y salga el ahblante o unknown pero que salgan todos los mensajes
 class SanchoAINode(Node):
 
     def __init__(self, type):
@@ -28,8 +30,12 @@ class SanchoAINode(Node):
         self.get_logger().info("SanchoAI Node initializated succesfully")
 
     def prompt_service(self, request, response):
-        response.text = self.sancho_ai.on_message(request.text)
+        ai_response = self.sancho_ai.on_message(request.text)
+
+        response.text = ai_response
+        
         return response
+
 
 def main(args=None):
     rclpy.init(args=args)

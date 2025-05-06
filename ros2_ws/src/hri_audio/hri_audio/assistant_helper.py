@@ -1,3 +1,5 @@
+import re
+import unidecode
 import numpy as np
 from queue import Queue
 from enum import Enum
@@ -8,11 +10,9 @@ from rclpy.node import Node
 from hri_msgs.msg import ChunkMono
 from hri_msgs.srv import AudioRecognition
 
+from .api.sound import play
+from .api.sounds import ACTIVATION_SOUND
 
-# Poner que si solo se graba un chunk o alguna cosa asi que no se suba sobretodo si esta esperando un comando
-# Poner que si no traduce nada que printee "Nothing transcribed" o algo asi
-# Poner la cola con tiempo, si un mensaje tiene mas de 10s lo purga
-# Pensar que hacer con la cola
 
 class AUDIO_STATE(Enum, int):
     NO_AUDIO = -1,
@@ -23,10 +23,37 @@ class HELPER_STATE(Enum, int):
     COMMAND = 0,
     NAME = 1
 
-class AssistantHelper(Node):
+
+class AssistantHelperNode(Node):
 
     def __init__(self):
         super().__init__("assistant_helper")
+
+        self.assistant_text_pub = self.create_publisher(str, 'hri_audio/assistant_helper/transcription', 10)
+        self.micro_sub = self.create_subscription(ChunkMono, 'hri_audio/microphone/mono', self.microphone_callback, 10)
+        
+        self.audio_recognition_client = self.create_client(AudioRecognition, 'hri_audio/stt')
+        while not self.audio_recognition_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('Audio recognition service not available, waiting again...')
+            
+        self.transcribe_queue = Queue(maxsize=1)
+        self.chunk_queue = Queue()
+
+        self.get_logger().info("Assistant Helper Node initializated succesfully.")
+
+    def microphone_callback(self, msg):
+        new_audio = list([np.int16(x) for x in msg.chunk_mono])
+        sample_rate = msg.sample_rate
+
+        self.chunk_queue.put([new_audio, sample_rate])
+
+
+class AssistantHelper:
+
+    def __init__(self, name="Sancho"):
+        super().__init__("assistant_helper")
+
+        self.name = name
 
         self.audio_state = AUDIO_STATE.NO_AUDIO
         self.helper_state = HELPER_STATE.NAME
@@ -40,33 +67,19 @@ class AssistantHelper(Node):
         self.check_audio = []
         self.previous_chunk = []
 
-        self.text_publisher = self.create_publisher(str, 'hri_audio/microphone/text', 10)
-        self.micro_sub = self.create_subscription(ChunkMono, 'hri_audio/microphone/mono', self.microphone_callback, 10)
-        
-        self.audio_recognition_client = self.create_client(AudioRecognition, 'hri_audio/stt')
-        while not self.audio_recognition_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('Audio recognition service not available, waiting again...')
-            
-        self.transcribe_queue = Queue(maxsize=1)
-        self.chunk_queue = Queue()
-
-    def microphone_callback(self, msg):
-        new_audio = list([np.int16(x) for x in msg.chunk_mono])
-        sample_rate = msg.sample_rate
-
-        self.chunk_queue.put([new_audio, sample_rate])
+        self.node = AssistantHelperNode()
 
     def spin(self):
         while rclpy.ok():
-            if not self.chunk_queue.empty(): # Combine audio chunks
-                [new_audio, sample_rate] = self.chunk_queue.get()
+            if not self.node.chunk_queue.empty(): # Combine audio chunks
+                [new_audio, sample_rate] = self.node.chunk_queue.get()
 
                 self.check_audio = self.check_audio + new_audio
                 self.sample_rate = sample_rate # Sample rate set
 
                 if self.is_audio_length(audio, self.check_each_seconds):
                     avg_intensity = self.audio_average_intensity(self.check_audio)
-                    self.get_logger().info(f"{self.check_each_seconds} seconds: {avg_intensity}")
+                    self.node.get_logger().info(f"{self.check_each_seconds} seconds: {avg_intensity}")
 
                     if avg_intensity >= self.intensity_threshold: # Si hay intensidad, lo añadimos
                         if self.audio_state == AUDIO_STATE.NO_AUDIO: # Por si es en END, no pase a SOME
@@ -76,23 +89,23 @@ class AssistantHelper(Node):
                             self.audio = self.previous_chunk 
 
                         self.audio = self.audio + self.check_audio # Luego el trozo nuevo
-                        self.get_logger().info(f"Chunk attached ({len(self.audio) / self.sample_rate} seconds)")
+                        self.node.get_logger().info(f"Chunk attached ({len(self.audio) / self.sample_rate} seconds)")
                     elif self.audio_state != AUDIO_STATE.NO_AUDIO: # Si no hay intensidad y hay audio, terminamos trozo
                         self.audio_state = AUDIO_STATE.END_AUDIO
 
                         self.audio = self.audio + self.check_audio # Para que no se corte el audio, metemos tmb este ultimo
-                        self.get_logger().info("No more audio detected...")
+                        self.node.get_logger().info("No more audio detected...")
                     else: # Si no hay intensidad ni audio, pues aun no hay audio
-                        self.get_logger().info("No audio detected yet")
+                        self.node.get_logger().info("No audio detected yet")
 
                     self.previous_chunk = self.check_audio
                     self.check_audio = []
 
                 if self.no_more_audio == AUDIO_STATE.END_AUDIO:
-                    if self.transcribe_queue.qsize() < 1:
-                        self.transcribe_queue.put(self.audio)
+                    if self.node.transcribe_queue.qsize() < 1:
+                        self.node.transcribe_queue.put(self.audio)
                     else:
-                        self.get_logger().info("Transcribe Queue IS FULL!!!")
+                        self.node.get_logger().info("Transcribe Queue IS FULL!!!")
                     
                     self.audio = []
                     self.check_audio = []
@@ -102,30 +115,34 @@ class AssistantHelper(Node):
                 if self.helper_state == HELPER_STATE.NAME and self.is_audio_length(audio, self.name_seconds):
                     self.audio_state = AUDIO_STATE.END_AUDIO
 
-            if not self.transcribe_queue.empty(): # Transcribe audio chunks
-                audio = self.transcribe_queue.get()
-                self.get_logger().info("Transcribing...")
+            if not self.node.transcribe_queue.empty(): # Transcribe audio chunks
+                audio = self.node.transcribe_queue.get()
+                self.node.get_logger().info("Transcribing...")
         
                 rec = self.audio_recognition_request(audio)                
-                if rec is not None:
-                    self.get_logger().info(f"Sending to assistant {len(audio) / self.sample_rate} seconds")
-                    self.text_publisher.publish(rec)
+                if rec:
+                    self.node.get_logger().info(f"Text transcribed ({len(audio) / self.sample_rate} seconds): {rec}")
+                    
+                    rec_processed = rec.strip().lower()
+                    rec_processed = unidecode.unidecode(rec_processed)
+                    rec_processed = re.sub(r'[^a-z\s]', '', rec_processed)
+                    
+                    # Cambiar por porcurpine nojeke
+                    if (self.name.lower() in rec_processed and self.helper_state == HELPER_STATE.NAME) \
+                        or (self.name.lower() == rec_processed and self.helper_state == HELPER_STATE.COMMAND):
+                        self.helper_state = HELPER_STATE.COMMAND
+                        
+                        play(ACTIVATION_SOUND)
+                    elif self.helper_state == HELPER_STATE.COMMAND:
+                        self.helper_state = HELPER_STATE.NAME
+                        self.node.assistant_text_pub.publish(rec)
+            
                 else:
-                    self.get_logger().info("Transcription result is None")
+                    self.node.get_logger().info("Transcription result is None: Nothing transcribed")
 
-                self.get_logger().info(f"Average intensity: {self.audio_average_intensity(audio)}")
+                self.node.get_logger().info(f"Average intensity: {self.audio_average_intensity(audio)}")
 
             rclpy.spin_once(self)
-
-    def is_audio_length(self, audio, seconds):
-        return len(audio) >= seconds * self.sample_rate
-
-    def audio_average_intensity(self, audio):
-        average_intensity = np.mean(np.abs(audio))
-        if average_intensity < 0:
-            average_intensity = 32767
-            
-        return average_intensity
 
     def audio_recognition_request(self, audio):
         audio_recognition_request = AudioRecognition.Request()
@@ -135,11 +152,22 @@ class AssistantHelper(Node):
         audio_recognition_request.audio = audio
         audio_recognition_request.sample_rate = self.sample_rate
 
-        future_audio_recognition = self.audio_recognition_client.call_async(audio_recognition_request)
+        future_audio_recognition = self.node.audio_recognition_client.call_async(audio_recognition_request)
         rclpy.spin_until_future_complete(self, future_audio_recognition)
         result_audio_recognition = future_audio_recognition.result()
 
         return result_audio_recognition.text
+    
+    def is_audio_length(self, audio, seconds):
+        return len(audio) >= seconds * self.sample_rate
+
+    def audio_average_intensity(self, audio):
+        average_intensity = np.mean(np.abs(audio))
+        if average_intensity < 0:
+            average_intensity = 32767
+            
+        return average_intensity
+    
 
 def main(args=None):
     rclpy.init(args=args)
