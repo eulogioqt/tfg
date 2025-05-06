@@ -33,9 +33,9 @@ class Assistant:
     def spin(self):
         while rclpy.ok():
             if not self.node.queue.empty():
-                ai_response = self.node.queue.get()
-                self.node.get_logger().info(f"SANCHO >> {ai_response}")
-
+                user_text = self.node.queue.get()
+                ai_response = self.sancho_prompt_request(user_text)
+                
                 self.node.tts_pub.publish(ai_response)
 
             rclpy.spin_once(self.node)

@@ -1,10 +1,11 @@
 import rclpy
 from rclpy.node import Node
 
-from human_face_recognition_msgs.srv import AudioRecognition
+from hri_msgs.srv import AudioRecognition
 from std_msgs.msg import String
 
 from .api.gstt import transcribe
+
 
 class GoogleSTT(Node):
 

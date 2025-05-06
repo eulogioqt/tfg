@@ -127,7 +127,7 @@ class AssistantHelper:
                     rec_processed = unidecode.unidecode(rec_processed)
                     rec_processed = re.sub(r'[^a-z\s]', '', rec_processed)
                     
-                    # Cambiar por porcurpine nojeke
+                    # Cambiar por porcurpine nojeke para hotword en plan mas pro
                     if (self.name.lower() in rec_processed and self.helper_state == HELPER_STATE.NAME) \
                         or (self.name.lower() == rec_processed and self.helper_state == HELPER_STATE.COMMAND):
                         self.helper_state = HELPER_STATE.COMMAND
