@@ -1,8 +1,8 @@
 import numpy as np
 import soundfile as sf
-from bark import generate_audio, preload_models
+from bark import generate_audio, preload_models, SAMPLE_RATE
 
-from .tts_model import TTSModel
+from tts_model import TTSModel
 
 
 class BarkTTS(TTSModel):
@@ -12,7 +12,7 @@ class BarkTTS(TTSModel):
 
         preload_models()
 
-        self.sample_rate = 22050
+        self.sample_rate = SAMPLE_RATE
         self.speakers = ["es_speaker_0"]
 
     def get_sample_rate(self) -> int:

@@ -2,7 +2,7 @@ import wave
 import numpy as np
 from piper import PiperVoice
 
-from .tts_model import TTSModel
+from tts_model import TTSModel
 
 
 class PiperTTS(TTSModel):
@@ -12,7 +12,7 @@ class PiperTTS(TTSModel):
 
         self.model = PiperVoice.load(f"es_ES-{speaker}-medium.onnx", config_path=f"es_ES-{speaker}-medium.onnx.json")
 
-        self.sample_rate = 22050
+        self.sample_rate = self.model.config.sample_rate
         self.speakers = ["davefx", "sharvard"]
 
     def get_sample_rate(self) -> int:
