@@ -4,6 +4,7 @@ import soundfile as sf
 from bark import generate_audio, preload_models, SAMPLE_RATE
 
 from .tts_model import TTSModel
+from . import TTS_SPEAKERS
 
 
 class BarkTTS(TTSModel):
@@ -36,4 +37,4 @@ class BarkTTS(TTSModel):
         return SAMPLE_RATE
     
     def get_speakers(self) -> list[str]:
-        return ["es_speaker_0"]
+        return list(TTS_SPEAKERS.BARK)

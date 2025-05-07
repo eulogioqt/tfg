@@ -5,6 +5,7 @@ from io import BytesIO
 from pydub import AudioSegment
 
 from .tts_model import TTSModel
+from . import TTS_SPEAKERS
 
 
 class GoogleTTS(TTSModel):
@@ -33,4 +34,4 @@ class GoogleTTS(TTSModel):
         return 24000
     
     def get_speakers(self) -> list[str]:
-        return ["es", "com.mx", "us"]
+        return list(TTS_SPEAKERS.GOOGLE)

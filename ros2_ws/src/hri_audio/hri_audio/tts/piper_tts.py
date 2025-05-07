@@ -3,6 +3,7 @@ import numpy as np
 from piper import PiperVoice
 
 from .tts_model import TTSModel
+from . import TTS_SPEAKERS
 
 
 class PiperTTS(TTSModel):
@@ -34,4 +35,4 @@ class PiperTTS(TTSModel):
         return self.models[0].config.sample_rate
     
     def get_speakers(self) -> list[str]:
-        return ["davefx", "sharvard"]
+        return list(TTS_SPEAKERS.PIPER)

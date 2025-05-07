@@ -23,6 +23,3 @@ class CoquiMultiTTS(CoquiTTS):
 
     def get_sample_rate(self) -> int:
         return self.model.synthesizer.output_sample_rate
-    
-    def get_speakers(self) -> list[str]:
-        return list(self.model.synthesizer.tts_model.speaker_manager.name_to_id)
