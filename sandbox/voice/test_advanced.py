@@ -7,7 +7,7 @@ from faster_whisper import WhisperModel
 from dotenv import load_dotenv
 from pyannote.audio import Inference
 
-from models import TTSModel, PiperTTS, CSS10TTS, XTTS, Tacotron2TTS, BarkTTS, YourTTS
+from models import TTSModel, GoogleTTS, PiperTTS, CSS10TTS, XTTS, Tacotron2TTS, BarkTTS, YourTTS
 
 load_dotenv()
 HUGGING_FACE_API_KEY = os.getenv("HUGGING_FACE_API_KEY")
@@ -108,6 +108,7 @@ if __name__ == "__main__":
     TTS_OPTIONS = {
         "bark": BarkTTS,
         "css10": CSS10TTS,
+        "google": GoogleTTS,
         "piper": PiperTTS,
         "tacotron2": Tacotron2TTS,
         "xtts": XTTS,
