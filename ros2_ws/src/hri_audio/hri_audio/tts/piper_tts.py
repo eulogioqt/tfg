@@ -1,3 +1,4 @@
+import os
 import wave
 import numpy as np
 from piper import PiperVoice
@@ -9,9 +10,12 @@ from . import TTS_SPEAKERS
 class PiperTTS(TTSModel):
 
     def __init__(self):
+        path_dave = os.path.join(os.path.dirname(__file__), "models/es_ES-davefx-medium.onnx")
+        path_shar = os.path.join(os.path.dirname(__file__), "models/es_ES-sharvard-medium.onnx")
+
         self.models = {
-            "davefx": PiperVoice.load(f"es_ES-davefx-medium.onnx", config_path=f"es_ES-davefx-medium.onnx.json"),
-            "sharvard": PiperVoice.load(f"es_ES-sharvard-medium.onnx", config_path=f"es_ES-sharvard-medium.onnx.json"),
+            "davefx": PiperVoice.load(path_dave, config_path=f"{path_dave}.json"),
+            "sharvard": PiperVoice.load(path_shar, config_path=f"{path_shar}.json"),
         } 
 
     def synthesize(self, text: str, speaker: str) -> np.ndarray:
