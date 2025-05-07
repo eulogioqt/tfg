@@ -7,6 +7,7 @@ from enum import Enum
 import rclpy
 from rclpy.node import Node
 
+from std_msgs.msg import String
 from hri_msgs.msg import ChunkMono
 from hri_msgs.srv import AudioRecognition
 
@@ -14,12 +15,12 @@ from .api.sound import play
 from .api.sounds import ACTIVATION_SOUND
 
 
-class AUDIO_STATE(Enum, int):
+class AUDIO_STATE(int, Enum):
     NO_AUDIO = -1,
     SOME_AUDIO = 0,
     END_AUDIO = 1
 
-class HELPER_STATE(Enum, int):
+class HELPER_STATE(int, Enum):
     COMMAND = 0,
     NAME = 1
 
@@ -29,7 +30,7 @@ class AssistantHelperNode(Node):
     def __init__(self):
         super().__init__("assistant_helper")
 
-        self.assistant_text_pub = self.create_publisher(str, 'hri_audio/assistant_helper/transcription', 10)
+        self.assistant_text_pub = self.create_publisher(String, 'hri_audio/assistant_helper/transcription', 10)
         self.micro_sub = self.create_subscription(ChunkMono, 'hri_audio/microphone/mono', self.microphone_callback, 10)
         
         self.audio_recognition_client = self.create_client(AudioRecognition, 'hri_audio/stt')
@@ -51,8 +52,6 @@ class AssistantHelperNode(Node):
 class AssistantHelper:
 
     def __init__(self, name="Sancho"):
-        super().__init__("assistant_helper")
-
         self.name = name
 
         self.audio_state = AUDIO_STATE.NO_AUDIO
@@ -135,14 +134,14 @@ class AssistantHelper:
                         play(ACTIVATION_SOUND)
                     elif self.helper_state == HELPER_STATE.COMMAND:
                         self.helper_state = HELPER_STATE.NAME
-                        self.node.assistant_text_pub.publish(rec)
+                        self.node.assistant_text_pub.publish(String(data=rec))
             
                 else:
                     self.node.get_logger().info("Transcription result is None: Nothing transcribed")
 
                 self.node.get_logger().info(f"Average intensity: {self.audio_average_intensity(audio)}")
 
-            rclpy.spin_once(self)
+            rclpy.spin_once(self.node)
 
     def audio_recognition_request(self, audio):
         audio_recognition_request = AudioRecognition.Request()

@@ -31,7 +31,6 @@ class MicrophoneCapturer:
         self.stream = self.setup_microphone(self.device_index, self.sample_rate, self.num_channels, self.chunk_size)
 
         self.node = MicrophoneCapturerNode()
-        self.node.get_logger().info(f"Microphone Node initializated succesfully on device index: {self.device_index}")
 
     def spin(self):
         first = True

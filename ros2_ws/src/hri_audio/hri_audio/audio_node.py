@@ -19,9 +19,6 @@ class AudioNode(Node):
         self.wav_path = wav_path
         self.chunk_size = chunk_size
 
-        self.get_logger().info(f"Microphone Node initializated succesfully with wav path: {wav_path}")
-
-
     def spin(self):
         first = True
 
@@ -32,7 +29,7 @@ class AudioNode(Node):
                 sample_rate = wf.getframerate()
                 num_channels = wf.getnchannels()
 
-                self.get_logger().info(f"Reproduciendo {self.wav_path} a {sample_rate} Hz con {num_channels} canales")
+                self.get_logger().info(f"Reproducing {self.wav_path} with {sample_rate}hz and {num_channels} channels")
 
                 while True:
                     chunk_stereo = ChunkStereo(sample_rate=sample_rate)
@@ -63,12 +60,12 @@ class AudioNode(Node):
 
                     time.sleep(self.chunk_size / sample_rate)
 
-                self.get_logger().info("Reproducción terminada, esperando 5s antes de repetir")
+                self.get_logger().info("Audio finished, waiting 5s before starting again...")
                 time.sleep(5)
                 wf.close()
 
             except Exception as e:
-                self.get_logger().error(f"Error durante la simulación de audio: {e}")
+                self.get_logger().error(f"Error while reproducing audio: {e}")
                 time.sleep(1)
 
 

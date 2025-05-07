@@ -3,6 +3,7 @@ from rclpy.node import Node
 
 from queue import Queue
 
+from std_msgs.msg import String
 from hri_msgs.srv import SanchoPrompt
 
 
@@ -11,8 +12,8 @@ class AssistantNode(Node):
     def __init__(self):
         super().__init__("assistant")
 
-        self.tts_pub = self.create_publisher(str, "hri_audio/tts", 10)
-        self.text_sub = self.create_subscription(str, 'hri_audio/assistant_helper/transcription', self.text_callback)
+        self.tts_pub = self.create_publisher(String, "hri_audio/tts", 10)
+        self.text_sub = self.create_subscription(String, 'hri_audio/assistant_helper/transcription', self.text_callback, 10)
 
         self.sancho_prompt_client = self.create_client(SanchoPrompt, "sancho_ai/prompt")
         while not self.sancho_prompt_client.wait_for_service(timeout_sec=1.0):
@@ -23,7 +24,7 @@ class AssistantNode(Node):
 
     def text_callback(self, msg):
         if self.queue.qsize() < 1:
-            self.queue.put(msg)
+            self.queue.put(msg.data)
 
 class Assistant:
 
@@ -36,7 +37,7 @@ class Assistant:
                 user_text = self.node.queue.get()
                 ai_response = self.sancho_prompt_request(user_text)
                 
-                self.node.tts_pub.publish(ai_response)
+                self.node.tts_pub.publish(String(data=ai_response))
 
             rclpy.spin_once(self.node)
 
