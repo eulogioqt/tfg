@@ -20,7 +20,7 @@ class GeminiProvider(APIProvider):
         raise NotImplementedError("This provider does not support embeddings.")
 
     def prompt(self, model, prompt_system, messages_json, user_input, parameters_json):
-        if not model or model not in self.client:
+        if not model:
             model = list(self.client.keys())[0]
 
         messages = self.formatter.format(prompt_system, messages_json, user_input)

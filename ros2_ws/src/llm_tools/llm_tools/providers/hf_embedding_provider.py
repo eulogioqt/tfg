@@ -17,7 +17,7 @@ class HFEmbeddingProvider(BaseProvider):
             self.load(models)
 
     def embedding(self, user_input, model):
-        if not model or model not in self.models:
+        if not model:
             model = list(self.models.keys())[0]
         
         return self.models[model].encode([user_input])[0].tolist(), model

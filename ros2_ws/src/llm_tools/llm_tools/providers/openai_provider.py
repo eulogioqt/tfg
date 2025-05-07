@@ -13,13 +13,13 @@ class OpenAIProvider(APIProvider):
         self.formatter = OpenAIFormatter()
     
     def embedding(self, model, user_input):
-        if not model or model not in list(MODELS.EMBEDDING.OPENAI):
+        if not model:
             model = MODELS.EMBEDDING.OPENAI.SMALL_3
 
         return self.client.embeddings.create(model=model, input=[user_input]).data[0].embedding, model
 
     def prompt(self, model, prompt_system, messages_json, user_input, parameters_json):       
-        if not model or model not in list(MODELS.LLM.OPENAI):
+        if not model:
             model = MODELS.LLM.OPENAI.GPT_3_5_TURBO
 
         messages = self.formatter.format(prompt_system, messages_json, user_input)

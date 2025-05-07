@@ -1,0 +1,5 @@
+string embedding_provider
+string embedding_model
+---
+string message
+bool success

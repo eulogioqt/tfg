@@ -3,7 +3,7 @@ import importlib
 
 from rclpy.node import Node
 from llm_msgs.msg import LoadUnloadResult, ProviderModel
-from llm_msgs.srv import GetModels, Prompt, Embedding, LoadModel, UnloadModel
+from llm_msgs.srv import GetModels, Prompt, Embedding, LoadModel, UnloadModel, SetActiveLLMModel, SetActiveEmbeddingModel
 
 from .models import PROVIDER, MODELS
 
@@ -27,12 +27,17 @@ class LLMNode(Node):
         
         self.provider_map = {}
 
+        self.active_llm = None
+        self.active_embedding = None
+
         self.get_all_srv = self.create_service(GetModels, 'llm_tools/get_all_models', self.handle_get_all_models)
         self.get_available_srv = self.create_service(GetModels, 'llm_tools/get_available_models', self.handle_get_available_models)
         self.prompt_srv = self.create_service(Prompt, 'llm_tools/prompt', self.handle_prompt)
         self.embedding_srv = self.create_service(Embedding, 'llm_tools/embedding', self.handle_embedding)
         self.load_model_srv = self.create_service(LoadModel, 'llm_tools/load_model', self.handle_load_model)
         self.unload_model_srv = self.create_service(UnloadModel, 'llm_tools/unload_model', self.handle_unload_model)
+        self.set_active_llm_srv = self.create_service(SetActiveLLMModel, 'llm_tools/set_active_llm', self.handle_set_active_llm)
+        self.set_active_embedding_srv = self.create_service(SetActiveEmbeddingModel, 'llm_tools/set_active_embedding', self.handle_set_active_embedding)
 
         self.get_logger().info("LLM Node initializated succesfully")
 
@@ -88,9 +93,11 @@ class LLMNode(Node):
         self.get_logger().info(f"📖 Prompt service for provider='{request.provider}', model='{request.model}'")
 
         try:
-            provider_name, provider = self._get_provider(request.provider)     
+            provider_name, model_name = self._get_or_active("llm", request.provider, request.model)
+            provider = self._get_provider(provider_name)
+
             result, model_used = provider.prompt(
-                model=request.model,
+                model=model_name,
                 prompt_system=request.prompt_system,
                 messages_json=request.messages_json,
                 user_input=request.user_input,
@@ -111,9 +118,11 @@ class LLMNode(Node):
         self.get_logger().info(f"📖 Embedding service for provider='{request.provider}', model='{request.model}'")
         
         try:
-            provider_name, provider = self._get_provider(request.provider)
+            provider_name, model_name = self._get_or_active("embedding", request.provider, request.model)
+            provider = self._get_provider(provider_name)
+
             result, model_used = provider.embedding(
-                model=request.model,
+                model=model_name,
                 user_input=request.user_input
             )
 
@@ -170,17 +179,44 @@ class LLMNode(Node):
 
         return response
 
-    def _get_provider(self, requested_name):
-        if requested_name in self.provider_map:
-            return requested_name, self.provider_map[requested_name]
+    def handle_set_active_llm(self, request, response):
+        response.success, response.message = self._set_active_model(
+            kind="llm",
+            provider=request.llm_provider,
+            model=request.llm_model
+        )
 
-        if not self.provider_map:
-            raise ValueError("No providers are loaded")
+        return response
 
-        fallback_name, fallback_provider = next(iter(self.provider_map.items()))
-        self.get_logger().warn(f"[WARN] Provider '{requested_name}' not found. Using fallback '{fallback_provider}' instead.")
+    def handle_set_active_embedding(self, request, response):
+        response.success, response.message = self._set_active_model(
+            kind="embedding",
+            provider=request.embedding_provider,
+            model=request.embedding_model
+        )
+
+        return response
+
+    def _set_active_model(self, kind, provider, model):
+        assert kind in ['llm', 'embedding']
+
+        kind_upper = kind.upper()
+        model_label = f"{kind_upper} model"
+
+        if not provider or not model:
+            return False, "Provider and model must be specified"
+        if provider not in list(PROVIDER):
+            return False, f"Invalid {model_label.lower()} provider: {provider}"
+        if not hasattr(getattr(MODELS, kind_upper), provider.upper()):
+            return False, f"{model_label} '{model}' not found for provider '{provider}'"
+        if provider not in self.provider_map:
+            return False, f"Provider '{provider}' is not loaded. You must load it with your model first."
+        if model not in self.provider_map[provider].get_active_models():
+            return False, f"Provider '{provider}' is loaded but model '{model}' is not loaded. You must load it first."
+
+        setattr(self, f"active_{kind}", [provider, model])
         
-        return fallback_name, fallback_provider
+        return True, f"Active {model_label} set to {provider}/{model}"
     
     def _try_load_provider(self, name, api_key=""):
         if name not in self.provider_map:
@@ -197,7 +233,26 @@ class LLMNode(Node):
             self.provider_map[name] = provider_class(api_key=api_key) if api_key else provider_class()
 
         return self.provider_map[name]
+    
+    def _get_or_active(self, kind, provider_name, model_name):
+        assert kind in ['llm', 'embedding']
+        
+        if not provider_name:
+            active = getattr(self, f"active_{kind}", None)
+            if active:
+                return active
+            else:
+                raise ValueError(f"No provider specified and no active {kind.upper()} model")
+        
+        return provider_name, model_name
 
+    def _get_provider(self, provider_name):
+        if provider_name in self.provider_map:
+            return self.provider_map[provider_name]
+        elif provider_name not in list(PROVIDER):
+            raise ValueError(f"Provider {provider_name} does not exist.")
+        else:
+            raise ValueError(f"Provider {provider_name} is not loaded.")
 
     def _fill_response(self, response, success, message, provider, model):
         response.success = success

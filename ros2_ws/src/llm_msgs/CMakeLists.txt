@@ -25,6 +25,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/LoadModel.srv"
   "srv/UnloadModel.srv"
   "srv/GetModels.srv"
+  "srv/SetActiveEmbeddingModel.srv"
+  "srv/SetActiveLLMModel.srv.srv"
 )
 
 if(BUILD_TESTING)
