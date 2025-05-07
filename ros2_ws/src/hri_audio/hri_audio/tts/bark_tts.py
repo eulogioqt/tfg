@@ -8,9 +8,7 @@ from .tts_model import TTSModel
 
 class BarkTTS(TTSModel):
 
-    def __init__(self, speaker="es_speaker_0"):
-        self.speaker = speaker
-
+    def __init__(self):
         use_gpu = torch.cuda.is_available()
         preload_models(
             text_use_gpu=use_gpu, 
@@ -19,17 +17,23 @@ class BarkTTS(TTSModel):
             coarse_use_gpu=use_gpu
         )
 
-        self.sample_rate = SAMPLE_RATE
-        self.speakers = ["es_speaker_0"]
+    def synthesize(self, text: str, speaker: str) -> np.ndarray:
+        if not speaker or speaker not in self.get_speakers():
+            speaker = self.get_speakers()[0]
 
-    def synthesize(self, text: str) -> np.ndarray:
-        audio = generate_audio(text, history_prompt=self.speaker)
+        audio = generate_audio(text, history_prompt=speaker)
 
         return audio
     
-    def save(self, audio: np.ndarray, sample_rate: int, filename: str):
+    def save(self, audio: np.ndarray, filename: str):
         if hasattr(audio, "numpy"):
             audio = audio.numpy()
 
         audio = np.clip(audio, -1.0, 1.0)
-        sf.write(filename, audio, samplerate=sample_rate, subtype="PCM_16")
+        sf.write(filename, audio, samplerate=self.get_sample_rate(), subtype="PCM_16")
+
+    def get_sample_rate(self) -> int:
+        return SAMPLE_RATE
+    
+    def get_speakers(self) -> list[str]:
+        return ["es_speaker_0"]
