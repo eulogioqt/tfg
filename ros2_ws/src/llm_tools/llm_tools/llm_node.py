@@ -10,7 +10,7 @@ from .models import PROVIDER, MODELS
 
 class LLMNode(Node):
 
-    PROVIDER_CLASS_MAP = { # Poner esto mas cool
+    PROVIDER_CLASS_MAP = { # Poner esto mas cool, solo con el nombre camelcase se puede hacer, lo demas no es necesario
         PROVIDER.OPENAI: ("llm_tools.providers.openai_provider", "OpenAIProvider"),
         PROVIDER.MISTRAL: ("llm_tools.providers.mistral_provider", "MistralProvider"),
         PROVIDER.PHI: ("llm_tools.providers.phi_provider", "PhiProvider"),
