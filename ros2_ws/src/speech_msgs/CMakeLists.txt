@@ -17,12 +17,18 @@ find_package(std_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/ModelSpeaker.msg"
+  "msg/LoadUnloadResult.msg"
   
   "srv/STT.srv"
+  "srv/STTGetActiveModel.srv"
+  "srv/STTGetModels.srv"
+  "srv/STTSetActiveModel.srv"
   "srv/TTS.srv"
-  "srv/TTSModelSet.srv"
-  "srv/TTSModelGetAll.srv"
-  "srv/TTSModelGetActual.srv"
+  "srv/TTSGetActiveModel.srv"
+  "srv/TTSGetModels.srv"
+  "srv/TTSSetActiveModel.srv"
+  "srv/LoadModel.srv"
+  "srv/UnloadModel.srv"
 )
 
 if(BUILD_TESTING)
