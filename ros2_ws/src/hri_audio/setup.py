@@ -24,19 +24,12 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'microphone_capturer= hri_audio.microphone_publisher:main',
-            'microphone_test= hri_audio.microphone_test:main',
-            'audio_direction= hri_audio.audio_direction:main',
-            'test= hri_audio.microphone_test:main',
-            'assistant= hri_audio.assistant:main',
-            'assistant_llm= hri_audio.assistant_llm:main',
-            'helper= hri_audio.assistant_helper:main',
-            'whisper_stt= hri_audio.whisper_stt:main',
-            'google_stt= hri_audio.google_stt:main',
-            'hri_tts= hri_audio.hri_tts:main',
-            'python_tts= hri_audio.python_tts:main',
-            'voice_detection= hri_audio.voice_detection:main',
-            'speaker_controller= hri_audio.speaker_controller:main',
+            'assistant_helper=hri_audio.assistant_helper_node:main',
+            'assistant=hri_audio.assistant_node:main',
+            'audio=hri_audio.audio_node:main',
+            'microphone=hri_audio.microphone_node:main',
+            'stt=hri_audio.stt_node:main',
+            'tts=hri_audio.tts_node:main'
         ],
     },
 )
