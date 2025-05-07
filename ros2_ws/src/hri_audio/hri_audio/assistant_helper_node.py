@@ -11,8 +11,8 @@ from std_msgs.msg import String
 from hri_msgs.msg import ChunkMono
 from hri_msgs.srv import STT
 
-from .api.sound import play
-from .api.sounds import ACTIVATION_SOUND
+from .utils.sound import play
+from .utils.sounds import ACTIVATION_SOUND
 
 
 class AUDIO_STATE(int, Enum):

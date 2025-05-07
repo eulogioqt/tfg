@@ -1,4 +1,4 @@
-from gtts import gTTS
+from tts.gtts import gTTS
 from io import BytesIO
 from pydub import AudioSegment
 import numpy as np

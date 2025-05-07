@@ -3,7 +3,7 @@ from rclpy.node import Node
 
 from hri_msgs.srv import STT
 
-from .api.gstt import stt
+from .stt.gstt import stt
 
 
 class STTNode(Node):

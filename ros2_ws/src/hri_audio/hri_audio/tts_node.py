@@ -3,7 +3,7 @@ from rclpy.node import Node
 
 from hri_msgs.srv import TTS
 
-from.api.gtts import tts
+from.tts.gtts import tts
 
 
 class TTSNode(Node):
