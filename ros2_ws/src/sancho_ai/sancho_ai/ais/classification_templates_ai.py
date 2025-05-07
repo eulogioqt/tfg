@@ -1,3 +1,4 @@
+import re
 import json
 
 from .template_ai import TemplateAI
@@ -10,6 +11,18 @@ from ..prompts.classification_prompt import ClassificationPrompt
 from ..prompts.commands.commands import COMMANDS
 
 from llm_tools.models import PROVIDER, MODELS
+
+
+def extract_json_from_code_block(text):
+    match = re.search(r"```json\s*(\{.*?\})\s*```", text, re.DOTALL)
+    if match:
+        return match.group(1).strip()
+    
+    match = re.search(r"(\{.*\})", text, re.DOTALL)
+    if match:
+        return match.group(1).strip()
+    
+    raise ValueError("No JSON object found in the text.")
 
 
 class ClassificationTemplatesAI(TemplateAI):
@@ -32,6 +45,7 @@ class ClassificationTemplatesAI(TemplateAI):
             user_input=classification_prompt.get_user_prompt(),
             parameters_json=classification_prompt.get_parameters()
         )
+        classification_response_json = extract_json_from_code_block(classification_response_json) # Gemini usually puts the response in ```json block
 
         self.node.get_logger().info(f"Assistant: {classification_response_json}")
         classification_response = json.loads(classification_response_json)

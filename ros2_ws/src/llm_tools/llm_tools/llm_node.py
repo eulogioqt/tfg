@@ -1,34 +1,25 @@
 import rclpy
+import importlib
 
 from rclpy.node import Node
 from llm_msgs.msg import LoadUnloadResult, ProviderModel
 from llm_msgs.srv import GetModels, Prompt, Embedding, LoadModel, UnloadModel
-
-from .providers.openai_provider import OpenAIProvider
-from .providers.mistral_provider import MistralProvider
-from .providers.phi_provider import PhiProvider
-from .providers.qwen_provider import QwenProvider
-from .providers.deepseek_provider import DeepSeekProvider
-from .providers.gemini_provider import GeminiProvider
-from .providers.sbert_provider import SBERTProvider
-from .providers.e5_provider import E5Provider
-from .providers.baai_provider import BAAIProvider
 
 from .models import PROVIDER, MODELS
 
 
 class LLMNode(Node):
 
-    PROVIDER_CLASS_MAP = {
-        PROVIDER.OPENAI: OpenAIProvider,
-        PROVIDER.MISTRAL: MistralProvider,
-        PROVIDER.PHI: PhiProvider,
-        PROVIDER.QWEN: QwenProvider,
-        PROVIDER.DEEPSEEK: DeepSeekProvider,
-        PROVIDER.GEMINI: GeminiProvider,
-        PROVIDER.SBERT: SBERTProvider,
-        PROVIDER.E5: E5Provider,
-        PROVIDER.BAAI: BAAIProvider,
+    PROVIDER_CLASS_MAP = { # Poner esto mas cool
+        PROVIDER.OPENAI: ("llm_tools.providers.openai_provider", "OpenAIProvider"),
+        PROVIDER.MISTRAL: ("llm_tools.providers.mistral_provider", "MistralProvider"),
+        PROVIDER.PHI: ("llm_tools.providers.phi_provider", "PhiProvider"),
+        PROVIDER.QWEN: ("llm_tools.providers.qwen_provider", "QwenProvider"),
+        PROVIDER.DEEPSEEK: ("llm_tools.providers.deepseek_provider", "DeepSeekProvider"),
+        PROVIDER.GEMINI: ("llm_tools.providers.gemini_provider", "GeminiProvider"),
+        PROVIDER.SBERT: ("llm_tools.providers.sbert_provider", "SBERTProvider"),
+        PROVIDER.E5: ("llm_tools.providers.e5_provider", "E5Provider"),
+        PROVIDER.BAAI: ("llm_tools.providers.baai_provider", "BAAIProvider"),
     }
 
     def __init__(self):
@@ -190,16 +181,23 @@ class LLMNode(Node):
         self.get_logger().warn(f"[WARN] Provider '{requested_name}' not found. Using fallback '{fallback_name}' instead.")
         
         return fallback_name, fallback_provider
-
+    
     def _try_load_provider(self, name, api_key=""):
         if name not in self.provider_map:
             if name not in self.PROVIDER_CLASS_MAP:
                 raise ValueError(f"Provider '{name}' is not supported.")
             
-            provider_class = self.PROVIDER_CLASS_MAP[name]
+            module_path, class_name = self.PROVIDER_CLASS_MAP[name]
+            try:
+                module = importlib.import_module(module_path)
+                provider_class = getattr(module, class_name)
+            except Exception as e:
+                raise ImportError(f"Could not load provider '{name}': {e}")
+            
             self.provider_map[name] = provider_class(api_key=api_key) if api_key else provider_class()
 
         return self.provider_map[name]
+
 
     def _fill_response(self, response, success, message, provider, model):
         response.success = success
