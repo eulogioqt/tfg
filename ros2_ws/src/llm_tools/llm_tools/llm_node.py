@@ -41,7 +41,7 @@ class LLMNode(Node):
         if not provider_names:
             provider_names = list(PROVIDER)
 
-        self.get_logger().info(f"📖 Get Available Models service for providers: {provider_names}")
+        self.get_logger().info(f"📖 Get All Models service for providers: {provider_names}")
         
         response.llm_models = []
         response.embedding_models = []

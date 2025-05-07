@@ -1,0 +1,2 @@
+string model
+string[] speakers
