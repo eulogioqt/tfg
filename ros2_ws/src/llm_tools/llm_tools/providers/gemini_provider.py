@@ -20,8 +20,8 @@ class GeminiProvider(APIProvider):
         raise NotImplementedError("This provider does not support embeddings.")
 
     def prompt(self, model, prompt_system, messages_json, user_input, parameters_json):
-        if not model:
-            model = MODELS.LLM.GEMINI.GEMINI_FLASH
+        if not model or model not in self.client:
+            model = list(self.client.keys())[0]
 
         messages = self.formatter.format(prompt_system, messages_json, user_input)
         chat = self.client[model].start_chat(history=messages)

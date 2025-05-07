@@ -24,9 +24,8 @@ class HFLLMProvider(BaseProvider):
         raise NotImplementedError("This provider does not support embeddings.")
 
     def prompt(self, model, prompt_system, messages_json, user_input, parameters_json):
-        model = model or list(self.models.keys())[0]
-        if model not in self.models:
-            raise ValueError(f"Model {model} not loaded in provider.")
+        if not model or model not in self.models:
+            model = list(self.models.keys())[0]
 
         tokenizer = self.tokenizers[model]
         formatter = self.formatters[model]

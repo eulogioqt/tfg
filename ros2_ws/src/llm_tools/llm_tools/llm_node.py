@@ -88,7 +88,7 @@ class LLMNode(Node):
         self.get_logger().info(f"📖 Prompt service for provider='{request.provider}', model='{request.model}'")
 
         try:
-            provider_name, provider = self._get_provider(request.provider)            
+            provider_name, provider = self._get_provider(request.provider)     
             result, model_used = provider.prompt(
                 model=request.model,
                 prompt_system=request.prompt_system,
@@ -96,7 +96,7 @@ class LLMNode(Node):
                 user_input=request.user_input,
                 parameters_json=request.parameters_json
             )
-
+            
             response.response = result
             self._fill_response(response, True, "OK", provider_name, model_used)
             self.get_logger().info(f"✅ Prompt done using provider='{provider_name}', model='{model_used}'")
@@ -178,7 +178,7 @@ class LLMNode(Node):
             raise ValueError("No providers are loaded")
 
         fallback_name, fallback_provider = next(iter(self.provider_map.items()))
-        self.get_logger().warn(f"[WARN] Provider '{requested_name}' not found. Using fallback '{fallback_name}' instead.")
+        self.get_logger().warn(f"[WARN] Provider '{requested_name}' not found. Using fallback '{fallback_provider}' instead.")
         
         return fallback_name, fallback_provider
     
