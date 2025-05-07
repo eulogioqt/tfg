@@ -5,7 +5,8 @@ from rclpy.node import Node
 from queue import Queue
 
 from std_msgs.msg import String
-from hri_msgs.srv import SanchoPrompt, TTS
+from hri_msgs.srv import SanchoPrompt
+from speech_msgs.srv import TTS
 
 
 class AssistantNode(Node):
@@ -19,7 +20,7 @@ class AssistantNode(Node):
         while not self.sancho_prompt_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().warning("Sancho Prompt Service not available, waiting...")
 
-        self.tts_client = self.create_client(TTS, 'hri_audio/tts')
+        self.tts_client = self.create_client(TTS, 'speech_tools/tts')
         while not self.tts_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('TTS service not available, waiting again...')
 

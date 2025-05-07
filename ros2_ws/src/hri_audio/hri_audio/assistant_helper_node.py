@@ -9,7 +9,7 @@ from rclpy.node import Node
 
 from std_msgs.msg import String
 from hri_msgs.msg import ChunkMono
-from hri_msgs.srv import STT
+from speech_msgs.srv import STT
 
 from .utils.sound import play
 from .utils.sounds import ACTIVATION_SOUND
@@ -34,7 +34,7 @@ class AssistantHelperNode(Node):
         self.assistant_text_pub = self.create_publisher(String, 'hri_audio/assistant_helper/transcription', 10)
         self.micro_sub = self.create_subscription(ChunkMono, 'hri_audio/microphone/mono', self.microphone_callback, 10)
         
-        self.stt_client = self.create_client(STT, 'hri_audio/stt')
+        self.stt_client = self.create_client(STT, 'speech_tools/stt')
         while not self.stt_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('STT service not available, waiting again...')
             

@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 
-from hri_msgs.srv import STT
+from speech_msgs.srv import STT
 
 from .stt.gstt import stt
 
@@ -11,7 +11,7 @@ class STTNode(Node):
     def __init__(self):
         super().__init__("stt")
 
-        self.stt_service = self.create_service(STT, 'hri_audio/stt', self.handle_stt)
+        self.stt_service = self.create_service(STT, 'speech_tools/stt', self.handle_stt)
 
         self.get_logger().info('STT Node inicializado correctamente')
             

@@ -2,8 +2,8 @@ import rclpy
 import importlib
 from rclpy.node import Node
 
-from hri_msgs.msg import ModelSpeaker
-from hri_msgs.srv import TTS, TTSModelSet, TTSModelGetAll, TTSModelGetActual
+from speech_msgs.msg import ModelSpeaker
+from speech_msgs.srv import TTS, TTSModelSet, TTSModelGetAll, TTSModelGetActual
 
 from .tts import TTSModel, TTS_MODELS, TTS_SPEAKERS
 
@@ -11,13 +11,13 @@ from .tts import TTSModel, TTS_MODELS, TTS_SPEAKERS
 class TTSNode(Node):
     
     MODELS_CLASS_MAP = { # Poner esto mas cool, solo con el nombre camelcase se puede hacer, lo demas no es necesario
-        TTS_MODELS.BARK: ("hri_audio.tts", "BarkTTS"),
-        TTS_MODELS.CSS10: ("hri_audio.tts", "CSS10TTS"),
-        TTS_MODELS.GOOGLE: ("hri_audio.tts", "GoogleTTS"),
-        TTS_MODELS.PIPER: ("hri_audio.tts", "PiperTTS"),
-        TTS_MODELS.TACOTRON2: ("hri_audio.tts", "Tacotron2TTS"),
-        TTS_MODELS.XTTS: ("hri_audio.tts", "XTTS"),
-        TTS_MODELS.YOUR_TTS: ("hri_audio.tts", "YourTTS"),
+        TTS_MODELS.BARK: ("speech_tools.tts", "BarkTTS"),
+        TTS_MODELS.CSS10: ("speech_tools.tts", "CSS10TTS"),
+        TTS_MODELS.GOOGLE: ("speech_tools.tts", "GoogleTTS"),
+        TTS_MODELS.PIPER: ("speech_tools.tts", "PiperTTS"),
+        TTS_MODELS.TACOTRON2: ("speech_tools.tts", "Tacotron2TTS"),
+        TTS_MODELS.XTTS: ("speech_tools.tts", "XTTS"),
+        TTS_MODELS.YOUR_TTS: ("speech_tools.tts", "YourTTS"),
     }
 
     def __init__(self):
@@ -25,10 +25,10 @@ class TTSNode(Node):
         
         self.model: TTSModel = None # Poner parametro como en ros2web
 
-        self.get_all_srv = self.create_service(TTSModelGetAll, 'hri_audio/tts/get_all_models', self.handle_get_all_models)
-        self.get_actual_srv = self.create_service(TTSModelGetActual, 'hri_audio/tts/get_actual_model', self.handle_get_actual_model)
-        self.tts_srv = self.create_service(TTS, 'hri_audio/tts', self.handle_tts)
-        self.model_set_srv = self.create_service(TTSModelSet, 'hri_audio/tts/model_set', self.handle_model_set)
+        self.get_all_srv = self.create_service(TTSModelGetAll, 'speech_tools/tts/get_all_models', self.handle_get_all_models)
+        self.get_actual_srv = self.create_service(TTSModelGetActual, 'speech_tools/tts/get_actual_model', self.handle_get_actual_model)
+        self.tts_srv = self.create_service(TTS, 'speech_tools/tts', self.handle_tts)
+        self.model_set_srv = self.create_service(TTSModelSet, 'speech_tools/tts/model_set', self.handle_model_set)
 
         self.get_logger().info('TTS Node inicializado correctamente')
 
