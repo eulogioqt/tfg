@@ -1,5 +1,4 @@
 import wave
-import torch
 import numpy as np
 from piper import PiperVoice
 

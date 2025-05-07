@@ -29,6 +29,6 @@ def transcribe(audio_samples, sample_rate):
             )['transcript']
             return best_transcript
         else:
-            return None
+            return ""
     else:
-        return None # If error
+        return ""

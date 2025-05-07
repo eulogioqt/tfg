@@ -9,7 +9,7 @@ class PythonTTS(Node):
     def __init__(self):
         super().__init__("python_tts")
         
-        self.create_subscription(str, "input_tts", self.text_to_speech, 10)
+        self.create_subscription(str, "hri_audio/tts", self.text_to_speech, 10)
     
     def text_to_speech(self, msg):
         text = msg

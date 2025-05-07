@@ -1,0 +1,4 @@
+int16[] audio
+int32 sample_rate
+---
+string text
