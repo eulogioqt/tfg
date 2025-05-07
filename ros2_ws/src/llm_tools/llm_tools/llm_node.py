@@ -3,7 +3,7 @@ import importlib
 
 from rclpy.node import Node
 from llm_msgs.msg import LoadUnloadResult, ProviderModel
-from llm_msgs.srv import GetModels, Prompt, Embedding, LoadModel, UnloadModel, SetActiveLLMModel, SetActiveEmbeddingModel
+from llm_msgs.srv import GetModels, Prompt, Embedding, LoadModel, UnloadModel, GetActiveModels, SetActiveModel
 
 from .models import PROVIDER, MODELS
 
@@ -31,13 +31,14 @@ class LLMNode(Node):
         self.active_embedding = None
 
         self.get_all_srv = self.create_service(GetModels, 'llm_tools/get_all_models', self.handle_get_all_models)
+        self.get_active_srv = self.create_service(GetActiveModels, 'llm_tools/get_active_models', self.handle_get_active_models)
         self.get_available_srv = self.create_service(GetModels, 'llm_tools/get_available_models', self.handle_get_available_models)
         self.prompt_srv = self.create_service(Prompt, 'llm_tools/prompt', self.handle_prompt)
         self.embedding_srv = self.create_service(Embedding, 'llm_tools/embedding', self.handle_embedding)
         self.load_model_srv = self.create_service(LoadModel, 'llm_tools/load_model', self.handle_load_model)
         self.unload_model_srv = self.create_service(UnloadModel, 'llm_tools/unload_model', self.handle_unload_model)
-        self.set_active_llm_srv = self.create_service(SetActiveLLMModel, 'llm_tools/set_active_llm', self.handle_set_active_llm)
-        self.set_active_embedding_srv = self.create_service(SetActiveEmbeddingModel, 'llm_tools/set_active_embedding', self.handle_set_active_embedding)
+        self.set_active_llm_srv = self.create_service(SetActiveModel, 'llm_tools/set_active_llm', self.handle_set_active_llm)
+        self.set_active_embedding_srv = self.create_service(SetActiveModel, 'llm_tools/set_active_embedding', self.handle_set_active_embedding)
 
         self.get_logger().info("LLM Node initializated succesfully")
 
@@ -62,6 +63,14 @@ class LLMNode(Node):
                 
             response.providers.append(provider_name)
 
+        return response
+
+    def handle_get_active_models(self, request, response):
+        if self.active_llm:
+            [response.llm_provider, response.llm_model] = self.active_llm
+        if self.active_embedding:
+            [response.embedding_provider, response.embedding_model] = self.active_embedding
+        
         return response
 
     def handle_get_available_models(self, request, response):
@@ -180,20 +189,12 @@ class LLMNode(Node):
         return response
 
     def handle_set_active_llm(self, request, response):
-        response.success, response.message = self._set_active_model(
-            kind="llm",
-            provider=request.llm_provider,
-            model=request.llm_model
-        )
+        response.success, response.message = self._set_active_model("llm", request.provider, request.model)
 
         return response
 
     def handle_set_active_embedding(self, request, response):
-        response.success, response.message = self._set_active_model(
-            kind="embedding",
-            provider=request.embedding_provider,
-            model=request.embedding_model
-        )
+        response.success, response.message = self._set_active_model("embedding", request.provider, request.model)
 
         return response
 
@@ -236,7 +237,7 @@ class LLMNode(Node):
     
     def _get_or_active(self, kind, provider_name, model_name):
         assert kind in ['llm', 'embedding']
-        
+
         if not provider_name:
             active = getattr(self, f"active_{kind}", None)
             if active:
