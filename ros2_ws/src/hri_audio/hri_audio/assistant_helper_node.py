@@ -9,7 +9,7 @@ from rclpy.node import Node
 
 from std_msgs.msg import String
 from hri_msgs.msg import ChunkMono
-from hri_msgs.srv import AudioRecognition
+from hri_msgs.srv import STT
 
 from .api.sound import play
 from .api.sounds import ACTIVATION_SOUND
@@ -34,9 +34,9 @@ class AssistantHelperNode(Node):
         self.assistant_text_pub = self.create_publisher(String, 'hri_audio/assistant_helper/transcription', 10)
         self.micro_sub = self.create_subscription(ChunkMono, 'hri_audio/microphone/mono', self.microphone_callback, 10)
         
-        self.audio_recognition_client = self.create_client(AudioRecognition, 'hri_audio/stt')
-        while not self.audio_recognition_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('Audio recognition service not available, waiting again...')
+        self.stt_client = self.create_client(STT, 'hri_audio/stt')
+        while not self.stt_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('STT service not available, waiting again...')
             
         self.transcribe_queue = Queue(maxsize=1)
         self.chunk_queue = Queue()
@@ -121,7 +121,7 @@ class AssistantHelper:
                 audio = self.node.transcribe_queue.get()
                 self.node.get_logger().info("Transcribing...")
         
-                rec = self.audio_recognition_request(audio)                
+                rec = self.stt_request(audio)                
                 if rec:
                     self.node.get_logger().info(f"Text transcribed ({len(audio) / self.sample_rate}s): {rec}")
                     
@@ -146,19 +146,19 @@ class AssistantHelper:
 
             rclpy.spin_once(self.node)
 
-    def audio_recognition_request(self, audio):
-        audio_recognition_request = AudioRecognition.Request()
+    def stt_request(self, audio):
+        stt_request = STT.Request()
 
         audio = np.ndarray.tolist(np.array(audio)) # This is weird. Without this conversion it doesn't work. Need to see why
 
-        audio_recognition_request.audio = audio
-        audio_recognition_request.sample_rate = self.sample_rate
+        stt_request.audio = audio
+        stt_request.sample_rate = self.sample_rate
 
-        future_audio_recognition = self.node.audio_recognition_client.call_async(audio_recognition_request)
-        rclpy.spin_until_future_complete(self.node, future_audio_recognition)
-        result_audio_recognition = future_audio_recognition.result()
+        future_stt = self.node.stt_client.call_async(stt_request)
+        rclpy.spin_until_future_complete(self.node, future_stt)
+        result_stt = future_stt.result()
 
-        return result_audio_recognition.text
+        return result_stt.text
     
     def is_audio_length(self, audio, seconds):
         return len(audio) >= seconds * self.sample_rate

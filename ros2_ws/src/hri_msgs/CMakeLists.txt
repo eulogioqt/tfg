@@ -28,7 +28,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/GetString.srv"
   "srv/SanchoPrompt.srv"
   "srv/CreateLog.srv"
-  "srv/AudioRecognition.srv"
+  "srv/STT.srv"
+  "srv/TTS.srv"
   
   DEPENDENCIES sensor_msgs std_msgs
 )

@@ -1,7 +1,7 @@
 import base64
 import requests
 
-def transcribe(audio_samples, sample_rate):
+def stt(audio_samples, sample_rate):
     audio_base64 = base64.b64encode(audio_samples).decode('utf-8')
     
     data = {
