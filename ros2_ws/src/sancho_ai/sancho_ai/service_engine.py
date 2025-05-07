@@ -13,14 +13,18 @@ class ServiceEngine(ABC):
     def __init__(self, node: Node):
         self.node = node
 
-    def create_client(self, srv_type, srv_name):
+    def create_client(self, srv_type, srv_name, wait=True):
         client = self.node.create_client(srv_type, srv_name)
-        while not client.wait_for_service(timeout_sec=1.0):
+        while wait and not client.wait_for_service(timeout_sec=1.0):
             self.node.get_logger().info(f'{srv_name} service not available, waiting again...')
 
         return client
 
     def call_service(self, client: Client, request):
+        if not client.service_is_ready():
+            self.node.get_logger().warn(f"Service'{client.srv_name}' not available")
+            return None
+        
         done_event = Event()
         result_holder = {}
 

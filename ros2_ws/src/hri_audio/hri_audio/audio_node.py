@@ -1,3 +1,4 @@
+import os
 import wave
 import numpy as np
 import time
@@ -10,13 +11,13 @@ from hri_msgs.msg import ChunkMono, ChunkStereo
 
 class AudioNode(Node):
 
-    def __init__(self, wav_path="./sounds/sample.wav", chunk_size=1024):
+    def __init__(self, wav_path="sounds/sample.wav", chunk_size=1024):
         super().__init__('audio')
 
         self.publisher_stereo = self.create_publisher(ChunkStereo, 'hri_audio/microphone/stereo', 10)
         self.publisher_mono = self.create_publisher(ChunkMono, 'hri_audio/microphone/mono', 10)
 
-        self.wav_path = wav_path
+        self.wav_path = os.path.join(os.path.dirname(__file__), wav_path)
         self.chunk_size = chunk_size
 
     def spin(self):

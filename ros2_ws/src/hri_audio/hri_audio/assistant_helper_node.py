@@ -25,6 +25,7 @@ class HELPER_STATE(int, Enum):
     NAME = 1
 
 
+# Cambiar el check each seconds si estamos en name o si estamos en command? En name 0.5 y en command 1?
 class AssistantHelperNode(Node):
 
     def __init__(self):
@@ -45,7 +46,7 @@ class AssistantHelperNode(Node):
     def microphone_callback(self, msg):
         new_audio = list([np.int16(x) for x in msg.chunk_mono])
         sample_rate = msg.sample_rate
-
+        
         self.chunk_queue.put([new_audio, sample_rate])
 
 
@@ -60,7 +61,7 @@ class AssistantHelper:
         self.sample_rate = -1 # Will set on mic callbacks
         self.check_each_seconds = 0.5
         self.intensity_threshold = 750
-        self.name_seconds = 1.5
+        self.name_max_seconds = 1.5
 
         self.audio = []
         self.check_audio = []
@@ -75,10 +76,10 @@ class AssistantHelper:
 
                 self.check_audio = self.check_audio + new_audio
                 self.sample_rate = sample_rate # Sample rate set
-
-                if self.is_audio_length(audio, self.check_each_seconds):
+                
+                if self.is_audio_length(self.check_audio, self.check_each_seconds):
                     avg_intensity = self.audio_average_intensity(self.check_audio)
-                    self.node.get_logger().info(f"{self.check_each_seconds} seconds: {avg_intensity}")
+                    self.node.get_logger().info(f"Chunk of {self.check_each_seconds}s: {avg_intensity:.2f} avg intensity")
 
                     if avg_intensity >= self.intensity_threshold: # Si hay intensidad, lo añadimos
                         if self.audio_state == AUDIO_STATE.NO_AUDIO: # Por si es en END, no pase a SOME
@@ -88,7 +89,7 @@ class AssistantHelper:
                             self.audio = self.previous_chunk 
 
                         self.audio = self.audio + self.check_audio # Luego el trozo nuevo
-                        self.node.get_logger().info(f"Chunk attached ({len(self.audio) / self.sample_rate} seconds)")
+                        self.node.get_logger().info(f"Chunk attached ({len(self.audio) / self.sample_rate}s)")
                     elif self.audio_state != AUDIO_STATE.NO_AUDIO: # Si no hay intensidad y hay audio, terminamos trozo
                         self.audio_state = AUDIO_STATE.END_AUDIO
 
@@ -100,18 +101,20 @@ class AssistantHelper:
                     self.previous_chunk = self.check_audio
                     self.check_audio = []
 
-                if self.no_more_audio == AUDIO_STATE.END_AUDIO:
+                if self.audio_state == AUDIO_STATE.END_AUDIO:
                     if self.node.transcribe_queue.qsize() < 1:
+                        self.node.get_logger().info(f"Adding {len(self.audio) / self.sample_rate}s chunk to transcribe queue")
                         self.node.transcribe_queue.put(self.audio)
                     else:
                         self.node.get_logger().info("Transcribe Queue IS FULL!!!")
                     
                     self.audio = []
                     self.check_audio = []
-                    self.no_more_audio = AUDIO_STATE.NO_AUDIO
+                    self.audio_state = AUDIO_STATE.NO_AUDIO
 
                 # Si ya nos hemos llegado al limite, modo end audio, que añada el siguiente chunk y termine
-                if self.helper_state == HELPER_STATE.NAME and self.is_audio_length(audio, self.name_seconds):
+                if self.helper_state == HELPER_STATE.NAME and self.is_audio_length(self.audio, self.name_max_seconds):
+                    self.node.get_logger().info(f"Name mode audio {len(self.audio) / self.sample_rate}s >= {self.name_max_seconds}s -> End audio mode")
                     self.audio_state = AUDIO_STATE.END_AUDIO
 
             if not self.node.transcribe_queue.empty(): # Transcribe audio chunks
@@ -120,7 +123,7 @@ class AssistantHelper:
         
                 rec = self.audio_recognition_request(audio)                
                 if rec:
-                    self.node.get_logger().info(f"Text transcribed ({len(audio) / self.sample_rate} seconds): {rec}")
+                    self.node.get_logger().info(f"Text transcribed ({len(audio) / self.sample_rate}s): {rec}")
                     
                     rec_processed = rec.strip().lower()
                     rec_processed = unidecode.unidecode(rec_processed)
@@ -152,7 +155,7 @@ class AssistantHelper:
         audio_recognition_request.sample_rate = self.sample_rate
 
         future_audio_recognition = self.node.audio_recognition_client.call_async(audio_recognition_request)
-        rclpy.spin_until_future_complete(self, future_audio_recognition)
+        rclpy.spin_until_future_complete(self.node, future_audio_recognition)
         result_audio_recognition = future_audio_recognition.result()
 
         return result_audio_recognition.text
