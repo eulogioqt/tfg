@@ -19,7 +19,7 @@ class BarkTTS(TTSModel):
         )
 
     def synthesize(self, text: str, speaker: str) -> np.ndarray:
-        if not speaker or speaker not in self.get_speakers():
+        if not speaker:
             speaker = self.get_speakers()[0]
 
         audio = generate_audio(text, history_prompt=speaker)

@@ -11,7 +11,7 @@ from . import TTS_SPEAKERS
 class GoogleTTS(TTSModel):
 
     def synthesize(self, text: str, speaker: str) -> np.ndarray:
-        if not speaker or speaker not in self.get_speakers():
+        if not speaker:
             speaker = self.get_speakers()[0]
             
         mp3_fp = BytesIO()

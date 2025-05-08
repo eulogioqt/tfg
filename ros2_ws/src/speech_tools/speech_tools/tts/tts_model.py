@@ -1,6 +1,8 @@
-from abc import ABC, abstractmethod
-
+import gc
+import torch
 import numpy as np
+
+from abc import ABC, abstractmethod
 
 
 class TTSModel(ABC):
@@ -20,3 +22,8 @@ class TTSModel(ABC):
     @abstractmethod
     def get_speakers(self) -> list[str]:
         pass
+
+    def unload(self):
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        gc.collect()

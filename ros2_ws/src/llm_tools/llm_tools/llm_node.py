@@ -6,6 +6,7 @@ from llm_msgs.msg import LoadUnloadResult, ProviderModel
 from llm_msgs.srv import GetModels, Prompt, Embedding, LoadModel, UnloadModel, GetActiveModels, SetActiveModel
 
 from .models import PROVIDER, MODELS
+from .providers.base_provider import BaseProvider
 
 
 class LLMNode(Node):
@@ -66,6 +67,8 @@ class LLMNode(Node):
         return response
 
     def handle_get_active_models(self, request, response):
+        self.get_logger().info(f"📖 Get Active Models service.")
+
         if self.active_llm:
             [response.llm_provider, response.llm_model] = self.active_llm
         if self.active_embedding:
@@ -118,7 +121,7 @@ class LLMNode(Node):
             self.get_logger().info(f"✅ Prompt done using provider='{provider_name}', model='{model_used}'")
         except Exception as e:
             response.response = ""
-            self._fill_response(response, False, str(e), request.provider, request.model)
+            self._fill_response(response, False, str(e))
             self.get_logger().info(f"❌ Prompt service failed: {str(e)}")
 
         return response
@@ -140,7 +143,7 @@ class LLMNode(Node):
             self.get_logger().info(f"✅ Embedding done using provider='{provider_name}', model='{model_used}'")
         except Exception as e:
             response.embedding = []
-            self._fill_response(response, False, str(e), request.provider, request.model)
+            self._fill_response(response, False, str(e))
             self.get_logger().info(f"❌ Embedding service failed: {str(e)}")
 
         return response
@@ -204,6 +207,8 @@ class LLMNode(Node):
         kind_upper = kind.upper()
         model_label = f"{kind_upper} model"
 
+        self.get_logger().info(f"📖 Set Active Model service for {kind_upper}. Provider: {provider}, Model: {model}.")
+
         if not provider or not model:
             return False, "Provider and model must be specified"
         if provider not in list(PROVIDER):
@@ -247,7 +252,7 @@ class LLMNode(Node):
         
         return provider_name, model_name
 
-    def _get_provider(self, provider_name):
+    def _get_provider(self, provider_name) -> BaseProvider:
         if provider_name in self.provider_map:
             return self.provider_map[provider_name]
         elif provider_name not in list(PROVIDER):
@@ -255,7 +260,7 @@ class LLMNode(Node):
         else:
             raise ValueError(f"Provider {provider_name} is not loaded.")
 
-    def _fill_response(self, response, success, message, provider, model):
+    def _fill_response(self, response, success, message, provider="", model=""):
         response.success = success
         response.message = message
         response.provider_used = provider

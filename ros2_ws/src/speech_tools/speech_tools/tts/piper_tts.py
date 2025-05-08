@@ -19,7 +19,7 @@ class PiperTTS(TTSModel):
         } 
 
     def synthesize(self, text: str, speaker: str) -> np.ndarray:
-        if not speaker or speaker not in self.get_speakers():
+        if not speaker:
             speaker = self.get_speakers()[0]
 
         stream = self.models[speaker].synthesize_stream_raw(text)
@@ -36,7 +36,11 @@ class PiperTTS(TTSModel):
             wf.writeframes(audio.tobytes())
 
     def get_sample_rate(self) -> int:
-        return self.models[0].config.sample_rate
+        return next(iter(self.models.values())).config.sample_rate
     
     def get_speakers(self) -> list[str]:
         return list(TTS_SPEAKERS.PIPER)
+
+    def unload(self):
+        del self.models
+        super().unload()
