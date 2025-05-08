@@ -1,12 +1,15 @@
 import gc
+import ast
 import rclpy
 import importlib
+import numpy as np
 from rclpy.node import Node
 
 from speech_msgs.msg import ModelSpeaker, LoadUnloadResult
-from speech_msgs.srv import TTS, TTSGetActiveModel, TTSGetModels, SetActiveModel, LoadModel, UnloadModel
+from speech_msgs.srv import TTS, TTSGetActiveModel, TTSGetModels, TTSSetActiveModel, LoadModel, UnloadModel
 
-from .tts import TTSModel, TTS_MODELS, TTS_SPEAKERS
+from .tts import TTSModel
+from .models import TTS_MODELS, TTS_SPEAKERS
 
 
 class TTSNode(Node):
@@ -34,11 +37,8 @@ class TTSNode(Node):
         self.tts_srv = self.create_service(TTS, 'speech_tools/tts', self.handle_tts)
         self.load_model_srv = self.create_service(LoadModel, 'speech_tools/tts/load_model', self.handle_load_model)
         self.unload_model_srv = self.create_service(UnloadModel, 'speech_tools/tts/unload_model', self.handle_unload_model)
-        self.set_active_model_srv = self.create_service(SetActiveModel, 'speech_tools/tts/set_active_model', self.handle_set_active_model)
+        self.set_active_model_srv = self.create_service(TTSSetActiveModel, 'speech_tools/tts/set_active_model', self.handle_set_active_model)
 
-        self.declare_parameter("load_models", [])
-        self.declare_parameter("active_model", "")
-        self.declare_parameter("active_speaker", "")
         self._init_from_parameters()
 
         self.get_logger().info('TTS Node inicializado correctamente')
@@ -95,7 +95,8 @@ class TTSNode(Node):
             audio, speaker_used = model.synthesize(
                 text=request.text, 
                 speaker=speaker_name
-            )
+            ) 
+            audio = audio.tolist()
 
             self._fill_response(response, audio, model.get_sample_rate(), "OK", True, model_name, speaker_used)
             self.get_logger().info(f"✅ TTS done using model {model_name} and speaker {speaker_name}")
@@ -171,9 +172,9 @@ class TTSNode(Node):
         return response
 
     def _init_from_parameters(self):
-        models_to_load = self.get_parameter("load_models").get_parameter_value().string_array_value
-        active_model = self.get_parameter("active_model").get_parameter_value().string_value
-        active_speaker = self.get_parameter("active_speaker").get_parameter_value().string_value
+        models_to_load = self.parse_string_list(self.declare_parameter("load_models", "[]").get_parameter_value().string_value)
+        active_model = self.declare_parameter("active_model", "").get_parameter_value().string_value
+        active_speaker = self.declare_parameter("active_speaker", "").get_parameter_value().string_value
 
         for model_name in models_to_load:
             try:
@@ -234,6 +235,12 @@ class TTSNode(Node):
         response.speaker_used = speaker_used
         response.message = message
         response.success = success
+
+    def parse_string_list(self, raw_string) -> list[str]:
+        try:
+            return ast.literal_eval(raw_string)
+        except Exception:
+            return []
 
 def main(args=None):
     rclpy.init(args=args)

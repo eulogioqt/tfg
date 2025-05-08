@@ -1,6 +1,8 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
+from speech_tools.models import TTS_MODELS, TTS_SPEAKERS
+
 def generate_launch_description():
     return LaunchDescription([
         Node(
@@ -21,9 +23,9 @@ def generate_launch_description():
             name='tts',
             output='screen',
             parameters=[{
-                "load_models": ["PIPER"],
-                "active_model": "PIPER",
-                "active_speaker": "davefx"
+                "load_models": f"['{TTS_MODELS.PIPER}']",
+                "active_model": f"{TTS_MODELS.PIPER}",
+                "active_speaker": f"{TTS_SPEAKERS.PIPER.DAVEFX}"
             }]
         ),
         Node(

@@ -4,7 +4,7 @@ import soundfile as sf
 from bark import generate_audio, preload_models, SAMPLE_RATE
 
 from .tts_model import TTSModel
-from . import TTS_SPEAKERS
+from ..models import TTS_SPEAKERS
 
 
 class BarkTTS(TTSModel):

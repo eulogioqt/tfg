@@ -1,5 +1,5 @@
 from .coqui_single_tts import CoquiSingleTTS
-from . import TTS_SPEAKERS
+from ..models import TTS_SPEAKERS
 
 
 class Tacotron2TTS(CoquiSingleTTS):

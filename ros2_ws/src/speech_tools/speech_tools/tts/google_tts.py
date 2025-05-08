@@ -5,7 +5,7 @@ from io import BytesIO
 from pydub import AudioSegment
 
 from .tts_model import TTSModel
-from . import TTS_SPEAKERS
+from ..models import TTS_SPEAKERS
 
 
 class GoogleTTS(TTSModel):

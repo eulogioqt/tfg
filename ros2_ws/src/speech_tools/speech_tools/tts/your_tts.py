@@ -1,5 +1,5 @@
 from .coqui_multi_tts import CoquiMultiTTS
-from . import TTS_SPEAKERS
+from ..models import TTS_SPEAKERS
 
 
 class YourTTS(CoquiMultiTTS):
