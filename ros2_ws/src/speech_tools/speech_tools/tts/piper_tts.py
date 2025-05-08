@@ -26,7 +26,7 @@ class PiperTTS(TTSModel):
         audio_bytes = b"".join(stream)
         audio = np.frombuffer(audio_bytes, dtype=np.int16)
 
-        return audio
+        return audio, speaker
     
     def save(self, audio: np.ndarray, filename: str):
         with wave.open(filename, "wb") as wf:

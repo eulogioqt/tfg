@@ -21,7 +21,7 @@ class GoogleTTS(TTSModel):
         audio = AudioSegment.from_mp3(mp3_fp).set_channels(1)
         audio = np.array(audio.get_array_of_samples()).astype(np.int16)
 
-        return audio
+        return audio, speaker
 
     def save(self, audio: np.ndarray, filename: str):
         with wave.open(filename, "wb") as wf:

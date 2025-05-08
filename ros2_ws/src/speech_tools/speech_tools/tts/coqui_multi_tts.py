@@ -19,7 +19,7 @@ class CoquiMultiTTS(CoquiTTS):
         audio = self.model.tts(text, speaker=speaker, speaker_wav=None, language=self.language)
         audio = np.array(audio)
 
-        return audio
+        return audio, speaker
 
     def get_sample_rate(self) -> int:
         return self.model.synthesizer.output_sample_rate

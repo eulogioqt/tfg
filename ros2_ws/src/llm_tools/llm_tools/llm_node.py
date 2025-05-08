@@ -213,7 +213,7 @@ class LLMNode(Node):
             return False, "Provider and model must be specified"
         if provider not in list(PROVIDER):
             return False, f"Invalid {model_label.lower()} provider: {provider}"
-        if not hasattr(getattr(MODELS, kind_upper), provider.upper()):
+        if model not in list(getattr(getattr(MODELS, kind_upper), provider.upper(), [])):
             return False, f"{model_label} '{model}' not found for provider '{provider}'"
         if provider not in self.provider_map:
             return False, f"Provider '{provider}' is not loaded. You must load it with your model first."

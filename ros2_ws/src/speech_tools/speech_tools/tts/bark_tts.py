@@ -24,7 +24,7 @@ class BarkTTS(TTSModel):
 
         audio = generate_audio(text, history_prompt=speaker)
 
-        return audio
+        return audio, speaker
     
     def save(self, audio: np.ndarray, filename: str):
         if hasattr(audio, "numpy"):

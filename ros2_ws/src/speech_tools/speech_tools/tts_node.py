@@ -36,6 +36,11 @@ class TTSNode(Node):
         self.unload_model_srv = self.create_service(UnloadModel, 'speech_tools/tts/unload_model', self.handle_unload_model)
         self.set_active_model_srv = self.create_service(SetActiveModel, 'speech_tools/tts/set_active_model', self.handle_set_active_model)
 
+        self.declare_parameter("load_models", [])
+        self.declare_parameter("active_model", "")
+        self.declare_parameter("active_speaker", "")
+        self._init_from_parameters()
+
         self.get_logger().info('TTS Node inicializado correctamente')
 
     def handle_get_all_models(self, request, response):
@@ -87,12 +92,12 @@ class TTSNode(Node):
             model_name, speaker_name = self._get_or_active(request.model, request.speaker)
             model = self._get_model(model_name)
 
-            audio, sample_rate, speaker_used = model.synthesize(
+            audio, speaker_used = model.synthesize(
                 text=request.text, 
                 speaker=speaker_name
             )
 
-            self._fill_response(response, audio, sample_rate, "OK", True, model_name, speaker_used)
+            self._fill_response(response, audio, model.get_sample_rate(), "OK", True, model_name, speaker_used)
             self.get_logger().info(f"✅ TTS done using model {model_name} and speaker {speaker_name}")
         except Exception as e:
             self._fill_response(response, [], 0, str(e), False)
@@ -129,7 +134,7 @@ class TTSNode(Node):
             if model:
                 try:
                     model.unload()
-                    del model
+                    del self.model_map[model_name]
                     gc.collect()
 
                     result.success, result.message = True, "Models unloaded succesfully"
@@ -155,15 +160,39 @@ class TTSNode(Node):
             response.success, response.message = False, "Model and speaker must be specified"
         elif model not in list(TTS_MODELS):
             response.success, response.message = False, f"Invalid model: {model}"
-        elif not hasattr(TTS_SPEAKERS, speaker.upper()):
+        elif speaker not in list(getattr(TTS_SPEAKERS, model.upper(), [])):
             response.success, response.message = False, f"Speaker '{speaker}' not found for model '{model}'"
         elif model not in self.model_map:
             response.success, response.message = False, f"Model '{model}' is not loaded. You must load it first."
         else:
-            self.active_model = [model, speaker]
+            self._set_active_model(model, speaker)
             response.success, response.message = True, f"Active model set to {model}/{speaker}"
 
         return response
+
+    def _init_from_parameters(self):
+        models_to_load = self.get_parameter("load_models").get_parameter_value().string_array_value
+        active_model = self.get_parameter("active_model").get_parameter_value().string_value
+        active_speaker = self.get_parameter("active_speaker").get_parameter_value().string_value
+
+        for model_name in models_to_load:
+            try:
+                self._try_load_model(model_name)
+                self.get_logger().info(f"🔄 Model '{model_name}' loaded from parameter")
+            except Exception as e:
+                self.get_logger().error(f"❌ Could not load model '{model_name}' from parameter: {e}")
+
+        if active_model and active_speaker:
+            if active_model not in self.model_map:
+                self.get_logger().warn(f"❌ Cannot set active model '{active_model}', it is not loaded")
+            elif active_speaker not in list(getattr(TTS_SPEAKERS, active_model.upper())):
+                self.get_logger().warn(f"❌ Cannot set active model. Speaker '{active_speaker}' not found")
+            else:
+                self._set_active_model(active_model, active_speaker)
+                self.get_logger().info(f"✅ Active model set to '{active_model}/{active_speaker}' from parameter")
+
+    def _set_active_model(self, model, speaker):
+        self.active_model = [model, speaker]
 
     def _try_load_model(self, model_name):
         if model_name not in self.model_map:

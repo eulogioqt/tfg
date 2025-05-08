@@ -19,7 +19,12 @@ def generate_launch_description():
             package='hri_audio',
             executable='tts',
             name='tts',
-            output='screen'
+            output='screen',
+            parameters=[{
+                "load_models": ["PIPER"],
+                "active_model": "PIPER",
+                "active_speaker": "davefx"
+            }]
         ),
         Node(
             package='hri_audio',
