@@ -38,7 +38,7 @@ class LLMEngine(ServiceEngine):
 
         return result.results
 
-    def prompt_request(self, provider="openai", model="gpt-3.5-turbo", prompt_system="", messages_json="", user_input="", parameters_json=""):
+    def prompt_request(self, provider="", model="", prompt_system="", messages_json="", user_input="", parameters_json=""):
         req = Prompt.Request()
         req.provider = provider
         req.model = model

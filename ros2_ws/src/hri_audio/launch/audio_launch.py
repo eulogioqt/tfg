@@ -16,7 +16,7 @@ def generate_launch_description():
             output='screen'
         ),
         Node(
-            package='hri_audio',
+            package='speech_tools',
             executable='tts',
             name='tts',
             output='screen',
@@ -27,7 +27,7 @@ def generate_launch_description():
             }]
         ),
         Node(
-            package='hri_audio',
+            package='speech_tools',
             executable='stt',
             name='stt',
             output='screen',

@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'llm = speech_tools.llm_node:main'
+            'stt=speech_tools.stt_node:main',
+            'tts=speech_tools.tts_node:main'
         ],
     },
 )

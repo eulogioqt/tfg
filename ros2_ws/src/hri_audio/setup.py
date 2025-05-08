@@ -27,9 +27,7 @@ setup(
             'assistant_helper=hri_audio.assistant_helper_node:main',
             'assistant=hri_audio.assistant_node:main',
             'audio=hri_audio.audio_node:main',
-            'microphone=hri_audio.microphone_node:main',
-            'stt=hri_audio.stt_node:main',
-            'tts=hri_audio.tts_node:main'
+            'microphone=hri_audio.microphone_node:main'
         ],
     },
 )

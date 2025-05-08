@@ -39,8 +39,8 @@ class ClassificationTemplatesAI(TemplateAI):
 
         self.node.get_logger().info(f"User: {message}")
         classification_response_json = self.llm_engine.prompt_request(
-            provider=PROVIDER.DEEPSEEK, # que esto devuelva el provider y el modelo por si quiero ponerlo por ahi en la web
-            model=MODELS.LLM.DEEPSEEK.DEEPSEEK_CHAT,
+            provider=PROVIDER.GEMINI, # que esto devuelva el provider y el modelo por si quiero ponerlo por ahi en la web
+            #model=MODELS.LLM.DEEPSEEK.DEEPSEEK_CHAT,
             prompt_system=classification_prompt.get_prompt_system(),
             user_input=classification_prompt.get_user_prompt(),
             parameters_json=classification_prompt.get_parameters()
