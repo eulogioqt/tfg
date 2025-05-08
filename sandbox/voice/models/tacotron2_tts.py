@@ -7,3 +7,6 @@ class Tacotron2TTS(CoquiSingleTTS):
         super().__init__(
             model="tts_models/es/mai/tacotron2-DDC"
         )
+
+    def get_speakers(self) -> list[str]:
+        return [""]

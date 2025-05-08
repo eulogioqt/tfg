@@ -96,8 +96,15 @@ class TTSNode(Node):
                 text=request.text, 
                 speaker=speaker_name
             ) 
+            self.get_logger().info(str(type(audio)))
             audio = audio.tolist()
-
+            self.get_logger().info(str(type(audio)))
+            self.get_logger().info(str(len(audio)))
+            self.get_logger().info(str(audio[3]))
+            self.get_logger().info(str(audio[233]))
+            self.get_logger().info(str(np.mean(audio)))
+            self.get_logger().info(str(np.max(audio)))
+            self.get_logger().info(str(np.min(audio)))
             self._fill_response(response, audio, model.get_sample_rate(), "OK", True, model_name, speaker_used)
             self.get_logger().info(f"✅ TTS done using model {model_name} and speaker {speaker_name}")
         except Exception as e:

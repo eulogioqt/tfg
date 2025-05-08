@@ -23,9 +23,9 @@ def generate_launch_description():
             name='tts',
             output='screen',
             parameters=[{
-                "load_models": f"['{TTS_MODELS.PIPER}']",
-                "active_model": f"{TTS_MODELS.PIPER}",
-                "active_speaker": f"{TTS_SPEAKERS.PIPER.DAVEFX}"
+                "load_models": f"['{TTS_MODELS.XTTS}']",
+                "active_model": f"{TTS_MODELS.XTTS}",
+                "active_speaker": f"{TTS_SPEAKERS.XTTS.ALMA_MARIA}"
             }]
         ),
         Node(

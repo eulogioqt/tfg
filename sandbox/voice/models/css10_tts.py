@@ -7,3 +7,6 @@ class CSS10TTS(CoquiSingleTTS):
         super().__init__(
             model="tts_models/es/css10/vits"
         )
+
+    def get_speakers(self) -> list[str]:
+        return [""]

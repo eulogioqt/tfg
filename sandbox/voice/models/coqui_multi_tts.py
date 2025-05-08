@@ -7,17 +7,23 @@ from .coqui_tts import CoquiTTS
 
 class CoquiMultiTTS(CoquiTTS):
 
-    def __init__(self, speaker, model, language):
-        self.speaker = speaker
+    def __init__(self, model, language):
         self.language = language
 
         self.model = TTS(model, progress_bar=False, gpu=torch.cuda.is_available())
 
-        self.sample_rate = self.model.synthesizer.output_sample_rate
-        self.speakers = list(self.model.synthesizer.tts_model.speaker_manager.name_to_id)
-
-    def synthesize(self, text: str) -> np.ndarray:
-        audio = self.model.tts(text, speaker=self.speaker, speaker_wav=None, language=self.language)
+    def synthesize(self, text: str, speaker: str) -> np.ndarray:
+        if not speaker:
+            speaker = self.get_speakers()[0]
+            
+        audio = self.model.tts(text, speaker=speaker, speaker_wav=None, language=self.language)
         audio = np.array(audio)
 
-        return audio
+        return audio, speaker
+
+    def get_sample_rate(self) -> int:
+        return self.model.synthesizer.output_sample_rate
+
+    def unload(self):
+        del self.model
+        super().unload()
