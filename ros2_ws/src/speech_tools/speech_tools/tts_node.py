@@ -7,20 +7,20 @@ from rclpy.node import Node
 from speech_msgs.msg import ModelSpeaker, LoadUnloadResult
 from speech_msgs.srv import TTS, TTSGetActiveModel, TTSGetModels, TTSSetActiveModel, LoadModel, UnloadModel
 
-from .tts import TTSModel
+from .tts.tts_model import TTSModel
 from .models import TTS_MODELS, TTS_SPEAKERS
 
 
 class TTSNode(Node):
     
     MODELS_CLASS_MAP = { # Poner esto mas cool, solo con el nombre camelcase se puede hacer, lo demas no es necesario
-        TTS_MODELS.BARK: ("speech_tools.tts", "BarkTTS"),
-        TTS_MODELS.CSS10: ("speech_tools.tts", "CSS10TTS"),
-        TTS_MODELS.GOOGLE: ("speech_tools.tts", "GoogleTTS"),
-        TTS_MODELS.PIPER: ("speech_tools.tts", "PiperTTS"),
-        TTS_MODELS.TACOTRON2: ("speech_tools.tts", "Tacotron2TTS"),
-        TTS_MODELS.XTTS: ("speech_tools.tts", "XTTS"),
-        TTS_MODELS.YOUR_TTS: ("speech_tools.tts", "YourTTS"),
+        TTS_MODELS.BARK: ("speech_tools.tts.bark_tts", "BarkTTS"),
+        TTS_MODELS.CSS10: ("speech_tools.tts.css10_tts", "CSS10TTS"),
+        TTS_MODELS.GOOGLE: ("speech_tools.tts.google_tts", "GoogleTTS"),
+        TTS_MODELS.PIPER: ("speech_tools.tts.piper_tts", "PiperTTS"),
+        TTS_MODELS.TACOTRON2: ("speech_tools.tts.tacotron2_tts", "Tacotron2TTS"),
+        TTS_MODELS.XTTS: ("speech_tools.tts.xtts", "XTTS"),
+        TTS_MODELS.YOUR_TTS: ("speech_tools.tts.your_tts", "YourTTS"),
     }
 
     def __init__(self):

@@ -34,3 +34,7 @@ class WhisperSTT(STTModel):
         finally:
             if 'tmp_path' in locals() and os.path.exists(tmp_path):
                 os.remove(tmp_path)
+
+    def unload(self):
+        del self.model
+        super().unload()

@@ -5,8 +5,8 @@ from rclpy.node import Node
 from llm_msgs.msg import LoadUnloadResult, ProviderModel
 from llm_msgs.srv import GetModels, Prompt, Embedding, LoadModel, UnloadModel, GetActiveModels, SetActiveModel
 
-from .models import PROVIDER, MODELS
 from .providers.base_provider import BaseProvider
+from .models import PROVIDER, MODELS
 
 
 class LLMNode(Node):

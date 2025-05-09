@@ -7,15 +7,15 @@ from rclpy.node import Node
 from speech_msgs.msg import LoadUnloadResult
 from speech_msgs.srv import STT, STTGetActiveModel, STTGetModels, STTSetActiveModel, LoadModel, UnloadModel
 
-from .stt import STTModel
+from .stt.stt_model import STTModel
 from .models import STT_MODELS
 
 
 class STTNode(Node):
     
     MODELS_CLASS_MAP = { # Poner esto mas cool, solo con el nombre camelcase se puede hacer, lo demas no es necesario
-        STT_MODELS.WHISPER: ("speech_tools.stt", "WhisperSTT"),
-        STT_MODELS.GOOGLE: ("speech_tools.stt", "GoogleSTT"),
+        STT_MODELS.WHISPER: ("speech_tools.stt.whisper_stt", "WhisperSTT"),
+        STT_MODELS.GOOGLE: ("speech_tools.stt.google_stt", "GoogleSTT"),
     }
 
     def __init__(self):
