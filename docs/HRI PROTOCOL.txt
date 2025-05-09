@@ -7,6 +7,21 @@ Respuestas a prompts con ID:
         value: ...
     }
 }
+{ // El cliente envia un AUDIO_PROMPT y el servidor responde con la transcripcion mientras genera la respuesta
+    type: "PROMPT_TRANSCRIPTION",
+    data: {
+        id: uuid,
+        value: ...
+    }
+}
+{ // Una vez ha enviado la respuesta y la transcripcion, cuando tiene el audio TTS, lo envia para que se reproduzca en el navegador
+    type: "AUDIO_RESPONSE",
+    data: {
+        id: uuid,
+        audio: [...],
+        sample_rate: ...
+    }
+}
 Mensajes sobre la API de faceprints:
 {
     "type": "FACEPRINT_EVENT",
@@ -18,10 +33,28 @@ Mensajes sobre la API de faceprints:
 
 CLIENTE => SERVIDOR
 Prompt del cliente:
-{
+{ // prompt de texto
     type: "PROMPT",
     data: {
         id: uuid,
         value: ...
     },
 };
+{ // prompt de audio
+    type: "AUDIO_PROMPT",
+    data: {
+        id: uuid,
+        value: ...
+    }
+}
+
+Se puede mejorar con streaming
+
+🎯 Flujo propuesto:
+Usuario graba y envía audio (por WebSocket o REST).
+Servidor transcribe el audio con STT (e.g. Whisper).
+Envía PROMPT_TRANSCRIPTION → el frontend muestra el mensaje del usuario.
+Servidor llama al LLM para generar la respuesta textual.
+Envía RESPONSE → el frontend muestra la respuesta textual del LLM.
+Servidor sintetiza audio con TTS.
+Envía AUDIO_RESPONSE → el frontend reproduce el audio automáticamente.
