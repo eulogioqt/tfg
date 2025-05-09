@@ -109,16 +109,16 @@ class TTSNode(Node):
         self.get_logger().info(f"📖 Load model service for models: {request.models}'")
 
         response.results = []
-        for model_name in request.models:
-            result = LoadUnloadResult(model=model_name)
+        for item in request.items:
+            result = LoadUnloadResult(model=item.model)
             try:
-                model = self._try_load_model(model_name) # Con crearse ya esta cargado
+                model = self._try_load_model(item.model, item.api_key) # Con crearse ya esta cargado
 
                 result.success, result.message = True, "Model loaded succesfully"
-                self.get_logger().info(f"✅ Model {model_name} loaded succesfully")
+                self.get_logger().info(f"✅ Model {item.model} loaded succesfully")
             except Exception as e:
                 result.success, result.message =  False, f"Error loading model: {str(e)}"
-                self.get_logger().info(f"❌ Load model service failed for model {model_name}: {str(e)}")
+                self.get_logger().info(f"❌ Load model service failed for model {item.model}: {str(e)}")
 
             response.results.append(result)
 
@@ -175,9 +175,9 @@ class TTSNode(Node):
         active_model = self.declare_parameter("active_model", "").get_parameter_value().string_value
         active_speaker = self.declare_parameter("active_speaker", "").get_parameter_value().string_value
 
-        for model_name in models_to_load:
+        for [model_name, api_key] in models_to_load:
             try:
-                self._try_load_model(model_name)
+                self._try_load_model(model_name, api_key)
                 self.get_logger().info(f"🔄 Model '{model_name}' loaded from parameter")
             except Exception as e:
                 self.get_logger().error(f"❌ Could not load model '{model_name}' from parameter: {e}")
@@ -194,7 +194,7 @@ class TTSNode(Node):
     def _set_active_model(self, model, speaker):
         self.active_model = [model, speaker]
 
-    def _try_load_model(self, model_name):
+    def _try_load_model(self, model_name, api_key=""):
         if model_name not in self.model_map:
             if model_name not in self.MODELS_CLASS_MAP:
                 raise ValueError(f"Model '{model_name}' is not supported.")
@@ -206,7 +206,7 @@ class TTSNode(Node):
             except Exception as e:
                 raise ImportError(f"Could not load model '{model_name}': {e}")
             
-            self.model_map[model_name] = model_class()
+            self.model_map[model_name] = model_class(api_key=api_key) if api_key else model_class()
 
         return self.model_map[model_name]
 

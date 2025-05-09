@@ -12,7 +12,7 @@ class CoquiMultiTTS(CoquiTTS):
 
         self.model = TTS(model, progress_bar=False, gpu=torch.cuda.is_available())
 
-    def synthesize(self, text: str, speaker: str) -> np.ndarray:
+    def synthesize(self, text: str, speaker: str) -> tuple[list[int], str]:
         if not speaker:
             speaker = self.get_speakers()[0]
             

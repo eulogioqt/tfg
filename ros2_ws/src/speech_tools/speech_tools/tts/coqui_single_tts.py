@@ -10,7 +10,7 @@ class CoquiSingleTTS(CoquiTTS):
     def __init__(self, model):       
         self.model = TTS(model, progress_bar=False, gpu=torch.cuda.is_available())
 
-    def synthesize(self, text: str, speaker: str) -> np.ndarray:
+    def synthesize(self, text: str, speaker: str) -> tuple[list[int], str]:
         audio = self.model.tts(text, speaker_wav=None)
         audio = np.clip(audio, -1.0, 1.0)
         audio = (audio * 32767).astype(np.int16)

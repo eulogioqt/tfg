@@ -17,7 +17,7 @@ class PiperTTS(TTSModel):
             "sharvard": PiperVoice.load(path_shar, config_path=f"{path_shar}.json"),
         } 
 
-    def synthesize(self, text: str, speaker: str) -> np.ndarray:
+    def synthesize(self, text: str, speaker: str) -> tuple[list[int], str]:
         if not speaker:
             speaker = self.get_speakers()[0]
 

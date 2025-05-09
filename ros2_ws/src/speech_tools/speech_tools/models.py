@@ -8,6 +8,10 @@ class SmartStrEnum(str, Enum):
     def __repr__(self):
         return self.value
 
+class STT_MODELS(SmartStrEnum):
+    WHISPER = "whisper"
+    GOOGLE = "google"
+
 class TTS_MODELS(SmartStrEnum):
     BARK = "bark"
     CSS10 = "css10"

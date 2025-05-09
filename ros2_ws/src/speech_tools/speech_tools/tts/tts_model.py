@@ -10,13 +10,9 @@ from abc import ABC, abstractmethod
 class TTSModel(ABC):
 
     @abstractmethod
-    def synthesize(self, text: str, speaker: str) -> np.ndarray:
+    def synthesize(self, text: str, speaker: str) -> tuple[list[int], str]:
         pass
-
-    @abstractmethod
-    def save(self, audio: np.ndarray, filename: str):
-        pass
-
+    
     @abstractmethod
     def get_sample_rate(self) -> int:
         pass

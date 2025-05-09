@@ -1,0 +1,1 @@
+# a futuro hacer faster whisper y whisper como difernetes, si eso meter mas STT y poner lo de provider y model como en los llms

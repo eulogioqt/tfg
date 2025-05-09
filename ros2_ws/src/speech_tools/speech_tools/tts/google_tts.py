@@ -10,7 +10,7 @@ from ..models import TTS_SPEAKERS
 
 class GoogleTTS(TTSModel):
 
-    def synthesize(self, text: str, speaker: str) -> np.ndarray:
+    def synthesize(self, text: str, speaker: str) -> tuple[list[int], str]:
         if not speaker:
             speaker = self.get_speakers()[0]
             

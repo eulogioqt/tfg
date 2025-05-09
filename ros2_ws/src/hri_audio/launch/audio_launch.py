@@ -1,7 +1,13 @@
+import os
+from dotenv import load_dotenv
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
-from speech_tools.models import TTS_MODELS, TTS_SPEAKERS
+from speech_tools.models import STT_MODELS, TTS_MODELS, TTS_SPEAKERS
+
+load_dotenv()
+google_stt_key = os.environ.get("GOOGLE_STT_KEY")
+
 
 def generate_launch_description():
     return LaunchDescription([
@@ -23,7 +29,7 @@ def generate_launch_description():
             name='tts',
             output='screen',
             parameters=[{
-                "load_models": f"['{TTS_MODELS.PIPER}']",
+                "load_models": f"[['{TTS_MODELS.PIPER}', '']]",
                 "active_model": f"{TTS_MODELS.PIPER}",
                 "active_speaker": f"{TTS_SPEAKERS.PIPER.DAVEFX}"
             }]
@@ -33,6 +39,10 @@ def generate_launch_description():
             executable='stt',
             name='stt',
             output='screen',
+            parameters=[{
+                "load_models": f"[['{STT_MODELS.GOOGLE}', '{google_stt_key}']]",
+                "active_model": f"{STT_MODELS.GOOGLE}"
+            }]
         ),
         Node(
             package='hri_audio',

@@ -18,6 +18,7 @@ find_package(std_msgs REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/ModelSpeaker.msg"
   "msg/LoadUnloadResult.msg"
+  "msg/LoadModel.msg"
   
   "srv/STT.srv"
   "srv/STTGetActiveModel.srv"
