@@ -10,6 +10,11 @@ class PromptMessage():
         self.id = msg["id"]
         self.value = msg["value"]
 
+class AudioPromptMessage():
+    def __init__(self, msg):
+        self.id = msg["id"]
+        self.audio = msg["audio"]
+        self.sample_rate = msg["sample_rate"]
 
 ##### SERVER MESSAGES #####
 class JSONMessage(ABC):
@@ -54,17 +59,52 @@ class FaceprintEventMessage(JSONMessage):
                 "id": self.id
             }
         }
+
+class PromptTranscriptionMessage(JSONMessage):
+    def __init__(self, id, value):
+        self.id = id
+        self.value = value
     
+    def to_dict(self):
+        return {
+            "type": MessageType.PROMPT_TRANSCRIPTION,
+            "data": {
+                "id": self.id,
+                "value": self.value
+            }
+        }
+
+class AudioResponseMessage(JSONMessage):
+    def __init__(self, id, audio, sample_rate):
+        self.id = id
+        self.audio = audio
+        self.sample_rate = sample_rate
+    
+    def to_dict(self):
+        return {
+            "type": MessageType.AUDIO_RESPONSE,
+            "data": {
+                "id": self.id,
+                "audio": self.audio,
+                "sample_rate": self.sample_rate
+            }
+        }
 
 ##### TYPES #####
 class MessageType(str, Enum):
-    RESPONSE = "RESPONSE"
-    PROMPT = "PROMPT"
-    FACEPRINT_EVENT = "FACEPRINT_EVENT"
+    PROMPT = "PROMPT" # Client -> Server
+    AUDIO_PROMPT = "AUDIO_PROMPT" # Client -> Server
+
+    RESPONSE = "RESPONSE" # Server -> Client
+    FACEPRINT_EVENT = "FACEPRINT_EVENT" # Server -> Client
+    PROMPT_TRANSCRIPTION = "PROMPT_TRANSCRIPTION" # Server -> Client
+    AUDIO_RESPONSE = "AUDIO_RESPONSE" # Server -> Client
     
 MESSAGE_OBJECT = {
-    MessageType.RESPONSE: ResponseMessage,
     MessageType.PROMPT: PromptMessage,
+    MessageType.AUDIO_PROMPT: AudioPromptMessage,
+
+    MessageType.RESPONSE: ResponseMessage,
     MessageType.FACEPRINT_EVENT: FaceprintEventMessage
 }
 

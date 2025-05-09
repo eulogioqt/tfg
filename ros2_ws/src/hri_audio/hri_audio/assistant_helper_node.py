@@ -149,9 +149,6 @@ class AssistantHelper:
 
     def stt_request(self, audio):
         stt_request = STT.Request()
-
-        audio = np.ndarray.tolist(np.array(audio)) # This is weird. Without this conversion it doesn't work. Need to see why
-
         stt_request.audio = audio
         stt_request.sample_rate = self.sample_rate
 
