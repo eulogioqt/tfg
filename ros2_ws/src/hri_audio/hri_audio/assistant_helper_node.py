@@ -133,12 +133,13 @@ class AssistantHelper:
                     if (self.name.lower() in rec_processed and self.helper_state == HELPER_STATE.NAME) \
                         or (self.name.lower() == rec_processed and self.helper_state == HELPER_STATE.COMMAND):
                         self.helper_state = HELPER_STATE.COMMAND
-                        
+                        self.node.get_logger().info("✅✅✅ 'SANCHO' HA SIDO ESCUCHADO")
+
                         play(ACTIVATION_SOUND)
                     elif self.helper_state == HELPER_STATE.COMMAND:
                         self.helper_state = HELPER_STATE.NAME
                         self.node.assistant_text_pub.publish(String(data=rec))
-            
+                        self.node.get_logger().info(f"✅✅✅ Mandado '{rec}' al asistente")
                 else:
                     self.node.get_logger().info("Transcription result is None: Nothing transcribed")
 
