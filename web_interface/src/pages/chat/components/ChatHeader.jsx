@@ -20,14 +20,15 @@ const ChatHeader = ({ collapsed, setCollapsed, handleNewChat }) => {
                     <i className="bi bi-list"></i>
                 </button>
 
-                <div className="d-flex justify-content-center align-items-center">
+                <div className="d-flex justify-content-center align-items-center clickable clickable-2">
                     <img
-                        className="img-fluid rounded-circle"
+                        className="img-fluid rounded-3"
                         src={sanchoHead}
                         alt="Sancho"
                         style={{
                             width: "50px",
                             height: "50px",
+                            cursor: "default",
                             display: collapsed || width < BREAKPOINTS.MD ? "block" : "block",
                         }}
                     />

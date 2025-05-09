@@ -53,7 +53,9 @@
 .clickable-05,
 .clickable-07,
 .clickable-1,
-.clickable-2 {
+.clickable-2,
+.clickable-5,
+.clickable-9 {
     transform: scale(1);
     cursor: pointer;
     transition: transform 0.3s ease;
@@ -77,4 +79,12 @@
 
 .clickable-2:hover {
     transform: scale(1.2);
+}
+
+.clickable-5:hover {
+    transform: scale(1.5);
+}
+
+.clickable-9:hover {
+    transform: scale(1.9);
 }
