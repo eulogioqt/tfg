@@ -12,9 +12,15 @@ class CoquiSingleTTS(CoquiTTS):
 
     def synthesize(self, text: str, speaker: str) -> np.ndarray:
         audio = self.model.tts(text, speaker_wav=None)
-        audio = np.array(audio)
+        audio = np.clip(audio, -1.0, 1.0)
+        audio = (audio * 32767).astype(np.int16)
 
-        return audio, speaker
+        max_val = np.max(np.abs(audio))
+        if max_val > 0:
+            scale = 32767 / max_val
+            audio = (audio.astype(np.float32) * scale).clip(-32767, 32767).astype(np.int16)
+
+        return audio.tolist(), speaker
 
     def get_sample_rate(self) -> int:
         return self.model.synthesizer.output_sample_rate

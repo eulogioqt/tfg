@@ -4,7 +4,6 @@ from datetime import datetime
 
 from models import TTSModel, GoogleTTS, PiperTTS, CSS10TTS, XTTS, Tacotron2TTS, BarkTTS, YourTTS
 import numpy as np
-import sounddevice as sd
 
 TTS_OPTIONS = {
     "bark": BarkTTS,
@@ -13,8 +12,17 @@ TTS_OPTIONS = {
     "piper": PiperTTS,
     "tacotron2": Tacotron2TTS,
     "xtts": XTTS,
-    "your_tts": YourTTS
+    "your_tts": YourTTS,
 }
+
+# bark -> numpy float32
+# css10 -> numpy float64
+# google -> numpy int16
+# piper -> numpy int16
+# tacoctron2 -> numpy float64
+# xtts -> numpy float64
+# your_tts -> numpy float64
+
 # repasar el get or default de los modelos y todo eos porque algunos esta la lista vacia y demas
 if __name__ == "__main__":
     text = input("📝 Introduce el texto a sintetizar: ").strip()
@@ -33,14 +41,10 @@ if __name__ == "__main__":
         tts_model: TTSModel = TTSClass()
 
         start = time.time()
-        audio = tts_model.synthesize(text, speaker="")
+        audio, speaker_used = tts_model.synthesize(text, speaker="")
         tts_time = time.time() - start
 
         times[tts_name] = tts_time
-
-        speaker_suffix = f"_{tts_model.speaker}" if tts_model.speaker else ""
-        filename = f"audio_tts_{tts_name}{speaker_suffix}.wav"
-        filepath = os.path.join(output_dir, filename)
         
         print(type(audio))
         print(type(audio[100]))
@@ -48,9 +52,14 @@ if __name__ == "__main__":
         print(np.mean(audio))
         print(np.max(audio))
         print(np.min(audio))
-        tts_model.save(audio,filepath)
-        sd.play(audio, samplerate=tts_model.get_sample_rate())
-        sd.wait()
+        
+        #save
+        filename = f"audio_tts_{tts_name}.wav"
+        filepath = os.path.join(output_dir, filename)
+        TTSModel.save(filepath, audio, tts_model.get_sample_rate())
+        
+        # play
+        TTSModel.play(audio, tts_model.get_sample_rate())
 
         print(f"✅ Guardado: {filepath}")
 

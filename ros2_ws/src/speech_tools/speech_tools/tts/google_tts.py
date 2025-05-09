@@ -1,5 +1,5 @@
-import wave
 import numpy as np
+
 from gtts import gTTS
 from io import BytesIO
 from pydub import AudioSegment
@@ -19,16 +19,14 @@ class GoogleTTS(TTSModel):
         mp3_fp.seek(0)
 
         audio = AudioSegment.from_mp3(mp3_fp).set_channels(1)
-        audio = np.array(audio.get_array_of_samples()).astype(np.int16)
+        audio = np.array(audio.get_array_of_samples(), dtype=np.int16)
 
-        return audio, speaker
+        max_val = np.max(np.abs(audio))
+        if max_val > 0:
+            scale = 32767 / max_val
+            audio = (audio.astype(np.float32) * scale).clip(-32767, 32767).astype(np.int16)
 
-    def save(self, audio: np.ndarray, filename: str):
-        with wave.open(filename, "wb") as wf:
-            wf.setnchannels(1)
-            wf.setsampwidth(2)  # 2 bytes para int16
-            wf.setframerate(self.get_sample_rate())
-            wf.writeframes(audio.tobytes())
+        return audio.tolist(), speaker
 
     def get_sample_rate(self) -> int:
         return 24000

@@ -9,4 +9,4 @@ class CSS10TTS(CoquiSingleTTS):
         )
 
     def get_speakers(self) -> list[str]:
-        return [""]
+        return []

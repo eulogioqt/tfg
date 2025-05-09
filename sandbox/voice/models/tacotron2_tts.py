@@ -9,4 +9,4 @@ class Tacotron2TTS(CoquiSingleTTS):
         )
 
     def get_speakers(self) -> list[str]:
-        return [""]
+        return []

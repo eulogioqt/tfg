@@ -1,5 +1,4 @@
 import os
-import wave
 import numpy as np
 from piper import PiperVoice
 
@@ -26,14 +25,12 @@ class PiperTTS(TTSModel):
         audio_bytes = b"".join(stream)
         audio = np.frombuffer(audio_bytes, dtype=np.int16)
 
-        return audio, speaker
-    
-    def save(self, audio: np.ndarray, filename: str):
-        with wave.open(filename, "wb") as wf:
-            wf.setnchannels(1)
-            wf.setsampwidth(2) 
-            wf.setframerate(self.get_sample_rate())
-            wf.writeframes(audio.tobytes())
+        max_val = np.max(np.abs(audio))
+        if max_val > 0:
+            scale = 32767 / max_val
+            audio = (audio.astype(np.float32) * scale).clip(-32767, 32767).astype(np.int16)
+
+        return audio.tolist(), speaker
 
     def get_sample_rate(self) -> int:
         return next(iter(self.models.values())).config.sample_rate

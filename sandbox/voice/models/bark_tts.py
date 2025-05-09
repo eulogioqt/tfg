@@ -17,21 +17,21 @@ class BarkTTS(TTSModel):
             coarse_use_gpu=use_gpu
         )
 
-    def synthesize(self, text: str, speaker: str) -> np.ndarray:
+    def synthesize(self, text: str, speaker: str) -> tuple[list[int], str]:
         if not speaker:
             speaker = self.get_speakers()[0]
 
         audio = generate_audio(text, history_prompt=speaker)
-
-        return audio, speaker
-    
-    def save(self, audio: np.ndarray, filename: str):
-        if hasattr(audio, "numpy"):
-            audio = audio.numpy()
-
         audio = np.clip(audio, -1.0, 1.0)
-        sf.write(filename, audio, samplerate=self.get_sample_rate(), subtype="PCM_16")
+        audio = (audio * 32767).astype(np.int16)
 
+        max_val = np.max(np.abs(audio))
+        if max_val > 0:
+            scale = 32767 / max_val
+            audio = (audio.astype(np.float32) * scale).clip(-32767, 32767).astype(np.int16)
+
+        return audio.tolist(), speaker
+        
     def get_sample_rate(self) -> int:
         return SAMPLE_RATE
     

@@ -10,4 +10,4 @@ class YourTTS(CoquiMultiTTS):
         )
 
     def get_speakers(self) -> list[str]:
-        return ["female_en_5"]
+        return ["female-en-5"]

@@ -1,4 +1,4 @@
-import wave
+import os
 import numpy as np
 from piper import PiperVoice
 
@@ -8,8 +8,8 @@ from .tts_model import TTSModel
 class PiperTTS(TTSModel):
 
     def __init__(self):
-        path_dave = "../es_ES-davefx-medium.onnx"
-        path_shar = "../es_ES-sharvard-medium.onnx"
+        path_dave = os.path.join(os.path.dirname(os.path.dirname(__file__)), "es_ES-davefx-medium.onnx")
+        path_shar = os.path.join(os.path.dirname(os.path.dirname(__file__)), "es_ES-sharvard-medium.onnx")
 
         self.models = {
             "davefx": PiperVoice.load(path_dave, config_path=f"{path_dave}.json"),
@@ -24,14 +24,12 @@ class PiperTTS(TTSModel):
         audio_bytes = b"".join(stream)
         audio = np.frombuffer(audio_bytes, dtype=np.int16)
 
-        return audio, speaker
-    
-    def save(self, audio: np.ndarray, filename: str):
-        with wave.open(filename, "wb") as wf:
-            wf.setnchannels(1)
-            wf.setsampwidth(2) 
-            wf.setframerate(self.get_sample_rate())
-            wf.writeframes(audio.tobytes())
+        max_val = np.max(np.abs(audio))
+        if max_val > 0:
+            scale = 32767 / max_val
+            audio = (audio.astype(np.float32) * scale).clip(-32767, 32767).astype(np.int16)
+
+        return audio.tolist(), speaker
 
     def get_sample_rate(self) -> int:
         return next(iter(self.models.values())).config.sample_rate
