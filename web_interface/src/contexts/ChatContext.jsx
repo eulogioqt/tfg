@@ -28,32 +28,37 @@ export const ChatProvider = ({ children }) => {
 
             const arrayBuffer = await file.arrayBuffer();
 
-            // Decodificar el audio a PCM usando Web Audio API
             const audioContext = new AudioContext();
             const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
-            // Convertir a Int16
-            const raw = audioBuffer.getChannelData(0); // Solo canal izquierdo (mono)
+            const raw = audioBuffer.getChannelData(0);
             const int16Data = new Int16Array(raw.length);
-
             for (let i = 0; i < raw.length; i++) {
                 const s = Math.max(-1, Math.min(1, raw[i]));
                 int16Data[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
             }
 
             const id = uuidv4();
-            const messageWithId = {
-                type: "AUDIO_PROMPT",
-                data: {
-                    id: id,
-                    audio: Array.from(int16Data), // Convertir a lista de int16
-                    sample_rate: audioBuffer.sampleRate,
-                },
-            };
-            console.log(JSON.stringify(messageWithId).length / 1024 / 1024 + " MB");
-            console.log(messageWithId);
+            const chunkSize = 48000;
 
-            sendMessage(messageWithId);
+            for (let i = 0; i < int16Data.length; i += chunkSize) {
+                const chunk = Array.from(int16Data.slice(i, i + chunkSize));
+                const final = i + chunkSize >= int16Data.length;
+                const index = Math.floor(i / chunkSize);
+
+                const message = {
+                    type: "AUDIO_PROMPT_CHUNK",
+                    data: {
+                        id: id,
+                        chunk_index: index,
+                        final: final,
+                        audio: chunk,
+                        sample_rate: audioBuffer.sampleRate,
+                    },
+                };
+
+                sendMessage(message);
+            }
         };
 
         input.click();

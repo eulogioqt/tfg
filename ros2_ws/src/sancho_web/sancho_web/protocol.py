@@ -81,7 +81,7 @@ class AudioResponseChunkMessage(JSONMessage):
         self.id = id
         self.chunk_index = chunk_index
         self.final = final
-        self.audio = audio
+        self.audio = list(audio)
         self.sample_rate = sample_rate
         
     def to_dict(self):
@@ -89,9 +89,9 @@ class AudioResponseChunkMessage(JSONMessage):
             "type": MessageType.AUDIO_RESPONSE_CHUNK,
             "data": {
                 "id": self.id,
+                "audio": self.audio,
                 "chunk_index": self.chunk_index,
                 "final": self.final,
-                "audio": self.audio,
                 "sample_rate": self.sample_rate
             }
         }

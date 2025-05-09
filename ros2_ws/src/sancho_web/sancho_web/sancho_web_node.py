@@ -149,12 +149,6 @@ class SanchoWeb:
         return result_tts.audio, result_tts.sample_rate
 
     def send_message(self, key, msg: JSONMessage):
-        if isinstance(msg, AudioResponseChunkMessage):
-            self.node.get_logger().info(msg.to_dict())
-            self.node.get_logger().info(type(msg.id))
-            self.node.get_logger().info(type(msg.audio))
-            self.node.get_logger().info(type(msg.sample_rate))
-            
         self.node.ros_pub.publish(R2WMessage(key=key, value=msg.to_json()))
 
 def main(args=None):
