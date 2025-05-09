@@ -1,5 +1,6 @@
-import { useContext, createContext, useState } from "react";
+import { useContext, createContext, useState, useEffect } from "react";
 import { useWebSocket } from "./WebSocketContext";
+import { useEventBus } from "./EventBusContext";
 
 import { v4 as uuidv4 } from "uuid";
 
@@ -7,6 +8,7 @@ const ChatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
     const { sendMessage, isConnected } = useWebSocket();
+    const { subscribe } = useEventBus();
 
     const [messages, setMessages] = useState([]);
     const [isReplying, setIsReplying] = useState(false);
@@ -15,6 +17,52 @@ export const ChatProvider = ({ children }) => {
     const addMessage = (text, id, isHuman) => {
         setMessages((oldMessages) => [...oldMessages, { text, id, isHuman }]);
         setIsReplying(isHuman);
+    };
+
+    useEffect(() => {
+        const bufferRef = { current: [] };
+
+        const processPT = (e) => addMessage(e.value, e.id, true);
+        const processARC = (e) => {
+            bufferRef.current.push(e.audio);
+            if (e.final) {
+                const finalAudio = bufferRef.current.flat();
+                bufferRef.current = [];
+
+                playAudio(finalAudio, e.sample_rate);
+            }
+        };
+
+        const unsubscribePT = subscribe("ROS_MESSAGE_PROMPT_TRANSCRIPTION", processPT);
+        const unsubscribeARC = subscribe("ROS_MESSAGE_AUDIO_RESPONSE_CHUNK", processARC);
+
+        return () => {
+            unsubscribePT();
+            unsubscribeARC();
+        };
+    }, []);
+
+    const playAudio = (audio, sampleRate) => {
+        if (!audio || audio.length === 0) {
+            console.warn("No audio data to play");
+            return;
+        }
+
+        const context = new AudioContext({ sampleRate });
+        const float32 = new Float32Array(audio.length);
+
+        for (let i = 0; i < audio.length; i++) {
+            float32[i] = Math.max(-1, Math.min(1, audio[i] / 32768));
+        }
+
+        const buffer = context.createBuffer(1, float32.length, sampleRate);
+        buffer.copyToChannel(float32, 0);
+
+        const source = context.createBufferSource();
+        source.buffer = buffer;
+        source.connect(context.destination);
+
+        source.start();
     };
 
     const handleAudio = () => {

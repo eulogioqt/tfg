@@ -15,7 +15,7 @@ Respuestas a prompts con ID:
     }
 }
 { // Una vez ha enviado la respuesta y la transcripcion, cuando tiene el audio TTS, lo envia para que se reproduzca en el navegador
-    type: "AUDIO_RESPONSE",
+    type: "AUDIO_RESPONSE_CHUNK",
     data: {
         id: uuid,
         chunk_index: int,

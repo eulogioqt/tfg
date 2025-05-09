@@ -91,16 +91,14 @@ class SanchoWeb:
             self.send_message(key, ResponseMessage(prompt.id, response))
         elif type == MessageType.AUDIO_PROMPT_CHUNK:
             audio_prompt = AudioPromptChunkMessage(data)
+            
+            if key not in self.audio_buffers:
+                self.audio_buffers[key] = []
+            self.audio_buffers[key] += audio_prompt.audio
 
-            if not audio_prompt.final: # If not final
-                if key not in self.audio_buffers:
-                    self.audio_buffers[key] = []
-
-                self.audio_buffers[key] += audio_prompt.audio
-            else: # If final
-                final_audio = self.audio_buffers.get(key, []) + audio_prompt.audio # El get por first = final
-                if key in self.audio_buffers:
-                    del self.audio_buffers[key]
+            if audio_prompt.final:
+                final_audio = self.audio_buffers[key] # El get por first = final
+                del self.audio_buffers[key]
                 
                 transcription = self.stt_request(final_audio, audio_prompt.sample_rate)
                 self.send_message(key, PromptTranscriptionMessage(audio_prompt.id, transcription))
