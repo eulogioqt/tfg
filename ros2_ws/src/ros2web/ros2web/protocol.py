@@ -1,10 +1,19 @@
 import json
 
 from enum import Enum
+from abc import ABC, abstractmethod
 
 
 ##### SERVER MESSAGES #####
-class Message(): # Cambiar a GeneralMessage o algo asi para no confundir, seria MessageMessage
+class JSONMessage(ABC):
+    @abstractmethod
+    def to_dict(self) -> dict:
+        pass
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_dict())
+    
+class Message(JSONMessage): # Cambiar a GeneralMessage o algo asi para no confundir, seria MessageMessage
     def __init__(self, data):
         self.data = data
     
@@ -16,7 +25,7 @@ class Message(): # Cambiar a GeneralMessage o algo asi para no confundir, seria 
 
         return json.dumps(message)
     
-class TopicMessage():
+class TopicMessage(JSONMessage):
     def __init__(self, topic, name, value):
         self.topic = topic
         self.name = name

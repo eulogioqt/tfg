@@ -1,6 +1,17 @@
+SEGMENTACION:
+CLIENT <=> SERVIDOR
+{
+    id: uuid,
+    type: "R2W_CHUNK",
+    chunk_index: int,
+    final: bool:
+    data: ...
+}
+
 CLIENTE => SERVIDOR
 El cliente envia un mensaje cualquiera:
 {
+    id: uuid,
     type: "MESSAGE",
     data: ...
 }
@@ -8,12 +19,14 @@ El cliente envia un mensaje cualquiera:
 SERVIDOR => CLIENTE
 El servidor envia un mensaje cualquiera:
 {
+    id: uuid,
     type: "MESSAGE",
     data: ...
 }
 
 El servidor envia un mensaje de un topic a todos los clientes:
 {
+    id: uuid,
     type: "TOPIC",
     data: {
         topic: "topic",
