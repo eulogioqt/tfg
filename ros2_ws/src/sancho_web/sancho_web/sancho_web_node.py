@@ -5,8 +5,8 @@ from queue import Queue
 
 from .protocol import (
     MessageType, JSONMessage, 
-    PromptMessage, AudioPromptMessage,
-    ResponseMessage, FaceprintEventMessage, PromptTranscriptionMessage, AudioResponseMessage,
+    PromptMessage, AudioPromptChunkMessage,
+    ResponseMessage, FaceprintEventMessage, PromptTranscriptionMessage, AudioResponseChunkMessage,
     parse_message
 )
 
@@ -62,6 +62,8 @@ class SanchoWeb:
     def __init__(self):
         self.node = SanchoWebNode()
 
+        self.audio_buffers = {}
+
     def spin(self):
         while True:
             if self.node.web_queue.qsize() > 0: # Web messages received
@@ -79,7 +81,7 @@ class SanchoWeb:
 
     def on_web_message(self, key, msg) -> JSONMessage:
         type, data = parse_message(msg)
-        print(f"Mensaje recibido: {type}")
+        self.node.get_logger().info(f"Mensaje recibido: {type}")
 
         if type == MessageType.PROMPT:
             prompt = PromptMessage(data)
@@ -87,18 +89,34 @@ class SanchoWeb:
             response = self.sancho_prompt_request(prompt.value)
   
             self.send_message(key, ResponseMessage(prompt.id, response))
-        elif type == MessageType.AUDIO_PROMPT:
-            audio_prompt = AudioPromptMessage(data)
+        elif type == MessageType.AUDIO_PROMPT_CHUNK:
+            audio_prompt = AudioPromptChunkMessage(data)
 
-            transcription = self.stt_request(audio_prompt.audio, audio_prompt.sample_rate)
-            self.send_message(key, PromptTranscriptionMessage(audio_prompt.id, transcription))
+            if not audio_prompt.final: # If not final
+                if key not in self.audio_buffers:
+                    self.audio_buffers[key] = []
 
-            response = self.sancho_prompt_request(transcription)
-            self.send_message(key, ResponseMessage(audio_prompt.id, response))
+                self.audio_buffers[key] += audio_prompt.audio
+            else: # If final
+                final_audio = self.audio_buffers.get(key, []) + audio_prompt.audio # El get por first = final
+                if key in self.audio_buffers:
+                    del self.audio_buffers[key]
+                
+                transcription = self.stt_request(final_audio, audio_prompt.sample_rate)
+                self.send_message(key, PromptTranscriptionMessage(audio_prompt.id, transcription))
 
-            audio, sample_rate = self.tts_request(response)
-            self.send_message(key, AudioResponseMessage(audio_prompt.id, audio, sample_rate))
+                response = self.sancho_prompt_request(transcription)
+                self.send_message(key, ResponseMessage(audio_prompt.id, response))
 
+                chunk_size = 48000
+                audio, sample_rate = self.tts_request(response)
+                for i in range(0, len(audio), chunk_size):
+                    chunk = audio[i:i + chunk_size]
+                    final = (i + chunk_size) >= len(audio)
+                    index = i // chunk_size
+
+                    self.send_message(key, AudioResponseChunkMessage(audio_prompt.id, index, final, chunk, sample_rate))
+                    
     def sancho_prompt_request(self, text):
         sancho_prompt_request = SanchoPrompt.Request()
         sancho_prompt_request.text = text
@@ -131,6 +149,12 @@ class SanchoWeb:
         return result_tts.audio, result_tts.sample_rate
 
     def send_message(self, key, msg: JSONMessage):
+        if isinstance(msg, AudioResponseChunkMessage):
+            self.node.get_logger().info(msg.to_dict())
+            self.node.get_logger().info(type(msg.id))
+            self.node.get_logger().info(type(msg.audio))
+            self.node.get_logger().info(type(msg.sample_rate))
+            
         self.node.ros_pub.publish(R2WMessage(key=key, value=msg.to_json()))
 
 def main(args=None):

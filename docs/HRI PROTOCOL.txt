@@ -18,8 +18,10 @@ Respuestas a prompts con ID:
     type: "AUDIO_RESPONSE",
     data: {
         id: uuid,
-        audio: [...],
-        sample_rate: ...
+        chunk_index: int,
+        final: bool,
+        audio: [int16],
+        sample_rate: int
     }
 }
 Mensajes sobre la API de faceprints:
@@ -41,11 +43,13 @@ Prompt del cliente:
     },
 };
 { // prompt de audio
-    type: "AUDIO_PROMPT",
+    type: "AUDIO_PROMPT_CHUNK",
     data: {
         id: uuid,
-        audio: [...],
-        sample_rate: ...
+        chunk_index: int,
+        final: bool,
+        audio: [int16],
+        sample_rate: int
     }
 }
 

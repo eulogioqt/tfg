@@ -10,9 +10,11 @@ class PromptMessage():
         self.id = msg["id"]
         self.value = msg["value"]
 
-class AudioPromptMessage():
+class AudioPromptChunkMessage():
     def __init__(self, msg):
         self.id = msg["id"]
+        self.chunk_index = msg["chunk_index"]
+        self.final = msg["final"]
         self.audio = msg["audio"]
         self.sample_rate = msg["sample_rate"]
 
@@ -74,17 +76,21 @@ class PromptTranscriptionMessage(JSONMessage):
             }
         }
 
-class AudioResponseMessage(JSONMessage):
-    def __init__(self, id, audio, sample_rate):
+class AudioResponseChunkMessage(JSONMessage):
+    def __init__(self, id, chunk_index, final, audio, sample_rate):
         self.id = id
+        self.chunk_index = chunk_index
+        self.final = final
         self.audio = audio
         self.sample_rate = sample_rate
-    
+        
     def to_dict(self):
         return {
-            "type": MessageType.AUDIO_RESPONSE,
+            "type": MessageType.AUDIO_RESPONSE_CHUNK,
             "data": {
                 "id": self.id,
+                "chunk_index": self.chunk_index,
+                "final": self.final,
                 "audio": self.audio,
                 "sample_rate": self.sample_rate
             }
@@ -93,19 +99,21 @@ class AudioResponseMessage(JSONMessage):
 ##### TYPES #####
 class MessageType(str, Enum):
     PROMPT = "PROMPT" # Client -> Server
-    AUDIO_PROMPT = "AUDIO_PROMPT" # Client -> Server
+    AUDIO_PROMPT_CHUNK = "AUDIO_PROMPT_CHUNK" # Client -> Server
 
     RESPONSE = "RESPONSE" # Server -> Client
     FACEPRINT_EVENT = "FACEPRINT_EVENT" # Server -> Client
     PROMPT_TRANSCRIPTION = "PROMPT_TRANSCRIPTION" # Server -> Client
-    AUDIO_RESPONSE = "AUDIO_RESPONSE" # Server -> Client
+    AUDIO_RESPONSE_CHUNK = "AUDIO_RESPONSE_CHUNK" # Server -> Client
     
 MESSAGE_OBJECT = {
     MessageType.PROMPT: PromptMessage,
-    MessageType.AUDIO_PROMPT: AudioPromptMessage,
+    MessageType.AUDIO_PROMPT_CHUNK: AudioPromptChunkMessage,
 
     MessageType.RESPONSE: ResponseMessage,
-    MessageType.FACEPRINT_EVENT: FaceprintEventMessage
+    MessageType.FACEPRINT_EVENT: FaceprintEventMessage,
+    MessageType.PROMPT_TRANSCRIPTION: PromptTranscriptionMessage,
+    MessageType.AUDIO_RESPONSE_CHUNK: AudioResponseChunkMessage
 }
 
 
