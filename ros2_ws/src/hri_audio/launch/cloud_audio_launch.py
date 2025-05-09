@@ -4,9 +4,11 @@ from launch import LaunchDescription
 from launch_ros.actions import Node
 
 from speech_tools.models import STT_MODELS, TTS_MODELS, TTS_SPEAKERS
+from llm_tools.models import PROVIDER, MODELS
 
 load_dotenv()
 google_stt_key = os.environ.get("GOOGLE_STT_KEY")
+gemini_api_key = os.environ.get("GEMINI_API_KEY")
 
 
 def generate_launch_description():
@@ -54,7 +56,15 @@ def generate_launch_description():
             package='llm_tools',
             executable='llm',
             name='llm',
-            output='screen'
+            output='screen',
+            parameters=[{
+                "llm_load_models": f"[['{PROVIDER.GEMINI}', ['{MODELS.LLM.GEMINI.GEMINI_FLASH}'], '{gemini_api_key}']]",
+                "llm_active_provider": f"{PROVIDER.GEMINI}",
+                "llm_active_model": f"{MODELS.LLM.GEMINI.GEMINI_FLASH}",         
+                #"embedding_load_models": f"[['{PROVIDER.GEMINI}', ['{MODELS.LLM.GEMINI.GEMINI_FLASH}'], '{gemini_api_key}']]",
+                #"embedding_active_provider": f"{PROVIDER.GEMINI}",
+                #"embedding_active_model": f"{MODELS.LLM.GEMINI.GEMINI_FLASH}",
+            }]
         ),
         Node(
             package='sancho_ai',

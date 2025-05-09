@@ -143,16 +143,7 @@ class STTNode(Node):
 
     def handle_set_active_model(self, request, response):
         self.get_logger().info(f"📖 Set Active Model service. Model: {request.model}")
-
-        if not request.model:
-            response.success, response.message = False, "Model must be specified"
-        elif request.model not in list(STT_MODELS):
-            response.success, response.message = False, f"Invalid model: {request.model}"
-        elif request.model not in self.model_map:
-            response.success, response.message = False, f"Model '{request.model}' is not loaded. You must load it first."
-        else:
-            self._set_active_model(request.model)
-            response.success, response.message = True, f"Active model set to {request.model}"
+        response.success, response.message = self._set_active_model(request.model)
 
         return response
 
@@ -168,14 +159,23 @@ class STTNode(Node):
                 self.get_logger().error(f"❌ Could not load model '{model_name}' from parameter: {e}")
 
         if active_model:
-            if active_model not in self.model_map:
-                self.get_logger().warn(f"❌ Cannot set active model '{active_model}', it is not loaded")
+            success, message = self._set_active_model(active_model)
+            if success:
+                self.get_logger().info(f"✅ {message} from parameter")
             else:
-                self.active_model = active_model
-                self.get_logger().info(f"✅ Active model set to '{active_model}' from parameter")
+                self.get_logger().warn(f"❌ {message}")
 
     def _set_active_model(self, model):
+        if not model:
+            return False, "Model must be specified"
+        if model not in list(STT_MODELS):
+            return False, f"Invalid model: {model}"
+        if model not in self.model_map:
+            return False, f"Model '{model}' is not loaded. You must load it first."
+
         self.active_model = model
+        
+        return True, f"Active model set to '{model}'"
 
     def _try_load_model(self, model_name, api_key=""):
         if model_name not in self.model_map:

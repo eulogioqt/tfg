@@ -1,3 +1,4 @@
+import ast
 import rclpy
 import importlib
 
@@ -40,6 +41,8 @@ class LLMNode(Node):
         self.unload_model_srv = self.create_service(UnloadModel, 'llm_tools/unload_model', self.handle_unload_model)
         self.set_active_llm_srv = self.create_service(SetActiveModel, 'llm_tools/set_active_llm', self.handle_set_active_llm)
         self.set_active_embedding_srv = self.create_service(SetActiveModel, 'llm_tools/set_active_embedding', self.handle_set_active_embedding)
+
+        self._init_from_parameters()
 
         self.get_logger().info("LLM Node initializated succesfully")
 
@@ -194,22 +197,56 @@ class LLMNode(Node):
         return response
 
     def handle_set_active_llm(self, request, response):
+        self.get_logger().info(f"📖 Set Active LLM Model service. Provider: {request.provider} Model: {request.model}")
         response.success, response.message = self._set_active_model("llm", request.provider, request.model)
 
         return response
 
     def handle_set_active_embedding(self, request, response):
+        self.get_logger().info(f"📖 Set Active Embedding Model service. Provider: {request.provider} Model: {request.model}")
         response.success, response.message = self._set_active_model("embedding", request.provider, request.model)
 
         return response
+
+    def _init_from_parameters(self):
+        self._init_from_parameters_generic("llm")
+        self._init_from_parameters_generic("embedding")
+
+    def _init_from_parameters_generic(self, kind):
+        assert kind in ["llm", "embedding"]
+
+        kind_upper = kind.upper()
+        kind_label = f"{kind_upper} model"
+        
+        models_param = f"{kind}_load_models"
+        active_provider_param = f"{kind}_active_provider"
+        active_model_param = f"{kind}_active_model"
+
+        models_to_load = self.parse_string_list(self.declare_parameter(models_param, "[]").get_parameter_value().string_value)
+        active_provider = self.declare_parameter(active_provider_param, "").get_parameter_value().string_value
+        active_model = self.declare_parameter(active_model_param, "").get_parameter_value().string_value
+
+        for [provider_name, models, api_key] in models_to_load:
+            try:
+                provider = self._try_load_provider(provider_name, api_key)
+                provider.load(models)
+
+                self.get_logger().info(f"✅ Models {models} from provider {provider_name} loaded successfully")
+            except Exception as e:
+                self.get_logger().error(f"❌ Could not load {kind_label.lower()}s from provider {provider_name}: {e}")
+
+        if active_provider and active_model:
+            success, message = self._set_active_model(kind, active_provider, active_model)
+            if success:
+                self.get_logger().info(f"✅ Active {kind_label.lower()} set to '{active_provider}/{active_model}' from parameters")
+            else:
+                self.get_logger().warn(f"❌ {message}")
 
     def _set_active_model(self, kind, provider, model):
         assert kind in ['llm', 'embedding']
 
         kind_upper = kind.upper()
         model_label = f"{kind_upper} model"
-
-        self.get_logger().info(f"📖 Set Active Model service for {kind_upper}. Provider: {provider}, Model: {model}.")
 
         if not provider or not model:
             return False, "Provider and model must be specified"
@@ -272,6 +309,12 @@ class LLMNode(Node):
         result.models = models
         result.success = success
         result.message = message
+
+    def parse_string_list(self, raw_string) -> list[str]:
+        try:
+            return ast.literal_eval(raw_string)
+        except Exception:
+            return []
 
 def main(args=None):
     rclpy.init(args=args)

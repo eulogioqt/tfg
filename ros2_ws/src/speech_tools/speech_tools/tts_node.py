@@ -154,22 +154,9 @@ class TTSNode(Node):
         return response
 
     def handle_set_active_model(self, request, response):
-        model = request.model
-        speaker = request.speaker
+        self.get_logger().info(f"📖 Set Active Model service. Model: {request.model}, Speaker: {request.speaker}")
 
-        self.get_logger().info(f"📖 Set Active Model service. Model: {model}, Speaker: {speaker}.")
-
-        if not model or not speaker:
-            response.success, response.message = False, "Model and speaker must be specified"
-        elif model not in list(TTS_MODELS):
-            response.success, response.message = False, f"Invalid model: {model}"
-        elif speaker not in list(getattr(TTS_SPEAKERS, model.upper(), [])):
-            response.success, response.message = False, f"Speaker '{speaker}' not found for model '{model}'"
-        elif model not in self.model_map:
-            response.success, response.message = False, f"Model '{model}' is not loaded. You must load it first."
-        else:
-            self._set_active_model(model, speaker)
-            response.success, response.message = True, f"Active model set to {model}/{speaker}"
+        response.success, response.message = self._set_active_model(request.model, request.speaker)
 
         return response
 
@@ -186,16 +173,25 @@ class TTSNode(Node):
                 self.get_logger().error(f"❌ Could not load model '{model_name}' from parameter: {e}")
 
         if active_model and active_speaker:
-            if active_model not in self.model_map:
-                self.get_logger().warn(f"❌ Cannot set active model '{active_model}', it is not loaded")
-            elif active_speaker not in list(getattr(TTS_SPEAKERS, active_model.upper())):
-                self.get_logger().warn(f"❌ Cannot set active model. Speaker '{active_speaker}' not found")
+            success, message = self._set_active_model(active_model, active_speaker)
+            if success:
+                self.get_logger().info(f"✅ {message} from parameter")
             else:
-                self._set_active_model(active_model, active_speaker)
-                self.get_logger().info(f"✅ Active model set to '{active_model}/{active_speaker}' from parameter")
+                self.get_logger().warn(f"❌ {message}")
 
     def _set_active_model(self, model, speaker):
+        if not model or not speaker:
+            return False, "Model and speaker must be specified"
+        if model not in list(TTS_MODELS):
+            return False, f"Invalid model: {model}"
+        if speaker not in list(getattr(TTS_SPEAKERS, model.upper(), [])):
+            return False, f"Speaker '{speaker}' not found for model '{model}'"
+        if model not in self.model_map:
+            return False, f"Model '{model}' is not loaded. You must load it first."
+
         self.active_model = [model, speaker]
+        
+        return True, f"Active model set to '{model}/{speaker}'"
 
     def _try_load_model(self, model_name, api_key=""):
         if model_name not in self.model_map:
