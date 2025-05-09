@@ -44,7 +44,7 @@ class LLMNode(Node):
         self.get_logger().info("LLM Node initializated succesfully")
 
     def handle_get_all_models(self, request, response):
-        provider_names = request.providers
+        provider_names = set(request.providers)
         if not provider_names:
             provider_names = list(PROVIDER)
 
@@ -57,17 +57,19 @@ class LLMNode(Node):
             if hasattr(MODELS.LLM, provider_name.upper()):
                 llm_models = list(getattr(MODELS.LLM, provider_name.upper()))
                 response.llm_models.append(ProviderModel(provider=provider_name, models=llm_models))
+                if provider_name not in response.providers:
+                    response.providers.append(provider_name)
 
             if hasattr(MODELS.EMBEDDING, provider_name.upper()):
                 embedding_models = list(getattr(MODELS.EMBEDDING, provider_name.upper()))
                 response.embedding_models.append(ProviderModel(provider=provider_name, models=embedding_models))
-                
-            response.providers.append(provider_name)
+                if provider_name not in response.providers:
+                    response.providers.append(provider_name)
 
         return response
 
     def handle_get_active_models(self, request, response):
-        self.get_logger().info(f"📖 Get Active Models service.")
+        self.get_logger().info(f"📖 Get Active Models service")
 
         if self.active_llm:
             [response.llm_provider, response.llm_model] = self.active_llm
@@ -77,7 +79,7 @@ class LLMNode(Node):
         return response
 
     def handle_get_available_models(self, request, response):
-        provider_names = request.providers
+        provider_names = set(request.providers)
         if not provider_names:
             provider_names = list(PROVIDER)
 

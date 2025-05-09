@@ -10,12 +10,13 @@ from .stt_model import STTModel
 
 # a futuro hacer faster whisper y whisper como difernetes, si eso meter mas STT y poner lo de provider y model como en los llms
 class WhisperSTT(STTModel):
-    def __init__(self, model_size: str = "base", device: str = "cuda", compute_type: str = "float16"):
+    def __init__(self, model_size: str = "large-v3", device: str = "cuda", compute_type: str = "float16"):
         self.model = WhisperModel(model_size, device=device, compute_type=compute_type)
 
-    def transcribe(self, audio: bytes, sample_rate: int) -> str:
+    def transcribe(self, audio: list[int], sample_rate: int) -> str:
         try:
-            audio_tensor = torch.tensor(torch.frombuffer(audio, dtype=torch.int16).float() / 32768.0).unsqueeze(0)
+            audio_tensor = torch.tensor(audio, dtype=torch.float32) / 32768.0
+            audio_tensor = audio_tensor.unsqueeze(0)  # (1, num_samples)
 
             with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmpfile:
                 tmp_path = tmpfile.name

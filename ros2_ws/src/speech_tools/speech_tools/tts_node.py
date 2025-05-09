@@ -2,7 +2,6 @@ import gc
 import ast
 import rclpy
 import importlib
-import numpy as np
 from rclpy.node import Node
 
 from speech_msgs.msg import ModelSpeaker, LoadUnloadResult
@@ -44,7 +43,7 @@ class TTSNode(Node):
         self.get_logger().info('TTS Node inicializado correctamente')
 
     def handle_get_all_models(self, request, response):
-        models_names = request.models
+        models_names = set(request.models)
         if not models_names:
             models_names = list(TTS_MODELS)
 
@@ -56,8 +55,8 @@ class TTSNode(Node):
             if hasattr(TTS_MODELS, model_name.upper()):
                 speakers = list(getattr(TTS_MODELS, model_name.upper()))
                 response.speakers.append(ModelSpeaker(model=model_name, speakers=speakers))
-                
-            response.models.append(model_name)
+                if model_name not in response.models:
+                    response.models.append(model_name)
 
         return response
 
@@ -70,7 +69,7 @@ class TTSNode(Node):
         return response
 
     def handle_get_available_models(self, request, response):
-        models_names = request.models
+        models_names = set(request.models)
         if not models_names:
             models_names = list(TTS_MODELS)
 
@@ -106,7 +105,7 @@ class TTSNode(Node):
         return response
 
     def handle_load_model(self, request, response):
-        self.get_logger().info(f"📖 Load model service for models: {request.models}'")
+        self.get_logger().info(f"📖 Load model service")
 
         response.results = []
         for item in request.items:
@@ -125,15 +124,19 @@ class TTSNode(Node):
         return response
 
     def handle_unload_model(self, request, response):
-        self.get_logger().info(f"📖 Unload model service for items: {request.models}'")
+        self.get_logger().info(f"📖 Unload model service")
         
         response.results = []
         for model_name in request.models:
             result = LoadUnloadResult(model=model_name)
-            model = self.model_map.get(model_name)
-            if model:
+
+            if self.active_model and self.active_model[0] == model_name:
+                result.success, result.message = False, f"Cannot unload model '{model_name}' because it is currently active"
+                self.get_logger().warn(f"❌ Cannot unload active model '{model_name}'")
+                response.results.append(result)
+            elif model_name in self.model_map:
                 try:
-                    model.unload()
+                    self.model_map[model_name].unload()
                     del self.model_map[model_name]
                     gc.collect()
 
