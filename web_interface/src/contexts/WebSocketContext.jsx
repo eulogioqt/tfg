@@ -49,6 +49,7 @@ export const WebSocketProvider = ({ children }) => {
             };
 
             ws.onerror = (error) => {
+                console.log("R2WSocket error:", error);
                 setConnected(false);
                 ws.close();
             };

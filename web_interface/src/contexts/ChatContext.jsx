@@ -17,6 +17,48 @@ export const ChatProvider = ({ children }) => {
         setIsReplying(isHuman);
     };
 
+    const handleAudio = () => {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "audio/*";
+
+        input.onchange = async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const arrayBuffer = await file.arrayBuffer();
+
+            // Decodificar el audio a PCM usando Web Audio API
+            const audioContext = new AudioContext();
+            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+            // Convertir a Int16
+            const raw = audioBuffer.getChannelData(0); // Solo canal izquierdo (mono)
+            const int16Data = new Int16Array(raw.length);
+
+            for (let i = 0; i < raw.length; i++) {
+                const s = Math.max(-1, Math.min(1, raw[i]));
+                int16Data[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+            }
+
+            const id = uuidv4();
+            const messageWithId = {
+                type: "AUDIO_PROMPT",
+                data: {
+                    id: id,
+                    audio: Array.from(int16Data), // Convertir a lista de int16
+                    sample_rate: audioBuffer.sampleRate,
+                },
+            };
+            console.log(JSON.stringify(messageWithId).length / 1024 / 1024 + " MB");
+            console.log(messageWithId);
+
+            sendMessage(messageWithId);
+        };
+
+        input.click();
+    };
+
     const handleSend = (inputMessage) => {
         if (inputMessage.length > 0) {
             const id = uuidv4();
@@ -41,7 +83,8 @@ export const ChatProvider = ({ children }) => {
 
                 clearMessages,
                 addMessage,
-                handleSend
+                handleAudio,
+                handleSend,
             }}
         >
             {children}

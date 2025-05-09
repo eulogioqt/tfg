@@ -10,7 +10,7 @@ import { useWindowSize, BREAKPOINTS } from "../../hooks/useWindowSize";
 import { useChat } from "../../contexts/ChatContext";
 
 const ChatPage = () => {
-    const { messages, clearMessages, addMessage, handleSend } = useChat();
+    const { messages, clearMessages, addMessage, handleAudio, handleSend } = useChat();
     const { subscribe } = useEventBus();
     const { width } = useWindowSize();
 
@@ -46,7 +46,7 @@ const ChatPage = () => {
 
                     <ChatMessageArea messages={messages} />
 
-                    <ChatFooter chatAreaRef={chatAreaRef} handleSend={handleSend} />
+                    <ChatFooter chatAreaRef={chatAreaRef} handleAudio={handleAudio} handleSend={handleSend} />
                 </div>
             </div>
         </>

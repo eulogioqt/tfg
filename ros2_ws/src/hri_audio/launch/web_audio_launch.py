@@ -53,9 +53,6 @@ def generate_launch_description():
             package='ros2web',
             executable='server',
             name='r2w_server',
-            parameters=[{
-                'topics': "[['/camera/color/recognition', 'IMAGE'], ['/logic/info/actual_people', 'ACTUAL_PEOPLE']]"
-            }],
             output='screen'
         ),
         Node(
@@ -63,11 +60,5 @@ def generate_launch_description():
             executable='sancho_web',
             name='sancho_web',
             output='screen'
-        ),
-        Node(
-            package='sancho_web',
-            executable='api_rest',
-            name='api_rest',
-            output='screen'
-        ),
+        )
     ])

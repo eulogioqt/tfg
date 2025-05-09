@@ -1,10 +1,10 @@
 import React from "react";
 import ChatFullTextArea from "./ChatFullTextArea";
 
-const ChatFooter = ({ chatAreaRef, handleSend }) => {
+const ChatFooter = ({ chatAreaRef, handleAudio, handleSend }) => {
     return (
         <div className="px-md-5 px-2 d-flex align-items-center">
-            <ChatFullTextArea chatAreaRef={chatAreaRef} handleSend={handleSend} />
+            <ChatFullTextArea chatAreaRef={chatAreaRef} handleAudio={handleAudio} handleSend={handleSend} />
         </div>
     );
 };
