@@ -41,7 +41,10 @@ class Assistant:
             if not self.node.queue.empty():
                 user_text = self.node.queue.get()
                 ai_response = self.sancho_prompt_request(user_text)
+                self.node.get_logger().info(f"✅✅✅ Respuesta recibida '{ai_response}'")
+
                 audio, sample_rate = self.tts_request(ai_response)
+                self.node.get_logger().info(f"✅✅✅ Reproduciendo por audio la respuesta")
 
                 sd.play(audio, samplerate=sample_rate)
                 sd.wait()
