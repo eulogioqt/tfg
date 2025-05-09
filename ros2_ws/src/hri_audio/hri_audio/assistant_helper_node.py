@@ -61,7 +61,7 @@ class AssistantHelper:
         self.sample_rate = -1 # Will set on mic callbacks
         self.check_each_seconds = 0.5
         self.intensity_threshold = 750
-        self.name_max_seconds = 1.5
+        self.name_max_seconds = 2
 
         self.audio = []
         self.check_audio = []
