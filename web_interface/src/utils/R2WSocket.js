@@ -12,6 +12,7 @@ const MESSAGE_TYPE = {
 export default class R2WSocket {
     constructor(url) {
         this.socket = new WebSocket(url); // Usar reconnecting websocket
+        this.encoder = new TextEncoder();
         this.buffers = {};
 
         this.socket.onopen = (event) => this.onopen?.(event);
@@ -29,7 +30,9 @@ export default class R2WSocket {
             
             const { id, type, chunk_index, final, data } = chunk_message;
             if (type === CHUNK_MESSAGE_TYPE.CHUNK) {
-                console.log("Chunk recibido:", chunk_index, final);
+                const sizeKB = (this.encoder.encode(event.data).length / 1024).toFixed(2);
+                console.log(`Chunk received ${chunk_index} (final: ${final}) — ${sizeKB} KB`);
+
                 if (!this.buffers[id]) this.buffers[id] = []
                 this.buffers[id].push({ index: chunk_index, data });
 
@@ -81,14 +84,17 @@ export default class R2WSocket {
             type: MESSAGE_TYPE.MESSAGE,
             data: message,
         });
-        
+    
         const chunks = this._msgToChunks(fullStr);
         chunks.forEach(chunk => {
-            console.log("Enviando chunk...", chunk.chunk_index, chunk.final);
-            this.socket.send(JSON.stringify(chunk));
-        });     
+            const chunkStr = JSON.stringify(chunk);
+            const sizeKB = (this.encoder.encode(chunkStr).length / 1024).toFixed(2);
+    
+            console.log(`Sending chunk ${chunk.chunk_index} (final: ${chunk.final}) — ${sizeKB} KB`);
+            this.socket.send(chunkStr);
+        });
     }
-
+    
     close() {
         this.socket.close();
     }
