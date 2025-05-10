@@ -12,16 +12,14 @@ class ChunkMessage(JSONMessage):
         self.final = final
         self.data = data
     
-    def to_json(self):
-        message = {
+    def to_dict(self):
+        return {
             "type": ChunkMessageType.CHUNK,
             "id": self.id,
             "chunk_index": self.chunk_index,
             "final": self.final,
             "data": self.data
         }
-
-        return json.dumps(message)
 
 ##### TYPES #####
 class ChunkMessageType(str, Enum):
@@ -37,7 +35,7 @@ CHUNK_MESSAGE_OBJECT = {
 def parse_chunk_message(msg):
     try:
         msg = json.loads(msg)
-        return msg.get("type"), msg.get("id"), msg.get("chunk_id"), msg.get("final"), msg.get("data")
+        return msg.get("type"), msg.get("id"), msg.get("chunk_index"), msg.get("final"), msg.get("data")
     except json.JSONDecodeError:
         print("Error: mensaje JSON malformado")
         return None, None

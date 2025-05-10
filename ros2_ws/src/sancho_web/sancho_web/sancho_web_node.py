@@ -85,7 +85,7 @@ class SanchoWeb:
             prompt = PromptMessage(data)
 
             response = self.sancho_prompt_request(prompt.value)
-  
+
             self.send_message(key, ResponseMessage(prompt.id, response))
         elif type == MessageType.AUDIO_PROMPT:
             audio_prompt = AudioPromptMessage(data)

@@ -21,7 +21,6 @@ export default class R2WSocket {
         this.socket.onmessage = (event) => {
             let chunk_message;
             try {
-                console.log("ws", event);
                 chunk_message = JSON.parse(event.data);
             } catch (e) {
                 console.log("ERROR ON JSON PARSE ON CHUNK MESSAGE", e, event.data);
@@ -52,7 +51,6 @@ export default class R2WSocket {
             return;
         }            
         
-        console.log("Full message:", r2w_message);
         const { type, data } = r2w_message;
         if (type === MESSAGE_TYPE.MESSAGE) {
             this.onmessage(JSON.parse(data));
@@ -86,6 +84,7 @@ export default class R2WSocket {
         
         const chunks = this._msgToChunks(fullStr);
         chunks.forEach(chunk => {
+            console.log("Enviando chunk...", chunk.chunk_index, chunk.final);
             this.socket.send(JSON.stringify(chunk));
         });     
     }

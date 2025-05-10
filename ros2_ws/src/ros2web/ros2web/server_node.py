@@ -72,14 +72,14 @@ class Server(StoppableNode):
 
     def on_message(self, key, msg):
         type, data = parse_message(msg)
-        self.node.get_logger().info(f"Message received ({key}): Type={type}")
+        self.node.get_logger().info(f"Message received from ({key}).")
 
         if type == MessageType.MESSAGE:
             self.node.web_pub.publish(R2WMessage(key=key, value=data)) # Data is already JSON
 
     def on_message_chunked(self, key, msg):
         type, id, chunk_index, final, data = parse_chunk_message(msg) 
-        self.node.get_logger().info(f"Chunk received ({key}): Index={chunk_index} Final={final}")
+        self.node.get_logger().info(f"Chunk received from ({key}): Index={chunk_index} Final={final}")
 
         if type == ChunkMessageType.CHUNK:
             full_data = self.chunk_manager.chunk_to_msg(id, chunk_index, final, data)
@@ -88,12 +88,14 @@ class Server(StoppableNode):
 
     def send_chunked(self, key, msg: JSONMessage):
         client = self.ws.get_client(key)
-        for chunk_message in self.chunk_manager.msg_to_chunks(msg.to_json()):
-            self.ws.send_message(client, chunk_message.to_json())
+        self.node.get_logger().info(f"Sending message to ({key}).")
+        for chunk in self.chunk_manager.msg_to_chunks(msg.to_json()):
+            self.node.get_logger().info(f"Sending chunk to ({key}): Index={chunk.chunk_index} Final={chunk.final}")
+            self.ws.send_message(client, chunk.to_json())
 
     def broadcast_chunked(self,  msg: JSONMessage):
-        for chunk_message in self.chunk_manager.msg_to_chunks(msg.to_json()):
-            self.ws.broadcast_message(chunk_message.to_json())
+        for chunk in self.chunk_manager.msg_to_chunks(msg.to_json()):
+            self.ws.broadcast_message(chunk.to_json())
 
     def on_user_connect(self, key):
         self.node.get_logger().info(f"Client connected ({key}) (Connections: {self.ws.get_connection_count()})")

@@ -17,13 +17,11 @@ class Message(JSONMessage): # Cambiar a GeneralMessage o algo asi para no confun
     def __init__(self, data):
         self.data = data
     
-    def to_json(self):
-        message = {
+    def to_dict(self):
+        return {
             "type": MessageType.MESSAGE,
             "data": self.data
         }
-
-        return json.dumps(message)
     
 class TopicMessage(JSONMessage):
     def __init__(self, topic, name, value):
@@ -31,8 +29,8 @@ class TopicMessage(JSONMessage):
         self.name = name
         self.value = value
 
-    def to_json(self):
-        message = {
+    def to_dict(self):
+        return {
             "type": MessageType.TOPIC,
             "data": {
                 "topic": self.topic,
@@ -40,8 +38,6 @@ class TopicMessage(JSONMessage):
                 "value": self.value
             }
         }
-
-        return json.dumps(message)
 
 
 ##### TYPES #####
