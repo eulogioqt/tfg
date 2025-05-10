@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid";
+
 const CHUNK_MESSAGE_TYPE = {
     CHUNK: "CHUNK",
 }
@@ -50,6 +52,7 @@ export default class R2WSocket {
             return;
         }            
         
+        console.log("Full message:", r2w_message);
         const { type, data } = r2w_message;
         if (type === MESSAGE_TYPE.MESSAGE) {
             this.onmessage(JSON.parse(data));

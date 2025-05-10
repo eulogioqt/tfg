@@ -5,8 +5,8 @@ from queue import Queue
 
 from .protocol import (
     MessageType, JSONMessage, 
-    PromptMessage, AudioPromptChunkMessage,
-    ResponseMessage, FaceprintEventMessage, PromptTranscriptionMessage, AudioResponseChunkMessage,
+    PromptMessage, AudioPromptMessage,
+    ResponseMessage, FaceprintEventMessage, PromptTranscriptionMessage, AudioResponseMessage,
     parse_message
 )
 
@@ -62,8 +62,6 @@ class SanchoWeb:
     def __init__(self):
         self.node = SanchoWebNode()
 
-        self.audio_buffers = {}
-
     def spin(self):
         while True:
             if self.node.web_queue.qsize() > 0: # Web messages received
@@ -89,32 +87,18 @@ class SanchoWeb:
             response = self.sancho_prompt_request(prompt.value)
   
             self.send_message(key, ResponseMessage(prompt.id, response))
-        elif type == MessageType.AUDIO_PROMPT_CHUNK:
-            audio_prompt = AudioPromptChunkMessage(data)
+        elif type == MessageType.AUDIO_PROMPT:
+            audio_prompt = AudioPromptMessage(data)
             
-            if key not in self.audio_buffers:
-                self.audio_buffers[key] = []
-            self.audio_buffers[key] += audio_prompt.audio
+            transcription = self.stt_request(audio_prompt.audio, audio_prompt.sample_rate)
+            self.send_message(key, PromptTranscriptionMessage(audio_prompt.id, transcription))
 
-            if audio_prompt.final:
-                final_audio = self.audio_buffers[key] # El get por first = final
-                del self.audio_buffers[key]
+            response = self.sancho_prompt_request(transcription)
+            self.send_message(key, ResponseMessage(audio_prompt.id, response))
+
+            audio, sample_rate = self.tts_request(response)
+            self.send_message(key, AudioResponseMessage(audio_prompt.id, audio, sample_rate))
                 
-                transcription = self.stt_request(final_audio, audio_prompt.sample_rate)
-                self.send_message(key, PromptTranscriptionMessage(audio_prompt.id, transcription))
-
-                response = self.sancho_prompt_request(transcription)
-                self.send_message(key, ResponseMessage(audio_prompt.id, response))
-
-                chunk_size = 48000
-                audio, sample_rate = self.tts_request(response)
-                for i in range(0, len(audio), chunk_size):
-                    chunk = audio[i:i + chunk_size]
-                    final = (i + chunk_size) >= len(audio)
-                    index = i // chunk_size
-
-                    self.send_message(key, AudioResponseChunkMessage(audio_prompt.id, index, final, chunk, sample_rate))
-                    
     def sancho_prompt_request(self, text):
         sancho_prompt_request = SanchoPrompt.Request()
         sancho_prompt_request.text = text

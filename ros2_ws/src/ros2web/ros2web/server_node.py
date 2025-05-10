@@ -75,8 +75,7 @@ class Server(StoppableNode):
         self.node.get_logger().info(f"Message received ({key}): Type={type}")
 
         if type == MessageType.MESSAGE:
-            value = json.dumps(data) # do this only if is JSON, you should be able to send any kind of data not only json formatted
-            self.node.web_pub.publish(R2WMessage(key=key, value=value))
+            self.node.web_pub.publish(R2WMessage(key=key, value=data)) # Data is already JSON
 
     def on_message_chunked(self, key, msg):
         type, id, chunk_index, final, data = parse_chunk_message(msg) 

@@ -20,21 +20,11 @@ export const ChatProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        const bufferRef = { current: [] };
-
         const processPT = (e) => addMessage(e.value, e.id, true);
-        const processARC = (e) => {
-            bufferRef.current.push(e.audio);
-            if (e.final) {
-                const finalAudio = bufferRef.current.flat();
-                bufferRef.current = [];
-
-                playAudio(finalAudio, e.sample_rate);
-            }
-        };
+        const processAR = (e) => playAudio(e.audio, e.sample_rate);
 
         const unsubscribePT = subscribe("ROS_MESSAGE_PROMPT_TRANSCRIPTION", processPT);
-        const unsubscribeARC = subscribe("ROS_MESSAGE_AUDIO_RESPONSE_CHUNK", processARC);
+        const unsubscribeARC = subscribe("ROS_MESSAGE_AUDIO_RESPONSE", processAR);
 
         return () => {
             unsubscribePT();
@@ -86,27 +76,16 @@ export const ChatProvider = ({ children }) => {
                 int16Data[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
             }
 
-            const id = uuidv4();
-            const chunkSize = 48000;
+            const audioPromptMessage = {
+                type: "AUDIO_PROMPT",
+                data: {
+                    id: crypto.randomUUID(),
+                    audio: Array.from(int16Data), // Convertir a lista de int16
+                    sample_rate: audioBuffer.sampleRate,
+                },
+            };
 
-            for (let i = 0; i < int16Data.length; i += chunkSize) {
-                const chunk = Array.from(int16Data.slice(i, i + chunkSize));
-                const final = i + chunkSize >= int16Data.length;
-                const index = Math.floor(i / chunkSize);
-
-                const message = {
-                    type: "AUDIO_PROMPT_CHUNK",
-                    data: {
-                        id: id,
-                        chunk_index: index,
-                        final: final,
-                        audio: chunk,
-                        sample_rate: audioBuffer.sampleRate,
-                    },
-                };
-
-                sendMessage(message);
-            }
+            sendMessage(JSON.stringify(audioPromptMessage));
         };
 
         input.click();
@@ -123,7 +102,7 @@ export const ChatProvider = ({ children }) => {
                 },
             };
 
-            sendMessage(messageWithId);
+            sendMessage(JSON.stringify(messageWithId));
             addMessage(inputMessage, id, true);
         }
     };

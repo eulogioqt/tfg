@@ -11,7 +11,6 @@ CLIENT <=> SERVIDOR
 CLIENTE => SERVIDOR
 El cliente envia un mensaje cualquiera:
 {
-    id: uuid,
     type: "MESSAGE",
     data: ...
 }
@@ -19,14 +18,12 @@ El cliente envia un mensaje cualquiera:
 SERVIDOR => CLIENTE
 El servidor envia un mensaje cualquiera:
 {
-    id: uuid,
     type: "MESSAGE",
     data: ...
 }
 
 El servidor envia un mensaje de un topic a todos los clientes:
 {
-    id: uuid,
     type: "TOPIC",
     data: {
         topic: "topic",
