@@ -1,7 +1,8 @@
 import React from "react";
 import ChatTextArea from "./ChatTextArea";
+import ChatMicrophoneButton from "./ChatMicrophoneButton";
 
-const ChatFullTextArea = ({ chatAreaRef, handleAudio, handleSend }) => {
+const ChatFullTextArea = ({ chatAreaRef, handleAudio, handleUploadAudio, handleSend }) => {
     return (
         <div
             className="container d-flex flex-column pb-2 py-1 mb-4 shadow-sm border border-2 border-light-subtle"
@@ -13,12 +14,14 @@ const ChatFullTextArea = ({ chatAreaRef, handleAudio, handleSend }) => {
             </div>
 
             <div className="d-flex justify-content-end align-items-end pe-0 pb-0">
-                <button className="btn btn-black rounded-circle me-1" type="button" onClick={() => handleAudio()}>
-                    <i className="bi bi-mic"></i>
+                <ChatMicrophoneButton onFinish={handleAudio} />
+
+                <button className="btn btn-dark rounded-circle me-1" type="button" onClick={() => handleUploadAudio()}>
+                    <i className="bi bi-file-earmark-music"></i>
                 </button>
 
                 <button
-                    className="btn btn-black rounded-circle"
+                    className="btn btn-dark rounded-circle"
                     type="button"
                     onClick={() => chatAreaRef.current?.send()}
                 >

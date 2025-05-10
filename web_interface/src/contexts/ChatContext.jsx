@@ -11,6 +11,7 @@ export const ChatProvider = ({ children }) => {
     const { subscribe } = useEventBus();
 
     const [messages, setMessages] = useState([]);
+    const [transcribing, setTranscribing] = useState(false);
     const [isReplying, setIsReplying] = useState(false);
 
     const clearMessages = () => setMessages([]);
@@ -20,7 +21,10 @@ export const ChatProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        const processPT = (e) => addMessage(e.value, e.id, true);
+        const processPT = (e) => {
+            setTranscribing(false);
+            addMessage(e.value, e.id, true);
+        };
         const processAR = (e) => playAudio(e.audio, e.sample_rate);
 
         const unsubscribePT = subscribe("ROS_MESSAGE_PROMPT_TRANSCRIPTION", processPT);
@@ -55,7 +59,33 @@ export const ChatProvider = ({ children }) => {
         source.start();
     };
 
-    const handleAudio = () => {
+    const handleAudio = async (audioBlob) => {
+        const arrayBuffer = await audioBlob.arrayBuffer();
+
+        const audioContext = new AudioContext();
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+        const raw = audioBuffer.getChannelData(0); // Solo canal izquierdo (mono)
+        const int16Data = new Int16Array(raw.length);
+        for (let i = 0; i < raw.length; i++) {
+            const s = Math.max(-1, Math.min(1, raw[i]));
+            int16Data[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+        }
+
+        const audioPromptMessage = {
+            type: "AUDIO_PROMPT",
+            data: {
+                id: crypto.randomUUID(),
+                audio: Array.from(int16Data),
+                sample_rate: audioBuffer.sampleRate,
+            },
+        };
+
+        setTranscribing(true);
+        sendMessage(JSON.stringify(audioPromptMessage));
+    };
+
+    const handleUploadAudio = () => {
         const input = document.createElement("input");
         input.type = "file";
         input.accept = "audio/*";
@@ -64,28 +94,7 @@ export const ChatProvider = ({ children }) => {
             const file = event.target.files[0];
             if (!file) return;
 
-            const arrayBuffer = await file.arrayBuffer();
-
-            const audioContext = new AudioContext();
-            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-
-            const raw = audioBuffer.getChannelData(0);
-            const int16Data = new Int16Array(raw.length);
-            for (let i = 0; i < raw.length; i++) {
-                const s = Math.max(-1, Math.min(1, raw[i]));
-                int16Data[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
-            }
-
-            const audioPromptMessage = {
-                type: "AUDIO_PROMPT",
-                data: {
-                    id: crypto.randomUUID(),
-                    audio: Array.from(int16Data), // Convertir a lista de int16
-                    sample_rate: audioBuffer.sampleRate,
-                },
-            };
-
-            sendMessage(JSON.stringify(audioPromptMessage));
+            await handleAudio(file);
         };
 
         input.click();
@@ -112,10 +121,12 @@ export const ChatProvider = ({ children }) => {
             value={{
                 messages,
                 isReplying,
+                transcribing,
 
                 clearMessages,
                 addMessage,
                 handleAudio,
+                handleUploadAudio,
                 handleSend,
             }}
         >

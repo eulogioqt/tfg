@@ -1,7 +1,11 @@
 import React, { useRef, useEffect } from "react";
 import ChatMessage from "./ChatMessage";
 
+import { useChat } from "../../../contexts/ChatContext";
+
 const ChatMessageArea = ({ messages }) => {
+    const { transcribing } = useChat();
+
     const messagesEndRef = useRef(null);
     const firstScrollRef = useRef(false);
 
@@ -18,6 +22,11 @@ const ChatMessageArea = ({ messages }) => {
                 {messages.map((message, index) => (
                     <ChatMessage key={index} message={message} />
                 ))}
+
+                <div className="justify-content-end" style={{ display: transcribing ? "flex" : "none" }}>
+                    Transcribiendo...
+                </div>
+
                 <div ref={messagesEndRef} />
             </div>
         </div>
