@@ -1,4 +1,8 @@
-const R2W_MESSAGE_TYPE = {
+const CHUNK_MESSAGE_TYPE = {
+    CHUNK: "CHUNK",
+}
+
+const MESSAGE_TYPE = {
     MESSAGE: "MESSAGE",
     TOPIC: "TOPIC",
 };
@@ -6,45 +10,81 @@ const R2W_MESSAGE_TYPE = {
 export default class R2WSocket {
     constructor(url) {
         this.socket = new WebSocket(url); // Usar reconnecting websocket
+        this.buffers = {};
 
-        this.socket.onopen = (event) => {
-            if (this.onopen) this.onopen(event);
-        };
+        this.socket.onopen = (event) => this.onopen?.(event);
+        this.socket.onclose = (event) => this.onclose?.(event);
+        this.socket.onerror = (error) => this.onerror?.(error);
 
         this.socket.onmessage = (event) => {
-            let r2w_message;
+            let chunk_message;
             try {
-                r2w_message = JSON.parse(event.data);
+                console.log("ws", event);
+                chunk_message = JSON.parse(event.data);
             } catch (e) {
-                console.log("ERROR ON JSON PARSE ON R2WSocket", e);
-                console.log("ORIGINAL MESSAGE", event.data);
+                console.log("ERROR ON JSON PARSE ON CHUNK MESSAGE", e, event.data);
+                return;
             }            
             
-            if (r2w_message.type === R2W_MESSAGE_TYPE.MESSAGE) {
-                const message = JSON.parse(r2w_message.data); // Ver si cambiar esto para que ya venga parseado del nodo ros
-                if (this.onmessage) this.onmessage(message);
-            } else if  (r2w_message.type === R2W_MESSAGE_TYPE.TOPIC) {
-                const message = r2w_message.data;
-                if (this.ontopic) this.ontopic(message);
+            const { id, type, chunk_index, final, data } = chunk_message;
+            if (type === CHUNK_MESSAGE_TYPE.CHUNK) {
+                console.log("Chunk recibido:", chunk_index, final);
+                if (!this.buffers[id]) this.buffers[id] = []
+                this.buffers[id].push({ index: chunk_index, data });
+
+                if (final) {
+                    const fullStr = this.buffers[id].sort((a, b) => a.index - b.index).map(c => c.data).join("");
+                    delete this.buffers[id];
+                    this._onmessage(fullStr);
+                }
             }
-        };
-
-        this.socket.onclose = (event) => {
-            if (this.onclose) this.onclose(event);
-        };
-
-        this.socket.onerror = (error) => {
-            if (this.onerror) this.onerror(error);
         };
     }
 
-    send(message) {
-        const messageR2W = {
-            type: "MESSAGE",
-            data: message,
-        };
+    _onmessage(event) {
+        let r2w_message;
+        try {
+            r2w_message = JSON.parse(event);
+        } catch (e) {
+            console.log("ERROR ON JSON PARSE ON R2WSocket", e, event);
+            return;
+        }            
+        
+        const { type, data } = r2w_message;
+        if (type === MESSAGE_TYPE.MESSAGE) {
+            this.onmessage(JSON.parse(data));
+        } else if  (type === MESSAGE_TYPE.TOPIC) {
+            this.ontopic(data);
+        }
+    }
 
-        this.socket.send(JSON.stringify(messageR2W));
+    _msgToChunks(fullStr, maxChunkSize = 64000) {
+        const chunks = [];
+
+        const id = uuidv4();
+        for (let i = 0; i < fullStr.length; i += maxChunkSize) {
+            chunks.push({
+                id: id,
+                type: CHUNK_MESSAGE_TYPE.CHUNK,
+                chunk_index: Math.floor(i / maxChunkSize),
+                final: (i + maxChunkSize) >= fullStr.length,
+                data: fullStr.slice(i, i + maxChunkSize)
+            });
+        }
+    
+        return chunks;
+    }
+
+    send(message) {
+        const fullStr = JSON.stringify({
+            type: MESSAGE_TYPE.MESSAGE,
+            data: message,
+        });
+        
+        const chunks = this._msgToChunks(fullStr);
+        chunks.forEach(chunk => {
+            this.socket.send(JSON.stringify(chunk));
+        });     
     }
 
     close() {
