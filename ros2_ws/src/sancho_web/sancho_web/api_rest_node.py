@@ -12,6 +12,7 @@ from .faceprint_api import FaceprintAPI
 from .log_api import LogAPI
 from .session_api import SessionAPI
 
+# hacer un nodo por api y asi esta bien distribuido y al lanzar un nodo pues se mete con el resto y ya
 def main(args=None):
     rclpy.init(args=args)
 
