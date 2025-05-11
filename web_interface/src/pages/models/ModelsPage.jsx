@@ -1,27 +1,30 @@
 import React, { useState } from "react";
 
+import TTSPanel from "./components/TTSPanel";
+import STTPanel from "./components/STTPanel";
+import LLMPanel from "./components/LLMPanel";
+
 const ModelsPage = () => {
     const [activeTab, setActiveTab] = useState("tts");
 
     const renderPanel = () => {
         switch (activeTab) {
             case "tts":
-                return <div>Aquí van los modelos TTS</div>;
+                return <TTSPanel />;
             case "stt":
-                return <div>Aquí van los modelos STT</div>;
+                return <STTPanel />;
             case "llm":
-                return <div>Aquí van los modelos LLM</div>;
+                return <LLMPanel />;
             default:
                 return null;
         }
     };
 
     return (
-        <div className="container pt-3 mt-5">
+        <div className="container pt-4 mt-5">
             <h2 className="mb-4 fw-bold">Gestión de Modelos</h2>
 
             <div className="row">
-                {/* Sidebar */}
                 <div className="col-md-3">
                     <div className="list-group shadow-sm">
                         <button
@@ -48,14 +51,13 @@ const ModelsPage = () => {
                     </div>
                 </div>
 
-                {/* Panel derecho */}
                 <div className="col-md-9">
                     <div className="card border rounded shadow-sm">
                         <div className="card-header bg-light fw-semibold">
                             <i className="bi bi-gear me-2" />
                             Modelos {activeTab.toUpperCase()}
                         </div>
-                        <div className="card-body">{renderPanel()}</div>
+                        <div className="card-body mb-0 pb-0">{renderPanel()}</div>
                     </div>
                 </div>
             </div>
