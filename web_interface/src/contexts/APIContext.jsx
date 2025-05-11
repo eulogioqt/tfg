@@ -85,6 +85,17 @@ export const APIProvider = ({ children }) => {
         update: () => alert("Not implemented"),
         delete: () => alert("Not implemented"),
     });
+    const sttModelsAPI = createEndpointMethods("stt_models", {
+        load: (body, version = "v1") =>
+            apiMethods.post(`${BASE_URL}/api/${version}/stt_models/load`, body, getAuthorizationHeader()),
+        unload: (body, version = "v1") =>
+            apiMethods.post(`${BASE_URL}/api/${version}/stt_models/unload`, body, getAuthorizationHeader()),
+        activate: (body, version = "v1") =>
+            apiMethods.post(`${BASE_URL}/api/${version}/stt_models/activate`, body, getAuthorizationHeader()),
+        create: () => alert("Not implemented"),
+        update: () => alert("Not implemented"),
+        delete: () => alert("Not implemented"),
+    });
 
     return (
         <APIContext.Provider
@@ -93,6 +104,7 @@ export const APIProvider = ({ children }) => {
                 sessions: sessionsAPI,
                 logs: logsAPI,
                 ttsModels: ttsModelsAPI,
+                sttModels: sttModelsAPI,
 
                 isResponseOk: isResponseOk,
                 setAuthToken: setAuthToken,
