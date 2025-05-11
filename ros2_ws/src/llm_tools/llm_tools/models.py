@@ -64,3 +64,9 @@ class MODELS:
         class BAAI(SmartStrEnum):
             BGE_M3 = "BAAI/bge-m3"
             BGE_BASE_EN = "BAAI/bge-base-en-v1.5"
+
+NEEDS_API_KEY = {
+    PROVIDER.GEMINI,
+    PROVIDER.MISTRAL,
+    PROVIDER.OPENAI,
+}

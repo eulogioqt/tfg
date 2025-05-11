@@ -7,7 +7,7 @@ from llm_msgs.msg import LoadUnloadResult, ProviderModel
 from llm_msgs.srv import GetModels, Prompt, Embedding, LoadModel, UnloadModel, GetActiveModels, SetActiveModel
 
 from .providers.base_provider import BaseProvider
-from .models import PROVIDER, MODELS
+from .models import PROVIDER, MODELS, NEEDS_API_KEY
 
 
 class LLMNode(Node):
@@ -59,13 +59,15 @@ class LLMNode(Node):
         for provider_name in provider_names:
             if hasattr(MODELS.LLM, provider_name.upper()):
                 llm_models = list(getattr(MODELS.LLM, provider_name.upper()))
-                response.llm_models.append(ProviderModel(provider=provider_name, models=llm_models))
+                needs_api_key = provider_name in NEEDS_API_KEY
+                response.llm_models.append(ProviderModel(provider=provider_name, needs_api_key=needs_api_key, models=llm_models))
                 if provider_name not in response.providers:
                     response.providers.append(provider_name)
 
             if hasattr(MODELS.EMBEDDING, provider_name.upper()):
                 embedding_models = list(getattr(MODELS.EMBEDDING, provider_name.upper()))
-                response.embedding_models.append(ProviderModel(provider=provider_name, models=embedding_models))
+                needs_api_key = provider_name in NEEDS_API_KEY
+                response.embedding_models.append(ProviderModel(provider=provider_name, needs_api_key=needs_api_key, models=embedding_models))
                 if provider_name not in response.providers:
                     response.providers.append(provider_name)
 
