@@ -2,9 +2,6 @@ import rclpy
 from rclpy.node import Node
 from rclpy.client import Client
 
-from rclpy.executors import SingleThreadedExecutor
-from threading import Thread
-
 from abc import ABC
 
 
@@ -26,15 +23,3 @@ class ServiceEngine(ABC):
         result = future.result()
 
         return result
-
-    @staticmethod
-    def create_client_node():
-        node = rclpy.create_node("service_engine_client")
-
-        executor = SingleThreadedExecutor()
-        executor.add_node(node)
-
-        thread = Thread(target=executor.spin, daemon=True)
-        thread.start()
-
-        return node
