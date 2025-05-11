@@ -8,6 +8,7 @@ from .v1_sessions import router as v1_sessions
 from .v1_logs import router as v1_logs
 from .v1_tts_models import router as v1_tts_models
 from .v1_stt_models import router as v1_stt_models
+from .v1_llm_models import router as v1_llm_models
 
 load_dotenv()
 
@@ -35,3 +36,4 @@ app.include_router(v1_sessions, prefix="/api/v1/sessions")
 app.include_router(v1_logs, prefix="/api/v1/logs")
 app.include_router(v1_tts_models, prefix="/api/v1/tts_models")
 app.include_router(v1_stt_models, prefix="/api/v1/stt_models")
+app.include_router(v1_llm_models, prefix="/api/v1/llm_models")

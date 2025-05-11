@@ -67,7 +67,7 @@ def generate_launch_description():
             name='api_rest',
             output='screen',
             parameters=[{
-                "selected_apis": "['tts', 'stt']"
+                "selected_apis": "['tts_models', 'stt_models', 'llm_models']"
             }]
         ),
     ])
