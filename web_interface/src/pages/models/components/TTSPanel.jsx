@@ -1,10 +1,14 @@
 import React, { useState } from "react";
+
 import { useAPI } from "../../../contexts/APIContext";
 import { useToast } from "../../../contexts/ToastContext";
+import { useLoadingScreen } from "../../../components/LoadingScreen";
+
 import ActivateModal from "./ActivateModal";
 
 const TTSPanel = ({ ttsModelsList, setTtsModelsList }) => {
     const { ttsModels, isResponseOk } = useAPI();
+    const { withLoading } = useLoadingScreen();
     const { showToast } = useToast();
 
     const [showSpeakerModal, setShowSpeakerModal] = useState(false);
@@ -12,9 +16,11 @@ const TTSPanel = ({ ttsModelsList, setTtsModelsList }) => {
     const [selectedSpeaker, setSelectedSpeaker] = useState("");
 
     const onLoad = async (model) => {
-        const response = await ttsModels.load({
-            model: model,
-        });
+        const response = await withLoading(() =>
+            ttsModels.load({
+                model: model,
+            })
+        );
 
         if (isResponseOk(response)) {
             const { message, success } = response.data;
@@ -30,9 +36,11 @@ const TTSPanel = ({ ttsModelsList, setTtsModelsList }) => {
     };
 
     const onUnload = async (model) => {
-        const response = await ttsModels.unload({
-            model: model,
-        });
+        const response = await withLoading(() =>
+            ttsModels.unload({
+                model: model,
+            })
+        );
 
         if (isResponseOk(response)) {
             const { message, success } = response.data;
@@ -48,10 +56,12 @@ const TTSPanel = ({ ttsModelsList, setTtsModelsList }) => {
     };
 
     const onActivate = async (model, speaker) => {
-        const response = await ttsModels.activate({
-            model: model,
-            speaker: speaker,
-        });
+        const response = await withLoading(() =>
+            ttsModels.activate({
+                model: model,
+                speaker: speaker,
+            })
+        );
 
         if (isResponseOk(response)) {
             const { message, success } = response.data;
@@ -112,15 +122,15 @@ const TTSPanel = ({ ttsModelsList, setTtsModelsList }) => {
                             <h5 className="mb-1 text-capitalize">{model.model}</h5>
                             <p className="mb-1 text-muted small">
                                 {model.speakers.length > 0
-                                    ? `Hablantes: ${model.speakers.join(", ")}`
-                                    : "Este modelo no tiene hablantes configurables"}
+                                    ? `Voces: ${model.speakers.join(", ")}`
+                                    : "Este modelo no tiene voces configurables"}
                             </p>
                             <div>
                                 <span className={`badge me-2 ${model.loaded ? "bg-success" : "bg-secondary"}`}>
                                     {model.loaded ? "Cargado" : "No cargado"}
                                 </span>
                                 {model.active && (
-                                    <span className="badge bg-info text-dark">
+                                    <span className="badge bg-primary">
                                         Activo {model.speaker ? `(${model.speaker})` : ""}
                                     </span>
                                 )}

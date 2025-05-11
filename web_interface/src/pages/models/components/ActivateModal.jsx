@@ -15,7 +15,7 @@ const ActivateModal = ({ show, model, selectedSpeaker, setSelectedSpeaker, onClo
             buttonColor="primary"
             size="md"
         >
-            <label className="form-label">Selecciona un hablante</label>
+            <label className="form-label">Selecciona una voz</label>
             <select
                 className="form-select"
                 value={selectedSpeaker}
