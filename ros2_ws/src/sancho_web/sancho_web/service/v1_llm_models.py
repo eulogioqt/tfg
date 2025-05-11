@@ -1,7 +1,7 @@
 from typing import Optional, List
 from fastapi import APIRouter, HTTPException, Query, Request, Path
 
-from .llm_model_model import LLMModel, LLMLoadModel, LLMUnloadModel, LLMActiveModel, LLMResult
+from .llm_model_model import LLMProvider, LLMLoadModel, LLMUnloadModel, LLMActiveModel, LLMResult
 from .api_utils import APIUtils
 from ..apis import LLMModelAPI
 
@@ -20,20 +20,20 @@ def set_llm_model_api(api):
     llm_model_api = api
 
 
-@router.get("", tags=["LLM Models CRUD endpoints"], response_model=List[LLMModel])
-async def get_llm_models(
+@router.get("", tags=["LLM Models CRUD endpoints"], response_model=List[LLMProvider])
+async def get_llm_providers(
     request: Request,
     providers: Optional[List[str]] = Query(None, description="Lista de proveedores a buscar"),
     fields: Optional[str] = Query(None, description="Campos específicos a devolver"),
     sort: Optional[str] = Query(None, description="Campos por los que ordenar, separados por comas"),
     offset: int = Query(default=0, description="Índice de inicio para los resultados de la paginación"),
-    limit: int = Query(default=10, description="Cantidad de modelos a devolver, por defecto 10"),
+    limit: int = Query(default=10, description="Cantidad de proveedores a devolver, por defecto 10"),
     hateoas: Optional[bool] = Query(default=False, description="Incluir enlace HATEOAS")
 ):
     APIUtils.check_accept_json(request)
 
     try:
-        response = llm_model_api.get_all_llm_models(**({"providers": providers} if providers else {}))
+        response = llm_model_api.get_all_llm_providers(**({"providers": providers} if providers else {}))
         return response.to_fastapi()
 
     except HTTPException as e:
@@ -42,11 +42,10 @@ async def get_llm_models(
         raise HTTPException(status_code=500, detail={str(e)})
 
 
-@router.get("/{provider}/{model}", tags=["LLM Models CRUD endpoints"], response_model=LLMModel)
-async def get_llm_model_by_name(
+@router.get("/{provider}", tags=["LLM Models CRUD endpoints"], response_model=LLMProvider)
+async def get_llm_provider(
     request: Request,
     provider: str = Path(description="Nombre del proveedor"),
-    model: str = Path(description="Nombre del modelo"),
     fields: Optional[str] = Query(None, description="Campos específicos a devolver"),
     sort: Optional[str] = Query(None, description="Campos por los que ordenar, separados por comas"),
     offset: int = Query(default=0, description="Índice de inicio para los resultados de la paginación"),
@@ -56,7 +55,7 @@ async def get_llm_model_by_name(
     APIUtils.check_accept_json(request)
 
     try:
-        response = llm_model_api.get_llm_model(provider, model)
+        response = llm_model_api.get_llm_provider(provider)
         
         return response.to_fastapi()
 
