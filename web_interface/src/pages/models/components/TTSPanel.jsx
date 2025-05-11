@@ -4,7 +4,7 @@ import { useAPI } from "../../../contexts/APIContext";
 import { useToast } from "../../../contexts/ToastContext";
 import { useLoadingScreen } from "../../../components/LoadingScreen";
 
-import ActivateModal from "./ActivateModal";
+import ActivateTTSModal from "./ActivateTTSModal";
 
 const TTSPanel = ({ ttsModelsList, setTtsModelsList }) => {
     const { ttsModels, isResponseOk } = useAPI();
@@ -96,7 +96,7 @@ const TTSPanel = ({ ttsModelsList, setTtsModelsList }) => {
 
     return (
         <>
-            <ActivateModal
+            <ActivateTTSModal
                 show={showSpeakerModal}
                 model={selectedModel}
                 selectedSpeaker={selectedSpeaker}

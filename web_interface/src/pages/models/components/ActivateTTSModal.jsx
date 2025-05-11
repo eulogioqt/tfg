@@ -1,7 +1,7 @@
 import React from "react";
 import ActionModal from "../../../components/ActionModal";
 
-const ActivateModal = ({ show, model, selectedSpeaker, setSelectedSpeaker, onClose, onConfirm }) => {
+const ActivateTTSModal = ({ show, model, selectedSpeaker, setSelectedSpeaker, onClose, onConfirm }) => {
     if (!show || !model) return null;
 
     return (
@@ -31,4 +31,4 @@ const ActivateModal = ({ show, model, selectedSpeaker, setSelectedSpeaker, onClo
     );
 };
 
-export default ActivateModal;
+export default ActivateTTSModal;
