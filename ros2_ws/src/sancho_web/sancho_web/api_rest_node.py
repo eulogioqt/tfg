@@ -9,8 +9,9 @@ from .service.v1_faceprints import set_faceprint_api
 from .service.v1_logs import set_log_api
 from .service.v1_sessions import set_session_api
 from .service.v1_tts_models import set_tts_model_api
+from .service.v1_stt_models import set_stt_model_api
 
-from .apis import FaceprintAPI, LogAPI, SessionAPI, TTSModelAPI
+from .apis import FaceprintAPI, LogAPI, SessionAPI, TTSModelAPI, STTModelAPI
 
 
 class APIRESTNode(Node):
@@ -19,7 +20,8 @@ class APIRESTNode(Node):
         "faceprint": (FaceprintAPI, set_faceprint_api),
         "log": (LogAPI, set_log_api),
         "session": (SessionAPI, set_session_api),
-        "tts": (TTSModelAPI, set_tts_model_api)
+        "tts": (TTSModelAPI, set_tts_model_api),
+        "stt": (STTModelAPI, set_stt_model_api)
     }
 
     def __init__(self):
