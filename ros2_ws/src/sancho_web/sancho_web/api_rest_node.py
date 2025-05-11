@@ -6,7 +6,7 @@ from .service.v1_faceprints import set_faceprint_api
 from .service.v1_logs import set_log_api
 from .service.v1_sessions import set_session_api
 
-from .client_node import ClientNode
+from .engines import ServiceEngine
 
 from .faceprint_api import FaceprintAPI
 from .log_api import LogAPI
@@ -16,7 +16,7 @@ from .session_api import SessionAPI
 def main(args=None):
     rclpy.init(args=args)
 
-    client_node = ClientNode()
+    client_node = ServiceEngine.create_client_node()
 
     faceprint_api = FaceprintAPI(node=client_node)
     set_faceprint_api(faceprint_api)
