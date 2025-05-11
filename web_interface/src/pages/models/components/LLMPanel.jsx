@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useAPI } from "../../../contexts/APIContext";
 import { useToast } from "../../../contexts/ToastContext";
 import { useLoadingScreen } from "../../../components/LoadingScreen";
+import ModelItem from "./ModelItem";
+import LoadInputButton from "./LoadInputButton";
 
 const LLMPanel = ({ llmProvidersList, setLlmProvidersList }) => {
     const { llmModels, isResponseOk } = useAPI();
@@ -14,17 +16,17 @@ const LLMPanel = ({ llmProvidersList, setLlmProvidersList }) => {
     const getCachedApiKey = (provider) => localStorage.getItem(`llm_api_key_${provider}`) || "";
     const cacheApiKey = (provider, key) => localStorage.setItem(`llm_api_key_${provider}`, key);
 
-    const onStartLoad = (provider, executedLocally, needsApiKey, model = null) => {
+    const onStartLoad = (provider, needsApiKey, model = null) => {
         if (needsApiKey) {
             const cached = getCachedApiKey(provider);
             setApiKeys((prev) => ({ ...prev, [provider]: cached }));
             setShowApiInput((prev) => ({ ...prev, [provider]: model || true }));
         } else {
-            onConfirmLoad(provider, executedLocally, "", model);
+            onConfirmLoad(provider, "", model);
         }
     };
 
-    const onConfirmLoad = async (provider, executedLocally, apiKey, model = null) => {
+    const onConfirmLoad = async (provider, apiKey, model = null) => {
         const providerData = llmProvidersList.find((p) => p.provider === provider);
         const needsApiKey = providerData.needs_api_key;
 
@@ -143,149 +145,36 @@ const LLMPanel = ({ llmProvidersList, setLlmProvidersList }) => {
                         <h5 className="mb-0 text-capitalize">{providerData.provider}</h5>
                         {!providerData.executed_locally && !providerData.models[0].loaded && (
                             <div className="d-flex align-items-center">
-                                {showApiInput[providerData.provider] ? (
-                                    <>
-                                        <input
-                                            type="password"
-                                            className="form-control form-control-sm me-2"
-                                            placeholder="API Key"
-                                            value={apiKeys[providerData.provider] || ""}
-                                            onChange={(e) =>
-                                                setApiKeys((prev) => ({
-                                                    ...prev,
-                                                    [providerData.provider]: e.target.value,
-                                                }))
-                                            }
-                                            style={{ maxWidth: "200px" }}
-                                        />
-                                        <button
-                                            className="btn btn-sm btn-outline-success"
-                                            onClick={() =>
-                                                onConfirmLoad(
-                                                    providerData.provider,
-                                                    false,
-                                                    apiKeys[providerData.provider]
-                                                )
-                                            }
-                                        >
-                                            Confirmar
-                                        </button>
-                                    </>
-                                ) : (
-                                    <button
-                                        className="btn btn-sm btn-outline-success"
-                                        onClick={() =>
-                                            onStartLoad(providerData.provider, false, providerData.needs_api_key)
-                                        }
-                                    >
-                                        Cargar
-                                    </button>
-                                )}
+                                <LoadInputButton
+                                    provider={providerData.provider}
+                                    model={null}
+                                    showApiInput={showApiInput[providerData.provider]}
+                                    apiKey={apiKeys[providerData.provider]}
+                                    needsApiKey={providerData.needs_api_key}
+                                    setApiKeys={setApiKeys}
+                                    onConfirmLoad={onConfirmLoad}
+                                    onStartLoad={onStartLoad}
+                                />
                             </div>
                         )}
                     </div>
                     <div className="card-body p-2">
                         {providerData.models.map((model) => (
-                            <div
-                                key={model.model}
-                                className={`list-group-item d-flex justify-content-between align-items-center ${
-                                    model.active ? "list-group-item-primary" : ""
-                                }`}
-                            >
-                                <div className="me-3">
-                                    <h6 className="mb-1 text-capitalize">{model.model}</h6>
-                                    <div>
-                                        <span className={`badge me-2 ${model.loaded ? "bg-success" : "bg-secondary"}`}>
-                                            {model.loaded ? "Cargado" : "No cargado"}
-                                        </span>
-                                        {model.active && <span className="badge bg-primary">Activo</span>}
-                                    </div>
-                                </div>
-
-                                <div className="btn-group align-items-center">
-                                    {providerData.executed_locally && !model.loaded && (
-                                        <div className="btn-group align-items-center">
-                                            {showApiInput[providerData.provider] == model.model ? (
-                                                <>
-                                                    <input
-                                                        type="password"
-                                                        className="form-control form-control-sm me-2"
-                                                        placeholder="API Key"
-                                                        value={apiKeys[providerData.provider] || ""}
-                                                        onChange={(e) =>
-                                                            setApiKeys((prev) => ({
-                                                                ...prev,
-                                                                [providerData.provider]: e.target.value,
-                                                            }))
-                                                        }
-                                                        style={{ maxWidth: "200px" }}
-                                                    />
-                                                    <button
-                                                        className="btn btn-sm btn-outline-success"
-                                                        onClick={() =>
-                                                            onConfirmLoad(
-                                                                providerData.provider,
-                                                                false,
-                                                                apiKeys[providerData.provider],
-                                                                model.model
-                                                            )
-                                                        }
-                                                    >
-                                                        Confirmar
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <button
-                                                    className="btn btn-sm btn-outline-success"
-                                                    onClick={() =>
-                                                        providerData.needs_api_key
-                                                            ? onStartLoad(
-                                                                  providerData.provider,
-                                                                  true,
-                                                                  true,
-                                                                  model.model
-                                                              )
-                                                            : onConfirmLoad(
-                                                                  providerData.provider,
-                                                                  true,
-                                                                  "",
-                                                                  model.model
-                                                              )
-                                                    }
-                                                >
-                                                    Cargar
-                                                </button>
-                                            )}
-                                        </div>
-                                    )}
-
-                                    {providerData.executed_locally && model.loaded && !model.active && (
-                                        <>
-                                            <button
-                                                className="btn btn-sm btn-outline-primary"
-                                                onClick={() => onActivate(providerData.provider, model.model)}
-                                            >
-                                                Activar
-                                            </button>
-                                            <button
-                                                className="btn btn-sm btn-outline-danger"
-                                                onClick={() => onUnload(providerData.provider, model.model)}
-                                            >
-                                                Liberar
-                                            </button>
-                                        </>
-                                    )}
-
-                                    {!providerData.executed_locally && model.loaded && !model.active && (
-                                        <button
-                                            className="btn btn-sm btn-outline-primary"
-                                            onClick={() => onActivate(providerData.provider, model.model)}
-                                        >
-                                            Activar
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
+                            <ModelItem
+                                provider={providerData.provider}
+                                executedLocally={providerData.executed_locally}
+                                needsApiKey={providerData.needs_api_key}
+                                model={model.model}
+                                loaded={model.loaded}
+                                active={model.active}
+                                setApiKeys={setApiKeys}
+                                showApiInput={showApiInput}
+                                apiKeys={apiKeys}
+                                onConfirmLoad={onConfirmLoad}
+                                onStartLoad={onStartLoad}
+                                onActivate={onActivate}
+                                onUnload={onUnload}
+                            />
                         ))}
                     </div>
                 </div>

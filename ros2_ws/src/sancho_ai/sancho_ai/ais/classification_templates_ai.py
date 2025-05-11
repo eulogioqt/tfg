@@ -39,7 +39,7 @@ class ClassificationTemplatesAI(TemplateAI):
 
         self.node.get_logger().info(f"User: {user_input}")
         response, provider_used, model_used, message, success = self.llm_engine.prompt_request(
-            #provider=PROVIDER.GEMINI, # que esto devuelva el provider y el modelo por si quiero ponerlo por ahi en la web
+            #provider=PROVIDER.GEMINI,
             #model=MODELS.LLM.DEEPSEEK.DEEPSEEK_CHAT,
             prompt_system=classification_prompt.get_prompt_system(),
             user_input=classification_prompt.get_user_prompt(),
@@ -52,7 +52,7 @@ class ClassificationTemplatesAI(TemplateAI):
         
         classification_response_json = extract_json_from_code_block(response) # Gemini usually puts the response in ```json block
         if not classification_response_json:
-            self.node.get_logger().error(f"No JSON format: {classification_response_json}")
+            self.node.get_logger().error(f"No JSON format found: {classification_response_json}")
             return self.unknown_message()
 
         self.node.get_logger().info(f"Assistant: {classification_response_json}")
@@ -75,4 +75,4 @@ class ClassificationTemplatesAI(TemplateAI):
         else:
             response = self.unknown_message()
 
-        return response
+        return response#, provider_used, model_used
