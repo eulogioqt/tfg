@@ -51,3 +51,7 @@ class TTS_SPEAKERS:
     class YOUR_TTS(SmartStrEnum):
         FEMALE_EN_5 = "female-en-5"
         MALE_EN_2 = "male-en-2"
+
+NEEDS_API_KEY = {
+    STT_MODELS.GOOGLE
+}

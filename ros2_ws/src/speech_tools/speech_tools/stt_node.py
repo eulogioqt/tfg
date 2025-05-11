@@ -4,11 +4,11 @@ import rclpy
 import importlib
 from rclpy.node import Node
 
-from speech_msgs.msg import LoadUnloadResult
+from speech_msgs.msg import LoadUnloadResult, ModelItem
 from speech_msgs.srv import STT, STTGetActiveModel, STTGetModels, STTSetActiveModel, LoadModel, UnloadModel
 
 from .stt.stt_model import STTModel
-from .models import STT_MODELS
+from .models import STT_MODELS, NEEDS_API_KEY
 
 
 class STTNode(Node):
@@ -47,8 +47,7 @@ class STTNode(Node):
         response.models = []
         for model_name in models_names:
             if hasattr(STT_MODELS, model_name.upper()):
-                if model_name not in response.models:
-                    response.models.append(model_name)
+                response.models.append(ModelItem(model=model_name, needs_api_key=(model_name in NEEDS_API_KEY)))
 
         return response
 
@@ -70,7 +69,7 @@ class STTNode(Node):
         response.models = []
         for model_name in models_names:
             if model_name in self.model_map:
-                response.models.append(model_name)
+                response.models.append(ModelItem(model=model_name, needs_api_key=(model_name in NEEDS_API_KEY)))
 
         return response
 

@@ -19,6 +19,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/ModelSpeaker.msg"
   "msg/LoadUnloadResult.msg"
   "msg/LoadModel.msg"
+  "msg/ModelItem.msg"
   
   "srv/STT.srv"
   "srv/STTGetActiveModel.srv"

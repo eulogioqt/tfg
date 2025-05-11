@@ -8,16 +8,71 @@ class TTSModelAPI:
         self.engine = TTSModelEngine(node)
 
     def get_all_tts_models(self, models: list[str] = []) -> APIResponse:
-        pass
+        models_response = []
+
+        [all_modelspeaker, _] = self.engine.get_all_models_request(models)
+        [_, loaded_models] = self.engine.get_available_models_request(models)
+        [active_model, active_speaker] = self.engine.get_active_model_request()
+
+        for [model, needs_api_key, speakers] in all_modelspeaker:
+            loaded = model in loaded_models
+            active = model == active_model
+
+            item = self._build_model_dict(model, needs_api_key, speakers, loaded, active, active_speaker)
+            models_response.append(item)
+
+        return JSONResponse(content=models_response)
 
     def get_tts_model(self, model: str) -> APIResponse:
-        pass
+        [all_modelspeaker, _] = self.engine.get_all_models_request([model])
+        if not all_modelspeaker:
+            raise HTTPException(status_code=404, detail=f"Model '{model}' not found.")
+
+        [_, loaded_models] = self.engine.get_available_models_request([model])
+        [active_model, active_speaker] = self.engine.get_active_model_request()
+
+        model, needs_api_key, speakers = all_modelspeaker[0]
+        loaded = model in loaded_models
+        active = model == active_model
+
+        item = self._build_model_dict(model, needs_api_key, speakers, loaded, active, active_speaker)
+
+        return JSONResponse(content=item)
 
     def load_tts_model(self, model: str, api_key: str) -> APIResponse:
-        pass
+        results = self.engine.load_model_request([model, api_key])
+        [_, message, success] = results[0]
+
+        return JSONResponse(content={
+            "message": message,
+            "success": success
+        })
 
     def unload_tts_model(self, model: str) -> APIResponse:
-        pass
+        results = self.engine.unload_model_request([model])
+        [_, message, success] = results[0]
 
+        return JSONResponse(content={
+            "message": message,
+            "success": success
+        })
+    
     def set_active_tts_model(self, model: str, speaker: str) -> APIResponse:
-        pass
+        message, success = self.engine.set_active_model_request(model, speaker)
+
+        return JSONResponse(content={
+            "message": message,
+            "success": success
+        })
+
+    def _build_model_dict(self, model, needs_api_key, speakers, loaded, active, active_speaker):
+        item = {
+            "model": model,
+            "speakers": speakers,
+            "needs_api_key": needs_api_key,
+            "loaded": loaded,
+            "active": active,
+        }
+        if active:
+            item["speaker"] = active_speaker
+        return item

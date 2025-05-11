@@ -4,11 +4,11 @@ import rclpy
 import importlib
 from rclpy.node import Node
 
-from speech_msgs.msg import ModelSpeaker, LoadUnloadResult
+from speech_msgs.msg import ModelSpeaker,ModelItem, LoadUnloadResult
 from speech_msgs.srv import TTS, TTSGetActiveModel, TTSGetModels, TTSSetActiveModel, LoadModel, UnloadModel
 
 from .tts.tts_model import TTSModel
-from .models import TTS_MODELS, TTS_SPEAKERS
+from .models import TTS_MODELS, TTS_SPEAKERS, NEEDS_API_KEY
 
 
 class TTSNode(Node):
@@ -53,10 +53,11 @@ class TTSNode(Node):
         response.models = []
         for model_name in models_names:
             if hasattr(TTS_MODELS, model_name.upper()):
-                speakers = list(getattr(TTS_MODELS, model_name.upper()))
-                response.speakers.append(ModelSpeaker(model=model_name, speakers=speakers))
-                if model_name not in response.models:
-                    response.models.append(model_name)
+                speakers = list(getattr(TTS_SPEAKERS, model_name.upper()))
+                needs_api_key = model_name in NEEDS_API_KEY
+                
+                response.speakers.append(ModelSpeaker(model=model_name, needs_api_key=needs_api_key, speakers=speakers))
+                response.models.append(model_name)
 
         return response
 
@@ -80,8 +81,9 @@ class TTSNode(Node):
         for model_name in models_names:
             if model_name in self.model_map:
                 speakers = list(getattr(TTS_SPEAKERS, model_name.upper()))
-                response.speakers.append(ModelSpeaker(model=model_name, speakers=speakers))
-
+                needs_api_key = model_name in NEEDS_API_KEY
+                
+                response.speakers.append(ModelSpeaker(model=model_name, needs_api_key=needs_api_key, speakers=speakers))
                 response.models.append(model_name)
 
         return response
