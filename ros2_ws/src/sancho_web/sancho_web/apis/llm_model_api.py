@@ -7,46 +7,57 @@ class LLMModelAPI:
     def __init__(self, node):
         self.engine = LLMModelEngine(node)
 
-    def get_all_llm_models(self, providers: list[str] = []) -> APIResponse:
-        models_response = []
+    def get_all_llm_providers(self, providers: list[str] = []) -> APIResponse:
+        providers_response = []
 
-        [all_provider_models, _] = self.engine.get_all_models_request(providers)
-        [available_provider_models, _] = self.engine.get_available_models_request(providers)
+        [all_providers, _] = self.engine.get_all_models_request(providers)
+        [available_providers, _] = self.engine.get_available_models_request(providers)
         [active_provider, active_model] = self.engine.get_active_model_request()
 
         available_map = {
-            provider: set(models) for [provider, _, models] in available_provider_models
+            provider: set(models) for [provider, _, _, models] in available_providers
         }
 
-        for [provider, needs_api_key, models] in all_provider_models:
+        for [provider, needs_api_key, executed_locally, models] in all_providers:
+            models_data = []
             for model in models:
                 loaded = model in available_map.get(provider, set())
                 active = provider == active_provider and model == active_model
 
-                item = self._build_model_dict(provider, model, needs_api_key, loaded, active)
-                models_response.append(item)
+                item = self._build_model_dict(model, loaded, active)
+                models_data.append(item)
 
-        return JSONResponse(content=models_response)
+            item = self._build_provider_dict(provider, needs_api_key, executed_locally, models_data)
+            providers_response.append(item)
 
-    def get_llm_model(self, provider: str, model: str) -> APIResponse:
-        [all_provider_models, _] = self.engine.get_all_models_request([provider])
-        if not all_provider_models:
+        return JSONResponse(content=providers_response)
+
+    def get_llm_provider(self, provider: str) -> APIResponse:
+        [all_providers, _] = self.engine.get_all_models_request([provider])
+        if not all_providers:
             raise HTTPException(status_code=404, detail=f"Provider '{provider}' not found.")
 
-        [available_provider_models, _] = self.engine.get_available_models_request([provider])
+        [available_providers, _] = self.engine.get_available_models_request([provider])
         [active_provider, active_model] = self.engine.get_active_model_request()
 
-        models_all = next((m for m in all_provider_models if m[0] == provider), None)
-        models_available = next((m for m in available_provider_models if m[0] == provider), None)
+        models_all = next((p for p in all_providers if p[0] == provider), None)
+        models_available = next((p for p in available_providers if p[0] == provider), None)
 
-        if not models_all or model not in models_all[2]:
-            raise HTTPException(status_code=404, detail=f"Model '{model}' not found for provider '{provider}'.")
+        if not models_all:
+            raise HTTPException(status_code=404, detail=f"Provider '{provider}' not found.")
 
-        needs_api_key = models_all[1]
-        loaded = model in (models_available[2] if models_available else [])
-        active = provider == active_provider and model == active_model
+        [_, needs_api_key, executed_locally, models] = models_all
+        available_models = models_available[3] if models_available else []
 
-        item = self._build_model_dict(provider, model, needs_api_key, loaded, active)
+        models_data = []
+        for model in models:
+            loaded = model in available_models
+            active = provider == active_provider and model == active_model
+
+            item = self._build_model_dict(model, loaded, active)
+            models_data.append(item)
+
+        item = self._build_provider_dict(provider, needs_api_key, executed_locally, models_data)
 
         return JSONResponse(content=item)
 
@@ -69,18 +80,24 @@ class LLMModelAPI:
         })
 
     def set_active_llm_model(self, provider: str, model: str) -> APIResponse:
-        message, success = self.engine.set_active_model_request(provider, model)
+        [message, success] = self.engine.set_active_model_request(provider, model)
 
         return JSONResponse(content={
             "message": message,
             "success": success
         })
 
-    def _build_model_dict(self, provider, model, needs_api_key, loaded, active):
+    def _build_provider_dict(self, provider: str, needs_api_key: bool, executed_locally: bool, models: list[dict]) -> dict:
         return {
             "provider": provider,
-            "model": model,
             "needs_api_key": needs_api_key,
+            "executed_locally": executed_locally,
+            "models": models
+        }
+
+    def _build_model_dict(self, model: str, loaded: bool, active: bool) -> dict:
+        return {
+            "model": model,
             "loaded": loaded,
-            "active": active,
+            "active": active
         }
