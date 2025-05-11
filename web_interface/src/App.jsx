@@ -8,6 +8,7 @@ import FaceprintDetailPage from "./pages/faceprints/FaceprintDetailPage";
 
 import WebSocketVideoViewer from "./components/WebSocketVideoViewer";
 import LoadingScreen from "./components/LoadingScreen";
+import ModelsPage from "./pages/models/ModelsPage";
 
 const App = () => {
     const wrap = (page) => (
@@ -25,8 +26,9 @@ const App = () => {
             <Routes>
                 <Route path="/" element={wrap(<HomePage />)} />
                 <Route path="/faceprints" element={wrap(<FaceprintListPage />)} />
-                <Route path="/faceprints/:id" element={wrap(<FaceprintDetailPage/>)} />
+                <Route path="/faceprints/:id" element={wrap(<FaceprintDetailPage />)} />
                 <Route path="/chat" element={wrap(<ChatPage />)} />
+                <Route path="/models" element={wrap(<ModelsPage />)} />
                 <Route path="*" element={<Navigate to="/" />} />
             </Routes>
         </Router>

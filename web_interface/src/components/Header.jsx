@@ -16,6 +16,9 @@ const Header = () => {
             <span className="text-white my-1 fw-bold fs-5 ms-3" onClick={() => navigate("/chat")}>
                 Chat
             </span>
+            <span className="text-white my-1 fw-bold fs-5 ms-3" onClick={() => navigate("/models")}>
+                Models
+            </span>
         </div>
     );
 };
