@@ -30,7 +30,7 @@ const ModelsPage = () => {
     const renderPanel = () => {
         switch (activeTab) {
             case "tts":
-                return <TTSPanel ttsModelsList={ttsModelsList} />;
+                return <TTSPanel ttsModelsList={ttsModelsList} setTtsModelsList={setTtsModelsList} />;
             case "stt":
                 return <STTPanel />;
             case "llm":
