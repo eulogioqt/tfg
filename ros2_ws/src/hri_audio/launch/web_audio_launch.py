@@ -60,5 +60,14 @@ def generate_launch_description():
             executable='sancho_web',
             name='sancho_web',
             output='screen'
-        )
+        ),
+        Node(
+            package='sancho_web',
+            executable='api_rest',
+            name='api_rest',
+            output='screen',
+            parameters=[{
+                "selected_apis": "['tts']"
+            }]
+        ),
     ])

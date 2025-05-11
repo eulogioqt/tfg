@@ -36,10 +36,10 @@ class APIRESTNode(Node):
         for api_name in selected:
             if api_name not in self.AVAILABLE_APIS:
                 self.get_logger().error(f"API '{api_name}' not found.")
-
-            api_class, setter_fn = self.AVAILABLE_APIS[api_name]
-            api_instance = api_class(node=self)
-            setter_fn(api_instance)
+            else:
+                api_class, setter_fn = self.AVAILABLE_APIS[api_name]
+                api_instance = api_class(node=self)
+                setter_fn(api_instance)
 
     def parse_string_list(self, raw_string) -> list[str]:
         try:
