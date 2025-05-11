@@ -78,7 +78,7 @@ async def create_faceprint(
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al actualizar el faceprint: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al crear el faceprint: {str(e)}")
 
 @router.put("/{id}", tags=["Faceprints CRUD endpoints"], response_model=Faceprint)
 async def update_faceprint(

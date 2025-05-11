@@ -7,14 +7,17 @@ class TTSModelAPI:
     def __init__(self, node):
         self.engine = TTSModelEngine(node)
 
-    def get_models(self) -> APIResponse:
+    def get_all_tts_models(self, models: list[str] = []) -> APIResponse:
         pass
 
-    def load_model(self, model: str) -> APIResponse:
+    def get_tts_model(self, model: str) -> APIResponse:
         pass
 
-    def unload_model(self, model: str) -> APIResponse:
+    def load_tts_model(self, model: str, api_key: str) -> APIResponse:
         pass
 
-    def set_active_model(self, model: str, speaker: str) -> APIResponse:
+    def unload_tts_model(self, model: str) -> APIResponse:
+        pass
+
+    def set_active_tts_model(self, model: str, speaker: str) -> APIResponse:
         pass
