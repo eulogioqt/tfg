@@ -1,16 +1,36 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+
+import { useAPI } from "../../contexts/APIContext";
+import { useToast } from "../../contexts/ToastContext";
 
 import TTSPanel from "./components/TTSPanel";
 import STTPanel from "./components/STTPanel";
 import LLMPanel from "./components/LLMPanel";
 
 const ModelsPage = () => {
+    const { ttsModels, isResponseOk } = useAPI();
+    const { showToast } = useToast();
+
     const [activeTab, setActiveTab] = useState("tts");
+    const [ttsModelsList, setTtsModelsList] = useState([]);
+
+    useEffect(() => {
+        const fetchTTS = async () => {
+            const response = await ttsModels.getAll();
+            if (isResponseOk(response)) {
+                setTtsModelsList(response.data);
+            } else {
+                showToast("Error al obtener modelos TTS", response.data.detail, "red");
+            }
+        };
+
+        fetchTTS();
+    }, []);
 
     const renderPanel = () => {
         switch (activeTab) {
             case "tts":
-                return <TTSPanel />;
+                return <TTSPanel ttsModelsList={ttsModelsList} />;
             case "stt":
                 return <STTPanel />;
             case "llm":
@@ -57,7 +77,7 @@ const ModelsPage = () => {
                             <i className="bi bi-gear me-2" />
                             Modelos {activeTab.toUpperCase()}
                         </div>
-                        <div className="card-body mb-0 pb-0">{renderPanel()}</div>
+                        <div className="card-body">{renderPanel()}</div>
                     </div>
                 </div>
             </div>

@@ -8,11 +8,11 @@ class TTSModel(BaseModel):
     needs_api_key: bool = Field(example=True)
     loaded: bool = Field(example=True)
     active: bool = Field(example=True)
-    speaker: Optional[str] = Field(description="Voz activa si el modelo está activo", example="davefx")
+    speaker: Optional[str] = Field(default=None, description="Voz activa si el modelo está activo", example="davefx")
 
 class TTSLoadModel(BaseModel):
     model: str = Field(example="piper")
-    api_key: Optional[str] = Field(example="...")
+    api_key: Optional[str] = Field(default=None, example="...")
 
 class TTSUnloadModel(BaseModel):
     model: str = Field(example="piper")

@@ -39,7 +39,7 @@ async def get_tts_models(
     except HTTPException as e:
         raise e 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al buscar modelos de TTS: {str(e)}")
+        raise HTTPException(status_code=500, detail={str(e)})
 
 @router.get("/{model}", tags=["TTS Models CRUD endpoints"], response_model=TTSModel)
 async def get_tts_model_by_name(
@@ -61,7 +61,7 @@ async def get_tts_model_by_name(
     except HTTPException as e:
         raise e 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al obtener el modelo TTS: {str(e)}")
+        raise HTTPException(status_code=500, detail={str(e)})
 
 @router.post("/load", tags=["TTS Models CRUD endpoints"], response_model=TTSResult)
 async def load_tts_model(
@@ -83,7 +83,7 @@ async def load_tts_model(
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al cargar modelo TTS: {str(e)}")
+        raise HTTPException(status_code=500, detail={str(e)})
 
 @router.post("/unload", tags=["TTS Models CRUD endpoints"], response_model=TTSResult)
 async def unload_tts_model(
@@ -104,7 +104,7 @@ async def unload_tts_model(
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al descargar modelo TTS: {str(e)}")
+        raise HTTPException(status_code=500, detail={str(e)})
 
 @router.post("/activate", tags=["TTS Models CRUD endpoints"], response_model=TTSResult)
 async def activate_tts_model(
@@ -126,4 +126,4 @@ async def activate_tts_model(
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al poner como activo modelo TTS: {str(e)}")
+        raise HTTPException(status_code=500, detail={str(e)})

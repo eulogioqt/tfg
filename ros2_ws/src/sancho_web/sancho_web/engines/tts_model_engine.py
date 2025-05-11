@@ -48,7 +48,7 @@ class TTSModelEngine(ServiceEngine):
             req.items.append(LoadModelMSG(model=model, api_key=api_key))
         
         result = self.call_service(self.load_model_cli, req)
-
+        
         return [[i.model, i.message, i.success] for i in result.results]
 
     def unload_model_request(self, models):

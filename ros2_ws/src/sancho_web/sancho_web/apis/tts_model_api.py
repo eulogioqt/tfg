@@ -40,7 +40,7 @@ class TTSModelAPI:
         return JSONResponse(content=item)
 
     def load_tts_model(self, model: str, api_key: str) -> APIResponse:
-        results = self.engine.load_model_request([model, api_key])
+        results = self.engine.load_model_request([[model, api_key]])
         [_, message, success] = results[0]
 
         return JSONResponse(content={

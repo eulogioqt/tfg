@@ -68,12 +68,23 @@ export const APIProvider = ({ children }) => {
         create: () => alert("Not implemented"),
         update: () => alert("Not implemented"),
         delete: () => alert("Not implemented"),
-    })
+    });
     const logsAPI = createEndpointMethods("logs", {
         create: () => alert("Not implemented"),
         update: () => alert("Not implemented"),
         delete: () => alert("Not implemented"),
-    })
+    });
+    const ttsModelsAPI = createEndpointMethods("tts_models", {
+        load: (body, version = "v1") =>
+            apiMethods.post(`${BASE_URL}/api/${version}/tts_models/load`, body, getAuthorizationHeader()),
+        unload: (body, version = "v1") =>
+            apiMethods.post(`${BASE_URL}/api/${version}/tts_models/unload`, body, getAuthorizationHeader()),
+        activate: (body, version = "v1") =>
+            apiMethods.post(`${BASE_URL}/api/${version}/tts_models/activate`, body, getAuthorizationHeader()),
+        create: () => alert("Not implemented"),
+        update: () => alert("Not implemented"),
+        delete: () => alert("Not implemented"),
+    });
 
     return (
         <APIContext.Provider
@@ -81,6 +92,7 @@ export const APIProvider = ({ children }) => {
                 faceprints: faceprintsAPI,
                 sessions: sessionsAPI,
                 logs: logsAPI,
+                ttsModels: ttsModelsAPI,
 
                 isResponseOk: isResponseOk,
                 setAuthToken: setAuthToken,
