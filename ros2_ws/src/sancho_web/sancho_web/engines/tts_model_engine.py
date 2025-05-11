@@ -3,7 +3,7 @@ from speech_msgs.srv import TTSGetActiveModel, TTSGetModels, TTSSetActiveModel, 
 from .service_engine import ServiceEngine
 
 
-class TTSEngine(ServiceEngine):
+class TTSModelEngine(ServiceEngine):
     def __init__(self, node):
         super().__init__(node)
 

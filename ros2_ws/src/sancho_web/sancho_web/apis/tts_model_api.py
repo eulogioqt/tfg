@@ -1,7 +1,11 @@
+from ..engines import TTSModelEngine
 from .api_responses import HTTPException, JSONResponse, APIResponse
 
 
-class TTSAPI:
+class TTSModelAPI:
+
+    def __init__(self, node):
+        self.engine = TTSModelEngine(node)
 
     def get_models(self) -> APIResponse:
         pass
