@@ -14,7 +14,7 @@ const ModelsPage = () => {
     const [activeTab, setActiveTab] = useState("tts");
     const [ttsModelsList, setTtsModelsList] = useState([]);
     const [sttModelsList, setSttModelsList] = useState([]);
-    const [llmModelsList, setLlmModelsList] = useState([]);
+    const [llmProvidersList, setLlmProvidersList] = useState([]);
 
     useEffect(() => {
         const fetchTTS = async () => {
@@ -42,7 +42,7 @@ const ModelsPage = () => {
         const fetchLLM = async () => {
             const response = await llmModels.getAll();
             if (isResponseOk(response)) {
-                setLlmModelsList(response.data);
+                setLlmProvidersList(response.data);
             } else {
                 showToast("Error al obtener modelos LLM", response.data.detail, "red");
             }
@@ -58,7 +58,7 @@ const ModelsPage = () => {
             case "stt":
                 return <STTPanel sttModelsList={sttModelsList} setSttModelsList={setSttModelsList} />;
             case "llm":
-                return <LLMPanel llmModelsList={llmModelsList} setLlmModelsList={setLlmModelsList} />;
+                return <LLMPanel llmProvidersList={llmProvidersList} setLlmProvidersList={setLlmProvidersList} />;
             default:
                 return null;
         }
