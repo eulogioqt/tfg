@@ -1,4 +1,4 @@
-from speech_msgs.msg import LoadModel as LoadModelMSG
+from speech_msgs.msg import LoadModel as LoadModelMsg
 from speech_msgs.srv import STTGetActiveModel, STTGetModels, STTSetActiveModel, LoadModel, UnloadModel
 
 from .service_engine import ServiceEngine
@@ -45,7 +45,7 @@ class STTModelEngine(ServiceEngine):
 
         req.items = []
         for [model, api_key] in items_list:
-            req.items.append(LoadModelMSG(model=model, api_key=api_key))
+            req.items.append(LoadModelMsg(model=model, api_key=api_key))
 
         result = self.call_service(self.load_model_cli, req)
 
