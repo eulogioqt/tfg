@@ -7,6 +7,7 @@ from .v1_faceprints import router as v1_faceprints
 from .v1_sessions import router as v1_sessions
 from .v1_logs import router as v1_logs
 from .v1_tts_models import router as v1_tts_models
+from .v1_stt_models import router as v1_stt_models
 
 load_dotenv()
 
@@ -33,3 +34,4 @@ app.include_router(v1_faceprints, prefix="/api/v1/faceprints")
 app.include_router(v1_sessions, prefix="/api/v1/sessions")
 app.include_router(v1_logs, prefix="/api/v1/logs")
 app.include_router(v1_tts_models, prefix="/api/v1/tts_models")
+app.include_router(v1_stt_models, prefix="/api/v1/stt_models")
