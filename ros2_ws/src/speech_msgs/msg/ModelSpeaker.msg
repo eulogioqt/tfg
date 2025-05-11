@@ -1,3 +1,3 @@
 string model
-string needs_api_key
+bool needs_api_key
 string[] speakers

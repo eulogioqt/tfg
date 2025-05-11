@@ -8,7 +8,7 @@ from speech_msgs.msg import LoadUnloadResult, ModelItem
 from speech_msgs.srv import STT, STTGetActiveModel, STTGetModels, STTSetActiveModel, LoadModel, UnloadModel
 
 from .stt.stt_model import STTModel
-from .models import STT_MODELS, NEEDS_API_KEY
+from .models import STT_MODELS, STT_NEEDS_API_KEY
 
 
 class STTNode(Node):
@@ -47,7 +47,7 @@ class STTNode(Node):
         response.models = []
         for model_name in models_names:
             if hasattr(STT_MODELS, model_name.upper()):
-                response.models.append(ModelItem(model=model_name, needs_api_key=(model_name in NEEDS_API_KEY)))
+                response.models.append(ModelItem(model=model_name, needs_api_key=(model_name in STT_NEEDS_API_KEY)))
 
         return response
 
@@ -69,7 +69,7 @@ class STTNode(Node):
         response.models = []
         for model_name in models_names:
             if model_name in self.model_map:
-                response.models.append(ModelItem(model=model_name, needs_api_key=(model_name in NEEDS_API_KEY)))
+                response.models.append(ModelItem(model=model_name, needs_api_key=(model_name in STT_NEEDS_API_KEY)))
 
         return response
 

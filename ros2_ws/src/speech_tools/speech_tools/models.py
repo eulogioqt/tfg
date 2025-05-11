@@ -52,6 +52,10 @@ class TTS_SPEAKERS:
         FEMALE_EN_5 = "female-en-5"
         MALE_EN_2 = "male-en-2"
 
-NEEDS_API_KEY = {
+STT_NEEDS_API_KEY = {
     STT_MODELS.GOOGLE
+}
+
+TTS_NEEDS_API_KEY = {
+
 }

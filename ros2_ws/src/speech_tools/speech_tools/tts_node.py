@@ -8,7 +8,7 @@ from speech_msgs.msg import ModelSpeaker,ModelItem, LoadUnloadResult
 from speech_msgs.srv import TTS, TTSGetActiveModel, TTSGetModels, TTSSetActiveModel, LoadModel, UnloadModel
 
 from .tts.tts_model import TTSModel
-from .models import TTS_MODELS, TTS_SPEAKERS, NEEDS_API_KEY
+from .models import TTS_MODELS, TTS_SPEAKERS, TTS_NEEDS_API_KEY
 
 
 class TTSNode(Node):
@@ -54,7 +54,7 @@ class TTSNode(Node):
         for model_name in models_names:
             if hasattr(TTS_MODELS, model_name.upper()):
                 speakers = list(getattr(TTS_SPEAKERS, model_name.upper()))
-                needs_api_key = model_name in NEEDS_API_KEY
+                needs_api_key = model_name in TTS_NEEDS_API_KEY
                 
                 response.speakers.append(ModelSpeaker(model=model_name, needs_api_key=needs_api_key, speakers=speakers))
                 response.models.append(model_name)
@@ -81,7 +81,7 @@ class TTSNode(Node):
         for model_name in models_names:
             if model_name in self.model_map:
                 speakers = list(getattr(TTS_SPEAKERS, model_name.upper()))
-                needs_api_key = model_name in NEEDS_API_KEY
+                needs_api_key = model_name in TTS_NEEDS_API_KEY
                 
                 response.speakers.append(ModelSpeaker(model=model_name, needs_api_key=needs_api_key, speakers=speakers))
                 response.models.append(model_name)
