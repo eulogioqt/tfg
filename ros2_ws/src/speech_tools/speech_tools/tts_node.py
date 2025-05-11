@@ -174,7 +174,7 @@ class TTSNode(Node):
             except Exception as e:
                 self.get_logger().error(f"❌ Could not load model '{model_name}' from parameter: {e}")
 
-        if active_model and active_speaker:
+        if active_model:
             success, message = self._set_active_model(active_model, active_speaker)
             if success:
                 self.get_logger().info(f"✅ {message} from parameter")
@@ -182,11 +182,15 @@ class TTSNode(Node):
                 self.get_logger().warn(f"❌ {message}")
 
     def _set_active_model(self, model, speaker):
-        if not model or not speaker:
-            return False, "Model and speaker must be specified"
+        if not model:
+            return False, "Model must be specified"
         if model not in list(TTS_MODELS):
             return False, f"Invalid model: {model}"
-        if speaker not in list(getattr(TTS_SPEAKERS, model.upper(), [])):
+        
+        speakers = list(getattr(TTS_SPEAKERS, model.upper(), []))
+        if speakers and not speaker:
+            return False, f"Speaker must be specified for model '{model}'"
+        if speakers and speaker not in speakers:
             return False, f"Speaker '{speaker}' not found for model '{model}'"
         if model not in self.model_map:
             return False, f"Model '{model}' is not loaded. You must load it first."

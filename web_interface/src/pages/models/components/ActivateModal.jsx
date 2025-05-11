@@ -21,7 +21,6 @@ const ActivateModal = ({ show, model, selectedSpeaker, setSelectedSpeaker, onClo
                 value={selectedSpeaker}
                 onChange={(e) => setSelectedSpeaker(e.target.value)}
             >
-                <option value="">Selecciona...</option>
                 {model.speakers.map((spk) => (
                     <option key={spk} value={spk}>
                         {spk}
