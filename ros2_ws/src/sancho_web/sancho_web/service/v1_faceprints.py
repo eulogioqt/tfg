@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Query, Request, Path
 
 from .faceprint_model import Faceprint, FaceprintCreate, FaceprintUpdate, FaceprintDeleteResponse
 from .api_utils import APIUtils
-from ..interfaces import FaceprintAPIInterface
+from ..apis import FaceprintAPI
 
 from dotenv import load_dotenv
 
@@ -14,10 +14,10 @@ router = APIRouter()
 endpoint_name = "faceprints"
 version = "v1"
 
-faceprint_interface: FaceprintAPIInterface = None
-def set_faceprint_api(interface):
-    global faceprint_interface
-    faceprint_interface = interface
+faceprint_api: FaceprintAPI = None
+def set_faceprint_api(api):
+    global faceprint_api
+    faceprint_api = api
 
 @router.get("", tags=["Faceprints CRUD endpoints"], response_model=List[Faceprint])
 async def get_faceprints(
@@ -31,7 +31,7 @@ async def get_faceprints(
     APIUtils.check_accept_json(request)
 
     try:
-        response = faceprint_interface.get_all_faceprints()
+        response = faceprint_api.get_all_faceprints()
         
         return response.to_fastapi()
     
@@ -49,7 +49,7 @@ async def get_faceprint_by_id(
     APIUtils.check_accept_json(request)
     
     try:
-        response = faceprint_interface.get_faceprint(id)
+        response = faceprint_api.get_faceprint(id)
 
         return response.to_fastapi()
     
@@ -71,7 +71,7 @@ async def create_faceprint(
         name = update_data["name"]
         image_base64 = update_data["image"]
         
-        response = faceprint_interface.create_faceprint(name, image_base64)
+        response = faceprint_api.create_faceprint(name, image_base64)
 
         return response.to_fastapi()
 
@@ -91,7 +91,7 @@ async def update_faceprint(
 
     try:
         update_data = faceprint_update.model_dump(exclude_defaults=True)
-        response = faceprint_interface.update_faceprint(id, update_data)
+        response = faceprint_api.update_faceprint(id, update_data)
 
         return response.to_fastapi()
     
@@ -109,7 +109,7 @@ async def delete_faceprint(
     APIUtils.check_accept_json(request)
 
     try:
-        response = faceprint_interface.delete_faceprint(id)
+        response = faceprint_api.delete_faceprint(id)
 
         return response.to_fastapi()
     

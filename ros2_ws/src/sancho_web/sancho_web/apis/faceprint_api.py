@@ -2,23 +2,23 @@ import json
 
 from std_msgs.msg import String
 
-from .engines import FaceprintEngine
-from .interfaces import FaceprintAPIInterface, HTTPException, JSONResponse
+from ..engines import FaceprintEngine
+from .api_responses import APIResponse, HTTPException, JSONResponse
 from hri_vision.database.system_database import CONSTANTS
 
 
-class FaceprintAPI(FaceprintAPIInterface):
+class FaceprintAPI:
 
     def __init__(self, node):
         self.engine = FaceprintEngine(node)
 
-    def get_all_faceprints(self):
+    def get_all_faceprints(self) -> APIResponse:
         faceprints_json = self.engine.get_faceprint_request()
         faceprints = json.loads(faceprints_json)
 
         return JSONResponse(content=faceprints)
 
-    def get_faceprint(self, id):
+    def get_faceprint(self, id: str) -> APIResponse:
         faceprint_json = self.engine.get_faceprint_request(json.dumps({ "id": id }))
 
         faceprint = json.loads(faceprint_json)
@@ -27,7 +27,7 @@ class FaceprintAPI(FaceprintAPIInterface):
         
         return JSONResponse(content=faceprint)
 
-    def create_faceprint(self, name, image_base64):
+    def create_faceprint(self, name: str, image_base64: str) -> APIResponse:
         image_cv2 = self.engine.br.base64_to_cv2(image_base64)
         image_msg = self.engine.br.cv2_to_imgmsg(image_cv2, encoding="bgr8")
         
@@ -80,7 +80,7 @@ class FaceprintAPI(FaceprintAPIInterface):
                 else:
                     return HTTPException(detail=f"Ya te conozco {classified_name}, esta función es para personas nuevas.")
 
-    def update_faceprint(self, id, faceprint):
+    def update_faceprint(self, id: str, faceprint: dict) -> APIResponse:
         new_name = faceprint["name"]
         if new_name is None:
             return HTTPException(detail="No has incluido el campo name.")
@@ -104,7 +104,7 @@ class FaceprintAPI(FaceprintAPIInterface):
 
         return JSONResponse(content=updated_item)
 
-    def delete_faceprint(self, id):
+    def delete_faceprint(self, id: str) -> APIResponse:
         item_json = self.engine.get_faceprint_request(json.dumps({ "id": id }))
         item = json.loads(item_json)
         if not item:

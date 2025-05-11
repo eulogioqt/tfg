@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Query, Request, Path
 
 from .session_model import Session
 from .api_utils import APIUtils
-from ..interfaces import SessionAPIInterface
+from ..apis import SessionAPI
 
 from dotenv import load_dotenv
 
@@ -14,10 +14,10 @@ router = APIRouter()
 endpoint_name = "sessions"
 version = "v1"
 
-session_interface: SessionAPIInterface = None
-def set_session_api(interface):
-    global session_interface
-    session_interface = interface
+session_api: SessionAPI = None
+def set_session_api(api):
+    global session_api
+    session_api = api
 
 @router.get("", tags=["Sessions CRUD endpoints"], response_model=List[Session])
 async def get_sessions(
@@ -32,7 +32,7 @@ async def get_sessions(
     APIUtils.check_accept_json(request)
 
     try:
-        response = session_interface.get_all_sessions(**({ "faceprint_id": faceprint_id} if faceprint_id else {}))
+        response = session_api.get_all_sessions(**({ "faceprint_id": faceprint_id} if faceprint_id else {}))
         
         return response.to_fastapi()
     
@@ -54,7 +54,7 @@ async def get_sessions_by_faceprint_id(
     APIUtils.check_accept_json(request)
     
     try:
-        response = session_interface.get_session_by_id(id)
+        response = session_api.get_session_by_id(id)
 
         return response.to_fastapi()
     

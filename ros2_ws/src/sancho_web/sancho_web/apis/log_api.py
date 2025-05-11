@@ -1,15 +1,15 @@
 import json
 
-from .engines import LogEngine
-from .interfaces import LogAPIInterface, JSONResponse
+from ..engines import LogEngine
+from .api_responses import JSONResponse, APIResponse
 
 
-class LogAPI(LogAPIInterface):
+class LogAPI:
 
     def __init__(self, node):
         self.engine = LogEngine(node)
 
-    def get_all_logs(self, faceprint_id=None):
+    def get_all_logs(self, faceprint_id: str = None) -> APIResponse:
         if faceprint_id is not None:
             logs_json = self.engine.get_logs_request(json.dumps({ "faceprint_id": faceprint_id}))
         else:
@@ -19,7 +19,7 @@ class LogAPI(LogAPIInterface):
 
         return JSONResponse(content=logs)
 
-    def get_log_by_id(self, id):
+    def get_log_by_id(self, id: str) -> APIResponse:
         log_json = self.engine.get_logs_request(json.dumps({ "id": id }))
         log = json.loads(log_json)
 

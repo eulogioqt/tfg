@@ -8,11 +8,9 @@ from .service.v1_sessions import set_session_api
 
 from .engines import ServiceEngine
 
-from .faceprint_api import FaceprintAPI
-from .log_api import LogAPI
-from .session_api import SessionAPI
+from .apis import FaceprintAPI, LogAPI, SessionAPI
 
-# hacer un nodo por api y asi esta bien distribuido y al lanzar un nodo pues se mete con el resto y ya
+
 def main(args=None):
     rclpy.init(args=args)
 

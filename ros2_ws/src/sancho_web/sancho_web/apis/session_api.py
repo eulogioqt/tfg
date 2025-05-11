@@ -1,15 +1,15 @@
 import json
 
-from .engines import SessionEngine
-from .interfaces import SessionAPIInterface, JSONResponse
+from ..engines import SessionEngine
+from .api_responses import JSONResponse, APIResponse
 
 
-class SessionAPI(SessionAPIInterface):
+class SessionAPI:
 
     def __init__(self, node):
         self.engine = SessionEngine(node)
 
-    def get_all_sessions(self, faceprint_id=None):
+    def get_all_sessions(self, faceprint_id: str = None) -> APIResponse:
         if faceprint_id is not None:
             sessions_json = self.engine.get_sessions_request(json.dumps({ "faceprint_id": faceprint_id }))
         else:
@@ -19,7 +19,7 @@ class SessionAPI(SessionAPIInterface):
 
         return JSONResponse(content=sessions)
 
-    def get_session_by_id(self, id):
+    def get_session_by_id(self, id: str) -> APIResponse:
         session_json = self.engine.get_sessions_request(json.dumps({ "id": id }))
         session = json.loads(session_json)
 

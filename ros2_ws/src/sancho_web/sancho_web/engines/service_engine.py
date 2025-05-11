@@ -4,7 +4,7 @@ from rclpy.client import Client
 
 from rclpy.executors import SingleThreadedExecutor
 from threading import Thread
-ç
+
 from abc import ABC
 
 

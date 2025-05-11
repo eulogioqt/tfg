@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Query, Request, Path
 
 from .log_model import Log
 from .api_utils import APIUtils
-from ..interfaces import LogAPIInterface
+from ..apis import LogAPI
 
 from dotenv import load_dotenv
 
@@ -14,10 +14,10 @@ router = APIRouter()
 endpoint_name = "logs"
 version = "v1"
 
-log_interface: LogAPIInterface = None
-def set_log_api(interface):
-    global log_interface
-    log_interface = interface
+log_api: LogAPI = None
+def set_log_api(api):
+    global log_api
+    log_api = api
 
 @router.get("", tags=["Logs CRUD endpoints"], response_model=List[Log])
 async def get_logs(
@@ -32,7 +32,7 @@ async def get_logs(
     APIUtils.check_accept_json(request)
 
     try:
-        response = log_interface.get_all_logs(**({ "faceprint_id": faceprint_id} if faceprint_id else {}))
+        response = log_api.get_all_logs(**({ "faceprint_id": faceprint_id} if faceprint_id else {}))
         
         return response.to_fastapi()
     
@@ -54,7 +54,7 @@ async def get_logs_by_id(
     APIUtils.check_accept_json(request)
     
     try:
-        response = log_interface.get_log_by_id(id)
+        response = log_api.get_log_by_id(id)
 
         return response.to_fastapi()
     
