@@ -19,10 +19,10 @@ class LLMEngine(ServiceEngine):
         self.load_model_cli = self.create_client(LoadModel, "llm_tools/load_model")
         self.prompt_cli = self.create_client(Prompt, "llm_tools/prompt")
 
-        self._load_models([
-            [PROVIDER.GEMINI, [], os.environ.get("GEMINI_API_KEY")],
-            [PROVIDER.DEEPSEEK, [MODELS.LLM.DEEPSEEK.DEEPSEEK_CHAT], ""]
-        ])
+        #self._load_models([
+        #    [PROVIDER.GEMINI, [], os.environ.get("GEMINI_API_KEY")],
+        #    [PROVIDER.DEEPSEEK, [MODELS.LLM.DEEPSEEK.DEEPSEEK_CHAT], ""]
+        #])
 
         self.node.get_logger().info("Prompt Engine initializated succesfully")
         
