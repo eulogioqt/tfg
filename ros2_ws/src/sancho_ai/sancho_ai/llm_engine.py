@@ -49,7 +49,7 @@ class LLMEngine(ServiceEngine):
 
         result = self.call_service(self.prompt_cli, req)
 
-        return result.response
+        return result.response, result.provider_used, result.model_used, result.message, result.success
     
     def _load_models(self, items):
         results = self.load_model_request(items)

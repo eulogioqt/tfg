@@ -22,7 +22,7 @@ def extract_json_from_code_block(text):
     if match:
         return match.group(1).strip()
     
-    raise ValueError("No JSON object found in the text.")
+    raise None
 
 
 class ClassificationTemplatesAI(TemplateAI):
@@ -34,18 +34,26 @@ class ClassificationTemplatesAI(TemplateAI):
         self.hri_engine = HRIEngine(self.node)
         self.llm_engine = LLMEngine(self.node)
     
-    def on_message(self, message):
-        classification_prompt = ClassificationPrompt(message)
+    def on_message(self, user_input):
+        classification_prompt = ClassificationPrompt(user_input)
 
-        self.node.get_logger().info(f"User: {message}")
-        classification_response_json = self.llm_engine.prompt_request(
+        self.node.get_logger().info(f"User: {user_input}")
+        response, provider_used, model_used, message, success = self.llm_engine.prompt_request(
             #provider=PROVIDER.GEMINI, # que esto devuelva el provider y el modelo por si quiero ponerlo por ahi en la web
             #model=MODELS.LLM.DEEPSEEK.DEEPSEEK_CHAT,
             prompt_system=classification_prompt.get_prompt_system(),
             user_input=classification_prompt.get_user_prompt(),
             parameters_json=classification_prompt.get_parameters()
         )
-        classification_response_json = extract_json_from_code_block(classification_response_json) # Gemini usually puts the response in ```json block
+        
+        if not success:
+            self.node.get_logger().error(f"There was a problem with prompt: {message}")
+            return self.unknown_message()
+        
+        classification_response_json = extract_json_from_code_block(response) # Gemini usually puts the response in ```json block
+        if not classification_response_json:
+            self.node.get_logger().error(f"No JSON format: {classification_response_json}")
+            return self.unknown_message()
 
         self.node.get_logger().info(f"Assistant: {classification_response_json}")
         classification_response = json.loads(classification_response_json)
