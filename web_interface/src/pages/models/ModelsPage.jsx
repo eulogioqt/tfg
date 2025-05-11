@@ -8,12 +8,13 @@ import STTPanel from "./components/STTPanel";
 import LLMPanel from "./components/LLMPanel";
 
 const ModelsPage = () => {
-    const { ttsModels, sttModels, isResponseOk } = useAPI();
+    const { ttsModels, sttModels, llmModels, isResponseOk } = useAPI();
     const { showToast } = useToast();
 
     const [activeTab, setActiveTab] = useState("tts");
     const [ttsModelsList, setTtsModelsList] = useState([]);
     const [sttModelsList, setSttModelsList] = useState([]);
+    const [llmModelsList, setLlmModelsList] = useState([]);
 
     useEffect(() => {
         const fetchTTS = async () => {
@@ -37,6 +38,17 @@ const ModelsPage = () => {
         };
 
         fetchSTT();
+
+        const fetchLLM = async () => {
+            const response = await llmModels.getAll();
+            if (isResponseOk(response)) {
+                setLlmModelsList(response.data);
+            } else {
+                showToast("Error al obtener modelos LLM", response.data.detail, "red");
+            }
+        };
+
+        fetchLLM();
     }, []);
 
     const renderPanel = () => {
@@ -46,7 +58,7 @@ const ModelsPage = () => {
             case "stt":
                 return <STTPanel sttModelsList={sttModelsList} setSttModelsList={setSttModelsList} />;
             case "llm":
-                return <LLMPanel />;
+                return <LLMPanel llmModelsList={llmModelsList} setLlmModelsList={setLlmModelsList} />;
             default:
                 return null;
         }

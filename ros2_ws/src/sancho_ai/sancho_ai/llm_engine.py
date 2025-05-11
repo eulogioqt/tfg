@@ -5,7 +5,7 @@ from .service_engine import ServiceEngine
 from dotenv import load_dotenv
 
 from llm_msgs.srv import Prompt, LoadModel
-from llm_msgs.msg import LoadProviderModel
+from llm_msgs.msg import LoadModel as LoadModelMsg
 
 from llm_tools.models import PROVIDER, MODELS # es buena idea esto? arreglar ya que no completa
 
@@ -32,7 +32,7 @@ class LLMEngine(ServiceEngine):
 
         for item in items:
             provider, models, api_key = item
-            req.items.append(LoadProviderModel(provider=provider, models=models, api_key=api_key))
+            req.items.append(LoadModelMsg(provider=provider, models=models, api_key=api_key))
 
         result = self.call_service(self.load_model_cli, req)
 

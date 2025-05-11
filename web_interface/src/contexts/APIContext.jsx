@@ -96,6 +96,17 @@ export const APIProvider = ({ children }) => {
         update: () => alert("Not implemented"),
         delete: () => alert("Not implemented"),
     });
+    const llmModelsAPI = createEndpointMethods("llm_models", {
+        load: (body, version = "v1") =>
+            apiMethods.post(`${BASE_URL}/api/${version}/llm_models/load`, body, getAuthorizationHeader()),
+        unload: (body, version = "v1") =>
+            apiMethods.post(`${BASE_URL}/api/${version}/llm_models/unload`, body, getAuthorizationHeader()),
+        activate: (body, version = "v1") =>
+            apiMethods.post(`${BASE_URL}/api/${version}/llm_models/activate`, body, getAuthorizationHeader()),
+        create: () => alert("Not implemented"),
+        update: () => alert("Not implemented"),
+        delete: () => alert("Not implemented"),
+    });
 
     return (
         <APIContext.Provider
@@ -105,6 +116,7 @@ export const APIProvider = ({ children }) => {
                 logs: logsAPI,
                 ttsModels: ttsModelsAPI,
                 sttModels: sttModelsAPI,
+                llmModels: llmModelsAPI,
 
                 isResponseOk: isResponseOk,
                 setAuthToken: setAuthToken,

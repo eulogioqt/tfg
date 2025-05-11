@@ -3,11 +3,11 @@ import rclpy
 import importlib
 
 from rclpy.node import Node
-from llm_msgs.msg import LoadUnloadResult, ProviderModel
+from llm_msgs.msg import LoadUnloadResult, ProviderModel, ProviderItem
 from llm_msgs.srv import GetModels, Prompt, Embedding, LoadModel, UnloadModel, GetActiveModels, SetActiveModel
 
 from .providers.base_provider import BaseProvider
-from .models import PROVIDER, MODELS, NEEDS_API_KEY
+from .models import PROVIDER, MODELS, NEEDS_API_KEY, EXECUTED_LOCALLY
 
 
 class LLMNode(Node):
@@ -60,14 +60,22 @@ class LLMNode(Node):
             if hasattr(MODELS.LLM, provider_name.upper()):
                 llm_models = list(getattr(MODELS.LLM, provider_name.upper()))
                 needs_api_key = provider_name in NEEDS_API_KEY
-                response.llm_models.append(ProviderModel(provider=provider_name, needs_api_key=needs_api_key, models=llm_models))
+                executed_locally = provider_name in EXECUTED_LOCALLY
+                response.llm_models.append(ProviderItem(
+                    provider=provider_name, needs_api_key=needs_api_key, 
+                    executed_locally=executed_locally, models=llm_models
+                ))
                 if provider_name not in response.providers:
                     response.providers.append(provider_name)
 
             if hasattr(MODELS.EMBEDDING, provider_name.upper()):
                 embedding_models = list(getattr(MODELS.EMBEDDING, provider_name.upper()))
                 needs_api_key = provider_name in NEEDS_API_KEY
-                response.embedding_models.append(ProviderModel(provider=provider_name, needs_api_key=needs_api_key, models=embedding_models))
+                executed_locally = provider_name in EXECUTED_LOCALLY
+                response.embedding_models.append(ProviderItem(
+                    provider=provider_name, needs_api_key=needs_api_key, 
+                    executed_locally=executed_locally,models=embedding_models
+                ))
                 if provider_name not in response.providers:
                     response.providers.append(provider_name)
 
@@ -99,11 +107,21 @@ class LLMNode(Node):
                 models = provider.get_active_models()
 
                 llm_models = [m for m in models if m in list(getattr(MODELS.LLM, provider_name.upper(), []))]
-                response.llm_models.append(ProviderModel(provider=provider_name, models=llm_models))
-
-                embedding_models = [m for m in models if m in list(getattr(MODELS.EMBEDDING, provider_name.upper(), []))]
-                response.embedding_models.append(ProviderModel(provider=provider_name, models=embedding_models))
+                needs_api_key = provider_name in NEEDS_API_KEY
+                executed_locally = provider_name in EXECUTED_LOCALLY
+                response.llm_models.append(ProviderItem(
+                    provider=provider_name, needs_api_key=needs_api_key, 
+                    executed_locally=executed_locally,models=llm_models
+                ))
                 
+                embedding_models = [m for m in models if m in list(getattr(MODELS.EMBEDDING, provider_name.upper(), []))]
+                needs_api_key = provider_name in NEEDS_API_KEY
+                executed_locally = provider_name in EXECUTED_LOCALLY
+                response.embedding_models.append(ProviderItem(
+                    provider=provider_name, needs_api_key=needs_api_key, 
+                    executed_locally=executed_locally,models=embedding_models
+                ))
+
                 response.providers.append(provider_name)
 
         return response
@@ -185,10 +203,10 @@ class LLMNode(Node):
             if provider:
                 try:
                     provider.unload(item.models)
-                    self._fill_result(result, True, "Models unloaded succesfully")
+                    self._fill_result(result, item.models, True, "Models unloaded succesfully")
                     self.get_logger().info(f"✅ Models {item.models} from provider {item.provider} unloaded succesfully")
                 except Exception as e:
-                    self._fill_result(result, item.models, False, f"Error unloading models: {str(e)}")
+                    self._fill_result(result, [], False, f"Error unloading models: {str(e)}")
                     self.get_logger().info(f"❌ Unload models service failed: {str(e)}")
             else:
                 self._fill_result(result, [], False, f"Provider '{item.provider}' not found.")

@@ -1,4 +1,4 @@
-from llm_msgs.msg import ProviderModel as ProviderModelMsg
+from llm_msgs.msg import ProviderModel, LoadModel as LoadModelMsg
 from llm_msgs.srv import GetModels, LoadModel, UnloadModel, GetActiveModels, SetActiveModel
 
 from .service_engine import ServiceEngine
@@ -47,7 +47,7 @@ class LLMModelEngine(ServiceEngine):
         req.items = []
         for [provider, models, api_key] in items_list:
             req.items.append(
-                ProviderModelMsg(provider=provider, models=models, api_key=api_key)
+                LoadModelMsg(provider=provider, api_key=api_key, models=models)
             )
 
         result = self.call_service(self.load_model_cli, req)
@@ -59,7 +59,7 @@ class LLMModelEngine(ServiceEngine):
         req.items = []
         for [provider, models] in items_list:
             req.items.append(
-                ProviderModelMsg(provider=provider, models=models)
+                ProviderModel(provider=provider, models=models)
             )
 
         result = self.call_service(self.unload_model_cli, req)

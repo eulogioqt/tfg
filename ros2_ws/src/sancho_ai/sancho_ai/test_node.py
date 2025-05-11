@@ -8,7 +8,7 @@ from rclpy.executors import SingleThreadedExecutor
 from dotenv import load_dotenv
 
 from llm_msgs.srv import GetModels, Prompt, Embedding, LoadModel, UnloadModel
-from llm_msgs.msg import LoadProviderModel, ProviderModel
+from llm_msgs.msg import LoadModel as LoadModelMsg, ProviderModel
 from llm_tools.models import PROVIDER, MODELS
 
 
@@ -78,7 +78,7 @@ class TestNode(Node):
         if not self.wait_for_service(self.cli_load):
             return
         req = LoadModel.Request()
-        item = LoadProviderModel(provider=provider, models=models, api_key=api_key)
+        item = LoadModelMsg(provider=provider, models=models, api_key=api_key)
         req.items = [item]
         res = self.call_sync(self.cli_load, req)
         for r in res.results:
