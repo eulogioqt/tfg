@@ -5,8 +5,6 @@ import { useWindowSize, BREAKPOINTS } from "../../../hooks/useWindowSize";
 const Sidebar = ({ collapsed, setCollapsed, handleNewChat }) => {
     const { width } = useWindowSize();
 
-    const navigate = useNavigate();
-
     return (
         <>
             <div className="d-flex" style={{ zIndex: "100", marginTop: "77px" }}>
@@ -36,11 +34,6 @@ const Sidebar = ({ collapsed, setCollapsed, handleNewChat }) => {
                             <button className="btn btn-light text-start" onClick={handleNewChat}>
                                 <i className="bi bi-chat-dots me-2"></i>
                                 <span>Nuevo Chat</span>
-                            </button>
-
-                            <button className="btn btn-light text-start" onClick={() => navigate("/")}>
-                                <i className="bi bi-house-door me-2"></i>
-                                <span>Inicio</span>
                             </button>
                         </div>
                     </div>

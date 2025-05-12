@@ -5,11 +5,14 @@ export const useMicrophone = () => {
     const [audioBlob, setAudioBlob] = useState(null);
     const mediaRecorderRef = useRef(null);
     const audioChunksRef = useRef([]);
+    const streamRef = useRef(null);
 
     const startRecording = async () => {
         if (recording) return;
 
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        streamRef.current = stream;
+
         const mediaRecorder = new MediaRecorder(stream);
         mediaRecorderRef.current = mediaRecorder;
 
@@ -23,6 +26,9 @@ export const useMicrophone = () => {
         mediaRecorder.onstop = () => {
             const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
             setAudioBlob(audioBlob);
+
+            streamRef.current?.getTracks().forEach((track) => track.stop());
+            streamRef.current = null;
         };
 
         mediaRecorder.start();
@@ -31,14 +37,13 @@ export const useMicrophone = () => {
 
     const stopRecording = () => {
         if (!recording || !mediaRecorderRef.current) return;
-
         mediaRecorderRef.current.stop();
         setRecording(false);
     };
 
     return {
         recording,
-        audioBlob, // Puedes usar esto para enviarlo o convertirlo a PCM
+        audioBlob,
         startRecording,
         stopRecording,
     };

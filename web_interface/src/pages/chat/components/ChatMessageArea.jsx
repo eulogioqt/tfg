@@ -23,9 +23,7 @@ const ChatMessageArea = ({ messages }) => {
                     <ChatMessage key={index} message={message} />
                 ))}
 
-                {transcribing && <div className="justify-content-end">
-                    Transcribiendo audio...
-                </div>}
+                {transcribing && <div className="d-flex justify-content-end">Transcribiendo audio...</div>}
 
                 <div ref={messagesEndRef} />
             </div>
