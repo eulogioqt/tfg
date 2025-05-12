@@ -8,6 +8,7 @@ import { WebSocketProvider } from "./contexts/WebSocketContext";
 import { ModelsProvider } from "./contexts/ModelsContext.jsx";
 import { ChatProvider } from "./contexts/ChatContext.jsx";
 import { FaceprintsProvider } from "./contexts/FaceprintsContext.jsx";
+import { AudioProvider } from "./contexts/AudioContext.jsx";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
@@ -19,13 +20,15 @@ createRoot(document.getElementById("root")).render(
         <EventBusProvider>
             <APIProvider>
                 <WebSocketProvider>
-                    <ModelsProvider>
-                        <ChatProvider>
-                            <FaceprintsProvider>
-                                <App />
-                            </FaceprintsProvider>
-                        </ChatProvider>
-                    </ModelsProvider>
+                    <AudioProvider>
+                        <ModelsProvider>
+                            <ChatProvider>
+                                <FaceprintsProvider>
+                                    <App />
+                                </FaceprintsProvider>
+                            </ChatProvider>
+                        </ModelsProvider>
+                    </AudioProvider>
                 </WebSocketProvider>
             </APIProvider>
         </EventBusProvider>

@@ -64,82 +64,43 @@ export const ChatProvider = ({ children }) => {
         };
     }, []);
 
-    const playAudio = (audio, sampleRate) => {
-        if (!audio || audio.length === 0) {
-            console.warn("No audio data to play");
-            return;
-        }
-
-        const context = new AudioContext({ sampleRate });
-        const float32 = new Float32Array(audio.length);
-
-        for (let i = 0; i < audio.length; i++) {
-            float32[i] = Math.max(-1, Math.min(1, audio[i] / 32768));
-        }
-
-        const buffer = context.createBuffer(1, float32.length, sampleRate);
-        buffer.copyToChannel(float32, 0);
-
-        const source = context.createBufferSource();
-        source.buffer = buffer;
-        source.connect(context.destination);
-
-        source.start();
-    };
-
     const handleUploadAudio = () => {
-        if (!isConnected) {
-            setIsOpenNCModal(true);
-            return;
-        }
+        if (!isConnected) return setIsOpenNCModal(true);
 
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = "audio/*";
-
-        input.onchange = async (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            await handleAudio(file);
-        };
+        const input = Object.assign(document.createElement("input"), {
+            type: "file",
+            accept: "audio/*",
+            onchange: async (e) => {
+                const file = e.target.files?.[0];
+                if (file) await handleAudio(file);
+            },
+        });
 
         input.click();
     };
 
-    const handleAudio = async (audioBlob) => {
-        if (!isConnected) {
-            setIsOpenNCModal(true);
-            return;
-        }
+    const handleAudio = async (blob) => {
+        if (!isConnected) return setIsOpenNCModal(true);
 
-        const arrayBuffer = await audioBlob.arrayBuffer();
+        const buffer = await blob.arrayBuffer();
+        const audioCtx = new AudioContext();
+        const audioBuffer = await audioCtx.decodeAudioData(buffer);
 
-        const audioContext = new AudioContext();
-        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-
-        const raw = audioBuffer.getChannelData(0); // Solo canal izquierdo (mono)
-        const int16Data = new Int16Array(raw.length);
-        for (let i = 0; i < raw.length; i++) {
-            const s = Math.max(-1, Math.min(1, raw[i]));
-            int16Data[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
-        }
+        const floatData = audioBuffer.getChannelData(0);
+        const int16Data = Int16Array.from(floatData, (s) => Math.max(-1, Math.min(1, s)) * 0x7fff);
 
         const id = uuidv4();
         const audio = Array.from(int16Data);
         const sampleRate = audioBuffer.sampleRate;
 
-        const audioPromptMessage = {
+        const message = {
             type: "AUDIO_PROMPT",
-            data: {
-                id: id,
-                audio: audio,
-                sample_rate: sampleRate,
-            },
+            data: { id, audio, sample_rate: sampleRate },
         };
 
-        const result = sendMessage(JSON.stringify(audioPromptMessage));
-        if (result) addHumanMessage({ id: id, audio: audio, sampleRate: sampleRate });
+        if (sendMessage(JSON.stringify(message))) {
+            addHumanMessage({ id, audio, sampleRate });
+        }
     };
 
     const handleSend = (inputMessage) => {
@@ -154,8 +115,9 @@ export const ChatProvider = ({ children }) => {
                 },
             };
 
-            const result = sendMessage(JSON.stringify(messageWithId));
-            if (result) addHumanMessage({ id: id, value: inputMessage }, true);
+            if (sendMessage(JSON.stringify(messageWithId))) {
+                addHumanMessage({ id: id, value: inputMessage }, true);
+            }
         }
     };
 
@@ -166,7 +128,6 @@ export const ChatProvider = ({ children }) => {
                 setCollapsed,
 
                 messages,
-                playAudio, // quitar
                 clearMessages,
                 handleAudio,
                 handleUploadAudio,
