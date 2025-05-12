@@ -52,11 +52,13 @@ const Sidebar = ({ collapsed, setCollapsed, handleNewChat }) => {
 
             {/* Gray background */}
             <div
-                className="vh-100 vw-100 position-absolute"
+                className="vw-100 position-absolute"
                 onClick={() => setCollapsed(true)}
                 style={{
                     display: !collapsed && width < BREAKPOINTS.MD ? "block" : "none",
                     zIndex: "50",
+                    height: window.innerHeight - 76,
+                    bottom: 0,
                     backgroundColor: "rgba(224, 224, 224, 0.5)",
                 }}
             ></div>

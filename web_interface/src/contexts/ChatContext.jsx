@@ -9,10 +9,10 @@ import NotConnectedModal from "../pages/chat/components/NotConnectedModal";
 const ChatContext = createContext();
 
 // ideas muy bomba: Toggle para revisar o no la transcripcion, para que se envie del tiron o que salga antes de enviar la trans
-// toggle para el audio, si esta activo, cuando respnde sancho tmb se escucha al voz, si no no.
-// Mostrar el modelo de llm tts y stt que esta activo en el momento
+// toggle para el audio, si esta activo, cuando respnde sancho tmb se escucha la voz, si no no.
+// Mostrar el modelo de tts y stt que esta activo en el momento
 // Poner a parte del transcribiendo el generando respuesta el reproduciendo y eso, si eso incluso el tiempo que tarda y que lleva
-// Poner la intencion del texto clasificada
+
 export const ChatProvider = ({ children }) => {
     const { sendMessage, isConnected } = useWebSocket();
     const { subscribe } = useEventBus();
