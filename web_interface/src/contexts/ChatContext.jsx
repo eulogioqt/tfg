@@ -4,6 +4,7 @@ import { useEventBus } from "./EventBusContext";
 import { BREAKPOINTS, useWindowSize } from "../hooks/useWindowSize";
 
 import { v4 as uuidv4 } from "uuid";
+import NotConnectedModal from "../pages/chat/components/NotConnectedModal";
 
 const ChatContext = createContext();
 
@@ -21,6 +22,7 @@ export const ChatProvider = ({ children }) => {
     const [collapsed, setCollapsed] = useState(width < BREAKPOINTS.MD);
     const [transcribing, setTranscribing] = useState(false);
     const [isReplying, setIsReplying] = useState(false);
+    const [isOpenNCModal, setIsOpenNCModal] = useState(false);
 
     const clearMessages = () => setMessages([]);
     const addHumanMessage = (message) => {
@@ -33,16 +35,16 @@ export const ChatProvider = ({ children }) => {
             setMessages((prevMessages) => {
                 const isResponseAdded = prevMessages.some((m) => !m.isHuman && m.id === e.id);
                 if (isResponseAdded) return prevMessages;
-        
+
                 const updatedMessages = prevMessages.map((m) =>
                     m.isHuman && m.id === e.id ? { ...m, intent: e.intent } : m
                 );
-        
+
                 return [...updatedMessages, { ...e, isHuman: false }];
             });
-        
+
             setIsReplying(false);
-        };      
+        };
         const processPT = (e) => {
             setTranscribing(false);
             addHumanMessage(e, true);
@@ -84,6 +86,11 @@ export const ChatProvider = ({ children }) => {
     };
 
     const handleAudio = async (audioBlob) => {
+        if (!isConnected) {
+            setIsOpenNCModal(true);
+            return;
+        }
+
         const arrayBuffer = await audioBlob.arrayBuffer();
 
         const audioContext = new AudioContext();
@@ -110,6 +117,11 @@ export const ChatProvider = ({ children }) => {
     };
 
     const handleUploadAudio = () => {
+        if (!isConnected) {
+            setIsOpenNCModal(true);
+            return;
+        }
+
         const input = document.createElement("input");
         input.type = "file";
         input.accept = "audio/*";
@@ -135,8 +147,8 @@ export const ChatProvider = ({ children }) => {
                 },
             };
 
-            sendMessage(JSON.stringify(messageWithId));
-            addHumanMessage({ id: id, value: inputMessage }, true);
+            const result = sendMessage(JSON.stringify(messageWithId));
+            if (result) addHumanMessage({ id: id, value: inputMessage }, true);
         }
     };
 
@@ -145,7 +157,7 @@ export const ChatProvider = ({ children }) => {
             value={{
                 collapsed,
                 setCollapsed,
-                
+
                 messages,
                 isReplying,
                 transcribing,
@@ -156,6 +168,8 @@ export const ChatProvider = ({ children }) => {
                 handleSend,
             }}
         >
+            <NotConnectedModal isOpen={isOpenNCModal} handleClose={() => setIsOpenNCModal(false)} />
+
             {children}
         </ChatContext.Provider>
     );

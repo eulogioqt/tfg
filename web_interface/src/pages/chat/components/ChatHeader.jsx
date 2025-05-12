@@ -1,10 +1,10 @@
 import React from "react";
 import { useWindowSize, BREAKPOINTS } from "../../../hooks/useWindowSize";
-
-import sanchoHead from "../../../assets/images/sancho_head.jpg";
+import { useWebSocket } from "../../../contexts/WebSocketContext";
 
 const ChatHeader = ({ collapsed, setCollapsed, handleNewChat }) => {
     const { width } = useWindowSize();
+    const { isConnected } = useWebSocket();
 
     return (
         <div
@@ -20,24 +20,22 @@ const ChatHeader = ({ collapsed, setCollapsed, handleNewChat }) => {
                     <i className="bi bi-list"></i>
                 </button>
 
-                <div className="d-flex justify-content-center align-items-center clickable clickable-2">
-                    <img
-                        className="img-fluid rounded-3"
-                        src={sanchoHead}
-                        alt="Sancho"
+                <div className="d-flex justify-content-center align-items-center">
+                    <div
+                        className={`rounded-circle border border-dark ${isConnected ? "bg-success" : "bg-danger"}`}
+                        title={isConnected ? "Conectado" : "Desconectado"}
                         style={{
-                            width: "50px",
-                            height: "50px",
-                            cursor: "default",
-                            display: collapsed || width < BREAKPOINTS.MD ? "block" : "block",
+                            width: "16px",
+                            height: "16px",
+                            boxShadow: "0 0 5px rgba(0, 0, 0, 0.5)",
+                            transition: "background-color 0.3s ease",
                         }}
                     />
 
                     <span
-                        className="fw-bold fs-2 ms-3"
+                        className="fw-bold fs-2 ms-3 my-0 py-0"
                         style={{
                             whiteSpace: "nowrap",
-                            cursor: "default",
                             display: collapsed || width < BREAKPOINTS.MD ? "block" : "none",
                         }}
                     >
