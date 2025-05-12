@@ -91,10 +91,8 @@ export const WebSocketProvider = ({ children }) => {
     };
 
     const sendMessage = (message, show = true) => {
-        if (socketRef.current) {
-            socketRef.current.send(message);
-            return true;
-        } else if (show) {
+        if (socketRef.current) return socketRef.current.send(message);
+        else if (show) {
             console.log("No conectado al R2WSocket");
             showToast("Sin conexión", "No estás conectado a ROS", "red");
             return false;

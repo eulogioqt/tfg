@@ -6,7 +6,7 @@ const ChatMessage = ({ message }) => {
     const isHuman = message.isHuman;
     const backgroundColor = isHuman ? "#E0E0E0" : "#FFFFFF";
     const shadowColor = isHuman ? "#C0C0C0" : "#DDDDDD";
-    console.log(message);
+
     return (
         <div className={`d-flex ${isHuman ? "justify-content-end" : "justify-content-start"}`}>
             {/* Tema audio */}
@@ -42,7 +42,7 @@ const ChatMessage = ({ message }) => {
                     <div className="text-end w-100 mt-1">
                         {message.sttModel && (
                             <span className="pe-0 py-0 badge text-muted text-end ms-1">
-                                <i className="bi bi-volume-up me-1"></i>
+                                <i className="bi bi-mic me-1"></i>
                                 {message.sttModel}
                             </span>
                         )}

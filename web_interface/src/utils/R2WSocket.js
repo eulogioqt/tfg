@@ -80,19 +80,25 @@ export default class R2WSocket {
     }
 
     send(message) {
-        const fullStr = JSON.stringify({
-            type: MESSAGE_TYPE.MESSAGE,
-            data: message,
-        });
-    
-        const chunks = this._msgToChunks(fullStr);
-        chunks.forEach(chunk => {
-            const chunkStr = JSON.stringify(chunk);
-            const sizeKB = (this.encoder.encode(chunkStr).length / 1024).toFixed(2);
-    
-            console.log(`Sending chunk ${chunk.chunk_index} (final: ${chunk.final}) — ${sizeKB} KB`);
-            this.socket.send(chunkStr);
-        });
+        try {
+            const fullStr = JSON.stringify({
+                type: MESSAGE_TYPE.MESSAGE,
+                data: message,
+            });
+        
+            const chunks = this._msgToChunks(fullStr);
+            chunks.forEach(chunk => {
+                const chunkStr = JSON.stringify(chunk);
+                const sizeKB = (this.encoder.encode(chunkStr).length / 1024).toFixed(2);
+        
+                console.log(`Sending chunk ${chunk.chunk_index} (final: ${chunk.final}) — ${sizeKB} KB`);
+                this.socket.send(chunkStr);
+            });
+
+            return true;
+        } catch (e) {
+            return false;
+        }
     }
     
     close() {
