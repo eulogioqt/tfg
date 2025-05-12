@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 
 import Header from "./components/Header";
+import Footer from "./components/Footer";
 import HomePage from "./pages/home/HomePage";
 import ChatPage from "./pages/chat/ChatPage";
 import FaceprintListPage from "./pages/faceprints/FaceprintListPage";
@@ -12,11 +13,15 @@ import ModelsPage from "./pages/models/ModelsPage";
 
 const App = () => {
     const wrap = (page) => (
-        <>
+        <div className="d-flex flex-column min-vh-100">
             <Header />
-            {page}
-        </>
+            <main className="flex-grow-1">
+                {page}
+            </main>
+            <Footer />
+        </div>
     );
+    
 
     return (
         <Router>
