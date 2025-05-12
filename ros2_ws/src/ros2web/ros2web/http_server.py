@@ -6,11 +6,12 @@ from werkzeug.serving import make_server
 
 
 class HTTPServer:
-    def __init__(self, host="0.0.0.0", port=8080, webclient_dir=None):
+    def __init__(self, host="0.0.0.0", port=8080, webclient_dir=None, open_on_start=False):
         self.host = host
         self.port = port
 
         self.webclient_dir = webclient_dir or self._find_client_dist()
+        self.open_on_start = open_on_start
 
         self.app = Flask(__name__, static_folder=None) 
         self.app.add_url_rule('/', 'index', self.serve_html)
@@ -76,5 +77,8 @@ class HTTPServer:
 
     def run(self):
         print(f"Sirviendo desde: {self.webclient_dir}")
-        webbrowser.open(f"http://localhost:{self.port}")
+
+        if self.open_on_start:
+            webbrowser.open(f"http://localhost:{self.port}")
+            
         self.server.serve_forever()
