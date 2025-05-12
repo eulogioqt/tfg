@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useToast } from "./ToastContext";
 import { useAPI } from "./APIContext";
+import { useWebSocket } from "./WebSocketContext";
 
 const ModelsContext = createContext();
 
 export const ModelsProvider = ({ children }) => {
+    const { isConnected } = useWebSocket();
     const { ttsModels, sttModels, llmModels, isResponseOk } = useAPI();
     const { showToast } = useToast();
 
@@ -14,25 +16,25 @@ export const ModelsProvider = ({ children }) => {
     const [llmProvidersList, setLlmProvidersList] = useState(undefined);
 
     const getActiveTtsModel = () => {
-        if (ttsModelsList === undefined) return undefined;
+        if (ttsModelsList === undefined || ttsModelsList === null) return ttsModelsList;
         const active = ttsModelsList.find((m) => m.active);
-        return active || null;
+        return active || "";
     };
 
     const getActiveSttModel = () => {
-        if (sttModelsList === undefined) return undefined;
+        if (sttModelsList === undefined || sttModelsList === null) return sttModelsList;
         const active = sttModelsList.find((m) => m.active);
-        return active || null;
+        return active || "";
     };
 
     const getActiveLlmModel = () => {
-        if (llmProvidersList === undefined) return undefined;
+        if (llmProvidersList === undefined || llmProvidersList === null) return llmProvidersList;
 
         const active = llmProvidersList.flatMap((p) =>
             p.models.filter((m) => m.active).map((m) => ({ ...p, ...m }))
         )[0];
 
-        return active || null;
+        return active || "";
     };
 
     const buildFetchFunc = (kind, apiObj, setFunc) => {
@@ -55,9 +57,13 @@ export const ModelsProvider = ({ children }) => {
         llm: buildFetchFunc("llm", llmModels, setLlmProvidersList),
     };
 
+    const firstRun = useRef(true);
     useEffect(() => {
-        Object.values(fetchFunctions).forEach((func) => func());
-    }, []);
+        if (firstRun.current || !isConnected) {
+            firstRun.current = false;
+            Object.values(fetchFunctions).forEach((func) => func());
+        }
+    }, [isConnected]);
 
     return (
         <ModelsContext.Provider

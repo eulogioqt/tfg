@@ -87,8 +87,9 @@ const TTSPanel = () => {
     };
 
     const openSpeakerModal = (model) => {
-        if (model.speakers.length === 0) {
-            onActivate(model.model, "");
+        if (model.speakers.length <= 1) {
+            const speaker = model.speakers.length == 1 ? model.speakers[0] : "";
+            onActivate(model.model, speaker);
         } else {
             setSelectedModel(model);
             setSelectedSpeaker(model.speaker || model.speakers[0] || "");
@@ -162,20 +163,24 @@ const TTSPanel = () => {
                                     Cargar
                                 </button>
                             )}
-                            {model.loaded && !model.active && (
+                            {model.loaded && (
                                 <>
-                                    <button
-                                        className="btn btn-sm btn-outline-primary"
-                                        onClick={() => openSpeakerModal(model)}
-                                    >
-                                        Activar
-                                    </button>
-                                    <button
-                                        className="btn btn-sm btn-outline-danger"
-                                        onClick={() => onUnload(model.model)}
-                                    >
-                                        Liberar
-                                    </button>
+                                    {!model.active && (
+                                        <button
+                                            className="btn btn-sm me-2 btn-outline-danger"
+                                            onClick={() => onUnload(model.model)}
+                                        >
+                                            Liberar
+                                        </button>
+                                    )}
+                                    {(!model.active || model.speakers.length > 1) && (
+                                        <button
+                                            className={`btn btn-sm btn-outline-${model.active ? "dark" : "primary"}`}
+                                            onClick={() => openSpeakerModal(model)}
+                                        >
+                                            {model.active ? "Cambiar voz" : "Activar"}
+                                        </button>
+                                    )}
                                 </>
                             )}
                         </div>

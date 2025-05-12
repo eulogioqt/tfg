@@ -18,6 +18,14 @@ const ChatModelBadge = ({ model, type }) => {
     if (model === null) {
         return (
             <span className="badge bg-danger me-2">
+                <i className={`bi ${icons[type]} me-1`}></i>Desconectado
+            </span>
+        );
+    }
+
+    if (model === "") {
+        return (
+            <span className="badge bg-warning me-2">
                 <i className={`bi ${icons[type]} me-1`}></i>No activo
             </span>
         );
