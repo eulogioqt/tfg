@@ -2,9 +2,11 @@ import React from "react";
 import { useWindowSize, BREAKPOINTS } from "../../../hooks/useWindowSize";
 import { useWebSocket } from "../../../contexts/WebSocketContext";
 import { useModels } from "../../../contexts/ModelsContext";
+import { useChat } from "../../../contexts/ChatContext";
 import ChatModelBadge from "./ChatModelBadge";
 
-const ChatHeader = ({ collapsed, setCollapsed, handleNewChat }) => {
+const ChatHeader = ({ handleNewChat }) => {
+    const { collapsed, setCollapsed } = useChat();
     const { getActiveTtsModel, getActiveSttModel, getActiveLlmModel } = useModels();
     const { width } = useWindowSize();
     const { isConnected } = useWebSocket();

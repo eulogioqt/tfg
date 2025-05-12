@@ -3,8 +3,8 @@ import ChatMessage from "./ChatMessage";
 
 import { useChat } from "../../../contexts/ChatContext";
 
-const ChatMessageArea = ({ messages }) => {
-    const { transcribing } = useChat();
+const ChatMessageArea = () => {
+    const { messages } = useChat();
 
     const messagesEndRef = useRef(null);
     const firstScrollRef = useRef(false);
@@ -22,8 +22,6 @@ const ChatMessageArea = ({ messages }) => {
                 {messages.map((message, index) => (
                     <ChatMessage key={index} message={message} />
                 ))}
-
-                {transcribing && <div className="d-flex justify-content-end">Transcribiendo audio...</div>}
 
                 <div ref={messagesEndRef} />
             </div>

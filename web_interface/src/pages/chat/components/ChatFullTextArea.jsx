@@ -1,8 +1,30 @@
 import React from "react";
+
+import { useWebSocket } from "../../../contexts/WebSocketContext";
+import { useChat } from "../../../contexts/ChatContext";
+
 import ChatTextArea from "./ChatTextArea";
 import ChatMicrophoneButton from "./ChatMicrophoneButton";
 
-const ChatFullTextArea = ({ chatAreaRef, handleAudio, handleUploadAudio, handleSend }) => {
+const ChatFullTextArea = ({ chatAreaRef }) => {
+    const { isConnected } = useWebSocket();
+    const { handleAudio, handleSend, setIsOpenNCModal } = useChat();
+
+    const handleUploadAudio = () => {
+        if (!isConnected) return setIsOpenNCModal(true);
+
+        const input = Object.assign(document.createElement("input"), {
+            type: "file",
+            accept: "audio/*",
+            onchange: async (e) => {
+                const file = e.target.files?.[0];
+                if (file) await handleAudio(file);
+            },
+        });
+
+        input.click();
+    };
+
     return (
         <div
             className="container d-flex flex-column pb-2 py-1 mb-4 shadow-sm border border-2 border-light-subtle"
@@ -14,7 +36,11 @@ const ChatFullTextArea = ({ chatAreaRef, handleAudio, handleUploadAudio, handleS
             </div>
 
             <div className="d-flex justify-content-end align-items-end pe-0 pb-0">
-                <ChatMicrophoneButton onFinish={handleAudio} />
+                <ChatMicrophoneButton
+                    onFinish={handleAudio}
+                    recordCondition={isConnected}
+                    noConditionAction={() => setIsOpenNCModal(true)}
+                />
 
                 <button className="btn btn-dark rounded-circle me-1" type="button" onClick={() => handleUploadAudio()}>
                     <i className="bi bi-file-earmark-music"></i>

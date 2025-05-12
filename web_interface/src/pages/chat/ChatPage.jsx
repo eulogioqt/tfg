@@ -9,7 +9,7 @@ import { useWindowSize, BREAKPOINTS } from "../../hooks/useWindowSize";
 import { useChat } from "../../contexts/ChatContext";
 
 const ChatPage = () => {
-    const { collapsed, setCollapsed, messages, clearMessages, handleAudio, handleUploadAudio, handleSend } = useChat();
+    const { setCollapsed, clearMessages } = useChat();
     const { width } = useWindowSize();
 
     const chatAreaRef = useRef(null);
@@ -23,19 +23,14 @@ const ChatPage = () => {
     return (
         <>
             <div className="d-flex vh-100">
-                <ChatSidebar collapsed={collapsed} setCollapsed={setCollapsed} handleNewChat={handleNewChat} />
+                <ChatSidebar handleNewChat={handleNewChat} />
 
                 <div className="d-flex flex-column flex-grow-1" style={{ overflow: "hidden", marginTop: "76px" }}>
-                    <ChatHeader collapsed={collapsed} setCollapsed={setCollapsed} handleNewChat={handleNewChat} />
+                    <ChatHeader handleNewChat={handleNewChat} />
 
-                    <ChatMessageArea messages={messages} />
+                    <ChatMessageArea />
 
-                    <ChatFooter
-                        chatAreaRef={chatAreaRef}
-                        handleAudio={handleAudio}
-                        handleUploadAudio={handleUploadAudio}
-                        handleSend={handleSend}
-                    />
+                    <ChatFooter chatAreaRef={chatAreaRef} />
                 </div>
             </div>
         </>

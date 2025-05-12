@@ -66,21 +66,6 @@ export const ChatProvider = ({ children }) => {
         };
     }, []);
 
-    const handleUploadAudio = () => {
-        if (!isConnected) return setIsOpenNCModal(true);
-
-        const input = Object.assign(document.createElement("input"), {
-            type: "file",
-            accept: "audio/*",
-            onchange: async (e) => {
-                const file = e.target.files?.[0];
-                if (file) await handleAudio(file);
-            },
-        });
-
-        input.click();
-    };
-
     const handleAudio = async (blob) => {
         if (!isConnected) return setIsOpenNCModal(true);
 
@@ -132,8 +117,9 @@ export const ChatProvider = ({ children }) => {
                 messages,
                 clearMessages,
                 handleAudio,
-                handleUploadAudio,
                 handleSend,
+
+                setIsOpenNCModal,
             }}
         >
             <NotConnectedModal isOpen={isOpenNCModal} handleClose={() => setIsOpenNCModal(false)} />

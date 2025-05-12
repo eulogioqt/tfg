@@ -1,8 +1,10 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { useWindowSize, BREAKPOINTS } from "../../../hooks/useWindowSize";
 
-const Sidebar = ({ collapsed, setCollapsed, handleNewChat }) => {
+import { useWindowSize, BREAKPOINTS } from "../../../hooks/useWindowSize";
+import { useChat } from "../../../contexts/ChatContext";
+
+const ChatSidebar = ({ handleNewChat }) => {
+    const { collapsed, setCollapsed } = useChat();
     const { width } = useWindowSize();
 
     return (
@@ -66,4 +68,4 @@ const Sidebar = ({ collapsed, setCollapsed, handleNewChat }) => {
     );
 };
 
-export default Sidebar;
+export default ChatSidebar;

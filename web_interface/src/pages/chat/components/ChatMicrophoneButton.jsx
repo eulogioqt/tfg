@@ -1,12 +1,15 @@
 import React, { useEffect } from "react";
 import { useMicrophone } from "../../../hooks/useMicrophone";
 
-export default function ChatMicrophoneButton({ onFinish }) {
+const ChatMicrophoneButton = ({ onFinish, recordCondition, noConditionAction }) => {
     const { recording, audioBlob, startRecording, stopRecording } = useMicrophone();
 
     const toggleRecording = () => {
-        if (recording) stopRecording();
-        else startRecording();
+        if (!recordCondition) noConditionAction();
+        else {
+            if (recording) stopRecording();
+            else startRecording();
+        }
     };
 
     useEffect(() => {
@@ -20,4 +23,6 @@ export default function ChatMicrophoneButton({ onFinish }) {
             <i className="bi bi-mic-fill" />
         </button>
     );
-}
+};
+
+export default ChatMicrophoneButton;
