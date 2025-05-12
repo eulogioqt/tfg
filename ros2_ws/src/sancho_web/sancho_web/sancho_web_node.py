@@ -90,14 +90,14 @@ class SanchoWeb:
         elif type == MessageType.AUDIO_PROMPT:
             audio_prompt = AudioPromptMessage(data)
             
-            transcription = self.stt_request(audio_prompt.audio, audio_prompt.sample_rate)
-            self.send_message(key, PromptTranscriptionMessage(audio_prompt.id, transcription))
+            transcription, model = self.stt_request(audio_prompt.audio, audio_prompt.sample_rate)
+            self.send_message(key, PromptTranscriptionMessage(audio_prompt.id, transcription, model))
 
             response, method, intent, provider, model = self.sancho_prompt_request(transcription)
             self.send_message(key, ResponseMessage(audio_prompt.id, response, method, intent, provider, model))
 
-            audio, sample_rate = self.tts_request(response)
-            self.send_message(key, AudioResponseMessage(audio_prompt.id, audio, sample_rate))
+            audio, sample_rate, model, speaker = self.tts_request(response)
+            self.send_message(key, AudioResponseMessage(audio_prompt.id, audio, sample_rate, model, speaker))
                 
     def sancho_prompt_request(self, text):
         req = SanchoPrompt.Request()
@@ -118,7 +118,7 @@ class SanchoWeb:
         rclpy.spin_until_future_complete(self.node, future)
         result = future.result()
 
-        return result.text
+        return result.text, result.model_used
 
     def tts_request(self, text):
         req = TTS.Request()
@@ -128,7 +128,7 @@ class SanchoWeb:
         rclpy.spin_until_future_complete(self.node, future)
         result = future.result()
 
-        return result.audio, result.sample_rate
+        return result.audio, result.sample_rate, result.model_used, result.speaker_used
 
     def send_message(self, key, msg: JSONMessage):
         self.node.ros_pub.publish(R2WMessage(key=key, value=msg.to_json()))

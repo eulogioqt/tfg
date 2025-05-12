@@ -69,30 +69,36 @@ class FaceprintEventMessage(JSONMessage):
         }
 
 class PromptTranscriptionMessage(JSONMessage):
-    def __init__(self, id, value):
+    def __init__(self, id, value, model):
         self.id = id
         self.value = value
+        self.model = model
     
     def to_dict(self):
         return {
             "type": MessageType.PROMPT_TRANSCRIPTION,
             "data": {
                 "id": self.id,
+                "model": self.model,
                 "value": self.value
             }
         }
 
 class AudioResponseMessage(JSONMessage):
-    def __init__(self, id, audio, sample_rate):
+    def __init__(self, id, audio, sample_rate, model, speaker):
         self.id = id
         self.audio = list(audio)
         self.sample_rate = sample_rate
+        self.model = model
+        self.speaker = speaker
         
     def to_dict(self):
         return {
             "type": MessageType.AUDIO_RESPONSE,
             "data": {
                 "id": self.id,
+                "model": self.model,
+                "speaker": self.speaker,
                 "audio": self.audio,
                 "sample_rate": self.sample_rate
             }

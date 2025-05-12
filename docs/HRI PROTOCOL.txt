@@ -15,6 +15,7 @@ Respuestas a prompts con ID:
     type: "PROMPT_TRANSCRIPTION",
     data: {
         id: uuid,
+        model: str,
         value: ...
     }
 }
@@ -22,6 +23,8 @@ Respuestas a prompts con ID:
     type: "AUDIO_RESPONSE",
     data: {
         id: uuid,
+        model: str,
+        speaker: str,
         audio: [int16],
         sample_rate: int
     }
@@ -63,3 +66,18 @@ Servidor llama al LLM para generar la respuesta textual.
 Envía RESPONSE → el frontend muestra la respuesta textual del LLM.
 Servidor sintetiza audio con TTS.
 Envía AUDIO_RESPONSE → el frontend reproduce el audio automáticamente.
+
+
+los mensajes isHuman:
+
+Al enviar texto, se tiene solo id y value.
+Cuando llega la respuesta del llm, se añade intent.
+
+Si se envia con audio, se tiene solo id, y sampleRate.
+Cuando llega la respuesta del stt, se añade value y sttModel.
+Cuando llega la respuesta del llm, se añade intent.
+
+Los mensajes not isHuman:
+
+Cuando llega la respuesta, se tiene id, method, provider, model y value.
+Si se usa tts, se añade audio y sampleRate.

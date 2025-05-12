@@ -4,7 +4,7 @@ const ChatModelBadge = ({ model, type }) => {
     const icons = {
         tts: "bi-volume-up",
         stt: "bi-mic",
-        llm: "bi-cpu",
+        llm: "bi-robot",
     };
 
     if (model === undefined) {
