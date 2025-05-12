@@ -22,7 +22,9 @@ const ChatHeader = ({ collapsed, setCollapsed, handleNewChat }) => {
 
                 <div className="d-flex justify-content-center align-items-center">
                     <div
-                        className={`rounded-circle border border-dark ${isConnected ? "bg-success" : "bg-danger"}`}
+                        className={`rounded-circle border border-dark ${
+                            isConnected == undefined ? "bg-primary" : isConnected ? "bg-success" : "bg-danger"
+                        }`}
                         title={isConnected ? "Conectado" : "Desconectado"}
                         style={{
                             width: "16px",

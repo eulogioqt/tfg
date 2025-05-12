@@ -13,6 +13,12 @@ export const ModelsProvider = ({ children }) => {
     const [sttModelsList, setSttModelsList] = useState(undefined);
     const [llmProvidersList, setLlmProvidersList] = useState(undefined);
 
+    const getActiveTtsModel = () => ttsModelsList && ttsModelsList.find((model) => model.active);
+    const getActiveSttModel = () => sttModelsList && sttModelsList.find((model) => model.active);
+    const getActiveLlmModel = () =>
+        llmProvidersList &&
+        llmProvidersList.flatMap((p) => p.models.filter((m) => m.active).map((m) => ({ ...p, ...m })))[0];
+
     const buildFetchFunc = (kind, apiObj, setFunc) => {
         return async () => {
             setFunc(undefined);

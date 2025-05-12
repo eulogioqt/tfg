@@ -23,7 +23,7 @@ export const WebSocketProvider = ({ children }) => {
     const { publish } = useEventBus();
     const { showToast } = useToast();
 
-    const [isConnected, setConnected] = useState(false);
+    const [isConnected, setConnected] = useState(undefined);
 
     const socketRef = useRef(null);
 
