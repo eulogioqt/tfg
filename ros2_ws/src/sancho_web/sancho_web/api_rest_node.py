@@ -12,26 +12,26 @@ from .service.v1_tts_models import set_tts_model_api
 from .service.v1_stt_models import set_stt_model_api
 from .service.v1_llm_models import set_llm_model_api
 
-from .apis import FaceprintAPI, LogAPI, SessionAPI, TTSModelAPI, STTModelAPI, LLMModelAPI
+from .apis import FaceprintAPI, LogAPI, SessionAPI, TTSModelAPI, STTModelAPI, LLMModelAPI, API_LIST
 
 
 class APIRESTNode(Node):
 
     AVAILABLE_APIS = {
-        "faceprints": (FaceprintAPI, set_faceprint_api),
-        "logs": (LogAPI, set_log_api),
-        "sessions": (SessionAPI, set_session_api),
-        "tts_models": (TTSModelAPI, set_tts_model_api),
-        "stt_models": (STTModelAPI, set_stt_model_api),
-        "llm_models": (LLMModelAPI, set_llm_model_api)
+        API_LIST.FACEPRINTS: (FaceprintAPI, set_faceprint_api),
+        API_LIST.LOGS: (LogAPI, set_log_api),
+        API_LIST.SESSIONS: (SessionAPI, set_session_api),
+        API_LIST.TTS_MODELS: (TTSModelAPI, set_tts_model_api),
+        API_LIST.STT_MODELS: (STTModelAPI, set_stt_model_api),
+        API_LIST.LLM_MODELS: (LLMModelAPI, set_llm_model_api)
     }
 
     def __init__(self):
         super().__init__("api_rest_node")
 
         default = str(list(self.AVAILABLE_APIS.keys()))
-        selected_apis = self.parse_string_list(self.declare_parameter("selected_apis", default).get_parameter_value().string_value)
-        self.configure_apis(selected_apis)
+        apis = self.parse_string_list(self.declare_parameter("apis", default).get_parameter_value().string_value)
+        self.configure_apis(apis)
 
         self.get_logger().info("API REST Node initializated successfully.")
 

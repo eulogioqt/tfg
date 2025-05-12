@@ -3,6 +3,7 @@ from launch_ros.actions import Node
 
 from speech_tools.models import STT_MODELS, TTS_MODELS, TTS_SPEAKERS
 from llm_tools.models import PROVIDER, MODELS
+from sancho_web.apis import API_LIST
 
 
 def generate_launch_description():
@@ -67,7 +68,7 @@ def generate_launch_description():
             name='api_rest',
             output='screen',
             parameters=[{
-                "selected_apis": "['tts_models', 'stt_models', 'llm_models']"
+                "apis": f"['{API_LIST.TTS_MODELS}', '{API_LIST.STT_MODELS}', '{API_LIST.LLM_MODELS}']"
             }]
         ),
     ])
