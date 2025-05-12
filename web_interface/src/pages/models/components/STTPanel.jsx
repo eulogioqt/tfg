@@ -3,8 +3,10 @@ import React, { useState } from "react";
 import { useAPI } from "../../../contexts/APIContext";
 import { useToast } from "../../../contexts/ToastContext";
 import { useLoadingScreen } from "../../../components/LoadingScreen";
+import { useModels } from "../../../contexts/ModelsContext";
 
-const STTPanel = ({ sttModelsList, setSttModelsList }) => {
+const STTPanel = () => {
+    const { sttModelsList, setSttModelsList } = useModels();
     const { sttModels, isResponseOk } = useAPI();
     const { withLoading } = useLoadingScreen();
     const { showToast } = useToast();

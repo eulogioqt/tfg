@@ -1,64 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
-import { useAPI } from "../../contexts/APIContext";
-import { useToast } from "../../contexts/ToastContext";
+import { useModels } from "../../contexts/ModelsContext";
 
 import TTSPanel from "./components/TTSPanel";
 import STTPanel from "./components/STTPanel";
 import LLMPanel from "./components/LLMPanel";
 
 const ModelsPage = () => {
-    const { ttsModels, sttModels, llmModels, isResponseOk } = useAPI();
-    const { showToast } = useToast();
-
-    const [activeTab, setActiveTab] = useState("tts");
-    const [ttsModelsList, setTtsModelsList] = useState([]);
-    const [sttModelsList, setSttModelsList] = useState([]);
-    const [llmProvidersList, setLlmProvidersList] = useState([]);
-
-    useEffect(() => {
-        const fetchTTS = async () => {
-            const response = await ttsModels.getAll();
-            if (isResponseOk(response)) {
-                setTtsModelsList(response.data);
-            } else {
-                showToast("Error al obtener modelos TTS", response.data.detail, "red");
-            }
-        };
-
-        fetchTTS();
-
-        const fetchSTT = async () => {
-            const response = await sttModels.getAll();
-            if (isResponseOk(response)) {
-                setSttModelsList(response.data);
-            } else {
-                showToast("Error al obtener modelos STT", response.data.detail, "red");
-            }
-        };
-
-        fetchSTT();
-
-        const fetchLLM = async () => {
-            const response = await llmModels.getAll();
-            if (isResponseOk(response)) {
-                setLlmProvidersList(response.data);
-            } else {
-                showToast("Error al obtener modelos LLM", response.data.detail, "red");
-            }
-        };
-
-        fetchLLM();
-    }, []);
+    const {activeTab, setActiveTab} = useModels();
 
     const renderPanel = () => {
         switch (activeTab) {
             case "tts":
-                return <TTSPanel ttsModelsList={ttsModelsList} setTtsModelsList={setTtsModelsList} />;
+                return <TTSPanel />;
             case "stt":
-                return <STTPanel sttModelsList={sttModelsList} setSttModelsList={setSttModelsList} />;
+                return <STTPanel />;
             case "llm":
-                return <LLMPanel llmProvidersList={llmProvidersList} setLlmProvidersList={setLlmProvidersList} />;
+                return <LLMPanel />;
             default:
                 return null;
         }
@@ -96,7 +54,7 @@ const ModelsPage = () => {
                 </div>
 
                 <div className="col-md-9">
-                    <div className="card border rounded shadow-sm">
+                    <div className="card border rounded shadow-sm mb-5">
                         <div className="card-header bg-light fw-semibold">
                             <i className="bi bi-gear me-2" />
                             Modelos {activeTab.toUpperCase()}

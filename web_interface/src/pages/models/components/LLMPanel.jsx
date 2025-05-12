@@ -1,11 +1,16 @@
 import React, { useState } from "react";
+
 import { useAPI } from "../../../contexts/APIContext";
 import { useToast } from "../../../contexts/ToastContext";
 import { useLoadingScreen } from "../../../components/LoadingScreen";
+import { useModels } from "../../../contexts/ModelsContext";
+
 import ModelItem from "./ModelItem";
 import LoadInputButton from "./LoadInputButton";
 
-const LLMPanel = ({ llmProvidersList, setLlmProvidersList }) => {
+const LLMPanel = () => {
+    const { llmProvidersList, setLlmProvidersList } = useModels();
+
     const { llmModels, isResponseOk } = useAPI();
     const { showToast } = useToast();
     const { withLoading } = useLoadingScreen();
@@ -140,7 +145,7 @@ const LLMPanel = ({ llmProvidersList, setLlmProvidersList }) => {
     return (
         <div className="list-group shadow-sm">
             {llmProvidersList.map((providerData) => (
-                <div key={providerData.provider} className="card my-3">
+                <div key={providerData.provider} className="card my-2">
                     <div className="card-header d-flex justify-content-between align-items-center">
                         <h5 className="mb-0 text-capitalize">{providerData.provider}</h5>
                         {!providerData.executed_locally && !providerData.models[0].loaded && (

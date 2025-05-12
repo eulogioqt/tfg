@@ -3,10 +3,12 @@ import React, { useState } from "react";
 import { useAPI } from "../../../contexts/APIContext";
 import { useToast } from "../../../contexts/ToastContext";
 import { useLoadingScreen } from "../../../components/LoadingScreen";
+import { useModels } from "../../../contexts/ModelsContext";
 
 import ActivateTTSModal from "./ActivateTTSModal";
 
-const TTSPanel = ({ ttsModelsList, setTtsModelsList }) => {
+const TTSPanel = () => {
+    const { ttsModelsList, setTtsModelsList } = useModels();
     const { ttsModels, isResponseOk } = useAPI();
     const { withLoading } = useLoadingScreen();
     const { showToast } = useToast();

@@ -1,6 +1,7 @@
 import { useContext, createContext, useState, useEffect } from "react";
 import { useWebSocket } from "./WebSocketContext";
 import { useEventBus } from "./EventBusContext";
+import { BREAKPOINTS, useWindowSize } from "../hooks/useWindowSize";
 
 import { v4 as uuidv4 } from "uuid";
 
@@ -14,8 +15,10 @@ const ChatContext = createContext();
 export const ChatProvider = ({ children }) => {
     const { sendMessage, isConnected } = useWebSocket();
     const { subscribe } = useEventBus();
+    const { width } = useWindowSize();
 
     const [messages, setMessages] = useState([]);
+    const [collapsed, setCollapsed] = useState(width < BREAKPOINTS.MD);
     const [transcribing, setTranscribing] = useState(false);
     const [isReplying, setIsReplying] = useState(false);
 
@@ -124,6 +127,9 @@ export const ChatProvider = ({ children }) => {
     return (
         <ChatContext.Provider
             value={{
+                collapsed,
+                setCollapsed,
+                
                 messages,
                 isReplying,
                 transcribing,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 import ChatSidebar from "./components/ChatSidebar";
 import ChatFooter from "./components/ChatFooter";
@@ -10,11 +10,9 @@ import { useWindowSize, BREAKPOINTS } from "../../hooks/useWindowSize";
 import { useChat } from "../../contexts/ChatContext";
 
 const ChatPage = () => {
-    const { messages, clearMessages, addMessage, handleAudio, handleUploadAudio, handleSend } = useChat();
+    const { collapsed, setCollapsed, messages, clearMessages, addMessage, handleAudio, handleUploadAudio, handleSend } = useChat();
     const { subscribe } = useEventBus();
     const { width } = useWindowSize();
-
-    const [collapsed, setCollapsed] = useState(width < BREAKPOINTS.MD);
 
     const chatAreaRef = useRef(null);
 

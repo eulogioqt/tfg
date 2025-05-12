@@ -5,6 +5,7 @@ import { ToastProvider } from "./contexts/ToastContext.jsx";
 import { EventBusProvider } from "./contexts/EventBusContext.jsx";
 import { APIProvider } from "./contexts/APIContext";
 import { WebSocketProvider } from "./contexts/WebSocketContext";
+import { ModelsProvider } from "./contexts/ModelsContext.jsx";
 import { ChatProvider } from "./contexts/ChatContext.jsx";
 import { FaceprintsProvider } from "./contexts/FaceprintsContext.jsx";
 
@@ -18,11 +19,13 @@ createRoot(document.getElementById("root")).render(
         <EventBusProvider>
             <APIProvider>
                 <WebSocketProvider>
-                    <ChatProvider>
-                        <FaceprintsProvider>
-                            <App />
-                        </FaceprintsProvider>
-                    </ChatProvider>
+                    <ModelsProvider>
+                        <ChatProvider>
+                            <FaceprintsProvider>
+                                <App />
+                            </FaceprintsProvider>
+                        </ChatProvider>
+                    </ModelsProvider>
                 </WebSocketProvider>
             </APIProvider>
         </EventBusProvider>

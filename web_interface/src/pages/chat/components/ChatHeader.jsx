@@ -37,6 +37,7 @@ const ChatHeader = ({ collapsed, setCollapsed, handleNewChat }) => {
                         className="fw-bold fs-2 ms-3"
                         style={{
                             whiteSpace: "nowrap",
+                            cursor: "default",
                             display: collapsed || width < BREAKPOINTS.MD ? "block" : "none",
                         }}
                     >
