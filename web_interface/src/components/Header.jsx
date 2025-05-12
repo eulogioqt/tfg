@@ -17,7 +17,7 @@ const Header = () => {
 
     return (
         <header>
-            <nav className="d-flex justify-content-start align-items-center position-absolute w-100 navbar navbar-expand-lg bg-body-tertiary border-bottom top-0">
+            <nav className="ps-4 d-flex justify-content-start align-items-center position-absolute w-100 navbar navbar-expand-lg bg-body-tertiary border-bottom top-0">
                 <div className="container-fluid">
                     <a
                         className="navbar-brand"
@@ -26,7 +26,7 @@ const Header = () => {
                             navigate("/");
                         }}
                     >
-                        <img src={bannerSrc} alt="SanchoHub" height="50" />
+                        <img src={bannerSrc} alt="SanchoUI" height="50" />
                     </a>
                     <button
                         className="navbar-toggler"
@@ -48,7 +48,7 @@ const Header = () => {
             </nav>
         </header>
     );
-}
+};
 
 const item = (link, name) => {
     return (
@@ -56,9 +56,7 @@ const item = (link, name) => {
             <Link
                 className={
                     "nav-link text-dark" +
-                    (document.URL.split("/")[3].toLowerCase() === link.toLowerCase()
-                        ? " active fw-bold"
-                        : "")
+                    (document.URL.split("/")[3].toLowerCase() === link.toLowerCase() ? " active fw-bold" : "")
                 }
                 to={"/" + link}
                 style={{ color: "#0d6efd" }} // Usamos el color primario de Bootstrap para el enlace

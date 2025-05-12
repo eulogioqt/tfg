@@ -5,7 +5,8 @@ const Footer = () => {
         <footer className="bg-body-tertiary text-center py-3 border-top mt-auto">
             <div className="container">
                 <span className="text-muted small">
-                    © {new Date().getFullYear()} SanchoHub · Proyecto de Fin de Grado · Desarrollado por Eulogio Quemada Tores
+                    © {new Date().getFullYear()} SanchoUI · Proyecto de Fin de Grado · Desarrollado por Eulogio Quemada
+                    Tores
                 </span>
             </div>
         </footer>

@@ -23,22 +23,29 @@ export const ChatProvider = ({ children }) => {
     const [isReplying, setIsReplying] = useState(false);
 
     const clearMessages = () => setMessages([]);
-    const addMessage = (text, id, isHuman) => {
-        setMessages((oldMessages) => [...oldMessages, { text, id, isHuman }]);
-        setIsReplying(isHuman);
+    const addHumanMessage = (message) => {
+        setMessages((prevMessages) => [...prevMessages, { ...message, isHuman: true }]);
+        setIsReplying(true);
     };
 
     useEffect(() => {
         const processR = (e) => {
-            console.log(e);
-            const isResponseAdded = messages.filter((m) => !m.isHuman).some((m) => m.id === e.id);
-            if (!isResponseAdded) {
-                addMessage(e.value, e.id, false);
-            }
-        };
+            setMessages((prevMessages) => {
+                const isResponseAdded = prevMessages.some((m) => !m.isHuman && m.id === e.id);
+                if (isResponseAdded) return prevMessages;
+        
+                const updatedMessages = prevMessages.map((m) =>
+                    m.isHuman && m.id === e.id ? { ...m, intent: e.intent } : m
+                );
+        
+                return [...updatedMessages, { ...e, isHuman: false }];
+            });
+        
+            setIsReplying(false);
+        };      
         const processPT = (e) => {
             setTranscribing(false);
-            addMessage(e.value, e.id, true);
+            addHumanMessage(e, true);
         };
         const processAR = (e) => playAudio(e.audio, e.sample_rate);
 
@@ -129,7 +136,7 @@ export const ChatProvider = ({ children }) => {
             };
 
             sendMessage(JSON.stringify(messageWithId));
-            addMessage(inputMessage, id, true);
+            addHumanMessage({ id: id, value: inputMessage }, true);
         }
     };
 
@@ -144,7 +151,6 @@ export const ChatProvider = ({ children }) => {
                 transcribing,
 
                 clearMessages,
-                addMessage,
                 handleAudio,
                 handleUploadAudio,
                 handleSend,

@@ -20,7 +20,7 @@ class HRIEngine(ServiceEngine):
 
         result = self.call_service(self.actual_people_cli, req)
         if result is None:
-            return ""
+            return "[]"
         
         return result.text
 
