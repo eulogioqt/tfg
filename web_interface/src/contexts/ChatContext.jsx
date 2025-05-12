@@ -29,16 +29,25 @@ export const ChatProvider = ({ children }) => {
     };
 
     useEffect(() => {
+        const processR = (e) => {
+            console.log(e);
+            const isResponseAdded = messages.filter((m) => !m.isHuman).some((m) => m.id === e.id);
+            if (!isResponseAdded) {
+                addMessage(e.value, e.id, false);
+            }
+        };
         const processPT = (e) => {
             setTranscribing(false);
             addMessage(e.value, e.id, true);
         };
         const processAR = (e) => playAudio(e.audio, e.sample_rate);
 
+        const unsubscribeR = subscribe("ROS_MESSAGE_RESPONSE", processR);
         const unsubscribePT = subscribe("ROS_MESSAGE_PROMPT_TRANSCRIPTION", processPT);
         const unsubscribeARC = subscribe("ROS_MESSAGE_AUDIO_RESPONSE", processAR);
 
         return () => {
+            unsubscribeR();
             unsubscribePT();
             unsubscribeARC();
         };

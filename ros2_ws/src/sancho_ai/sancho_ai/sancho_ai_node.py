@@ -24,7 +24,8 @@ class SanchoAINode(Node):
     def __init__(self, type):
         super().__init__("sancho_ai")
 
-        self.sancho_ai = create_sancho_ai(type)
+        self.type = type
+        self.sancho_ai = create_sancho_ai(self.type)
         self.prompt_serv = self.create_service(SanchoPrompt, "sancho_ai/prompt", self.prompt_service)
 
         self.get_logger().info("SanchoAI Node initializated succesfully")

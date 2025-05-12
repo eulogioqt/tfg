@@ -144,8 +144,11 @@ const LLMPanel = () => {
 
     return (
         <div className="list-group shadow-sm">
-            {llmProvidersList.map((providerData) => (
-                <div key={providerData.provider} className="card my-2">
+            {llmProvidersList.map((providerData, index) => (
+                <div 
+                    key={providerData.provider} 
+                    className={"card " + (index == 0 ? "mb-2" : (index == llmProvidersList.length - 1 ? "mt-2" : "my-2"))}
+                >
                     <div className="card-header d-flex justify-content-between align-items-center">
                         <h5 className="mb-0 text-capitalize">{providerData.provider}</h5>
                         {!providerData.executed_locally && !providerData.models[0].loaded && (
