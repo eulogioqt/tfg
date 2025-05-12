@@ -12,6 +12,11 @@ from ..prompts.commands.commands import COMMANDS
 
 from llm_tools.models import PROVIDER, MODELS
 
+def try_json_loads(text):
+    try:
+        return json.loads(text)
+    except Exception:
+        return None
 
 def extract_json_from_code_block(text):
     match = re.search(r"```json\s*(\{.*?\})\s*```", text, re.DOTALL)
@@ -50,13 +55,17 @@ class ClassificationTemplatesAI(TemplateAI):
             self.node.get_logger().error(f"There was a problem with prompt: {message}")
             return self.unknown_message()
         
+        self.node.get_logger().info(f"LLM:\n{response}")
         classification_response_json = extract_json_from_code_block(response) # Gemini usually puts the response in ```json block
         if not classification_response_json:
-            self.node.get_logger().error(f"No JSON format found: {classification_response_json}")
+            self.node.get_logger().error(f"No JSON format found.")
             return self.unknown_message()
 
-        self.node.get_logger().info(f"Assistant: {classification_response_json}")
-        classification_response = json.loads(classification_response_json)
+        classification_response = try_json_loads(classification_response_json)
+        if not classification_response:
+            self.node.get_logger().error(f"Error on JSON loads.")
+            return self.unknown_message()
+        
         intent = classification_response["intent"]
 
         if intent == COMMANDS.HOW_ARE_YOU:
