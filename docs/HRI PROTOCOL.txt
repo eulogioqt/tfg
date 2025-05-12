@@ -4,6 +4,10 @@ Respuestas a prompts con ID:
     type: "RESPONSE",
     data: {
         id: uuid,
+        method: str,
+        intent: str,
+        provider: str,
+        model: str,
         value: ...
     }
 }

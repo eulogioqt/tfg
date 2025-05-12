@@ -30,9 +30,13 @@ class SanchoAINode(Node):
         self.get_logger().info("SanchoAI Node initializated succesfully")
 
     def prompt_service(self, request, response):
-        ai_response = self.sancho_ai.on_message(request.text)
+        ai_response, intent, provider, model = self.sancho_ai.on_message(request.text)
 
         response.text = ai_response
+        response.method = self.type
+        response.intent = intent
+        response.provider = provider
+        response.model = model
         
         return response
 

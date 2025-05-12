@@ -84,51 +84,51 @@ class SanchoWeb:
         if type == MessageType.PROMPT:
             prompt = PromptMessage(data)
 
-            response = self.sancho_prompt_request(prompt.value)
+            response, method, intent, provider, model = self.sancho_prompt_request(prompt.value)
 
-            self.send_message(key, ResponseMessage(prompt.id, response))
+            self.send_message(key, ResponseMessage(prompt.id, response, method, intent, provider, model))
         elif type == MessageType.AUDIO_PROMPT:
             audio_prompt = AudioPromptMessage(data)
             
             transcription = self.stt_request(audio_prompt.audio, audio_prompt.sample_rate)
             self.send_message(key, PromptTranscriptionMessage(audio_prompt.id, transcription))
 
-            response = self.sancho_prompt_request(transcription)
-            self.send_message(key, ResponseMessage(audio_prompt.id, response))
+            response, method, intent, provider, model = self.sancho_prompt_request(transcription)
+            self.send_message(key, ResponseMessage(audio_prompt.id, response, method, intent, provider, model))
 
             audio, sample_rate = self.tts_request(response)
             self.send_message(key, AudioResponseMessage(audio_prompt.id, audio, sample_rate))
                 
     def sancho_prompt_request(self, text):
-        sancho_prompt_request = SanchoPrompt.Request()
-        sancho_prompt_request.text = text
+        req = SanchoPrompt.Request()
+        req.text = text
 
-        future_sancho_prompt = self.node.sancho_prompt_client.call_async(sancho_prompt_request)
-        rclpy.spin_until_future_complete(self.node, future_sancho_prompt)
-        result_sancho_prompt = future_sancho_prompt.result()
+        future = self.node.sancho_prompt_client.call_async(req)
+        rclpy.spin_until_future_complete(self.node, future)
+        result = future.result()
 
-        return result_sancho_prompt.text
+        return result.text, result.method, result.intent, result.provider, result.model
 
     def stt_request(self, audio, sample_rate):
-        stt_request = STT.Request()
-        stt_request.audio = audio
-        stt_request.sample_rate = sample_rate
+        req = STT.Request()
+        req.audio = audio
+        req.sample_rate = sample_rate
 
-        future_stt = self.node.stt_client.call_async(stt_request)
-        rclpy.spin_until_future_complete(self.node, future_stt)
-        result_stt = future_stt.result()
+        future = self.node.stt_client.call_async(req)
+        rclpy.spin_until_future_complete(self.node, future)
+        result = future.result()
 
-        return result_stt.text
+        return result.text
 
     def tts_request(self, text):
-        tts_request = TTS.Request()
-        tts_request.text = text
+        req = TTS.Request()
+        req.text = text
 
-        future_tts = self.node.tts_client.call_async(tts_request)
-        rclpy.spin_until_future_complete(self.node, future_tts)
-        result_tts = future_tts.result()
+        future = self.node.tts_client.call_async(req)
+        rclpy.spin_until_future_complete(self.node, future)
+        result = future.result()
 
-        return result_tts.audio, result_tts.sample_rate
+        return result.audio, result.sample_rate
 
     def send_message(self, key, msg: JSONMessage):
         self.node.ros_pub.publish(R2WMessage(key=key, value=msg.to_json()))

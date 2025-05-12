@@ -53,18 +53,18 @@ class ClassificationTemplatesAI(TemplateAI):
         
         if not success:
             self.node.get_logger().error(f"There was a problem with prompt: {message}")
-            return self.unknown_message()
+            return self.unknown_message(), COMMANDS.UNKNOWN, provider_used, model_used
         
         self.node.get_logger().info(f"LLM:\n{response}")
         classification_response_json = extract_json_from_code_block(response) # Gemini usually puts the response in ```json block
         if not classification_response_json:
             self.node.get_logger().error(f"No JSON format found.")
-            return self.unknown_message()
+            return self.unknown_message(), COMMANDS.UNKNOWN, provider_used, model_used
 
         classification_response = try_json_loads(classification_response_json)
         if not classification_response:
             self.node.get_logger().error(f"Error on JSON loads.")
-            return self.unknown_message()
+            return self.unknown_message(), COMMANDS.UNKNOWN, provider_used, model_used
         
         intent = classification_response["intent"]
 
@@ -84,4 +84,4 @@ class ClassificationTemplatesAI(TemplateAI):
         else:
             response = self.unknown_message()
 
-        return response#, provider_used, model_used
+        return response, intent, provider_used, model_used

@@ -1,3 +1,7 @@
 string text
 ---
-string text # Poner con que modelo ha sido respondido el provider y eso
+string text
+string method
+string intent
+string provider
+string model

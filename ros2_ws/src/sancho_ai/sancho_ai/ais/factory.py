@@ -7,8 +7,14 @@ from .dummy_ai import DummyAI
 from .simple_ai import SimpleAI
 from .classification_templates_ai import ClassificationTemplatesAI
 
+class SmartStrEnum(str, Enum):
+    def __str__(self):
+        return self.value
 
-class AIType(str, Enum):
+    def __repr__(self):
+        return self.value
+    
+class AIType(SmartStrEnum):
     DUMMY = "DUMMY"
     SIMPLE = "SIMPLE"
     CLASSIFICATION_TEMPLATES = "CLASSIFICATION_TEMPLATES"

@@ -27,15 +27,23 @@ class JSONMessage(ABC):
 
 
 class ResponseMessage(JSONMessage):
-    def __init__(self, id, response):
+    def __init__(self, id, response, method, intent, provider, model):
         self.id = id
         self.response = response
+        self.method = method
+        self.intent = intent
+        self.provider = provider
+        self.model = model
     
     def to_dict(self):
         return {
             "type": MessageType.RESPONSE,
             "data": {
                 "id": self.id,
+                "method": self.method,
+                "intent": self.intent,
+                "provider": self.provider,
+                "model": self.model,
                 "value": self.response
             }
         }
