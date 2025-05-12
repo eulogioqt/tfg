@@ -41,7 +41,7 @@ const ChatPage = () => {
             <div className="d-flex vh-100">
                 <ChatSidebar collapsed={collapsed} setCollapsed={setCollapsed} handleNewChat={handleNewChat} />
 
-                <div className="d-flex flex-column mt-5 flex-grow-1" style={{ overflow: "hidden" }}>
+                <div className="d-flex flex-column flex-grow-1" style={{ overflow: "hidden", marginTop: "76px" }}>
                     <ChatHeader collapsed={collapsed} setCollapsed={setCollapsed} handleNewChat={handleNewChat} />
 
                     <ChatMessageArea messages={messages} />

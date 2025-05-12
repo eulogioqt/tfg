@@ -71,7 +71,7 @@ const FaceprintDetailPage = () => {
 
     if (!faceprint) {
         return (
-            <div className="text-center mt-5 py-5">
+            <div className="text-center" style={{ marginTop: "76px"}}>
                 <div className="spinner-border text-primary" role="status" />
             </div>
         );
@@ -95,7 +95,7 @@ const FaceprintDetailPage = () => {
                 action={() => handleDelete(faceprint.id)}
             />
 
-            <div className="container mt-5">
+            <div className="container" style={{ marginTop: "76px"}}>
                 <button className="btn btn-secondary my-4" onClick={() => navigate("/faceprints")}>
                     Volver
                 </button>

@@ -65,7 +65,7 @@ const ModelsPage = () => {
     };
 
     return (
-        <div className="container pt-4 mt-5">
+        <div className="container pt-4" style={{ marginTop: "76px"}}>
             <h2 className="mb-4 fw-bold">Gestión de Modelos</h2>
 
             <div className="row">

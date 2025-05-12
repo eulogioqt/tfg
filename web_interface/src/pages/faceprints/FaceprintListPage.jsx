@@ -18,7 +18,7 @@ const FaceprintListPage = () => {
                 doAddFaceprint={doAddFaceprint}
             />
 
-            <div className="container mt-5">
+            <div className="container" style={{ marginTop: "76px"}}>
                 <div className="d-flex justify-content-between align-items-center mb-4 pt-4">
                     <h2>Base de Datos de Rostros Reconocidos</h2>
                     <div>

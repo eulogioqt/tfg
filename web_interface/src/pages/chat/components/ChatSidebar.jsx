@@ -9,14 +9,13 @@ const Sidebar = ({ collapsed, setCollapsed, handleNewChat }) => {
 
     return (
         <>
-            <div className="d-flex" style={{ zIndex: "100" }}>
+            <div className="d-flex" style={{ zIndex: "100", marginTop: "77px" }}>
                 <div
                     className="sidebar bg-light border-end p-3 d-flex flex-column"
                     style={{
                         transform: collapsed ? "translateX(-16rem)" : "translateX(0)",
                         transition: "transform " + (collapsed ? "0s" : "0.3s") + " ease",
                         width: "16rem",
-                        marginTop: "50px" /* quitar */,
                         position: "fixed",
                         height: "100vh",
                         overflowX: "hidden",
@@ -52,7 +51,6 @@ const Sidebar = ({ collapsed, setCollapsed, handleNewChat }) => {
                     style={{
                         width: collapsed || width < BREAKPOINTS.MD ? "0rem" : "16rem",
                         transition: "width " + (collapsed ? "0s" : "0.3s") + " ease",
-                        height: "100vh",
                         overflow: "hidden",
                         flexShrink: 0,
                     }}
