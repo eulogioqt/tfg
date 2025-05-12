@@ -1,6 +1,7 @@
 import { useContext, createContext, useState, useEffect } from "react";
 import { useWebSocket } from "./WebSocketContext";
 import { useEventBus } from "./EventBusContext";
+import { useAudio } from "./AudioContext";
 import { BREAKPOINTS, useWindowSize } from "../hooks/useWindowSize";
 
 import { v4 as uuidv4 } from "uuid";
@@ -13,6 +14,7 @@ const ChatContext = createContext();
 // Poner a parte del transcribiendo el generando respuesta el reproduciendo y eso, si eso incluso el tiempo que tarda y que lleva
 
 export const ChatProvider = ({ children }) => {
+    const { playAudio } = useAudio();
     const { sendMessage, isConnected } = useWebSocket();
     const { subscribe } = useEventBus();
     const { width } = useWindowSize();
@@ -50,7 +52,7 @@ export const ChatProvider = ({ children }) => {
                 )
             );
 
-            playAudio(e.audio, e.sample_rate);
+            playAudio(e.audio, e.sample_rate, e.id + false);
         };
 
         const unsubscribeR = subscribe("ROS_MESSAGE_RESPONSE", processR);

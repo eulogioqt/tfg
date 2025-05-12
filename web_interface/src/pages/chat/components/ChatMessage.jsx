@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useChat } from "../../../contexts/ChatContext";
+import { useAudio } from "../../../contexts/AudioContext";
 
 const ChatMessage = ({ message }) => {
-    const { playAudio } = useChat();
+    const { playAudio, stopCurrentAudio, activeAudioId } = useAudio();
 
     const [timer, setTimer] = useState(0);
 
@@ -58,11 +58,14 @@ const ChatMessage = ({ message }) => {
             {message.audio && message.sampleRate && (
                 <div className="d-flex flex-column align-items-center justify-content-center mb-3">
                     <i
-                        onClick={() => playAudio(message.audio, message.sampleRate)}
-                        title="Reproducir..."
-                        className={`d-flex justify-content-center align-items-center bi bi-play bg-dark text-white rounded-circle border ${
+                        onClick={() => {
+                            if (message.id + isHuman == activeAudioId) stopCurrentAudio();
+                            else playAudio(message.audio, message.sampleRate, message.id + isHuman);
+                        }}
+                        title={message.id + isHuman == activeAudioId ? "Parar..." : "Reproducir..."}
+                        className={`d-flex justify-content-center align-items-center text-white rounded-circle border ${
                             isHuman ? "ms-2" : "me-2"
-                        }`}
+                        } ${message.id + isHuman == activeAudioId ? "bg-danger bi-stop-fill" : "bg-dark bi-play-fill"}`}
                         style={{ fontSize: "1.5em", width: "48px", height: "48px", cursor: "pointer" }}
                     ></i>
                 </div>
