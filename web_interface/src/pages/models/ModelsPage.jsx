@@ -7,7 +7,7 @@ import STTPanel from "./components/STTPanel";
 import LLMPanel from "./components/LLMPanel";
 
 const ModelsPage = () => {
-    const {activeTab, setActiveTab} = useModels();
+    const { activeTab, setActiveTab, fetchFunctions } = useModels();
 
     const renderPanel = () => {
         switch (activeTab) {
@@ -23,7 +23,7 @@ const ModelsPage = () => {
     };
 
     return (
-        <div className="container pt-4" style={{ marginTop: "76px"}}>
+        <div className="container pt-4" style={{ marginTop: "76px" }}>
             <h2 className="mb-4 fw-bold">Gestión de Modelos</h2>
 
             <div className="row">
@@ -55,9 +55,15 @@ const ModelsPage = () => {
 
                 <div className="col-md-9">
                     <div className="card border rounded shadow-sm mb-5">
-                        <div className="card-header bg-light fw-semibold">
-                            <i className="bi bi-gear me-2" />
-                            Modelos {activeTab.toUpperCase()}
+                        <div className="card-header d-flex justify-content-between align-items-center bg-light fw-semibold">
+                            <div>
+                                <i className="bi bi-gear me-2" />
+                                Modelos {activeTab.toUpperCase()}
+                            </div>
+
+                            <button className="btn btn-outline-secondary" onClick={() => fetchFunctions[activeTab]()}>
+                                <i className="bi bi-arrow-clockwise me-2" /> Recargar
+                            </button>
                         </div>
                         <div className="card-body">{renderPanel()}</div>
                     </div>

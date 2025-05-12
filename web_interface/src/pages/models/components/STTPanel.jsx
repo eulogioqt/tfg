@@ -105,6 +105,23 @@ const STTPanel = () => {
         }
     };
 
+    if (sttModelsList === undefined) {
+        return (
+            <div className="d-flex align-items-center justify-content-center p-4">
+                <div className="spinner-border text-primary me-3" role="status" />
+                <span className="fs-5">Cargando modelos STT...</span>
+            </div>
+        );
+    }
+
+    if (sttModelsList === null) {
+        return (
+            <div className="alert alert-danger my-4 text-center" role="alert">
+                Error al cargar los modelos STT. Verifica la conexión o pulsa en recargar.
+            </div>
+        );
+    }
+
     return (
         <div className="list-group shadow-sm">
             {sttModelsList.map((model) => (

@@ -96,6 +96,23 @@ const TTSPanel = () => {
         }
     };
 
+    if (ttsModelsList === undefined) {
+        return (
+            <div className="d-flex align-items-center justify-content-center p-4">
+                <div className="spinner-border text-primary me-3" role="status" />
+                <span className="fs-5">Cargando modelos TTS...</span>
+            </div>
+        );
+    }
+
+    if (ttsModelsList === null) {
+        return (
+            <div className="alert alert-danger my-4 text-center" role="alert">
+                Error al cargar los modelos TTS. Verifica la conexión o pulsa en recargar.
+            </div>
+        );
+    }
+
     return (
         <>
             <ActivateTTSModal

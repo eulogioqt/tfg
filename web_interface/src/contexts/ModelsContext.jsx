@@ -1,51 +1,40 @@
-import React, {createContext, useContext, useEffect, useState} from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { useToast } from "./ToastContext";
 import { useAPI } from "./APIContext";
 
 const ModelsContext = createContext();
 
-export const ModelsProvider = ({children}) => {
+export const ModelsProvider = ({ children }) => {
     const { ttsModels, sttModels, llmModels, isResponseOk } = useAPI();
     const { showToast } = useToast();
 
     const [activeTab, setActiveTab] = useState("tts");
-    const [ttsModelsList, setTtsModelsList] = useState([]);
-    const [sttModelsList, setSttModelsList] = useState([]);
-    const [llmProvidersList, setLlmProvidersList] = useState([]);
+    const [ttsModelsList, setTtsModelsList] = useState(undefined);
+    const [sttModelsList, setSttModelsList] = useState(undefined);
+    const [llmProvidersList, setLlmProvidersList] = useState(undefined);
+
+    const buildFetchFunc = (kind, apiObj, setFunc) => {
+        return async () => {
+            setFunc(undefined);
+
+            const response = await apiObj.getAll();
+            if (isResponseOk(response)) {
+                setFunc(response.data);
+            } else {
+                setFunc(null);
+                showToast("Error al obtener modelos " + kind.toUpperCase(), response.data.detail, "red");
+            }
+        };
+    };
+
+    const fetchFunctions = {
+        tts: buildFetchFunc("tts", ttsModels, setTtsModelsList),
+        stt: buildFetchFunc("stt", sttModels, setSttModelsList),
+        llm: buildFetchFunc("llm", llmModels, setLlmProvidersList),
+    };
 
     useEffect(() => {
-        const fetchTTS = async () => {
-            const response = await ttsModels.getAll();
-            if (isResponseOk(response)) {
-                setTtsModelsList(response.data);
-            } else {
-                showToast("Error al obtener modelos TTS", response.data.detail, "red");
-            }
-        };
-
-        fetchTTS();
-
-        const fetchSTT = async () => {
-            const response = await sttModels.getAll();
-            if (isResponseOk(response)) {
-                setSttModelsList(response.data);
-            } else {
-                showToast("Error al obtener modelos STT", response.data.detail, "red");
-            }
-        };
-
-        fetchSTT();
-
-        const fetchLLM = async () => {
-            const response = await llmModels.getAll();
-            if (isResponseOk(response)) {
-                setLlmProvidersList(response.data);
-            } else {
-                showToast("Error al obtener modelos LLM", response.data.detail, "red");
-            }
-        };
-
-        fetchLLM();
+        Object.values(fetchFunctions).forEach((func) => func());
     }, []);
 
     return (
@@ -53,18 +42,19 @@ export const ModelsProvider = ({children}) => {
             value={{
                 activeTab,
                 setActiveTab,
-                
+
                 ttsModelsList,
                 setTtsModelsList,
                 sttModelsList,
                 setSttModelsList,
                 llmProvidersList,
-                setLlmProvidersList
+                setLlmProvidersList,
+
+                fetchFunctions,
             }}
         >
             {children}
         </ModelsContext.Provider>
     );
-
-}
+};
 export const useModels = () => useContext(ModelsContext);
