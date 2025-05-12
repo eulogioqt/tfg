@@ -18,7 +18,7 @@ const App = () => {
             <main className="flex-grow-1">
                 {page}
             </main>
-            <Footer />
+            {false && <Footer />}
         </div>
     );
     
