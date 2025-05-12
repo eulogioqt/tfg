@@ -36,6 +36,11 @@ const ChatFullTextArea = ({ chatAreaRef }) => {
             </div>
 
             <div className="d-flex justify-content-end align-items-end pe-0 pb-0">
+                <button className="btn btn-dark rounded-circle me-1" type="button" onClick={() => alert("Ajustes")}>
+                    <i className="bi bi-gear-fill"></i> {/* Que se abra un modal con settings */}
+                    {/* Toggle tts. Toggle auto transcription. Toggle technical data. */}
+                </button>
+
                 <ChatMicrophoneButton
                     onFinish={handleAudio}
                     recordCondition={isConnected}
@@ -43,7 +48,7 @@ const ChatFullTextArea = ({ chatAreaRef }) => {
                 />
 
                 <button className="btn btn-dark rounded-circle me-1" type="button" onClick={() => handleUploadAudio()}>
-                    <i className="bi bi-file-earmark-music"></i>
+                    <i className="bi bi-file-earmark-music-fill"></i>
                 </button>
 
                 <button
@@ -51,7 +56,7 @@ const ChatFullTextArea = ({ chatAreaRef }) => {
                     type="button"
                     onClick={() => chatAreaRef.current?.send()}
                 >
-                    <i className="bi bi-send"></i>
+                    <i className="bi bi-send-fill"></i>
                 </button>
             </div>
         </div>
