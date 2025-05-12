@@ -24,10 +24,17 @@ const ChatMessage = ({ message }) => {
     }, [message.value]);
 
     const getMessageFooter = (isHuman, data, timestamp) => {
+        const timeStr = new Date(timestamp).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+        });
+
         return (
-            <div className={"d-flex justify-content-between " + (isHuman ? "" : "flex-row-reverse")}>
+            <div className={"mt-1 d-flex justify-content-between " + (isHuman ? "" : "flex-row-reverse")}>
                 <div>
-                    <span className="px-0 py-0 badge text-muted">{timestamp}</span>
+                    <span className="px-0 py-0 badge text-muted">{timeStr}</span>
                 </div>
 
                 <div>

@@ -23,7 +23,7 @@ export const ChatProvider = ({ children }) => {
 
     const clearMessages = () => setMessages([]);
     const addHumanMessage = (message) => {
-        setMessages((prevMessages) => [...prevMessages, { ...message, isHuman: true }]);
+        setMessages((prevMessages) => [...prevMessages, { ...message, timestamp: Date.now(), isHuman: true }]);
     };
 
     useEffect(() => {
@@ -33,7 +33,7 @@ export const ChatProvider = ({ children }) => {
                     m.isHuman && m.id === e.id ? { ...m, intent: e.intent } : m
                 );
 
-                return [...updatedMessages, { ...e, isHuman: false }];
+                return [...updatedMessages, { ...e, timestamp: Date.now(), isHuman: false }];
             });
         };
         const processPT = (e) => {
