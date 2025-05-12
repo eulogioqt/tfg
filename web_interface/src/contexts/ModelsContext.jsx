@@ -13,11 +13,27 @@ export const ModelsProvider = ({ children }) => {
     const [sttModelsList, setSttModelsList] = useState(undefined);
     const [llmProvidersList, setLlmProvidersList] = useState(undefined);
 
-    const getActiveTtsModel = () => ttsModelsList && ttsModelsList.find((model) => model.active);
-    const getActiveSttModel = () => sttModelsList && sttModelsList.find((model) => model.active);
-    const getActiveLlmModel = () =>
-        llmProvidersList &&
-        llmProvidersList.flatMap((p) => p.models.filter((m) => m.active).map((m) => ({ ...p, ...m })))[0];
+    const getActiveTtsModel = () => {
+        if (ttsModelsList === undefined) return undefined;
+        const active = ttsModelsList.find((m) => m.active);
+        return active || null;
+    };
+
+    const getActiveSttModel = () => {
+        if (sttModelsList === undefined) return undefined;
+        const active = sttModelsList.find((m) => m.active);
+        return active || null;
+    };
+
+    const getActiveLlmModel = () => {
+        if (llmProvidersList === undefined) return undefined;
+
+        const active = llmProvidersList.flatMap((p) =>
+            p.models.filter((m) => m.active).map((m) => ({ ...p, ...m }))
+        )[0];
+
+        return active || null;
+    };
 
     const buildFetchFunc = (kind, apiObj, setFunc) => {
         return async () => {
@@ -48,6 +64,10 @@ export const ModelsProvider = ({ children }) => {
             value={{
                 activeTab,
                 setActiveTab,
+
+                getActiveTtsModel,
+                getActiveSttModel,
+                getActiveLlmModel,
 
                 ttsModelsList,
                 setTtsModelsList,

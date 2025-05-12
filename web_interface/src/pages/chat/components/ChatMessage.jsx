@@ -16,22 +16,20 @@ const ChatMessage = ({ message }) => {
                     maxWidth: "70%",
                     padding: "4px 10px",
                     wordWrap: "break-word",
-                    lineHeight: "1rem"
+                    lineHeight: "1rem",
                 }}
             >
                 {/* Contenido del mensaje */}
                 <div className="d-flex flex-column align-items-start justify-content-between">
                     <span className={`w-100 ${isHuman ? "text-end" : "text-start"}`}>{message.value}</span>
                 </div>
-            
+
                 {/* Info humanos */}
                 {isHuman && message.intent && (
                     <div className="mt-1">
-                        <span 
-                            className="p-0 badge text-muted text-end w-100 me-1" 
-                            style={{ fontSize: "0.65rem" }}
-                        >
-                            <i className="bi bi-compass me-1"></i>{message.intent}
+                        <span className="p-0 badge text-muted text-end w-100 me-1" style={{ fontSize: "0.65rem" }}>
+                            <i className="bi bi-compass me-1"></i>
+                            {message.intent}
                         </span>
                     </div>
                 )}
@@ -41,14 +39,16 @@ const ChatMessage = ({ message }) => {
                     <div className="mt-1">
                         {message.provider && (
                             <span className="ps-0 py-0 badge text-muted me-1">
-                                <i className="bi bi-robot me-1"></i>{message.provider}
+                                <i className="bi bi-robot me-1"></i>
+                                {message.provider}
                             </span>
                         )}
-                        {message.model && (
+                        {/*message.model && (
                             <span className="px-0 py-0 badge text-muted">
-                                <i className="bi bi-cpu me-1"></i>{message.model.split("/")[1] || message.model}
+                                <i className="bi bi-cpu me-1"></i>
+                                {message.model || message.model}
                             </span>
-                        )}
+                        )*/}
                     </div>
                 )}
             </div>

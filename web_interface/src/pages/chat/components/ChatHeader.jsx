@@ -1,15 +1,22 @@
 import React from "react";
 import { useWindowSize, BREAKPOINTS } from "../../../hooks/useWindowSize";
 import { useWebSocket } from "../../../contexts/WebSocketContext";
+import { useModels } from "../../../contexts/ModelsContext";
+import ChatModelBadge from "./ChatModelBadge";
 
 const ChatHeader = ({ collapsed, setCollapsed, handleNewChat }) => {
+    const { getActiveTtsModel, getActiveSttModel, getActiveLlmModel } = useModels();
     const { width } = useWindowSize();
     const { isConnected } = useWebSocket();
+
+    const activeTtsModel = getActiveTtsModel();
+    const activeSttModel = getActiveSttModel();
+    const activeLlmModel = getActiveLlmModel();
 
     return (
         <div
             className="w-100 px-md-5 px-3 d-flex align-items-center justify-content-between"
-            style={{ minHeight: "75px", height: "75px", borderBottom: "1px solid #EAEAEA" }}
+            style={{ minHeight: "82px", height: "82px", borderBottom: "1px solid #EAEAEA" }}
         >
             <div className="d-flex align-items-center justify-content-between justify-content-md-start w-100">
                 <button
@@ -21,28 +28,40 @@ const ChatHeader = ({ collapsed, setCollapsed, handleNewChat }) => {
                 </button>
 
                 <div className="d-flex justify-content-center align-items-center">
-                    <div
-                        className={`rounded-circle border border-dark ${
-                            isConnected == undefined ? "bg-primary" : isConnected ? "bg-success" : "bg-danger"
-                        }`}
-                        title={isConnected ? "Conectado" : "Desconectado"}
-                        style={{
-                            width: "16px",
-                            height: "16px",
-                            boxShadow: "0 0 5px rgba(0, 0, 0, 0.5)",
-                            transition: "background-color 0.3s ease",
-                        }}
-                    />
+                    <div className="d-flex flex-md-row flex-column justify-content-center align-items-center">
+                        {/* Connected and Sancho text */}
+                        <div className="d-flex align-items-center justify-content-center">
+                            <div
+                                className={`rounded-circle border border-dark ${
+                                    isConnected == undefined ? "bg-primary" : isConnected ? "bg-success" : "bg-danger"
+                                }`}
+                                title={isConnected ? "Conectado" : "Desconectado"}
+                                style={{
+                                    cursor: "help",
+                                    width: "16px",
+                                    height: "16px",
+                                    boxShadow: "0 0 5px rgba(0, 0, 0, 0.5)",
+                                    transition: "background-color 0.3s ease",
+                                }}
+                            />
+                            <span
+                                className="fw-bold fs-2 ms-3 my-0 py-0"
+                                style={{
+                                    whiteSpace: "nowrap",
+                                    display: collapsed || width < BREAKPOINTS.MD ? "block" : "none",
+                                }}
+                            >
+                                Sancho
+                            </span>
+                        </div>
 
-                    <span
-                        className="fw-bold fs-2 ms-3 my-0 py-0"
-                        style={{
-                            whiteSpace: "nowrap",
-                            display: collapsed || width < BREAKPOINTS.MD ? "block" : "none",
-                        }}
-                    >
-                        Sancho
-                    </span>
+                        {/* Badges */}
+                        <div className="ms-md-3">
+                            <ChatModelBadge model={activeTtsModel} type={"tts"} />
+                            <ChatModelBadge model={activeSttModel} type={"stt"} />
+                            <ChatModelBadge model={activeLlmModel} type={"llm"} />
+                        </div>
+                    </div>
                 </div>
 
                 <button
