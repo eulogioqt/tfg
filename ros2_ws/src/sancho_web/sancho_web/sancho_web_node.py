@@ -85,8 +85,11 @@ class SanchoWeb:
             prompt = PromptMessage(data)
 
             response, method, intent, provider, model = self.sancho_prompt_request(prompt.value)
-
             self.send_message(key, ResponseMessage(prompt.id, response, method, intent, provider, model))
+
+            if prompt.want_tts:
+                audio, sample_rate, model, speaker = self.tts_request(response)
+                self.send_message(key, AudioResponseMessage(prompt.id, audio, sample_rate, model, speaker))
         elif type == MessageType.AUDIO_PROMPT:
             audio_prompt = AudioPromptMessage(data)
             
@@ -96,8 +99,9 @@ class SanchoWeb:
             response, method, intent, provider, model = self.sancho_prompt_request(transcription)
             self.send_message(key, ResponseMessage(audio_prompt.id, response, method, intent, provider, model))
 
-            audio, sample_rate, model, speaker = self.tts_request(response)
-            self.send_message(key, AudioResponseMessage(audio_prompt.id, audio, sample_rate, model, speaker))
+            if audio_prompt.want_tts:
+                audio, sample_rate, model, speaker = self.tts_request(response)
+                self.send_message(key, AudioResponseMessage(audio_prompt.id, audio, sample_rate, model, speaker))
                 
     def sancho_prompt_request(self, text):
         req = SanchoPrompt.Request()

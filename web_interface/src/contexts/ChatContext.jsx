@@ -96,12 +96,13 @@ export const ChatProvider = ({ children }) => {
         const int16Data = Int16Array.from(floatData, (s) => Math.max(-1, Math.min(1, s)) * 0x7fff);
 
         const id = uuidv4();
+        const wantTts = settings.enableTTS;
         const audio = Array.from(int16Data);
         const sampleRate = audioBuffer.sampleRate;
 
         const message = {
             type: "AUDIO_PROMPT",
-            data: { id, audio, sampleRate },
+            data: { id, wantTts, audio, sampleRate },
         };
 
         if (sendMessage(JSON.stringify(message))) {
@@ -109,20 +110,18 @@ export const ChatProvider = ({ children }) => {
         }
     };
 
-    const handleSend = (inputMessage) => {
-        if (inputMessage.length > 0) {
+    const handleSend = (value) => {
+        if (value.length > 0) {
             const id = uuidv4();
+            const wantTts = settings.enableTTS;
 
             const messageWithId = {
                 type: "PROMPT",
-                data: {
-                    id: id,
-                    value: inputMessage,
-                },
+                data: { id, wantTts, value },
             };
 
             if (sendMessage(JSON.stringify(messageWithId))) {
-                addHumanMessage({ id: id, value: inputMessage }, true);
+                addHumanMessage({ id, value }, true);
             }
         }
     };
