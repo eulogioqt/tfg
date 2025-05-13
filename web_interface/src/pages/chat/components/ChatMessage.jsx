@@ -41,9 +41,12 @@ const ChatMessage = ({ message }) => {
 
                 <div>
                     {data.map(
-                        (item) =>
+                        (item, index) =>
                             item.value && (
-                                <span className={"px-0 py-0 badge text-muted " + (isHuman ? "ms-2" : "me-2")}>
+                                <span
+                                    key={index}
+                                    className={"px-0 py-0 badge text-muted " + (isHuman ? "ms-2" : "me-2")}
+                                >
                                     <i className={`bi bi-${item.icon} me-1`}></i>
                                     {item.value}
                                 </span>

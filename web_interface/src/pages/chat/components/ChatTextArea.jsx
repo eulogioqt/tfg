@@ -1,33 +1,34 @@
-import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from "react";
+import React, { useRef, useEffect, forwardRef, useImperativeHandle } from "react";
+import { useChat } from "../../../contexts/ChatContext";
 
 const ChatTextArea = forwardRef(({ onSend }, ref) => {
     // podria hacer un objeto normal que le paso el id y hace las cosas segun el id como los toast y eso de bootstrap
-    const [value, setValue] = useState("");
+    const { textAreaValue, setTextAreaValue } = useChat();
     const textAreaRef = useRef(null);
 
     useImperativeHandle(ref, () => ({
         send: () => handleSend(),
         clear: () => clearInput(),
         focus: () => focusTextArea(),
-        getValue: () => value,
+        getValue: () => textAreaValue,
     }));
 
     const handleSend = () => {
-        onSend(value);
+        onSend(textAreaValue);
         clearInput();
     };
 
     const clearInput = () => {
-        setValue("");
+        setTextAreaValue("");
         textAreaRef.current.style.height = "40px";
     };
 
     const focusTextArea = () => {
         textAreaRef.current?.focus();
-        textAreaRef.current?.setSelectionRange(value.length, value.length);
+        textAreaRef.current?.setSelectionRange(textAreaValue.length, textAreaValue.length);
     };
 
-    const handleChange = (event) => setValue(event.target.value);
+    const handleChange = (event) => setTextAreaValue(event.target.value);
     const handleKeyDown = (event) => {
         if (event.key === "Enter") {
             event.preventDefault();
@@ -40,13 +41,13 @@ const ChatTextArea = forwardRef(({ onSend }, ref) => {
             textAreaRef.current.style.height = "40px";
             textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
         }
-    }, [value]);
+    }, [textAreaValue]);
 
     return (
         <>
             <textarea
                 ref={textAreaRef}
-                value={value}
+                value={textAreaValue}
                 className="chat-textarea"
                 placeholder="Escribe un mensaje..."
                 onChange={handleChange}

@@ -1,4 +1,4 @@
-import { useContext, createContext, useState, useEffect } from "react";
+import { useContext, createContext, useState, useEffect, useRef } from "react";
 import { useWebSocket } from "./WebSocketContext";
 import { useEventBus } from "./EventBusContext";
 import { useAudio } from "./AudioContext";
@@ -32,6 +32,8 @@ export const ChatProvider = ({ children }) => {
     const toggleSetting = (key) => setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
 
     const [collapsed, setCollapsed] = useState(width < BREAKPOINTS.MD);
+    const [textAreaValue, setTextAreaValue] = useState("");
+    const transcriptionReqId = useRef(undefined);
 
     const [isOpenNCModal, setIsOpenNCModal] = useState(false);
     const [isOpenSettings, setIsOpenSettings] = useState(false);
@@ -58,9 +60,16 @@ export const ChatProvider = ({ children }) => {
             });
         };
         const processPT = (e) => {
-            setMessages((prevMessages) =>
-                prevMessages.map((m) => (m.isHuman && m.id === e.id ? { ...m, sttModel: e.model, value: e.value } : m))
-            );
+            if (transcriptionReqId.current && transcriptionReqId.current == e.id) {
+                setTextAreaValue((text) => text + e.value);
+                transcriptionReqId.current = undefined;
+            } else {
+                setMessages((prevMessages) =>
+                    prevMessages.map((m) =>
+                        m.isHuman && m.id === e.id ? { ...m, sttModel: e.model, value: e.value } : m
+                    )
+                );
+            }
         };
         const processAR = (e) => {
             setMessages((prevMessages) =>
@@ -96,17 +105,27 @@ export const ChatProvider = ({ children }) => {
         const int16Data = Int16Array.from(floatData, (s) => Math.max(-1, Math.min(1, s)) * 0x7fff);
 
         const id = uuidv4();
-        const wantTts = settings.enableTTS;
         const audio = Array.from(int16Data);
         const sampleRate = audioBuffer.sampleRate;
 
-        const message = {
-            type: "AUDIO_PROMPT",
-            data: { id, wantTts, audio, sampleRate },
-        };
+        if (settings.autoSendTranscription) {
+            const message = {
+                type: "AUDIO_PROMPT",
+                data: { id, wantTts: settings.enableTTS, audio, sampleRate },
+            };
 
-        if (sendMessage(JSON.stringify(message))) {
-            addHumanMessage({ id, audio, sampleRate });
+            if (sendMessage(JSON.stringify(message))) {
+                addHumanMessage({ id, audio, sampleRate });
+            }
+        } else {
+            const message = {
+                type: "TRANSCRIPTION_REQUEST",
+                data: { id, audio, sampleRate },
+            };
+
+            if (sendMessage(JSON.stringify(message))) {
+                transcriptionReqId.current = id;
+            }
         }
     };
 
@@ -134,6 +153,8 @@ export const ChatProvider = ({ children }) => {
 
                 collapsed,
                 setCollapsed,
+                textAreaValue,
+                setTextAreaValue,
 
                 settings,
 
