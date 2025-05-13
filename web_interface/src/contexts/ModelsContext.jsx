@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useToast } from "./ToastContext";
 import { useAPI } from "./APIContext";
 import { useWebSocket } from "./WebSocketContext";
