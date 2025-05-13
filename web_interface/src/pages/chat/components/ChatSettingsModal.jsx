@@ -22,7 +22,7 @@ const ChatSettingsModal = ({ isOpen, handleClose, settings, toggleSetting }) => 
                     <label className="form-check-label fw-semibold" htmlFor="showTechInfo">
                         Mostrar detalles técnicos
                     </label>
-                    <div className="form-text">Muestra tokens, embeddings y otros datos técnicos.</div>
+                    <div className="form-text">Muestra modelos usados entre otros datos internos.</div>
                 </div>
 
                 <div className="form-check form-switch">

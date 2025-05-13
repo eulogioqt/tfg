@@ -6,7 +6,7 @@ import { useChat } from "../../../contexts/ChatContext";
 import ModelBadge from "./ModelBadge";
 
 const ChatHeader = ({ handleNewChat }) => {
-    const { collapsed, setCollapsed } = useChat();
+    const { collapsed, setCollapsed, settings } = useChat();
     const { getActiveTtsModel, getActiveSttModel, getActiveLlmModel } = useModels();
     const { width } = useWindowSize();
     const { isConnected } = useWebSocket();
@@ -37,7 +37,9 @@ const ChatHeader = ({ handleNewChat }) => {
                                 className={`rounded-circle border border-dark ${
                                     isConnected == undefined ? "bg-primary" : isConnected ? "bg-success" : "bg-danger"
                                 }`}
-                                title={isConnected ? "Conectado" : "Desconectado"}
+                                title={
+                                    isConnected == undefined ? "Conectando" : isConnected ? "Conectado" : "Desconectado"
+                                }
                                 style={{
                                     cursor: "help",
                                     width: "16px",
@@ -58,11 +60,13 @@ const ChatHeader = ({ handleNewChat }) => {
                         </div>
 
                         {/* Badges */}
-                        <div className="ms-md-3">
-                            <ModelBadge model={activeTtsModel} type={"tts"} />
-                            <ModelBadge model={activeSttModel} type={"stt"} />
-                            <ModelBadge model={activeLlmModel} type={"llm"} />
-                        </div>
+                        {settings.showTechInfo && (
+                            <div className="ms-md-3">
+                                <ModelBadge model={activeTtsModel} type={"tts"} />
+                                <ModelBadge model={activeSttModel} type={"stt"} />
+                                <ModelBadge model={activeLlmModel} type={"llm"} />
+                            </div>
+                        )}
                     </div>
                 </div>
 

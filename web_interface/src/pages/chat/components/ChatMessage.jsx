@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useAudio } from "../../../contexts/AudioContext";
+import { useChat } from "../../../contexts/ChatContext";
 
 const ChatMessage = ({ message }) => {
+    const { settings } = useChat();
     const { playAudio, stopCurrentAudio, activeAudioId } = useAudio();
 
     const [timer, setTimer] = useState(0);
@@ -92,6 +94,7 @@ const ChatMessage = ({ message }) => {
 
                 {/* Info humanos */}
                 {isHuman &&
+                    settings.showTechInfo &&
                     getMessageFooter(
                         true,
                         [
@@ -103,6 +106,7 @@ const ChatMessage = ({ message }) => {
 
                 {/* Info bot */}
                 {!isHuman &&
+                    settings.showTechInfo &&
                     getMessageFooter(
                         false,
                         [
