@@ -130,16 +130,19 @@ export const ChatProvider = ({ children }) => {
     return (
         <ChatContext.Provider
             value={{
+                messages,
+                clearMessages,
+
                 collapsed,
                 setCollapsed,
 
-                messages,
-                clearMessages,
-                handleAudio,
-                handleSend,
+                settings,
 
                 openNCModal,
                 openSettingsModal,
+
+                handleAudio,
+                handleSend,
             }}
         >
             <NotConnectedModal isOpen={isOpenNCModal} handleClose={() => setIsOpenNCModal(false)} />
