@@ -31,7 +31,7 @@ export const WebSocketProvider = ({ children }) => {
         const connectWebSocket = () => {
             const serverIP = window.location.hostname;
             const ws = new R2WSocket("ws://" + serverIP + ":8765"); // Intentar meter en el R2WSocket el retry tmb por defecto
-            console.log("Intentando conectar con el servidor WebSocket");
+            console.log("Intentando conectar con el servidor WebSocket:", "ws://" + serverIP + ":8765");
             showToast("Intentando conectar", "Intentando establecer conexión con ROS", "blue");
 
             ws.onopen = () => {
