@@ -1,6 +1,7 @@
 import pvporcupine
 import pyaudio
 import struct
+import time
 
 # Cambia esto por la ruta a tu archivo .ppn personalizado con la palabra "Sancho"
 CUSTOM_WAKE_WORD_PATH = "sancho_linux.ppn"  # Asegúrate de que esta ruta es correcta
@@ -26,7 +27,9 @@ def main():
             pcm = audio_stream.read(porcupine.frame_length, exception_on_overflow=False)
             pcm = struct.unpack_from("h" * porcupine.frame_length, pcm)
 
+            t = time.time()
             result = porcupine.process(pcm)
+            print(f"Time to process {porcupine.frame_length} chunk: {(time.time() - t):.2f}")
             if result >= 0:
                 print("✅ PALABRA DETECTADA: Sancho")
 

@@ -25,6 +25,10 @@ class HELPER_STATE(int, Enum):
     NAME = 1
 
 
+# Hacer una copia de esto e integrar el picovoice porcupine
+# Que cuando este buscando nombre, todo vaya a picovoice hasta que detecte la palabra, que haria un callback
+# pondria el modo command, recortaria el nodo el audio y ya lo mandaria al stt y volveria a search for name
+
 # Cambiar el check each seconds si estamos en name o si estamos en command? En name 0.5 y en command 1?
 class AssistantHelperNode(Node):
 

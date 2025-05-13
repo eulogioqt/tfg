@@ -11,6 +11,7 @@ from .stt.stt_model import STTModel
 from .models import STT_MODELS, STT_NEEDS_API_KEY
 
 
+# Poner en el handle stt una capa VAD con silero vad para que si no hay voz del tiron devuelva un ""
 class STTNode(Node):
     
     MODELS_CLASS_MAP = { # Poner esto mas cool, solo con el nombre camelcase se puede hacer, lo demas no es necesario
@@ -72,7 +73,7 @@ class STTNode(Node):
                 response.models.append(ModelItem(model=model_name, needs_api_key=(model_name in STT_NEEDS_API_KEY)))
 
         return response
-
+    
     def handle_stt(self, request, response):
         try:
             model_name = self._get_or_active(request.model)
