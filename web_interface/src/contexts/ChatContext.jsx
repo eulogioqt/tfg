@@ -6,8 +6,15 @@ import { BREAKPOINTS, useWindowSize } from "../hooks/useWindowSize";
 
 import { v4 as uuidv4 } from "uuid";
 import NotConnectedModal from "../pages/chat/components/NotConnectedModal";
+import ChatSettingsModal from "../pages/chat/components/ChatSettingsModal";
 
 const ChatContext = createContext();
+
+const defaultSettings = {
+    showTechInfo: false,
+    enableTTS: true,
+    autoSendTranscription: false,
+};
 
 export const ChatProvider = ({ children }) => {
     const { playAudio } = useAudio();
@@ -16,13 +23,29 @@ export const ChatProvider = ({ children }) => {
     const { width } = useWindowSize();
 
     const [messages, setMessages] = useState([]);
-    const [collapsed, setCollapsed] = useState(width < BREAKPOINTS.MD);
-    const [isOpenNCModal, setIsOpenNCModal] = useState(false);
-
     const clearMessages = () => setMessages([]);
     const addHumanMessage = (message) => {
         setMessages((prevMessages) => [...prevMessages, { ...message, timestamp: Date.now(), isHuman: true }]);
     };
+
+    const [settings, setSettings] = useState(defaultSettings); // Si futuro + sett, hacer SettingsContext
+    const toggleSetting = (key) => setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
+
+    const [collapsed, setCollapsed] = useState(width < BREAKPOINTS.MD);
+    
+    const [isOpenNCModal, setIsOpenNCModal] = useState(false);
+    const [isOpenSettings, setIsOpenSettings] = useState(false);
+    const openNCModal = () => setIsOpenNCModal(true);
+    const openSettingsModal = () => setIsOpenSettings(true);
+
+    useEffect(() => {
+        const saved = localStorage.getItem("chatSettings");
+        if (saved) setSettings(JSON.parse(saved));
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem("chatSettings", JSON.stringify(settings));
+    }, [settings]);
 
     useEffect(() => {
         const processR = (e) => {
@@ -115,11 +138,18 @@ export const ChatProvider = ({ children }) => {
                 handleAudio,
                 handleSend,
 
-                setIsOpenNCModal,
+                openNCModal,
+                openSettingsModal,
             }}
         >
             <NotConnectedModal isOpen={isOpenNCModal} handleClose={() => setIsOpenNCModal(false)} />
-
+            <ChatSettingsModal 
+                isOpen={isOpenSettings} 
+                handleClose={() => setIsOpenSettings(false)} 
+                settings={settings} 
+                toggleSetting={toggleSetting}
+            />
+            
             {children}
         </ChatContext.Provider>
     );

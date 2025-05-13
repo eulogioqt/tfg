@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useMicrophone } from "../../../hooks/useMicrophone";
 
-const ChatMicrophoneButton = ({ onFinish, recordCondition, noConditionAction }) => {
+const MicrophoneButton = ({ onFinish, recordCondition, noConditionAction }) => {
     const { recording, audioBlob, startRecording, stopRecording } = useMicrophone();
 
     const toggleRecording = () => {
@@ -25,4 +25,4 @@ const ChatMicrophoneButton = ({ onFinish, recordCondition, noConditionAction }) 
     );
 };
 
-export default ChatMicrophoneButton;
+export default MicrophoneButton;

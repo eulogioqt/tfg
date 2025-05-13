@@ -1,6 +1,6 @@
 import React from "react";
 
-const ChatModelBadge = ({ model, type }) => {
+const ModelBadge = ({ model, type }) => {
     const icons = {
         tts: "bi-volume-up-fill",
         stt: "bi-mic-fill",
@@ -39,4 +39,4 @@ const ChatModelBadge = ({ model, type }) => {
     );
 };
 
-export default ChatModelBadge;
+export default ModelBadge;

@@ -3,7 +3,7 @@ import { useWindowSize, BREAKPOINTS } from "../../../hooks/useWindowSize";
 import { useWebSocket } from "../../../contexts/WebSocketContext";
 import { useModels } from "../../../contexts/ModelsContext";
 import { useChat } from "../../../contexts/ChatContext";
-import ChatModelBadge from "./ChatModelBadge";
+import ModelBadge from "./ModelBadge";
 
 const ChatHeader = ({ handleNewChat }) => {
     const { collapsed, setCollapsed } = useChat();
@@ -59,9 +59,9 @@ const ChatHeader = ({ handleNewChat }) => {
 
                         {/* Badges */}
                         <div className="ms-md-3">
-                            <ChatModelBadge model={activeTtsModel} type={"tts"} />
-                            <ChatModelBadge model={activeSttModel} type={"stt"} />
-                            <ChatModelBadge model={activeLlmModel} type={"llm"} />
+                            <ModelBadge model={activeTtsModel} type={"tts"} />
+                            <ModelBadge model={activeSttModel} type={"stt"} />
+                            <ModelBadge model={activeLlmModel} type={"llm"} />
                         </div>
                     </div>
                 </div>

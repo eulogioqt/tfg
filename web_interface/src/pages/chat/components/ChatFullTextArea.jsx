@@ -4,14 +4,14 @@ import { useWebSocket } from "../../../contexts/WebSocketContext";
 import { useChat } from "../../../contexts/ChatContext";
 
 import ChatTextArea from "./ChatTextArea";
-import ChatMicrophoneButton from "./ChatMicrophoneButton";
+import MicrophoneButton from "./MicrophoneButton";
 
 const ChatFullTextArea = ({ chatAreaRef }) => {
     const { isConnected } = useWebSocket();
-    const { handleAudio, handleSend, setIsOpenNCModal } = useChat();
+    const { handleAudio, handleSend, openNCModal, openSettingsModal } = useChat();
 
     const handleUploadAudio = () => {
-        if (!isConnected) return setIsOpenNCModal(true);
+        if (!isConnected) return openNCModal();
 
         const input = Object.assign(document.createElement("input"), {
             type: "file",
@@ -36,15 +36,15 @@ const ChatFullTextArea = ({ chatAreaRef }) => {
             </div>
 
             <div className="d-flex justify-content-end align-items-end pe-0 pb-0">
-                <button className="btn btn-dark rounded-circle me-1" type="button" onClick={() => alert("Ajustes")}>
+                <button className="btn btn-dark rounded-circle me-1" type="button" onClick={() => openSettingsModal()}>
                     <i className="bi bi-gear-fill"></i> {/* Que se abra un modal con settings */}
                     {/* Toggle tts. Toggle auto transcription. Toggle technical data. */}
                 </button>
 
-                <ChatMicrophoneButton
+                <MicrophoneButton
                     onFinish={handleAudio}
                     recordCondition={isConnected}
-                    noConditionAction={() => setIsOpenNCModal(true)}
+                    noConditionAction={() => openNCModal()}
                 />
 
                 <button className="btn btn-dark rounded-circle me-1" type="button" onClick={() => handleUploadAudio()}>
