@@ -57,6 +57,14 @@ Prompt del cliente:
         sampleRate: int
     }
 }
+{ // prompt de audio
+    type: "TRANSCRIPTION_REQUEST",
+    data: {
+        id: uuid,
+        audio: [int16],
+        sampleRate: int
+    }
+}
 
 Se puede mejorar con streaming
 

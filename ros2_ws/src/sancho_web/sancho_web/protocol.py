@@ -18,6 +18,12 @@ class AudioPromptMessage():
         self.audio = msg["audio"]
         self.sample_rate = msg["sampleRate"]
 
+class TranscriptionRequestMessage():
+    def __init__(self, msg):
+        self.id = msg["id"]
+        self.audio = msg["audio"]
+        self.sample_rate = msg["sampleRate"]
+
 ##### SERVER MESSAGES #####
 class JSONMessage(ABC):
     @abstractmethod
@@ -110,6 +116,7 @@ class AudioResponseMessage(JSONMessage):
 class MessageType(str, Enum):
     PROMPT = "PROMPT" # Client -> Server
     AUDIO_PROMPT = "AUDIO_PROMPT" # Client -> Server
+    TRANSCRIPTION_REQUEST = "TRANSCRIPTION_REQUEST" # Client -> Server
 
     RESPONSE = "RESPONSE" # Server -> Client
     FACEPRINT_EVENT = "FACEPRINT_EVENT" # Server -> Client
@@ -119,6 +126,7 @@ class MessageType(str, Enum):
 MESSAGE_OBJECT = {
     MessageType.PROMPT: PromptMessage,
     MessageType.AUDIO_PROMPT: AudioPromptMessage,
+    MessageType.TRANSCRIPTION_REQUEST: TranscriptionRequestMessage,
 
     MessageType.RESPONSE: ResponseMessage,
     MessageType.FACEPRINT_EVENT: FaceprintEventMessage,

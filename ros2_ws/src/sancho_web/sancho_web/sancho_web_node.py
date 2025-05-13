@@ -5,7 +5,7 @@ from queue import Queue
 
 from .protocol import (
     MessageType, JSONMessage, 
-    PromptMessage, AudioPromptMessage,
+    PromptMessage, AudioPromptMessage, TranscriptionRequestMessage,
     ResponseMessage, FaceprintEventMessage, PromptTranscriptionMessage, AudioResponseMessage,
     parse_message
 )
@@ -102,7 +102,12 @@ class SanchoWeb:
             if audio_prompt.want_tts:
                 audio, sample_rate, model, speaker = self.tts_request(response)
                 self.send_message(key, AudioResponseMessage(audio_prompt.id, audio, sample_rate, model, speaker))
-                
+        elif type == MessageType.TRANSCRIPTION_REQUEST:
+            transcription_request = TranscriptionRequestMessage(data)
+            
+            transcription, model = self.stt_request(transcription_request.audio, transcription_request.sample_rate)
+            self.send_message(key, PromptTranscriptionMessage(transcription_request.id, transcription, model))   
+
     def sancho_prompt_request(self, text):
         req = SanchoPrompt.Request()
         req.text = text
