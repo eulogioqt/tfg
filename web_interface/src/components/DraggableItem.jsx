@@ -73,7 +73,7 @@ const DraggableItem = ({ children, childrenWidth, childrenHeight }) => {
                 <div
                     onMouseDown={handleMouseDown}
                     style={{
-                        zIndex: 40 * (width < BREAKPOINTS.MD ? 1 : 10),
+                        zIndex: 90 /*40 * (width < BREAKPOINTS.MD ? 1 : 10),*/,
                         objectFit: "contain",
                         position: "fixed",
                         top: position.y,

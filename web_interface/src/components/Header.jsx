@@ -16,7 +16,7 @@ const Header = () => {
     //    items = [...items, { link: "admin", name: "Admin" }];
 
     return (
-        <header>
+        <header style={{ zIndex: 10 }}>
             <nav className="ps-4 d-flex justify-content-start align-items-center position-absolute w-100 navbar navbar-expand-lg bg-body-tertiary border-bottom top-0">
                 <div className="container-fluid">
                     <a
