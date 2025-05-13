@@ -18,7 +18,7 @@ const HomePage = () => {
                         natural y gestión remota.
                     </p>
                     <button className="btn btn-primary btn-lg me-2" onClick={() => navigate("/chat")}>
-                        <i className="bi bi-robot me-2"></i>Habla con Sancho
+                        <i className="bi bi-cpu-fill me-2"></i>Habla con Sancho
                     </button>
                     <button className="btn btn-outline-secondary btn-lg" onClick={() => navigate("/models")}>
                         <i className="bi bi-gear me-2"></i>Gestionar Modelos

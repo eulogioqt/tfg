@@ -33,7 +33,7 @@ const ModelsPage = () => {
                             className={`list-group-item list-group-item-action ${activeTab === "tts" ? "active" : ""}`}
                             onClick={() => setActiveTab("tts")}
                         >
-                            <i className="bi bi-volume-up-fill me-2" />
+                            <i className="bi bi-volume-up-fill-fill me-2" />
                             TTS
                         </button>
                         <button

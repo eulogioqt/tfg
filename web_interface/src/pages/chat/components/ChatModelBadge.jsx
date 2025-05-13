@@ -2,9 +2,9 @@ import React from "react";
 
 const ChatModelBadge = ({ model, type }) => {
     const icons = {
-        tts: "bi-volume-up",
-        stt: "bi-mic",
-        llm: "bi-robot",
+        tts: "bi-volume-up-fill",
+        stt: "bi-mic-fill",
+        llm: "bi-cpu-fill",
     };
 
     if (model === undefined) {

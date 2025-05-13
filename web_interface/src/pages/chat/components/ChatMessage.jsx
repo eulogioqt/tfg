@@ -107,7 +107,7 @@ const ChatMessage = ({ message }) => {
                         false,
                         [
                             { value: message.provider, icon: "robot" },
-                            { value: message.ttsModel, icon: "volume-up" },
+                            { value: message.ttsModel, icon: "volume-up-fill" },
                         ],
                         message.timestamp
                     )}
