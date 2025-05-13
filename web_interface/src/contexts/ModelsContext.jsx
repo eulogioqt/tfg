@@ -46,7 +46,11 @@ export const ModelsProvider = ({ children }) => {
                 setFunc(response.data);
             } else {
                 setFunc(null);
-                showToast("Error al obtener modelos " + kind.toUpperCase(), response ? response.data.detail : "Error con la API", "red");
+                showToast(
+                    "Error al obtener modelos " + kind.toUpperCase(),
+                    response ? response.data.detail : "Error con la API",
+                    "red"
+                );
             }
         };
     };
@@ -57,16 +61,15 @@ export const ModelsProvider = ({ children }) => {
         llm: buildFetchFunc("llm", llmModels, setLlmProvidersList),
     };
 
-    /*const firstRun = useRef(true);
+    const firstRun = useRef(true);
+    const wasConnected = useRef(false);
     useEffect(() => {
-        if (firstRun.current || !isConnected) {
-            firstRun.current = false;
-            Object.values(fetchFunctions).forEach((func) => func());
-        }
-    }, [isConnected]);*/
-    useEffect(() => {
-        Object.values(fetchFunctions).forEach((func) => func());
-    }, []);
+        if (firstRun.current || (wasConnected.current && isConnected == false))
+            Object.values(fetchFunctions).forEach((f) => f());
+
+        firstRun.current = false;
+        wasConnected.current = isConnected;
+    }, [isConnected]);
 
     return (
         <ModelsContext.Provider

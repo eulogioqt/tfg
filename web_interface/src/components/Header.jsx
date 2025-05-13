@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import bannerSrc from "/banner.png";
+import bannerSrc from "/logo.png";
 
 const Header = () => {
     const navigate = useNavigate();
