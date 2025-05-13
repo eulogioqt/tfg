@@ -26,7 +26,7 @@ Respuestas a prompts con ID:
         model: str,
         speaker: str,
         audio: [int16],
-        sample_rate: int
+        sampleRate: int
     }
 }
 Mensajes sobre la API de faceprints:
@@ -44,6 +44,7 @@ Prompt del cliente:
     type: "PROMPT",
     data: {
         id: uuid,
+        wantTts: bool,
         value: ...
     },
 };
@@ -51,8 +52,9 @@ Prompt del cliente:
     type: "AUDIO_PROMPT",
     data: {
         id: uuid,
+        wantTts: bool,
         audio: [int16],
-        sample_rate: int
+        sampleRate: int
     }
 }
 

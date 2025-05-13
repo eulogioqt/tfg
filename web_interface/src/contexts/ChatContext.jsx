@@ -32,7 +32,7 @@ export const ChatProvider = ({ children }) => {
     const toggleSetting = (key) => setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
 
     const [collapsed, setCollapsed] = useState(width < BREAKPOINTS.MD);
-    
+
     const [isOpenNCModal, setIsOpenNCModal] = useState(false);
     const [isOpenSettings, setIsOpenSettings] = useState(false);
     const openNCModal = () => setIsOpenNCModal(true);
@@ -66,12 +66,12 @@ export const ChatProvider = ({ children }) => {
             setMessages((prevMessages) =>
                 prevMessages.map((m) =>
                     !m.isHuman && m.id === e.id
-                        ? { ...m, ttsModel: e.model, speaker: e.speaker, audio: e.audio, sampleRate: e.sample_rate }
+                        ? { ...m, ttsModel: e.model, speaker: e.speaker, audio: e.audio, sampleRate: e.sampleRate }
                         : m
                 )
             );
 
-            playAudio(e.audio, e.sample_rate, e.id + false);
+            playAudio(e.audio, e.sampleRate, e.id + false);
         };
 
         const unsubscribeR = subscribe("ROS_MESSAGE_RESPONSE", processR);
@@ -101,7 +101,7 @@ export const ChatProvider = ({ children }) => {
 
         const message = {
             type: "AUDIO_PROMPT",
-            data: { id, audio, sample_rate: sampleRate },
+            data: { id, audio, sampleRate },
         };
 
         if (sendMessage(JSON.stringify(message))) {
@@ -146,13 +146,13 @@ export const ChatProvider = ({ children }) => {
             }}
         >
             <NotConnectedModal isOpen={isOpenNCModal} handleClose={() => setIsOpenNCModal(false)} />
-            <ChatSettingsModal 
-                isOpen={isOpenSettings} 
-                handleClose={() => setIsOpenSettings(false)} 
-                settings={settings} 
+            <ChatSettingsModal
+                isOpen={isOpenSettings}
+                handleClose={() => setIsOpenSettings(false)}
+                settings={settings}
                 toggleSetting={toggleSetting}
             />
-            
+
             {children}
         </ChatContext.Provider>
     );

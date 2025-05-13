@@ -14,7 +14,7 @@ class AudioPromptMessage():
     def __init__(self, msg):
         self.id = msg["id"]
         self.audio = msg["audio"]
-        self.sample_rate = msg["sample_rate"]
+        self.sample_rate = msg["sampleRate"]
 
 ##### SERVER MESSAGES #####
 class JSONMessage(ABC):
@@ -100,7 +100,7 @@ class AudioResponseMessage(JSONMessage):
                 "model": self.model,
                 "speaker": self.speaker,
                 "audio": self.audio,
-                "sample_rate": self.sample_rate
+                "sampleRate": self.sample_rate
             }
         }
 
