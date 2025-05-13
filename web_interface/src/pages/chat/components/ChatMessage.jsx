@@ -55,7 +55,7 @@ const ChatMessage = ({ message }) => {
     };
 
     return (
-        <div className={`d-flex ${isHuman ? "flex-row-reverse" : ""}`}>
+        <div className={`d-flex ${isHuman ? "justify-content-end" : "justify-content-end flex-row-reverse"}`}>
             {/* Boton reproducir audio ¿Pongo como whatsapp que sale las barritas de intensidad? */}
             {message.audio && message.sampleRate && (
                 <div className="d-flex flex-column align-items-center justify-content-center mb-3">
@@ -66,7 +66,7 @@ const ChatMessage = ({ message }) => {
                         }}
                         title={message.id + isHuman == activeAudioId ? "Parar..." : "Reproducir..."}
                         className={`d-flex justify-content-center align-items-center text-white rounded-circle border ${
-                            isHuman ? "ms-2" : "me-2"
+                            isHuman ? "me-2" : "ms-2"
                         } ${message.id + isHuman == activeAudioId ? "bg-danger bi-stop-fill" : "bg-dark bi-play-fill"}`}
                         style={{ fontSize: "1.5em", width: "48px", height: "48px", cursor: "pointer" }}
                     ></i>
