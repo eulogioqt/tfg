@@ -13,6 +13,8 @@ from speech_msgs.srv import STT
 
 from .utils.sound import play
 from .utils.sounds import ACTIVATION_SOUND
+from .utils.stt_hotword import STTHotword
+from .utils.pvporcupine_hotword import PVPorcupineHotword
 
 
 class AUDIO_STATE(int, Enum):
@@ -67,95 +69,85 @@ class AssistantHelper:
         self.sample_rate = -1 # Will set on mic callbacks
         self.helper_chunk_size = 0.5
         self.intensity_threshold = 750
-        self.name_max_seconds = 2
 
         self.audio = []
         self.check_audio = []
         self.previous_chunk = []
 
+        self.hotword_detector = STTHotword(self.stt_request, name=name)
         self.node = AssistantHelperNode()
 
     def spin(self):
         while rclpy.ok():
             if not self.node.chunk_queue.empty(): # Combine audio chunks
-                [new_audio, sample_rate] = self.node.chunk_queue.get()
+                [new_audio, self.sample_rate] = self.node.chunk_queue.get()
 
-                self.check_audio = self.check_audio + new_audio
-                self.sample_rate = sample_rate # Set sample rate
-                
-                if self.is_audio_length(self.check_audio, self.helper_chunk_size):
-                    avg_intensity = self.audio_average_intensity(self.check_audio)
-                    self.node.get_logger().info(f"Chunk of {self.helper_chunk_size}s: {avg_intensity:.2f} avg intensity")
+                if self.helper_state == HELPER_STATE.NAME: # Si NAME mode
+                    avg_intensity = self.audio_average_intensity(new_audio)
+                    if self.hotword_detector.detect(new_audio, self.sample_rate):
+                        self.helper_state = HELPER_STATE.COMMAND
 
-                    if avg_intensity >= self.intensity_threshold: # Si hay intensidad, lo añadimos
-                        if self.audio_state == AUDIO_STATE.NO_AUDIO: # Por si es en END, no pase a SOME
-                            self.audio_state = AUDIO_STATE.SOME_AUDIO
-
-                        if len(self.audio) == 0: # Si intensidad por primera vez, metemos chunk previo
-                            self.audio = self.previous_chunk 
-
-                        self.audio = self.audio + self.check_audio # Luego el trozo nuevo
-                        self.node.get_logger().info(f"Chunk attached ({len(self.audio) / self.sample_rate}s)")
-                    elif self.audio_state != AUDIO_STATE.NO_AUDIO: # Si no hay intensidad y hay audio, terminamos trozo
-                        self.audio_state = AUDIO_STATE.END_AUDIO
-
-                        self.audio = self.audio + self.check_audio # Para que no se corte el audio, metemos tmb este ultimo
-                        self.node.get_logger().info("No more audio detected...")
-                    else: # Si no hay intensidad ni audio, pues aun no hay audio
-                        self.node.get_logger().info("No audio detected yet")
-
-                    self.previous_chunk = self.check_audio
-                    self.check_audio = []
-
-                if self.audio_state == AUDIO_STATE.END_AUDIO:
-                    if self.node.transcribe_queue.qsize() < 1:
-                        self.node.get_logger().info(f"Adding {len(self.audio) / self.sample_rate}s chunk to transcribe queue")
-                        self.node.transcribe_queue.put(self.audio)
-                    else:
-                        self.node.get_logger().info("Transcribe Queue IS FULL!!!")
+                        play(ACTIVATION_SOUND)
+                        self.node.get_logger().info(f"✅✅✅ '{self.name.upper()}' DETECTED")
+                elif self.helper_state == HELPER_STATE.COMMAND: # Si COMMAND mode
+                    self.check_audio = self.check_audio + new_audio
                     
-                    self.audio = []
-                    self.check_audio = []
-                    self.audio_state = AUDIO_STATE.NO_AUDIO
+                    if self.is_audio_length(self.check_audio, self.helper_chunk_size):
+                        avg_intensity = self.audio_average_intensity(self.check_audio)
+                        self.node.get_logger().info(f"Chunk of {self.helper_chunk_size}s: {avg_intensity:.2f} avg intensity")
 
-                # Si ya nos hemos llegado al limite, modo end audio, que añada el siguiente chunk y termine
-                if self.helper_state == HELPER_STATE.NAME and self.is_audio_length(self.audio, self.name_max_seconds):
-                    self.node.get_logger().info(f"Name mode audio {len(self.audio) / self.sample_rate}s >= {self.name_max_seconds}s -> End audio mode")
-                    self.audio_state = AUDIO_STATE.END_AUDIO
+                        if avg_intensity >= self.intensity_threshold: # Si hay intensidad, lo añadimos
+                            if self.audio_state == AUDIO_STATE.NO_AUDIO: # Por si es en END, no pase a SOME
+                                self.audio_state = AUDIO_STATE.SOME_AUDIO
+
+                            if len(self.audio) == 0: # Si intensidad por primera vez, metemos chunk previo
+                                self.audio = self.previous_chunk 
+
+                            self.audio = self.audio + self.check_audio # Luego el trozo nuevo
+                            self.node.get_logger().info(f"Chunk attached ({len(self.audio) / self.sample_rate}s)")
+                        elif self.audio_state != AUDIO_STATE.NO_AUDIO: # Si no hay intensidad y hay audio, terminamos trozo
+                            self.audio_state = AUDIO_STATE.END_AUDIO
+
+                            self.audio = self.audio + self.check_audio # Para que no se corte el audio, metemos tmb este ultimo
+                            self.node.get_logger().info("No more audio detected...")
+                        else: # Si no hay intensidad ni audio, pues aun no hay audio
+                            self.node.get_logger().info("No audio detected yet")
+
+                        self.previous_chunk = self.check_audio
+                        self.check_audio = []
+
+                    if self.audio_state == AUDIO_STATE.END_AUDIO:
+                        if self.node.transcribe_queue.qsize() < 1:
+                            self.node.get_logger().info(f"Adding {len(self.audio) / self.sample_rate}s chunk to transcribe queue")
+                            self.node.transcribe_queue.put(self.audio)
+                        else:
+                            self.node.get_logger().info("Transcribe Queue IS FULL!!!")
+                        
+                        self.audio = []
+                        self.check_audio = []
+                        self.audio_state = AUDIO_STATE.NO_AUDIO
 
             if not self.node.transcribe_queue.empty(): # Transcribe audio chunks
                 audio = self.node.transcribe_queue.get()
                 self.node.get_logger().info("Transcribing...")
 
-                rec = self.stt_request(list(map(int, audio)))                
+                rec = self.stt_request(list(map(int, audio)), self.sample_rate)                
                 if rec:
-                    self.node.get_logger().info(f"Text transcribed ({len(audio) / self.sample_rate}s): {rec}")
-                    
-                    rec_processed = rec.strip().lower()
-                    rec_processed = unidecode.unidecode(rec_processed)
-                    rec_processed = re.sub(r'[^a-z\s]', '', rec_processed)
-                    
-                    if (self.name.lower() in rec_processed and self.helper_state == HELPER_STATE.NAME) \
-                        or (self.name.lower() == rec_processed and self.helper_state == HELPER_STATE.COMMAND):
-                        self.helper_state = HELPER_STATE.COMMAND
-                        self.node.get_logger().info("✅✅✅ 'SANCHO' HA SIDO ESCUCHADO")
+                    self.helper_state = HELPER_STATE.NAME
 
-                        play(ACTIVATION_SOUND)
-                    elif self.helper_state == HELPER_STATE.COMMAND:
-                        self.helper_state = HELPER_STATE.NAME
-                        self.node.assistant_text_pub.publish(String(data=rec))
-                        self.node.get_logger().info(f"✅✅✅ Mandado '{rec}' al asistente")
+                    self.node.assistant_text_pub.publish(String(data=rec))
+                    self.node.get_logger().info(f"✅✅✅ Text transcribed ({len(audio) / self.sample_rate}s): {rec}")
                 else:
-                    self.node.get_logger().info("Transcription result is None: Nothing transcribed")
+                    self.node.get_logger().info("Transcription result is empty.")
 
                 self.node.get_logger().info(f"Average intensity: {self.audio_average_intensity(audio)}")
 
             rclpy.spin_once(self.node)
 
-    def stt_request(self, audio):
+    def stt_request(self, audio, sample_rate):
         stt_request = STT.Request()
         stt_request.audio = audio
-        stt_request.sample_rate = self.sample_rate
+        stt_request.sample_rate = sample_rate
 
         future_stt = self.node.stt_client.call_async(stt_request)
         rclpy.spin_until_future_complete(self.node, future_stt)
