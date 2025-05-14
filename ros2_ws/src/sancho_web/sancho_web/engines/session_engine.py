@@ -7,7 +7,7 @@ class SessionEngine(ServiceEngine):
     def __init__(self, node):
         super().__init__(node)
 
-        self.get_sessions_cli = self.create_client(GetString, 'rumi/get/sessions')
+        self.get_sessions_cli = self.create_client(GetString, 'rumi/sessions/get')
 
         self.node.get_logger().info("Session Engine initializated successfully")
 

@@ -4,7 +4,7 @@ from .chunk_protocol import JSONMessage, ChunkMessage
 
 
 class ChunkManager:
-    def __init__(self, max_chunk_size=64000):
+    def __init__(self, max_chunk_size=256000):
         self.max_chunk_size = max_chunk_size
 
         self.buffers = {}
