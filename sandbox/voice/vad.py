@@ -5,6 +5,7 @@ import struct
 import time
 from scipy.signal import resample_poly
 
+
 # Cargar modelo Silero VAD
 model, utils = torch.hub.load(repo_or_dir='snakers4/silero-vad', model='silero_vad', trust_repo=True)
 (get_speech_ts, _, _, _, _) = utils
