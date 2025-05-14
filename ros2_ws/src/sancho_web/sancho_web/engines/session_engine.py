@@ -1,4 +1,4 @@
-from hri_msgs.srv import GetString
+from rumi_msgs.srv import GetString
 
 from .service_engine import ServiceEngine
 
@@ -7,7 +7,7 @@ class SessionEngine(ServiceEngine):
     def __init__(self, node):
         super().__init__(node)
 
-        self.get_sessions_cli = self.create_client(GetString, 'logic/get/sessions')
+        self.get_sessions_cli = self.create_client(GetString, 'rumi/get/sessions')
 
         self.node.get_logger().info("Session Engine initializated successfully")
 

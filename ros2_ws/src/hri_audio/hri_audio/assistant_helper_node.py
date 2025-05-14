@@ -1,5 +1,3 @@
-import re
-import unidecode
 import numpy as np
 from queue import Queue
 from enum import Enum
@@ -28,13 +26,7 @@ class HELPER_STATE(int, Enum):
     NAME = 1
 
 
-# Hacer una copia de esto e integrar el picovoice porcupine
-# Que cuando este buscando nombre, todo vaya a picovoice hasta que detecte la palabra, que haria un callback
-# pondria el modo command, recortaria el nodo el audio y ya lo mandaria al stt y volveria a search for name
-
 # A futuro hacer que la forma de mezclar los chunks sea con un VAD no con threshold de intensidad
-
-# Cambiar el check each seconds si estamos en name o si estamos en command? En name 0.5 y en command 1?
 class AssistantHelperNode(Node):
 
     def __init__(self):
@@ -68,7 +60,7 @@ class AssistantHelper:
         self.helper_state = HELPER_STATE.NAME
 
         self.sample_rate = -1 # Will set on mic callbacks
-        self.helper_chunk_size = 0.5
+        self.helper_chunk_size = 0.5 # Revisar este valor
         self.intensity_threshold = 750
 
         self.audio = []
@@ -76,7 +68,7 @@ class AssistantHelper:
         self.previous_chunk = []
 
         #self.hotword_detector = STTHotword(self.stt_request, name=name)
-        self.hotword_detector = PVPorcupineHotword()
+        self.hotword_detector = PVPorcupineHotword() # Hacer un de esto para usar intensity o VAD para meter chunks
         self.node = AssistantHelperNode()
 
     def spin(self):

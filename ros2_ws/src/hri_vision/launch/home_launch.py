@@ -60,4 +60,10 @@ def generate_launch_description():
             name='sancho_ai',
             output='screen'
         ),
+        Node(
+            package='rumi_web',
+            executable='session_manager',
+            name='session_manager',
+            output='screen'
+        ),
     ])

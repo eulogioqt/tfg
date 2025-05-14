@@ -7,9 +7,10 @@ from rclpy.node import Node
 from sensor_msgs.msg import Image
 from std_msgs.msg import String
 from hri_msgs.srv import Detection, Recognition, Training, CreateLog, GetString
+from rumi_msgs.msg import SessionMessage
 
 from .database.system_database import SystemDatabase, CONSTANTS
-from .database.session_manager import SessionManager
+from .database.people_manager import PeopleManager
 
 from .hri_bridge import HRIBridge
 from .api.gui import get_name, ask_if_name, mark_face
@@ -28,10 +29,10 @@ class HRILogicNode(Node):
         self.get_actual_people_service = self.create_service(GetString, 'logic/get/actual_people', self.hri_logic.get_actual_people_service)
         self.create_log_service = self.create_service(CreateLog, 'logic/create_log', self.hri_logic.create_log_service)
         self.get_logs_service = self.create_service(GetString, 'logic/get/logs', self.hri_logic.get_logs_service)
-        self.get_sessions_service = self.create_service(GetString, 'logic/get/sessions', self.hri_logic.get_sessions_service)
 
         self.subscription_camera = self.create_subscription(Image, 'camera/color/image_raw', self.frame_callback, 1)
 
+        self.publisher_session = self.create_publisher(SessionMessage, 'rumi/sessions/process', 10)
         self.publisher_recognition = self.create_publisher(Image, 'camera/color/recognition', 1)
         self.publisher_people = self.create_publisher(String, 'logic/info/actual_people', 1)
 
@@ -81,10 +82,9 @@ class HRILogic():
 
         self.db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "database/system.db"))
         self.db = SystemDatabase(self.db_path)
-        self.sessions = SessionManager(self.db, timeout_seconds=20.0, time_between_detections=0.5)
 
         self.node = HRILogicNode(self)
-        self.node.create_timer(10.0, self.sessions.check_timeouts)
+        self.people = PeopleManager(self.node)
     
     def spin(self):
         """Spins the logic node searching for new frames. If one is detected, process the frame."""
@@ -136,7 +136,7 @@ class HRILogic():
                             classified_id = message
 
                             self.node.get_logger().info(f"Nueva clase con id {classified_id}")
-                            self.sessions.process_detection(classified_id, scores[i], distance)
+                            self.people.process_detection(classified_id, scores[i], distance)
 
                             self.read_text("Bienvenido " + classified_name + ", no te conocía")
                             self.create_log(CONSTANTS.ACTION_ADD_CLASS, classified_id)
@@ -148,7 +148,7 @@ class HRILogic():
                     self.read_text("Creo que eres " + classified_name + ", ¿es cierto?")
                     answer = ask_if_name(face_aligned, f"{classified_name} (ID {classified_id})")
                     if answer: # Si dice que si es esa persona
-                        self.sessions.process_detection(classified_id, scores[i], distance)
+                        self.people.process_detection(classified_id, scores[i], distance)
 
                         output, message = self.training_request(String(data="add_features"), String(data=json.dumps({
                             "class_id": classified_id,
@@ -178,7 +178,7 @@ class HRILogic():
                                 classified_id = message
 
                                 self.node.get_logger().info(f"Nueva clase con id {classified_id}")
-                                self.sessions.process_detection(classified_id, scores[i], distance)
+                                self.people.process_detection(classified_id, scores[i], distance)
 
                                 self.read_text("Encantando de conocerte " + classified_name + ", perdona por confundirte")
                                 self.create_log(CONSTANTS.ACTION_ADD_CLASS, classified_id)
@@ -186,14 +186,12 @@ class HRILogic():
                                 self.node.get_logger().info(f">> ERROR: Algo salio mal al agregar una nueva clase: {message}")
 
             elif distance < self.UPPER_BOUND: # Sabe que es alguien pero lo detecta un poco raro
-                self.sessions.process_detection(classified_id, scores[i], distance)
-                #classifier.addFeatures(classified, features)
-                # ver si aqui refinar o que hacer
+                self.people.process_detection(classified_id, scores[i], distance)
             else: # Reconoce perfectamente
-                if self.sessions.get_last_seen(classified_id) > 60:
+                if self.people.get_last_seen(classified_id) > 60:
                     self.read_text("Bienvenido de vuelta " + classified_name)
 
-                self.sessions.process_detection(classified_id, scores[i], distance)
+                self.people.process_detection(classified_id, scores[i], distance)
 
                 output, message = self.training_request(String(data="refine_class"), String(data=json.dumps({
                     "class_id": classified_id,
@@ -207,7 +205,7 @@ class HRILogic():
             mark_face(frame, positions[i], distance, self.MIDDLE_BOUND, self.UPPER_BOUND, classified=classified_name, 
                       drawRectangle=self.draw_rectangle, score=scores[i], showDistance=self.show_distance, showScore=self.show_score)
 
-        actual_people_time = self.sessions.get_all_last_seen()
+        actual_people_time = self.people.get_all_last_seen()
         actual_people_json = json.dumps(actual_people_time)
         self.node.publisher_people.publish(String(data=actual_people_json))
         self.node.publisher_recognition.publish(self.node.br.cv2_to_imgmsg(frame, "bgr8"))
@@ -290,7 +288,7 @@ class HRILogic():
 
     # Services
     def get_actual_people_service(self, request, response):
-        actual_people_time = self.sessions.get_all_last_seen()
+        actual_people_time = self.people.get_all_last_seen()
         actual_people_json = json.dumps(actual_people_time)
         response.text = actual_people_json
 
@@ -311,12 +309,6 @@ class HRILogic():
         return response
 
     def get_logs_service(self, request, response):
-        return self._handle_get_list(request, response, self.db.get_all_logs, self.db.get_log_by_id, self.db.get_logs_by_faceprint_id)
-
-    def get_sessions_service(self, request, response):
-        return self._handle_get_list(request, response, self.db.get_all_sessions, self.db.get_session_by_id, self.db.get_sessions_by_faceprint_id)
-
-    def _handle_get_list(self, request, response, get_all_func, get_by_id, get_by_faceprint_id):
         args = request.args
 
         if args:
@@ -325,13 +317,13 @@ class HRILogic():
             id = args.get("id", None)
             faceprint_id = args.get("faceprint_id", None)
             if id is not None:
-                item = get_by_id(id)
+                item = self.db.get_log_by_id(id)
                 response.text = json.dumps(item)
             elif faceprint_id is not None:
-                items = get_by_faceprint_id(faceprint_id)
+                items = self.db.get_logs_by_faceprint_id(faceprint_id)
                 response.text = json.dumps(items)
         else:
-            items = get_all_func()
+            items = self.db.get_all_logs()
             response.text = json.dumps(items)
 
         return response
@@ -344,6 +336,7 @@ class HRILogic():
     def create_log(self, action, faceprint_id, origin = CONSTANTS.ORIGIN_ROS):
         self.node.get_logger().info(f"[LOG] Nuevo log de tipo {action} para {faceprint_id} con origen {origin}")
         self.db.create_log(action, faceprint_id, origin)
+
 
 def main(args=None):
     rclpy.init(args=args)
