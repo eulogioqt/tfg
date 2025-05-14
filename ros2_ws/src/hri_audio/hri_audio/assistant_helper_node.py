@@ -13,6 +13,7 @@ from speech_msgs.srv import STT
 
 from .utils.sound import play
 from .utils.sounds import ACTIVATION_SOUND
+
 from .utils.stt_hotword import STTHotword
 from .utils.pvporcupine_hotword import PVPorcupineHotword
 
@@ -74,7 +75,7 @@ class AssistantHelper:
         self.check_audio = []
         self.previous_chunk = []
 
-        self.hotword_detector = STTHotword(self.stt_request, name=name)
+        self.hotword_detector = PVPorcupineHotword() #STTHotword(self.stt_request, name=name)
         self.node = AssistantHelperNode()
 
     def spin(self):
