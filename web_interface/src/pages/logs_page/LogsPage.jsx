@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useAPI } from "../../contexts/APIContext";
 import { useToast } from "../../contexts/ToastContext";
 
-import LogModal from "./LogModal";
+import LogModal from "./components/LogModal";
 import Pagination from "../../components/Pagination";
 
 const LogsPage = () => {
@@ -34,7 +34,7 @@ const LogsPage = () => {
     const pageData = logsList ? logsList.slice((currentPage - 1) * perPage, currentPage * perPage) : [];
 
     return (
-        <div className="container py-5" style={{ marginTop: "76px" }}>
+        <div className="container py-4" style={{ marginTop: "76px" }}>
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <div className="text-start">
                     <h2 className="fw-bold mb-1">Historial del sistema</h2>

@@ -59,18 +59,13 @@ const HomePage = () => {
             {/* Capturas y evidencia */}
             <section className="bg-white border-top border-bottom py-5">
                 <div className="container">
-                    <h3 className="text-center fw-bold mb-5">Sancho en acción</h3>
-                    <div className="row g-4 justify-content-center">
+                    <h3 className="text-center fw-bold mb-3 fs-1">Sancho</h3>
+                    <div className="row g-4 justify-content-center mb-4">
                         <div className="col-md-4">
                             <img src={sanchoSrc} className="img-fluid rounded shadow-sm" alt="Interfaz de rostros" />
                         </div>
-                        <div className="col-md-4">
-                            <img src={sanchoSrc} className="img-fluid rounded shadow-sm" alt="Interfaz de chat" />
-                        </div>
-                        <div className="col-md-4">
-                            <img src={sanchoSrc} className="img-fluid rounded shadow-sm" alt="Gestión de modelos" />
-                        </div>
                     </div>
+                    <p className="text-center alert alert-danger">Sancho es un robot... RELLENAR</p>
                 </div>
             </section>
 

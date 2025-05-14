@@ -18,9 +18,13 @@ const FaceprintListPage = () => {
                 doAddFaceprint={doAddFaceprint}
             />
 
-            <div className="container" style={{ marginTop: "76px"}}>
+            <div className="container" style={{ marginTop: "76px" }}>
                 <div className="d-flex justify-content-between align-items-center mb-4 pt-4">
-                    <h2>Base de Datos de Rostros Reconocidos</h2>
+                    <div className="text-start">
+                        <h2 className="fw-bold mb-1">Galería de rostros</h2>
+                        <p className="text-muted mb-0">Gestiona los rostros aprendidos por el sistema.</p>
+                    </div>
+
                     <div>
                         <button className="btn btn-primary me-2" onClick={() => setIsOpenFaceModal(true)}>
                             <i className="bi bi-database-add me-2" /> Añadir cara

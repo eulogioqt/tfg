@@ -28,9 +28,9 @@ const App = () => {
 
             <Routes>
                 <Route path="/" element={wrap(<HomePage />)} />
+                <Route path="/chat" element={wrap(<ChatPage />)} />
                 <Route path="/faceprints" element={wrap(<FaceprintListPage />)} />
                 <Route path="/faceprints/:id" element={wrap(<FaceprintDetailPage />)} />
-                <Route path="/chat" element={wrap(<ChatPage />)} />
                 <Route path="/models" element={wrap(<ModelsPage />)} />
                 <Route path="/logs" element={wrap(<LogsPage />)} />
                 <Route path="*" element={<Navigate to="/" />} />

@@ -1,5 +1,5 @@
 import React from "react";
-import SimpleModal from "../../components/SimpleModal";
+import SimpleModal from "../../../components/SimpleModal";
 
 const LogModal = ({ log, onClose }) => {
     if (!log) return null;

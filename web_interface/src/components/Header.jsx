@@ -6,8 +6,8 @@ const Header = () => {
 
     let items = [
         { link: "", name: "Inicio" },
-        { link: "faceprints", name: "Rostros" },
         { link: "chat", name: "Chat" },
+        { link: "faceprints", name: "Rostros" },
         { link: "models", name: "Modelos" },
         { link: "logs", name: "Logs" },
     ];
