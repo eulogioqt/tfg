@@ -126,8 +126,8 @@ class AssistantHelper:
             if not self.node.transcribe_queue.empty(): # Transcribe audio chunks
                 audio = self.node.transcribe_queue.get()
                 self.node.get_logger().info("Transcribing...")
-        
-                rec = self.stt_request(audio)                
+
+                rec = self.stt_request(list(map(int, audio)))                
                 if rec:
                     self.node.get_logger().info(f"Text transcribed ({len(audio) / self.sample_rate}s): {rec}")
                     
@@ -135,7 +135,6 @@ class AssistantHelper:
                     rec_processed = unidecode.unidecode(rec_processed)
                     rec_processed = re.sub(r'[^a-z\s]', '', rec_processed)
                     
-                    # Cambiar por porcurpine nojeke para hotword en plan mas pro
                     if (self.name.lower() in rec_processed and self.helper_state == HELPER_STATE.NAME) \
                         or (self.name.lower() == rec_processed and self.helper_state == HELPER_STATE.COMMAND):
                         self.helper_state = HELPER_STATE.COMMAND
