@@ -8,10 +8,10 @@ from speech_msgs.msg import LoadUnloadResult, ModelItem
 from speech_msgs.srv import STT, STTGetActiveModel, STTGetModels, STTSetActiveModel, LoadModel, UnloadModel
 
 from .stt.stt_model import STTModel
+from .utils import SileroVAD
 from .models import STT_MODELS, STT_NEEDS_API_KEY
 
 
-# Poner en el handle stt una capa VAD con silero vad para que si no hay voz del tiron devuelva un ""
 class STTNode(Node):
     
     MODELS_CLASS_MAP = { # Poner esto mas cool, solo con el nombre camelcase se puede hacer, lo demas no es necesario
@@ -23,8 +23,9 @@ class STTNode(Node):
         super().__init__("stt")
         
         self.model_map = {}
-
         self.active_model = None
+
+        self.vad = SileroVAD()
 
         self.get_all_srv = self.create_service(STTGetModels, 'speech_tools/stt/get_all_models', self.handle_get_all_models)
         self.get_active_srv = self.create_service(STTGetActiveModel, 'speech_tools/stt/get_active_model', self.handle_get_active_model)
@@ -79,13 +80,17 @@ class STTNode(Node):
             model_name = self._get_or_active(request.model)
             model = self._get_model(model_name)
 
-            text = model.transcribe(
-                audio=request.audio, 
-                sample_rate=request.sample_rate
-            )
+            if self.vad.has_human_voice(request.audio, request.sample_rate):
+                text = model.transcribe(
+                    audio=request.audio, 
+                    sample_rate=request.sample_rate
+                )
 
-            self._fill_response(response, "OK", True, model_name, text)
-            self.get_logger().info(f"✅ STT done using model {model_name}")
+                self._fill_response(response, "OK", True, model_name, text)
+                self.get_logger().info(f"✅ STT done using model {model_name}")
+            else:
+                self._fill_response(response, "OK", True, self.vad.__class__.__name__, "")
+                self.get_logger().info(f"✅ STT done using model but VAD indicated that THERE IS NO HUMAN VOICE")
         except Exception as e:
             self._fill_response(response, str(e), False)
             self.get_logger().error(f"❌ STT service failed: {str(e)}")
