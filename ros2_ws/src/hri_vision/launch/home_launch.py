@@ -51,7 +51,7 @@ def generate_launch_description():
             name='api_rest',
             output='screen',
             parameters=[{
-                "apis": f"['{API_LIST.FACEPRINTS}', '{API_LIST.SESSIONS}', '{API_LIST.LLM_MODELS}']"
+                "apis": f"['{API_LIST.FACEPRINTS}', '{API_LIST.SESSIONS}', '{API_LIST.LLM_MODELS}', '{API_LIST.LOGS}']"
             }]
         ),
         Node(

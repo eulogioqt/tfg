@@ -21,7 +21,7 @@ class DatabaseManagerNode(Node):
 
         self.get_logger().info("Database Manager Node initializated succesfully")
 
-    def log_callback(self, msg: Log):
+    def log_callback(self, msg):
         try:
             self.db.create_log(
                 level=msg.level,

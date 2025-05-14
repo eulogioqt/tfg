@@ -9,11 +9,8 @@ class LogAPI:
     def __init__(self, node):
         self.engine = LogEngine(node)
 
-    def get_all_logs(self, faceprint_id: str = None) -> APIResponse:
-        if faceprint_id is not None:
-            logs_json = self.engine.get_logs_request(json.dumps({ "faceprint_id": faceprint_id}))
-        else:
-            logs_json = self.engine.get_logs_request()
+    def get_all_logs(self) -> APIResponse:
+        logs_json = self.engine.get_logs_request()
         
         logs = json.loads(logs_json)
 

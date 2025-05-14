@@ -22,7 +22,6 @@ def set_log_api(api):
 @router.get("", tags=["Logs CRUD endpoints"], response_model=List[Log])
 async def get_logs(
     request: Request,
-    faceprint_id: Optional[str] = Query(None, description="ID de un faceprint"),
     fields: Optional[str] = Query(None, description="Campos específicos a devolver"),
     sort: Optional[str] = Query(None, description="Campos por los que ordenar, separados por comas"),
     offset: int = Query(default=0, description="Índice de inicio para los resultados de la paginación"),
@@ -32,7 +31,7 @@ async def get_logs(
     APIUtils.check_accept_json(request)
 
     try:
-        response = log_api.get_all_logs(**({ "faceprint_id": faceprint_id} if faceprint_id else {}))
+        response = log_api.get_all_logs()
         
         return response.to_fastapi()
     
