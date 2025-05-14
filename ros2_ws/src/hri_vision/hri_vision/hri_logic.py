@@ -6,10 +6,11 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from std_msgs.msg import String
-from hri_msgs.srv import Detection, Recognition, Training, CreateLog, GetString
+from hri_msgs.srv import Detection, Recognition, Training, GetString
+from hri_msgs.msg import Log
 from rumi_msgs.msg import SessionMessage
 
-from .database.system_database import SystemDatabase, CONSTANTS
+from sancho_web.database.system_database import CONSTANTS
 from .database.people_manager import PeopleManager
 
 from .hri_bridge import HRIBridge
@@ -27,11 +28,10 @@ class HRILogicNode(Node):
         self.data_queue = Queue(maxsize = 1) # Queremos que olvide frames antiguos, siempre a por los mas nuevos
         
         self.get_actual_people_service = self.create_service(GetString, 'logic/get/actual_people', self.hri_logic.get_actual_people_service)
-        self.create_log_service = self.create_service(CreateLog, 'logic/create_log', self.hri_logic.create_log_service)
-        self.get_logs_service = self.create_service(GetString, 'logic/get/logs', self.hri_logic.get_logs_service)
 
         self.subscription_camera = self.create_subscription(Image, 'camera/color/image_raw', self.frame_callback, 1)
 
+        self.publisher_log = self.create_publisher(Log, 'logs/add', 10)
         self.publisher_session = self.create_publisher(SessionMessage, 'rumi/sessions/process', 10)
         self.publisher_recognition = self.create_publisher(Image, 'camera/color/recognition', 1)
         self.publisher_people = self.create_publisher(String, 'logic/info/actual_people', 1)
@@ -80,9 +80,6 @@ class HRILogic():
         self.show_distance = show_distance
         self.show_score = show_score
 
-        self.db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "database/system.db"))
-        self.db = SystemDatabase(self.db_path)
-
         self.node = HRILogicNode(self)
         self.people = PeopleManager(self.node)
     
@@ -114,7 +111,7 @@ class HRILogic():
                 self.node.br.msg_to_recognizer(face_aligned_msg, features_msg, classified_name_msg, distance_msg, pos_msg)
  
             if face_updated:
-                self.create_log(CONSTANTS.ACTION_UPDATE_FACE, classified_id)
+                self.create_log(CONSTANTS.ACTION.UPDATE_FACE, classified_id)
 
             if distance < self.LOWER_BOUND: # No sabe quien es (en teoria nunca lo ha visto), pregunta por el nombre
                 classified_name = None
@@ -139,7 +136,7 @@ class HRILogic():
                             self.people.process_detection(classified_id, scores[i], distance)
 
                             self.read_text("Bienvenido " + classified_name + ", no te conocía")
-                            self.create_log(CONSTANTS.ACTION_ADD_CLASS, classified_id)
+                            self.create_log(CONSTANTS.ACTION.ADD_CLASS, classified_id)
                         else:
                             self.node.get_logger().info(f">> ERROR: Algo salio mal al agregar una nueva clase: {message}")
 
@@ -158,7 +155,7 @@ class HRILogic():
 
                         if output >= 0:
                             self.read_text("Gracias " + classified_name + ", me gusta confirmar que estoy reconociendo bien")
-                            self.create_log(CONSTANTS.ACTION_ADD_FEATURES, classified_id)
+                            self.create_log(CONSTANTS.ACTION.ADD_FEATURES, classified_id)
                         else:
                             self.node.get_logger().info(f">> ERROR: Algo salio mal al agregar features a una clase")
                     else: # Si dice que no, le pregunta el nombre
@@ -181,7 +178,7 @@ class HRILogic():
                                 self.people.process_detection(classified_id, scores[i], distance)
 
                                 self.read_text("Encantando de conocerte " + classified_name + ", perdona por confundirte")
-                                self.create_log(CONSTANTS.ACTION_ADD_CLASS, classified_id)
+                                self.create_log(CONSTANTS.ACTION.ADD_CLASS, classified_id)
                             else:
                                 self.node.get_logger().info(f">> ERROR: Algo salio mal al agregar una nueva clase: {message}")
 
@@ -294,49 +291,21 @@ class HRILogic():
 
         return response
 
-    def create_log_service(self, request, response):
-        try:
-            self.create_log(request.action, request.faceprint_id, request.origin)
-            success = True
-            message = "OK"
-        except Exception as e:
-            success = False
-            message = str(e)
-        
-        response.success = success
-        response.message = message
-
-        return response
-
-    def get_logs_service(self, request, response):
-        args = request.args
-
-        if args:
-            args = json.loads(args)
-
-            id = args.get("id", None)
-            faceprint_id = args.get("faceprint_id", None)
-            if id is not None:
-                item = self.db.get_log_by_id(id)
-                response.text = json.dumps(item)
-            elif faceprint_id is not None:
-                items = self.db.get_logs_by_faceprint_id(faceprint_id)
-                response.text = json.dumps(items)
-        else:
-            items = self.db.get_all_logs()
-            response.text = json.dumps(items)
-
-        return response
-
     # Utils
     def read_text(self, text):
         self.node.get_logger().info(f"[SANCHO] {text}")
         self.node.input_tts.publish(String(data=text))
     
-    def create_log(self, action, faceprint_id, origin = CONSTANTS.ORIGIN_ROS):
-        self.node.get_logger().info(f"[LOG] Nuevo log de tipo {action} para {faceprint_id} con origen {origin}")
-        self.db.create_log(action, faceprint_id, origin)
-
+    def create_log(self, action, faceprint_id):
+        self.node.publisher_log.publish(Log(
+            level=CONSTANTS.LEVEL.INFO,
+            origin=CONSTANTS.ORIGIN.ROS,
+            actor="logic_node",
+            action=action,
+            target=faceprint_id,
+            message="",
+            metadata_json=""
+        ))
 
 def main(args=None):
     rclpy.init(args=args)

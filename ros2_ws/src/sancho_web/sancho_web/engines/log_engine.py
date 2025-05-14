@@ -9,7 +9,7 @@ class LogEngine(ServiceEngine):
         super().__init__(node)
 
         self.create_log_cli = self.create_client(CreateLog, 'logic/create_log')
-        self.get_logs_cli = self.create_client(GetString, 'logic/get/logs')
+        self.get_logs_cli = self.create_client(GetString, 'logs/get')
 
         self.node.get_logger().info("Log Engine initializated successfully")
 

@@ -21,14 +21,14 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/ChunkMono.msg"
   "msg/FaceGuiRequest.msg"
   "msg/FaceprintEvent.msg"
+  "msg/Log.msg"
   
   "srv/Detection.srv"
   "srv/Recognition.srv"
   "srv/Training.srv"
   "srv/GetString.srv"
   "srv/SanchoPrompt.srv"
-  "srv/CreateLog.srv"
-  
+
   DEPENDENCIES sensor_msgs std_msgs
 )
 

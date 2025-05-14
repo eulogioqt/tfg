@@ -1,6 +1,0 @@
-string action
-string faceprint_id
-string origin
----
-bool success
-string message

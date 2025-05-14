@@ -1,10 +1,10 @@
 from datetime import datetime
 from typing import Optional
-from .system_database import SystemDatabase
+from .sessions_database import SessionsDatabase
 
 
 class SessionManager:
-    def __init__(self, db: SystemDatabase, timeout_seconds: float = 5, time_between_detections: float = 1):
+    def __init__(self, db: SessionsDatabase, timeout_seconds: float = 5, time_between_detections: float = 1):
         self.db = db
         self.timeout_seconds = timeout_seconds
         self.time_between_detections = time_between_detections

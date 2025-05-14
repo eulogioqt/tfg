@@ -1,8 +1,8 @@
 import sqlite3
 
 
-class SystemDatabase:
-    def __init__(self, db_path='system.db'):
+class SessionsDatabase:
+    def __init__(self, db_path='sessions.db'):
         self.conn = sqlite3.connect(db_path)
         self.conn.row_factory = sqlite3.Row
         self.cursor = self.conn.cursor()

@@ -7,7 +7,7 @@ from rclpy.node import Node
 from rumi_msgs.msg import SessionMessage
 from rumi_msgs.srv import GetString, SetSessionParams
 
-from .database.system_database import SystemDatabase
+from .database.sessions_database import SessionsDatabase
 from .database.session_manager import SessionManager
 
 
@@ -15,8 +15,8 @@ class SessionManagerNode(Node):
     def __init__(self):
         super().__init__('api_client_node')
 
-        self.db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "database/system.db"))
-        self.db = SystemDatabase(self.db_path)
+        self.db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "database/sessions.db"))
+        self.db = SessionsDatabase(self.db_path)
         self.sessions = SessionManager(self.db, timeout_seconds=15.0, time_between_detections=0.0)
 
         self.session_sub = self.create_subscription(SessionMessage, 'rumi/sessions/process', self.session_callback, 10)

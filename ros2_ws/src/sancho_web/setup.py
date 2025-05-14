@@ -23,7 +23,8 @@ setup(
     entry_points={
         'console_scripts': [
             'sancho_web = sancho_web.sancho_web_node:main',
-            'api_rest = sancho_web.api_rest_node:main'
+            'api_rest = sancho_web.api_rest_node:main',
+            'database_manager = sancho_web.database_manager_node:main'
         ],
     },
 )
