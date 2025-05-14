@@ -10,18 +10,16 @@ import FaceprintDetailPage from "./pages/faceprints/FaceprintDetailPage";
 import WebSocketVideoViewer from "./components/WebSocketVideoViewer";
 import LoadingScreen from "./components/LoadingScreen";
 import ModelsPage from "./pages/models/ModelsPage";
+import LogsPage from "./pages/logs_page/LogsPage";
 
 const App = () => {
     const wrap = (page) => (
         <div className="d-flex flex-column min-vh-100">
             <Header />
-            <main className="flex-grow-1">
-                {page}
-            </main>
+            <main className="flex-grow-1">{page}</main>
             {false && <Footer />}
         </div>
     );
-    
 
     return (
         <Router>
@@ -34,6 +32,7 @@ const App = () => {
                 <Route path="/faceprints/:id" element={wrap(<FaceprintDetailPage />)} />
                 <Route path="/chat" element={wrap(<ChatPage />)} />
                 <Route path="/models" element={wrap(<ModelsPage />)} />
+                <Route path="/logs" element={wrap(<LogsPage />)} />
                 <Route path="*" element={<Navigate to="/" />} />
             </Routes>
         </Router>

@@ -9,6 +9,7 @@ const Header = () => {
         { link: "faceprints", name: "Rostros" },
         { link: "chat", name: "Chat" },
         { link: "models", name: "Modelos" },
+        { link: "logs", name: "Logs" },
     ];
 
     //const user = getActualUser();
