@@ -37,38 +37,7 @@ def generate_launch_description():
             parameters=[{
                 "llm_load_models": f"[['{PROVIDER.DEEPSEEK}', ['{MODELS.LLM.DEEPSEEK.DEEPSEEK_CHAT}'], '']]",
                 "llm_active_provider": f"{PROVIDER.DEEPSEEK}",
-                "llm_active_model": f"{MODELS.LLM.DEEPSEEK.DEEPSEEK_CHAT}",         
-                #"embedding_load_models": f"[['{PROVIDER.GEMINI}', ['{MODELS.LLM.GEMINI.GEMINI_FLASH}'], '']]",
-                #"embedding_active_provider": f"{PROVIDER.GEMINI}",
-                #"embedding_active_model": f"{MODELS.LLM.GEMINI.GEMINI_FLASH}",
-            }]
-        ),
-        Node(
-            package='sancho_ai',
-            executable='sancho_ai',
-            name='sancho_ai',
-            output='screen'
-        ),
-
-        Node(
-            package='ros2web',
-            executable='server',
-            name='r2w_server',
-            output='screen'
-        ),
-        Node(
-            package='sancho_web',
-            executable='sancho_web',
-            name='sancho_web',
-            output='screen'
-        ),
-        Node(
-            package='sancho_web',
-            executable='api_rest',
-            name='api_rest',
-            output='screen',
-            parameters=[{
-                "apis": f"['{API_LIST.TTS_MODELS}', '{API_LIST.STT_MODELS}', '{API_LIST.LLM_MODELS}']"
+                "llm_active_model": f"{MODELS.LLM.DEEPSEEK.DEEPSEEK_CHAT}",
             }]
         ),
     ])
