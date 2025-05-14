@@ -39,7 +39,7 @@ async def get_logs(
     except HTTPException as e:
         raise e 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al buscar los logs: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/{id}", tags=["Logs CRUD endpoints"], response_model=Log)
 async def get_logs_by_id(
@@ -61,4 +61,4 @@ async def get_logs_by_id(
     except HTTPException as e:
         raise e 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al obtener el log: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))

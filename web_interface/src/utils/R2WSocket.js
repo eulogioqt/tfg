@@ -31,7 +31,7 @@ export default class R2WSocket {
             const { id, type, chunk_index, final, data } = chunk_message;
             if (type === CHUNK_MESSAGE_TYPE.CHUNK) {
                 const sizeKB = (this.encoder.encode(event.data).length / 1024).toFixed(2);
-                console.log(`Chunk received ${chunk_index} (final: ${final}) — ${sizeKB} KB`);
+                //console.log(`Chunk received ${chunk_index} (final: ${final}) — ${sizeKB} KB`);
 
                 if (!this.buffers[id]) this.buffers[id] = []
                 this.buffers[id].push({ index: chunk_index, data });
@@ -91,7 +91,7 @@ export default class R2WSocket {
                 const chunkStr = JSON.stringify(chunk);
                 const sizeKB = (this.encoder.encode(chunkStr).length / 1024).toFixed(2);
         
-                console.log(`Sending chunk ${chunk.chunk_index} (final: ${chunk.final}) — ${sizeKB} KB`);
+                //console.log(`Sending chunk ${chunk.chunk_index} (final: ${chunk.final}) — ${sizeKB} KB`);
                 this.socket.send(chunkStr);
             });
 

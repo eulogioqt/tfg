@@ -39,8 +39,7 @@ async def get_llm_providers(
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail={str(e)})
-
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/{provider}", tags=["LLM Models CRUD endpoints"], response_model=LLMProvider)
 async def get_llm_provider(
@@ -62,8 +61,7 @@ async def get_llm_provider(
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail={str(e)})
-
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/load", tags=["LLM Models CRUD endpoints"], response_model=LLMResult)
 async def load_llm_model(
@@ -86,8 +84,7 @@ async def load_llm_model(
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail={str(e)})
-
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/unload", tags=["LLM Models CRUD endpoints"], response_model=LLMResult)
 async def unload_llm_model(
@@ -109,8 +106,7 @@ async def unload_llm_model(
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail={str(e)})
-
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/activate", tags=["LLM Models CRUD endpoints"], response_model=LLMResult)
 async def activate_llm_model(
@@ -132,4 +128,4 @@ async def activate_llm_model(
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail={str(e)})
+        raise HTTPException(status_code=500, detail=str(e))

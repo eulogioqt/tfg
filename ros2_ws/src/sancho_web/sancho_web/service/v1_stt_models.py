@@ -39,7 +39,7 @@ async def get_stt_models(
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail={str(e)})
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/{model}", tags=["STT Models CRUD endpoints"], response_model=STTModel)
 async def get_stt_model_by_name(
@@ -61,7 +61,7 @@ async def get_stt_model_by_name(
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail={str(e)})
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/load", tags=["STT Models CRUD endpoints"], response_model=STTResult)
 async def load_stt_model(
@@ -83,7 +83,7 @@ async def load_stt_model(
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail={str(e)})
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/unload", tags=["STT Models CRUD endpoints"], response_model=STTResult)
 async def unload_stt_model(
@@ -104,7 +104,7 @@ async def unload_stt_model(
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail={str(e)})
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/activate", tags=["STT Models CRUD endpoints"], response_model=STTResult)
 async def activate_stt_model(
@@ -125,4 +125,4 @@ async def activate_stt_model(
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail={str(e)})
+        raise HTTPException(status_code=500, detail=str(e))

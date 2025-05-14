@@ -46,11 +46,7 @@ export const ModelsProvider = ({ children }) => {
                 setFunc(response.data);
             } else {
                 setFunc(null);
-                showToast(
-                    "Error al obtener modelos " + kind.toUpperCase(),
-                    response ? response.data.detail : "Error con la API",
-                    "red"
-                );
+                showToast("Error al obtener modelos " + kind.toUpperCase(), "No se han podido cargar los datos", "red");
             }
         };
     };

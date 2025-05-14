@@ -38,7 +38,7 @@ async def get_faceprints(
     except HTTPException as e:
         raise e 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al buscar los faceprints: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/{id}", tags=["Faceprints CRUD endpoints"], response_model=Faceprint)
 async def get_faceprint_by_id(
@@ -56,7 +56,7 @@ async def get_faceprint_by_id(
     except HTTPException as e:
         raise e 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al obtener el faceprint: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("", tags=["Faceprints CRUD endpoints"], response_model=FaceprintCreate)
 async def create_faceprint(
@@ -78,7 +78,7 @@ async def create_faceprint(
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al crear el faceprint: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/{id}", tags=["Faceprints CRUD endpoints"], response_model=Faceprint)
 async def update_faceprint(
@@ -98,9 +98,8 @@ async def update_faceprint(
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al actualizar el faceprint: {str(e)}")
-
-
+        raise HTTPException(status_code=500, detail=str(e))
+    
 @router.delete("/{id}", tags=["Faceprints CRUD endpoints"], response_model=FaceprintDeleteResponse)
 async def delete_faceprint(
     id: str,
@@ -116,5 +115,4 @@ async def delete_faceprint(
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al eliminar el item: {str(e)}")
-
+        raise HTTPException(status_code=500, detail=str(e))

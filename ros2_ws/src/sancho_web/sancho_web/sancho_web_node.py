@@ -38,13 +38,8 @@ class SanchoWebNode(Node):
         while not self.sancho_prompt_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().warning("Sancho Prompt Service not available, waiting...")
 
-        self.stt_client = self.create_client(STT, 'speech_tools/stt')
-        while not self.stt_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('STT service not available, waiting again...')
-        # Hacer un mensaje notification o algo asi para que si un servicio o lo que sea falla, mandar un toast a la web
-        self.tts_client = self.create_client(TTS, 'speech_tools/tts')
-        while not self.tts_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('TTS service not available, waiting again...')
+        self.stt_client = self.create_client(STT, 'speech_tools/stt') # Hacer algun sistema para que la web
+        self.tts_client = self.create_client(TTS, 'speech_tools/tts') # Con success y message se hace
 
         self.get_logger().info("Sancho Web Node initializated succesfully")
 
@@ -120,6 +115,9 @@ class SanchoWeb:
         return result.text, result.method, result.intent, result.provider, result.model
 
     def stt_request(self, audio, sample_rate):
+        if not self.node.sancho_prompt_client.service_is_ready():
+            return "", ""
+        
         req = STT.Request()
         req.audio = audio
         req.sample_rate = sample_rate
@@ -131,6 +129,9 @@ class SanchoWeb:
         return result.text, result.model_used
 
     def tts_request(self, text):
+        if not self.node.sancho_prompt_client.service_is_ready():
+            return [], 0, "", ""
+        
         req = TTS.Request()
         req.text = text
 

@@ -29,8 +29,7 @@ class APIRESTNode(Node):
     def __init__(self):
         super().__init__("api_rest_node")
 
-        default = str(list(self.AVAILABLE_APIS.keys()))
-        apis = self.parse_string_list(self.declare_parameter("apis", default).get_parameter_value().string_value)
+        apis = self.parse_string_list(self.declare_parameter("apis", "[]").get_parameter_value().string_value)
         self.configure_apis(apis)
 
         self.get_logger().info("API REST Node initializated successfully.")
@@ -39,6 +38,9 @@ class APIRESTNode(Node):
         uvicorn.run(app, host="0.0.0.0", port=7654)
 
     def configure_apis(self, selected):
+        if not selected:
+            selected = list(self.AVAILABLE_APIS.keys())
+
         for api_name in selected:
             if api_name not in self.AVAILABLE_APIS:
                 self.get_logger().error(f"API '{api_name}' not found.")
