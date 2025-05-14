@@ -1,25 +1,24 @@
 import torch
-import torchaudio
 import numpy as np
 import pyaudio
 import struct
 import time
+from scipy.signal import resample_poly
 
 # Cargar modelo Silero VAD
 model, utils = torch.hub.load(repo_or_dir='snakers4/silero-vad', model='silero_vad', trust_repo=True)
 (get_speech_ts, _, _, _, _) = utils
 
 # Configuración de sample rates
-INPUT_SAMPLE_RATE = 48000       # El que usa tu micro o sistema
+INPUT_SAMPLE_RATE = 48000       # El que usa tu micro
 TARGET_SAMPLE_RATE = 16000      # El que necesita Silero
 FRAME_DURATION_MS = 30
 FRAME_SIZE = int(INPUT_SAMPLE_RATE * FRAME_DURATION_MS / 1000)
 
-# Resampler (una sola vez)
-resampler = torchaudio.transforms.Resample(orig_freq=INPUT_SAMPLE_RATE, new_freq=TARGET_SAMPLE_RATE)
+def resample_audio(audio_np, orig_sr=48000, target_sr=16000):
+    return resample_poly(audio_np, target_sr, orig_sr)
 
 def main():
-    # Configura el micrófono
     pa = pyaudio.PyAudio()
     audio_stream = pa.open(
         rate=INPUT_SAMPLE_RATE,
@@ -36,26 +35,27 @@ def main():
     try:
         while True:
             pcm = audio_stream.read(FRAME_SIZE, exception_on_overflow=False)
-            pcm_int16 = np.frombuffer(pcm, dtype=np.int16).astype(np.float32) / 32768.0  # Normaliza a [-1, 1]
+            pcm_int16 = np.frombuffer(pcm, dtype=np.int16).astype(np.float32) / 32768.0
             buffer.extend(pcm_int16)
 
-            if len(buffer) >= INPUT_SAMPLE_RATE * 15:  # 15 segundo a 48kHz
+            if len(buffer) >= INPUT_SAMPLE_RATE * 15:  # 15 segundos
                 t_start = time.time()
 
-                # Tensor original (1 canal)
-                audio_tensor = torch.tensor(buffer).unsqueeze(0)  # (1, N)
+                audio_np = np.array(buffer, dtype=np.float32)
+                audio_resampled_np = resample_audio(audio_np)
+                audio_resampled = torch.from_numpy(audio_resampled_np)
 
-                # Resample a 16kHz
-                audio_resampled = resampler(audio_tensor).squeeze(0)  # (N,)
+                t_resample = time.time() - t_start
 
                 # VAD
+                t_start = time.time()
                 speech_timestamps = get_speech_ts(audio_resampled, model, sampling_rate=TARGET_SAMPLE_RATE)
-                t_end = time.time()
+                t_vad = time.time() - t_start
 
                 if speech_timestamps:
-                    print(f"🗣️ VOZ DETECTADA ({len(speech_timestamps)} segmentos) | Proceso: {(t_end - t_start):.2f}s")
+                    print(f"🗣️ VOZ DETECTADA ({len(speech_timestamps)} segmentos) | Resample: {t_resample:.2f}s, VAD: {t_vad:.2f}s")
                 else:
-                    print(f"🔇 Sin voz | Proceso: {(t_end - t_start):.2f}s")
+                    print(f"🔇 Sin voz | Resample: {t_resample:.2f}s, VAD: {t_vad:.2f}s")
 
                 buffer = []
 

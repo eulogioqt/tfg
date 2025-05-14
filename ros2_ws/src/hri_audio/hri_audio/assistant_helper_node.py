@@ -29,6 +29,8 @@ class HELPER_STATE(int, Enum):
 # Que cuando este buscando nombre, todo vaya a picovoice hasta que detecte la palabra, que haria un callback
 # pondria el modo command, recortaria el nodo el audio y ya lo mandaria al stt y volveria a search for name
 
+# A futuro hacer que la forma de mezclar los chunks sea con un VAD no con threshold de intensidad
+
 # Cambiar el check each seconds si estamos en name o si estamos en command? En name 0.5 y en command 1?
 class AssistantHelperNode(Node):
 
@@ -63,7 +65,7 @@ class AssistantHelper:
         self.helper_state = HELPER_STATE.NAME
 
         self.sample_rate = -1 # Will set on mic callbacks
-        self.check_each_seconds = 0.5
+        self.helper_chunk_size = 0.5
         self.intensity_threshold = 750
         self.name_max_seconds = 2
 
@@ -79,11 +81,11 @@ class AssistantHelper:
                 [new_audio, sample_rate] = self.node.chunk_queue.get()
 
                 self.check_audio = self.check_audio + new_audio
-                self.sample_rate = sample_rate # Sample rate set
+                self.sample_rate = sample_rate # Set sample rate
                 
-                if self.is_audio_length(self.check_audio, self.check_each_seconds):
+                if self.is_audio_length(self.check_audio, self.helper_chunk_size):
                     avg_intensity = self.audio_average_intensity(self.check_audio)
-                    self.node.get_logger().info(f"Chunk of {self.check_each_seconds}s: {avg_intensity:.2f} avg intensity")
+                    self.node.get_logger().info(f"Chunk of {self.helper_chunk_size}s: {avg_intensity:.2f} avg intensity")
 
                     if avg_intensity >= self.intensity_threshold: # Si hay intensidad, lo añadimos
                         if self.audio_state == AUDIO_STATE.NO_AUDIO: # Por si es en END, no pase a SOME
