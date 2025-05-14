@@ -11,10 +11,10 @@ const ChatMessage = ({ message }) => {
     const isHuman = message.isHuman;
     const backgroundColor = isHuman ? "#E0E0E0" : "#FFFFFF";
     const shadowColor = isHuman ? "#C0C0C0" : "#DDDDDD";
-
+    
     useEffect(() => {
         let intervalId;
-        if (message.value) {
+        if (message.value != undefined) {
             if (timer > 0) setTimer(0);
         } else {
             intervalId = setInterval(() => {
@@ -91,7 +91,7 @@ const ChatMessage = ({ message }) => {
                 {/* Contenido del mensaje */}
                 <div className="d-flex flex-column align-items-start justify-content-between text-justify">
                     <span className="w-100 text-start">
-                        {message.value || "Transcribiendo... (" + (timer / 1000).toFixed(1) + "s)"}
+                        {message.value != undefined ? message.value : "Transcribiendo... (" + (timer / 1000).toFixed(1) + "s)"}
                     </span>
                 </div>
 

@@ -3,13 +3,14 @@ import rclpy
 import importlib
 
 from rclpy.node import Node
-from llm_msgs.msg import LoadUnloadResult, ProviderModel, ProviderItem
+from llm_msgs.msg import LoadUnloadResult, ProviderItem
 from llm_msgs.srv import GetModels, Prompt, Embedding, LoadModel, UnloadModel, GetActiveModels, SetActiveModel
 
 from .providers.base_provider import BaseProvider
 from .models import PROVIDER, MODELS, NEEDS_API_KEY, EXECUTED_LOCALLY
 
 
+# PHI NO FUNCIONA, DEEPSEEK SI LE METES UN "" EL MAX TOKENS DE SALIDA FALLA, AUNQUE ESTE A 60 SALEN MAS, REVISAR
 class LLMNode(Node):
 
     PROVIDER_CLASS_MAP = { # Poner esto mas cool, solo con el nombre camelcase se puede hacer, lo demas no es necesario

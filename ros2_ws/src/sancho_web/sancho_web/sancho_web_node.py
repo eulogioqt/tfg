@@ -95,13 +95,14 @@ class SanchoWeb:
             
             transcription, model = self.stt_request(audio_prompt.audio, audio_prompt.sample_rate)
             self.send_message(key, PromptTranscriptionMessage(audio_prompt.id, transcription, model))
+            
+            if transcription: # Si hay transcripcion
+                response, method, intent, provider, model = self.sancho_prompt_request(transcription)
+                self.send_message(key, ResponseMessage(audio_prompt.id, response, method, intent, provider, model))
 
-            response, method, intent, provider, model = self.sancho_prompt_request(transcription)
-            self.send_message(key, ResponseMessage(audio_prompt.id, response, method, intent, provider, model))
-
-            if audio_prompt.want_tts:
-                audio, sample_rate, model, speaker = self.tts_request(response)
-                self.send_message(key, AudioResponseMessage(audio_prompt.id, audio, sample_rate, model, speaker))
+                if audio_prompt.want_tts: # Si quiere TTS
+                    audio, sample_rate, model, speaker = self.tts_request(response)
+                    self.send_message(key, AudioResponseMessage(audio_prompt.id, audio, sample_rate, model, speaker))
         elif type == MessageType.TRANSCRIPTION_REQUEST:
             transcription_request = TranscriptionRequestMessage(data)
             

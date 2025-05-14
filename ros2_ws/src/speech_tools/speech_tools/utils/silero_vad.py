@@ -17,8 +17,15 @@ class SileroVAD(Node):
         self.get_speech_ts = get_speech_ts
 
     def has_human_voice(self, audio, sample_rate):
-        audio_np = np.array(audio, dtype=np.float32)
+        audio_np = np.array(audio, dtype=np.float32) / 32768.0
+
+        if len(audio_np) < int(sample_rate * 0.5):
+            return False
+
         audio_resampled_np = resample_poly(audio_np, self.VAD_SAMPLE_RATE, sample_rate)
         audio_resampled = torch.from_numpy(audio_resampled_np)
+
+        segments = self.get_speech_ts(audio_resampled, self.model, sampling_rate=self.VAD_SAMPLE_RATE)
         
-        return self.get_speech_ts(audio_resampled, self.model, sampling_rate=self.VAD_SAMPLE_RATE)
+        return bool(segments)
+

@@ -74,7 +74,7 @@ class STTNode(Node):
                 response.models.append(ModelItem(model=model_name, needs_api_key=(model_name in STT_NEEDS_API_KEY)))
 
         return response
-    
+
     def handle_stt(self, request, response):
         try:
             model_name = self._get_or_active(request.model)

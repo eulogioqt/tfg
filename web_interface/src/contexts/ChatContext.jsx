@@ -7,6 +7,7 @@ import { BREAKPOINTS, useWindowSize } from "../hooks/useWindowSize";
 import { v4 as uuidv4 } from "uuid";
 import NotConnectedModal from "../pages/chat/components/NotConnectedModal";
 import ChatSettingsModal from "../pages/chat/components/ChatSettingsModal";
+import { useToast } from "./ToastContext";
 
 const ChatContext = createContext();
 
@@ -21,6 +22,7 @@ export const ChatProvider = ({ children }) => {
     const { sendMessage, isConnected } = useWebSocket();
     const { subscribe } = useEventBus();
     const { width } = useWindowSize();
+    const { showToast } = useToast();
 
     const [messages, setMessages] = useState([]);
     const clearMessages = () => setMessages([]);
@@ -60,14 +62,15 @@ export const ChatProvider = ({ children }) => {
             });
         };
         const processPT = (e) => {
-            if (transcriptionReqId.current && transcriptionReqId.current == e.id) {
+            if (transcriptionReqId.current === e.id) {
                 setTextAreaValue((text) => text + e.value);
                 transcriptionReqId.current = undefined;
+            } else if (!e.value) {
+                showToast("Transcripción vacía", "El audio enviado no contenía voz reconocible.", "red");
+                setMessages((prev) => prev.filter((m) => m.id !== e.id));
             } else {
-                setMessages((prevMessages) =>
-                    prevMessages.map((m) =>
-                        m.isHuman && m.id === e.id ? { ...m, sttModel: e.model, value: e.value } : m
-                    )
+                setMessages((prev) =>
+                    prev.map((m) => m.isHuman && m.id === e.id ? { ...m, sttModel: e.model, value: e.value } : m)
                 );
             }
         };
