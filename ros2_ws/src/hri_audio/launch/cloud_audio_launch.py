@@ -7,7 +7,7 @@ from speech_tools.models import STT_MODELS, TTS_MODELS, TTS_SPEAKERS
 from llm_tools.models import PROVIDER, MODELS
 
 load_dotenv()
-google_stt_key = os.environ.get("GOOGLE_STT_KEY")
+GOOGLE_STT_API_KEY = os.environ.get("GOOGLE_STT_API_KEY")
 gemini_api_key = os.environ.get("GEMINI_API_KEY")
 
 
@@ -42,7 +42,7 @@ def generate_launch_description():
             name='stt',
             output='screen',
             parameters=[{
-                "load_models": f"[['{STT_MODELS.GOOGLE}', '{google_stt_key}']]",
+                "load_models": f"[['{STT_MODELS.GOOGLE}', '{GOOGLE_STT_API_KEY}']]",
                 "active_model": f"{STT_MODELS.GOOGLE}"
             }]
         ),

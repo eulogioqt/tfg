@@ -39,7 +39,7 @@ def main():
             pcm_int16 = np.frombuffer(pcm, dtype=np.int16).astype(np.float32) / 32768.0  # Normaliza a [-1, 1]
             buffer.extend(pcm_int16)
 
-            if len(buffer) >= INPUT_SAMPLE_RATE:  # 1 segundo a 48kHz
+            if len(buffer) >= INPUT_SAMPLE_RATE * 15:  # 15 segundo a 48kHz
                 t_start = time.time()
 
                 # Tensor original (1 canal)

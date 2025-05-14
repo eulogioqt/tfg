@@ -2,13 +2,26 @@ import pvporcupine
 import pyaudio
 import struct
 import time
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 # Cambia esto por la ruta a tu archivo .ppn personalizado con la palabra "Sancho"
 CUSTOM_WAKE_WORD_PATH = "sancho_linux.ppn"  # Asegúrate de que esta ruta es correcta
+PICOVOICE_API_KEY = os.environ.get("PICOVOICE_API_KEY")
+MODEL_PATH = "porcupine_params_es.pv"
 
 def main():
     # Inicializa Porcupine con el archivo de palabra personalizada
-    porcupine = pvporcupine.create(keyword_paths=[CUSTOM_WAKE_WORD_PATH])
+    porcupine = pvporcupine.create(
+        access_key=PICOVOICE_API_KEY,  # Usa tu clave real aquí
+        keyword_paths=[CUSTOM_WAKE_WORD_PATH],
+        model_path=MODEL_PATH
+    )
+
 
     # Configura el micrófono
     pa = pyaudio.PyAudio()
@@ -29,7 +42,7 @@ def main():
 
             t = time.time()
             result = porcupine.process(pcm)
-            print(f"Time to process {porcupine.frame_length} chunk: {(time.time() - t):.2f}")
+            print(f"Time to process {porcupine.frame_length} chunk: {(time.time() - t):.4f}")
             if result >= 0:
                 print("✅ PALABRA DETECTADA: Sancho")
 
