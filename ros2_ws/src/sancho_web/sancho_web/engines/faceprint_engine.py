@@ -1,5 +1,7 @@
-from hri_msgs.srv import Detection, Recognition, Training, CreateLog, GetString
-from hri_vision.database.system_database import CONSTANTS
+from hri_msgs.srv import Detection, Recognition, Training, GetString
+from hri_msgs.msg import Log
+
+from sancho_web.database.system_database import CONSTANTS
 from hri_vision.hri_bridge import HRIBridge
 
 from .service_engine import ServiceEngine
@@ -9,7 +11,8 @@ class FaceprintEngine(ServiceEngine):
     def __init__(self, node):
         super().__init__(node)
 
-        self.create_log_cli = self.create_client(CreateLog, 'logic/create_log')
+        self.publisher_log = self.node.create_publisher(Log, 'logs/add', 10)
+
         self.get_faceprint_cli = self.create_client(GetString, 'recognition/get_faceprint')
         self.detection_cli = self.create_client(Detection, 'detection')
         self.recognition_cli = self.create_client(Recognition, 'recognition')
@@ -19,15 +22,16 @@ class FaceprintEngine(ServiceEngine):
 
         self.node.get_logger().info("Faceprint Engine initializated successfully")
 
-    def create_log_request(self, action, faceprint_id):
-        req = CreateLog.Request()
-        req.action = action
-        req.faceprint_id = faceprint_id
-        req.origin = CONSTANTS.ORIGIN_WEB
-
-        result = self.call_service(self.create_log_cli, req)
-
-        return result.success, result.message
+    def create_log(self, action, faceprint_id):
+        self.publisher_log.publish(Log(
+            level=CONSTANTS.LEVEL.INFO,
+            origin=CONSTANTS.ORIGIN.ROS,
+            actor="logic_node",
+            action=action,
+            target=faceprint_id,
+            message="",
+            metadata_json=""
+        ))
 
     def get_faceprint_request(self, args_msg=""):
         req = GetString.Request()

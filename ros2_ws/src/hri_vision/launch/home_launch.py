@@ -55,6 +55,12 @@ def generate_launch_description():
             }]
         ),
         Node(
+            package='sancho_web',
+            executable='database_manager',
+            name='database_manager',
+            output='screen'
+        ),
+        Node(
             package='llm_tools',
             executable='llm',
             name='llm',

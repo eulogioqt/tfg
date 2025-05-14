@@ -4,7 +4,7 @@ from std_msgs.msg import String
 
 from ..engines import FaceprintEngine
 from .api_responses import APIResponse, HTTPException, JSONResponse
-from hri_vision.database.system_database import CONSTANTS
+from sancho_web.database.system_database import CONSTANTS
 
 
 class FaceprintAPI:
@@ -51,7 +51,7 @@ class FaceprintAPI:
                     self.engine.br.msg_to_recognizer(face_aligned_msg, features_msg, classified_name_msg, distance_msg, pos_msg)
                 
                 if face_updated:
-                    self.engine.create_log_request(CONSTANTS.ACTION_UPDATE_FACE, classified_id)
+                    self.engine.create_log(CONSTANTS.ACTION_UPDATE_FACE, classified_id)
 
                 LOWER_BOUND = 0.75
                 MIDDLE_BOUND = 0.80
@@ -71,7 +71,7 @@ class FaceprintAPI:
                         updated_item_json = self.engine.get_faceprint_request(json.dumps({ "id": classified_id }))
                         updated_item = json.loads(updated_item_json)
 
-                        self.engine.create_log_request(CONSTANTS.ACTION_ADD_CLASS, classified_id)
+                        self.engine.create_log(CONSTANTS.ACTION_ADD_CLASS, classified_id)
 
                         return JSONResponse(content=updated_item)
                     
@@ -97,7 +97,7 @@ class FaceprintAPI:
         if result <= 0:
             return HTTPException(detail=message)
         
-        self.engine.create_log_request(CONSTANTS.ACTION_RENAME_CLASS, id)
+        self.engine.create_log(CONSTANTS.ACTION_RENAME_CLASS, id)
 
         updated_item_json = self.engine.get_faceprint_request(json.dumps({ "id": id }))
         updated_item = json.loads(updated_item_json)
@@ -116,6 +116,6 @@ class FaceprintAPI:
         if result <= 0:
             return HTTPException(detail=message)
 
-        self.engine.create_log_request(CONSTANTS.ACTION_DELETE_CLASS, id)
+        self.engine.create_log(CONSTANTS.ACTION_DELETE_CLASS, id)
 
         return JSONResponse(content=f"Faceprint con id {id} elliminado correctamente.")
