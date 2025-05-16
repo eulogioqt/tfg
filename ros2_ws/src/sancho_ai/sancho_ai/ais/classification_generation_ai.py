@@ -28,10 +28,10 @@ def extract_json_from_code_block(text):
     raise None
 
 
-class ClassificationTemplatesAI(GenerateAI):
+class ClassificationGenerationAI(GenerateAI):
 
     def __init__(self):
-        super().__init__(self.llm_engine)
+        super().__init__()
 
         self.node = ServiceEngine.create_client_node()
         self.hri_engine = HRIEngine(self.node)
@@ -65,18 +65,18 @@ class ClassificationTemplatesAI(GenerateAI):
         intent = classification_response["intent"]
 
         if intent == COMMANDS.HOW_ARE_YOU:
-            response = self.how_are_you()
+            response = self.how_are_you(user_input, chat_history)
         elif intent == COMMANDS.WHAT_YOU_SEE:
             actual_people_json = self.hri_engine.get_actual_people_request()
             actual_people = json.loads(actual_people_json)
 
-            response = self.what_you_see(actual_people)
+            response = self.what_you_see(actual_people, user_input, chat_history)
         elif intent == COMMANDS.DELETE_USER:
             user = classification_response["arguments"]["user"]
             result = self.hri_engine.delete_request(user)
             result = "success" if result >= 0 else "failure"
 
-            response = self.delete_user(user, result)
+            response = self.delete_user(user, result, user_input, chat_history)
         else:
             response = self.unknown_message(user_input, chat_history)
 

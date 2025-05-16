@@ -1,7 +1,6 @@
 import json
 
 from .ai import AI
-from ..llm_engine import LLMEngine
 from ..prompts.commands.commands import COMMANDS
 
 from ..prompts.unknown_prompt import UnknownPrompt
@@ -35,13 +34,11 @@ def build_semantic_result(intent, arguments, status, details, missing_arguments)
 
 class GenerateAI(AI):
 
-    def __init__(self, llm_engine: LLMEngine):
-        self.llm_engine = llm_engine
-
     def do_semantic_response_prompt(self, user_input, semantic_result, chat_history):
         semantic_response_prompt = SemanticResponsePrompt(user_input, semantic_result, chat_history)
+        self.node.get_logger().info(f"PROMPT SYSTEM:\n{semantic_response_prompt.get_prompt_system()}")
+        
         response, provider_used, model_used, message, success = self.llm_engine.prompt_request(
-            messages_json=json.dumps(chat_history), # Ultimos 5 turnos
             prompt_system=semantic_response_prompt.get_prompt_system(),
             user_input=semantic_response_prompt.get_user_prompt(),
             parameters_json=semantic_response_prompt.get_parameters()
@@ -56,11 +53,10 @@ class GenerateAI(AI):
         return response
     
     def how_are_you(self, user_input, chat_history=[]):
-        result = build_semantic_result(COMMANDS.HOW_ARE_YOU.value, {}, "SUCCESS", "Estoy funcionado correctamente y sin errores.", [])
+        result = build_semantic_result(COMMANDS.HOW_ARE_YOU.value, {}, "SUCCESS", "", [])
         
         return self.do_semantic_response_prompt(user_input, result, chat_history)
-
-    
+ 
     def what_you_see(self, actual_people, user_input, chat_history=[]):
         people_on_screen = [person for person, time_on_screen in actual_people.items() if time_on_screen < 1]
         if not people_on_screen:

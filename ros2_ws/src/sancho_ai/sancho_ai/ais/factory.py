@@ -6,6 +6,7 @@ from .ai import AI
 from .dummy_ai import DummyAI
 from .simple_ai import SimpleAI
 from .classification_templates_ai import ClassificationTemplatesAI
+from .classification_generation_ai import ClassificationGenerationAI
 
 class SmartStrEnum(str, Enum):
     def __str__(self):
@@ -18,12 +19,14 @@ class AIType(SmartStrEnum):
     DUMMY = "DUMMY"
     SIMPLE = "SIMPLE"
     CLASSIFICATION_TEMPLATES = "CLASSIFICATION_TEMPLATES"
+    CLASSIFICATION_GENERATION = "CLASSIFICATION_GENERATION"
 
 
 AI_CLASSES: dict[AIType, Type[AI]] = {
     AIType.DUMMY: DummyAI,
     AIType.SIMPLE: SimpleAI,
-    AIType.CLASSIFICATION_TEMPLATES: ClassificationTemplatesAI
+    AIType.CLASSIFICATION_TEMPLATES: ClassificationTemplatesAI,
+    AIType.CLASSIFICATION_GENERATION: ClassificationGenerationAI
 }
 
 def create_sancho_ai(ai_type: AIType) -> AI:

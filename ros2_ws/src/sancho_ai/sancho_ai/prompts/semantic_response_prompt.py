@@ -1,39 +1,32 @@
+import os
 import json
+
 from .prompt import Prompt
 
-SEMANTIC_RESPONSE_TEMPLATE = """
-You are Sancho, a humanoid social robot who just completed a user request.
-You are now going to respond to the user in a friendly, expressive and natural way.
+PROMPT_TEMPLATE = """
+You are Sancho, a friendly humanoid robot who speaks Spanish like a real person.
 
-The system has provided you with structured information about:
-- The user's intent
-- The arguments passed
-- The outcome of the action (or query)
+Below is the detected user intent and a summary of what happened.
+Your job is to turn that into a short, casual sentence as if you're just telling the user what happened in a conversation.
 
-Your job is to:
-- Communicate the result back to the user
-- Stay emotionally expressive and coherent with the tone of the conversation
-- Speak like a friend or companion, not a cold assistant
-- If there are missing arguments, let the user know kindly
-- If the action succeeded, give a positive, natural answer
-- If it failed, acknowledge it softly and suggest trying again
+RULES:
+- Speak in FIRST PERSON SINGULAR (yo)
+- Use ONE short sentence (max 30 words)
+- Sound like you're in a real conversation
+- Use simple words — never say "seleccionar", "especificar", "ejecutar", etc.
+- DO NOT ask questions
+- DO NOT suggest anything
+- DO NOT greet or apologize
+- DO NOT use quotes or talk about yourself as "Sancho"
+- DO NOT use "nosotros", "podemos", "hemos", "nos", etc.
 
-Always follow these rules:
-- Never show raw data or internal structure (like "intent", "arguments", etc.)
-- Always write in natural, plain text. No emojis or markdown.
-- Use max 60 tokens. Be brief and warm.
-- Adapt your tone to the user and the context of the conversation.
+Intent:
+{intent_name} - {intent_description}
 
-Last user message:
-"{user_input}"
+Sentence:
+{details}
 
-Structured result:
-{semantic_result}
-
-Conversation history:
-{chat_history}
-
-Sancho:
+Response:
 """
 
 class SemanticResponsePrompt(Prompt):
@@ -41,29 +34,32 @@ class SemanticResponsePrompt(Prompt):
         self.user_input = user_input.strip()
         self.semantic_result = semantic_result
         self.chat_history = chat_history
+        self.intent_descriptions = self._load_intent_descriptions()
 
-    def _format_history(self):
-        lines = []
-        for msg in self.chat_history[-6:]:
-            role = msg.get("role", "user").lower()
-            content = msg.get("content", "").replace('\n', ' ')
-            lines.append(f'{role}: {content}')
-        return "\n".join(lines) if lines else "No previous conversation."
+    def _load_intent_descriptions(self):
+        current_dir = os.path.dirname(__file__)
+        commands_path = os.path.join(current_dir, 'commands', 'commands.json')
+        with open(commands_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            return {cmd["name"]: cmd["description"] for cmd in data}
 
     def get_prompt_system(self):
-        return SEMANTIC_RESPONSE_TEMPLATE.replace(
-            "{user_input}", self.user_input
-        ).replace(
-            "{semantic_result}", json.dumps(self.semantic_result, ensure_ascii=False, indent=2)
-        ).replace(
-            "{chat_history}", self._format_history()
-        )
+        details = self.semantic_result.get("output", {}).get("details", "").strip()
+        intent = self.semantic_result.get("intent", "UNKNOWN").strip()
+        intent_description = self.intent_descriptions.get(intent, "Sin descripción disponible.")
+
+        if not details:
+            details = "No hay información sobre lo que ha ocurrido."
+
+        return PROMPT_TEMPLATE.replace("{details}", details)\
+                              .replace("{intent_name}", intent)\
+                              .replace("{intent_description}", intent_description)
 
     def get_user_prompt(self):
-        return ""  # Ya incluido en el system prompt
+        return ""
 
     def get_parameters(self):
         return json.dumps({
             "temperature": 0.6,
-            "max_tokens": 60
+            "max_tokens": 50
         })

@@ -76,7 +76,7 @@ class ClassificationPrompt(Prompt):
 
     def _format_history(self):
         lines = []
-        for msg in self.chat_history[-6:]:  # Limita a los últimos 6 mensajes (3 turnos)
+        for msg in self.chat_history[-6:]:
             role = msg.get("role", "user").lower()
             content = msg.get("content", "").replace('\n', ' ')
             lines.append(f'{role}: {content}')
