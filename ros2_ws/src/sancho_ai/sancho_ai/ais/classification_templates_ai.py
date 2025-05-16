@@ -10,8 +10,6 @@ from ..llm_engine import LLMEngine
 from ..prompts.classification_prompt import ClassificationPrompt
 from ..prompts.commands.commands import COMMANDS
 
-from llm_tools.models import PROVIDER, MODELS
-
 def try_json_loads(text):
     try:
         return json.loads(text)
@@ -50,7 +48,7 @@ class ClassificationTemplatesAI(TemplateAI):
         )
         
         if not success:
-            self.node.get_logger().error(f"There was a problem with prompt: {message}")
+            self.node.get_logger().error(f"There was a problem with classification prompt: {message}")
             return self.unknown_message(), COMMANDS.UNKNOWN, provider_used, model_used
         
         self.node.get_logger().info(f"LLM:\n{response}")

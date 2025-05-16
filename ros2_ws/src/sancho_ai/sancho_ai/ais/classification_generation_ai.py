@@ -1,14 +1,13 @@
 import re
 import json
 
-from .template_ai import TemplateAI
+from .generate_ai import GenerateAI
 
 from ..service_engine import ServiceEngine
 from ..hri_engine import HRIEngine
 from ..llm_engine import LLMEngine
 
 from ..prompts.classification_prompt import ClassificationPrompt
-from ..prompts.unknown_prompt import UnknownPrompt
 from ..prompts.commands.commands import COMMANDS
 
 def try_json_loads(text):
@@ -29,10 +28,10 @@ def extract_json_from_code_block(text):
     raise None
 
 
-class ClassificationTemplatesAI(TemplateAI):
+class ClassificationTemplatesAI(GenerateAI):
 
     def __init__(self):
-        super().__init__()
+        super().__init__(self.llm_engine)
 
         self.node = ServiceEngine.create_client_node()
         self.hri_engine = HRIEngine(self.node)
@@ -49,7 +48,7 @@ class ClassificationTemplatesAI(TemplateAI):
         )
         
         if not success:
-            self.node.get_logger().error(f"There was a problem with prompt: {message}")
+            self.node.get_logger().error(f"There was a problem with classification prompt: {message}")
             return self.unknown_message(user_input, chat_history), COMMANDS.UNKNOWN, provider_used, model_used
         
         self.node.get_logger().info(f"LLM for Classification Prompt:\n{response}")
@@ -82,22 +81,3 @@ class ClassificationTemplatesAI(TemplateAI):
             response = self.unknown_message(user_input, chat_history)
 
         return response, intent, provider_used, model_used
-    
-    def unknown_message(self, user_input, chat_history=[]):
-        unknown_prompt = UnknownPrompt(user_input)
-
-        self.node.get_logger().info(f"User: {user_input}")
-        response, provider_used, model_used, message, success = self.llm_engine.prompt_request(
-            messages_json=json.dumps(chat_history), # Ultimos 5 turnos
-            prompt_system=unknown_prompt.get_prompt_system(),
-            user_input=unknown_prompt.get_user_prompt(),
-            parameters_json=unknown_prompt.get_parameters()
-        )
-        
-        if not success:
-            self.node.get_logger().error(f"There was a problem with prompt: {message}")
-            return super().unknown_message()
-        
-        self.node.get_logger().info(f"LLM for Unknown Prompt:\n{response}")
-
-        return response
