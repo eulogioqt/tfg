@@ -7,12 +7,12 @@ import numpy as np
 
 TTS_OPTIONS = {
     #"bark": BarkTTS,
-    "css10": CSS10TTS,
-    "google": GoogleTTS,
-    "piper": PiperTTS,
-    "tacotron2": Tacotron2TTS,
+    #"css10": CSS10TTS,
+    #"google": GoogleTTS,
+    #"piper": PiperTTS,
+    #"tacotron2": Tacotron2TTS,
     "xtts": XTTS,
-    "your_tts": YourTTS,
+    #"your_tts": YourTTS,
 }
 
 # bark -> numpy float32

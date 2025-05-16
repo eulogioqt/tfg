@@ -25,7 +25,9 @@ setup(
     maintainer_email='euquemada@gmail.com',
     description='TODO: Package description',
     license='TODO: License declaration',
-    tests_require=['pytest'],
+    extras_require={
+        'test': ['pytest']
+    },
     entry_points={
         'console_scripts': [
             'session_manager = rumi_web.session_manager_node:main',

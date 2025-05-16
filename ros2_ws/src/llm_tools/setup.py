@@ -17,7 +17,9 @@ setup(
     maintainer_email='euquemada@gmail.com',
     description='TODO: Package description',
     license='Apache-2.0',
-    tests_require=['pytest'],
+    extras_require={
+        'test': ['pytest']
+    },
     entry_points={
         'console_scripts': [
             'llm = llm_tools.llm_node:main'
