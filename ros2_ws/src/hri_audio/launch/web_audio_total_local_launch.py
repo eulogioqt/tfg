@@ -1,30 +1,19 @@
 import os
 from dotenv import load_dotenv
+
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
 from speech_tools.models import STT_MODELS, TTS_MODELS, TTS_SPEAKERS
 from llm_tools.models import PROVIDER, MODELS
+from sancho_web.apis import API_LIST
 
 load_dotenv()
 GOOGLE_STT_API_KEY = os.environ.get("GOOGLE_STT_API_KEY")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
-
 def generate_launch_description():
     return LaunchDescription([
-        Node(
-            package='hri_audio',
-            executable='assistant_helper',
-            name='assistant_helper',
-            output='screen'
-        ),
-        Node(
-            package='hri_audio',
-            executable='assistant',
-            name='assistant',
-            output='screen'
-        ),
         Node(
             package='speech_tools',
             executable='tts',
@@ -47,12 +36,6 @@ def generate_launch_description():
             }]
         ),
         Node(
-            package='hri_audio',
-            executable='audio',
-            name='audio',
-            output='screen',
-        ),
-        Node(
             package='llm_tools',
             executable='llm',
             name='llm',
@@ -61,9 +44,6 @@ def generate_launch_description():
                 "llm_load_models": f"[['{PROVIDER.GEMINI}', ['{MODELS.LLM.GEMINI.GEMINI_FLASH}'], '{GEMINI_API_KEY}']]",
                 "llm_active_provider": f"{PROVIDER.GEMINI}",
                 "llm_active_model": f"{MODELS.LLM.GEMINI.GEMINI_FLASH}",         
-                #"embedding_load_models": f"[['{PROVIDER.GEMINI}', ['{MODELS.LLM.GEMINI.GEMINI_FLASH}'], '{GEMINI_API_KEY}']]",
-                #"embedding_active_provider": f"{PROVIDER.GEMINI}",
-                #"embedding_active_model": f"{MODELS.LLM.GEMINI.GEMINI_FLASH}",
             }]
         ),
         Node(
@@ -71,5 +51,26 @@ def generate_launch_description():
             executable='sancho_ai',
             name='sancho_ai',
             output='screen'
+        ),
+        Node(
+            package='ros2web',
+            executable='server',
+            name='r2w_server',
+            output='screen'
+        ),
+        Node(
+            package='sancho_web',
+            executable='sancho_web',
+            name='sancho_web',
+            output='screen'
+        ),
+        Node(
+            package='sancho_web',
+            executable='api_rest',
+            name='api_rest',
+            output='screen',
+            parameters=[{
+                "apis": f"['{API_LIST.TTS_MODELS}', '{API_LIST.STT_MODELS}', '{API_LIST.LLM_MODELS}']"
+            }]
         ),
     ])

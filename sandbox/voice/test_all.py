@@ -6,7 +6,7 @@ from models import TTSModel, GoogleTTS, PiperTTS, CSS10TTS, XTTS, Tacotron2TTS, 
 import numpy as np
 
 TTS_OPTIONS = {
-    "bark": BarkTTS,
+    #"bark": BarkTTS,
     "css10": CSS10TTS,
     "google": GoogleTTS,
     "piper": PiperTTS,
@@ -23,7 +23,6 @@ TTS_OPTIONS = {
 # xtts -> numpy float64
 # your_tts -> numpy float64
 
-# repasar el get or default de los modelos y todo eos porque algunos esta la lista vacia y demas
 if __name__ == "__main__":
     text = input("📝 Introduce el texto a sintetizar: ").strip()
     if not text:
@@ -45,13 +44,6 @@ if __name__ == "__main__":
         tts_time = time.time() - start
 
         times[tts_name] = tts_time
-        
-        print(type(audio))
-        print(type(audio[100]))
-        print(f"{audio[0]} {audio[234]}")
-        print(np.mean(audio))
-        print(np.max(audio))
-        print(np.min(audio))
         
         #save
         filename = f"audio_tts_{tts_name}.wav"
