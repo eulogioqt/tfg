@@ -40,7 +40,7 @@ class HTTPServer:
             if os.path.exists(path):
                 return path
 
-        raise FileNotFoundError("No se pudo encontrar el directorio 'web_interface/dist'.")
+        print("No se pudo encontrar el directorio 'web_interface/dist'.")
 
     def serve_html(self):
         index_path = os.path.join(self.webclient_dir, 'index.html')
