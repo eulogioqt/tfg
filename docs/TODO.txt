@@ -1,129 +1,21 @@
-MEDIR LA PROFUNDIDAD SABIENDO EL TAMAÑO PROMEDIO DE UNA CABEZA
-INTENTAR SACAR EDAD TAMBIEN
+1. Pulir PromptSystem y LLMs para ser más listo y tener fallback de conversación. Que el unknown
+tenga infrmacion sobre todo y pueda respnder algo acotado bien y eso
+
+2. Animación de boca fluida y creíble, conectada al audio, controlar boca
+
+3. VAD en assistanth helper para recortar y pegar chunks.
+
+4. Logs detallados, fáciles de revisar.
+
+5. Cambiar tkinter por nodo con QT. Responder con voz tambien.
+
+6. Embeddings panel
+
+7. Pequeña interfaz de "usuario simulado" con permisos diferenciados (NO Firebase).
+
+8. Si sobra tiempo: panel ajustes más avanzado y limpieza general.
 
 
-
-
-A FUTURO METER LOS PAQUETES _MSGS EN EL PROPIO PAQUETE SI SE PUEDE
-
-- Hacer un context para el Chat y que ahi se maneje todo sobre eso, el cargado del historial de los distintos chats
-conversaciones y demas y el temporal etc
-
-- Usar para algo lo de que cada prompt este asociado con su respuesta, para que si se dicen varias cosas a la vez por
-ejemplo se muestre com en whatsapp arriba de la respuesta a que mensaje responde o algo asi
-
-- Poner los mensajes con los colores de chatgpt o alguna interfaz asi
-
-- Modelo da la cabeza de sancho donde se vean los ojos y la boca tal y como se ve en la vida real
-
-refactor a esta arquitectura
-ros2web/
-├── ros2web/
-│   ├── __init__.py
-│
-│   ├── nodes/                     # Todos los nodos ROS2 (entry points)
-│   │   ├── web_bridge_node.py     # Aquí está el main del nodo y la lógica de ROS
-│   │   └── web_dispatcher_node.py
-│
-│   ├── protocols/                 # Formatos de mensajes, protocolos definidos
-│   │   └── message_protocol.py
-│
-│   ├── websockets/                # Clases específicas para manejar WebSocket
-│   │   ├── websocket_server.py
-│   │   └── websocket_client.py
-│
-│   ├── bridges/                   # Clases que conectan ROS ↔ Web (sin lógica ROS directa)
-│   │   └── ros_web_bridge.py
-│
-│   ├── utils/                     # Funciones auxiliares
-│   │   └── logger.py
-│
-│   └── config/                    # Archivos de configuración (si tienes)
-│       └── defaults.py
-│
-├── resource/
-│   └── ros2web
-├── setup.py
-├── setup.cfg
-├── package.xml
-└── launch/
-    └── ros2web.launch.py
-
-
-# sqlite
-# nodo que administra sqlite
-# api rest para acceder a esa bd a traves del nodo ros
-# adaptador
-# state sync and events
-
-Al iniciar, el nodo BD carga la info de la SQLite y se la pasa al nodo reconocedor.
-El nodo reconocedor guarda una copia local en RAM para comparar, clasificar, etc.
-Cuando aprende algo nuevo:
-Actualiza la BD (por evento).
-Notifica al nodo web (que se encarga de avisar a la web).
-La web se entera vía WebSocket y vuelve a consultar a la API REST si necesita los nuevos datos.
-
-BD: SQLite → con FastAPI para exponer datos a la web (REST).
-Nodo BD: gestiona toda la persistencia.
-Nodo reconocedor: maneja RAM y manda eventos.
-Nodo "web": adapta ROS a WebSocket (centraliza protocolo).
-Web: consulta a API REST cuando le avisan por WebSocket.
-Todo asíncrono, en tiempo real, modular, limpio. Muy buen diseño.
-
-Aplicación 1: Nodo reconocedor y la base de datos
-State sync:
-Al iniciar, el nodo reconocedor le pide al nodo BD que le mande toda la info (personas aprendidas y sus vectores).
-Ya puede trabajar sin consultar la BD todo el rato.
-Event update:
-Si se aprende una persona nueva, el nodo reconocedor manda un evento al nodo BD para actualizarlo.
-Si quisieras hacerlo bidireccional (por si hay más fuentes), el nodo BD también podría emitir eventos de cambio.
-
-Aplicación 2: Web y visualización de datos
-State sync:
-Cuando se abre la web, hace una llamada inicial al API REST para cargar todo (personas, fotos, vectores…).
-Muestra ese estado completo.
-Event update:
-Cuando algo cambia en ROS (por ejemplo, una persona nueva), el nodo "web" lo publica por WebSocket con un mensaje tipo "BD_INFO" o "NEW_PERSON".
-La web no recibe todos los datos por el WebSocket, solo la notificación.
-Al recibirla, la web vuelve a llamar al API REST para traer los datos actualizados.
-
-THOUGHTS:
-en el add_class, mandar tambien la imagen codificada jpg blabla etc para que aprenda la cara y el score, para que no se creen sin mas sin cara
-poner un minimo tamaño de cara para reconocer o detectar, de resolucion en general, ya no solo por almacenar si no porque es un mierdon sino
-poner ya lo de que se publique en el frontend bien el faceprint event y hacer lo consecuente
-poner a las cosas del frontend de la api que compruebe que la peticion va bien y eso no a pelo y ya
-que cada cierto tiempo haga un get all
-hacer un context para el chat
-hacer un context para los faceprints y que todo esto funciona independientemente de que estes en esa pagina o no, o que 
-solo funcione cuando estas ahi pero el context guarde eso al menos.. preguntar a chatgpt por esto y por tener muchos contexts asi que pasa
-
-
-TODO:
-TOASTS DE AÑADIDO O ELIMINADO O RENOMBRADO GENTE TANTO POR LA WEB O POR EVENTO
-HACER YA UN NOTION
-GUARDAR EN LA BD DATOS DE ULTIMA VEZ VISTO VECES VISTO DIAS VISTOS COSAS ASI
-RECARGAR
-PAGINACION
-MEJOR FRONTEND
-PODER AÑADIR CARAS DESDE LA WEB, A PARTIR DE LA CAMARA O CON IMAGENES, SE LES PASA POR EL PROCESO
-DE DETECCION Y RECONOCIMIENTO Y YA SE DECIDE QUE HACER
-
-
-
-HACER QUE DESDE LA WEB PUEDA EL USUARIO EDITAR UNA CARA, PARA ELLO SE PASARA POR EL PROCESO DE DETECCION
-Y CLASIFICACION Y DEMAS Y SI LA FOTO QUE EL USUARIO HA PUESTO CORRESPONDE CON LA QUE QUIERE EDITAR Y DEMAS
-Y TIENE BUEN SCORE PUES SE PONDRA ESA PARA SIEMPRE (FACE_SCORE A INFINITO POR EJEMPLO)
-
-SE PODRIA HACER ALGO TIPO UPLOAD FACE Y SI YA EXISTE PUES SE REEMPLAZA Y SINO SE CREA (LE PIDE LE NOMBRE Y ESO)
-TA BOMBITA
-Y LUEGO LO DE PREGUNTAR QUIEN ERES Y DEMAS TMB SE PODIRA HACER POR LA INTERFAZ WEB
-
-
-
-NEXT THINGS:
-- ARREGLAR WARNINGS DE ATTENTION MASK Y EL EOS Y TO ESO
-- ARREGLAR EL WARNING DE SANCHO AI DE QUE HAY PUBLISHERS REPETIDOS O ALGO ASI
-- CONTINUAR CON LAS OTRAS TECNICAS DE TEMPLATE HRI, TODO JUNTO... RAG...
-- METER YA EL TEMA DE MAS REGISTROS DE FACEPRINTS Y HACER MEJOR FRONTEND MAS CHULO
-- LO DE ARRIBA
-- LOGIN
+CUANDO ESTE EN EL LAB BOCA Y REVISAR EL PIPELINE DE VOZ QUE PASA CON EL MICROFONO
+MANDAR TAMBIEN LOS ARGUMENTOS DE LA CLASIFICACION DE SANCHO AI AL SANCHO WEB
+Y DE SANCHO WEB A LA WEB Y QUE AL HACER CLICK EN LA CLASIFICACION PUES SALGAN LOS ARGUMENTOS

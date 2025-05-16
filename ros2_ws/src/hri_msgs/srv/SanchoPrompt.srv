@@ -1,7 +1,9 @@
+string user
 string text
 ---
 string text
 string method
 string intent
+string args_json
 string provider
 string model

@@ -53,6 +53,7 @@ class Assistant:
 
     def sancho_prompt_request(self, text):
         sancho_prompt_request = SanchoPrompt.Request()
+        sancho_prompt_request.user = "HRI System"
         sancho_prompt_request.text = text
 
         future_sancho_prompt = self.node.sancho_prompt_client.call_async(sancho_prompt_request)

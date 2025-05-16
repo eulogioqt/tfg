@@ -24,7 +24,9 @@ If the input doesn't match any known intent, respond with:
 Examples:
 {examples_section}
 
-Important: Only return valid JSON. No explanations. No markdown. No extra text.
+Now analyze this new input and respond accordingly:
+Input: "{user_input}"
+Output:
 """
 
 class ClassificationPrompt(Prompt):
@@ -58,16 +60,17 @@ class ClassificationPrompt(Prompt):
                 input_text = example["input"]
                 output_json = json.dumps(example["output"], ensure_ascii=False)
                 examples.append(f'Input: "{input_text}"\nOutput: {output_json}')
- 
+
         examples.append('Input: "me gusta mucho el fútbol"\nOutput: {"intent": "UNKNOWN", "arguments": {}}')
         return "\n\n".join(examples)
 
     def get_prompt_system(self):
         return PROMPT_TEMPLATE.replace("{intents_definitions}", self.intents_definitions_str)\
-                              .replace("{examples_section}", self.examples_str)
+                              .replace("{examples_section}", self.examples_str)\
+                              .replace("{user_input}", self.user_input)
 
     def get_user_prompt(self):
-        return self.user_input
+        return ""  # Ya no se necesita porque va embebido
 
     def get_parameters(self):
         return json.dumps({

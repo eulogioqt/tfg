@@ -8,9 +8,8 @@ from ..hri_engine import HRIEngine
 from ..llm_engine import LLMEngine
 
 from ..prompts.classification_prompt import ClassificationPrompt
+from ..prompts.unknown_prompt import UnknownPrompt
 from ..prompts.commands.commands import COMMANDS
-
-from llm_tools.models import PROVIDER, MODELS
 
 def try_json_loads(text):
     try:
@@ -44,8 +43,6 @@ class ClassificationTemplatesAI(TemplateAI):
 
         self.node.get_logger().info(f"User: {user_input}")
         response, provider_used, model_used, message, success = self.llm_engine.prompt_request(
-            #provider=PROVIDER.GEMINI,
-            #model=MODELS.LLM.DEEPSEEK.DEEPSEEK_CHAT,
             prompt_system=classification_prompt.get_prompt_system(),
             user_input=classification_prompt.get_user_prompt(),
             parameters_json=classification_prompt.get_parameters()
@@ -53,18 +50,18 @@ class ClassificationTemplatesAI(TemplateAI):
         
         if not success:
             self.node.get_logger().error(f"There was a problem with prompt: {message}")
-            return self.unknown_message(), COMMANDS.UNKNOWN, provider_used, model_used
+            return self.unknown_message(user_input), COMMANDS.UNKNOWN, provider_used, model_used
         
-        self.node.get_logger().info(f"LLM:\n{response}")
+        self.node.get_logger().info(f"LLM for Classification Prompt:\n{response}")
         classification_response_json = extract_json_from_code_block(response) # Gemini usually puts the response in ```json block
         if not classification_response_json:
             self.node.get_logger().error(f"No JSON format found.")
-            return self.unknown_message(), COMMANDS.UNKNOWN, provider_used, model_used
+            return self.unknown_message(user_input), COMMANDS.UNKNOWN, provider_used, model_used
 
         classification_response = try_json_loads(classification_response_json)
         if not classification_response:
             self.node.get_logger().error(f"Error on JSON loads.")
-            return self.unknown_message(), COMMANDS.UNKNOWN, provider_used, model_used
+            return self.unknown_message(user_input), COMMANDS.UNKNOWN, provider_used, model_used
         
         intent = classification_response["intent"]
 
@@ -82,6 +79,24 @@ class ClassificationTemplatesAI(TemplateAI):
 
             response = self.delete_user(user, result)
         else:
-            response = self.unknown_message()
+            response = self.unknown_message(user_input)
 
         return response, intent, provider_used, model_used
+    
+    def unknown_message(self, user_input):
+        unknown_prompt = UnknownPrompt(user_input)
+
+        self.node.get_logger().info(f"User: {user_input}")
+        response, provider_used, model_used, message, success = self.llm_engine.prompt_request(
+            prompt_system=unknown_prompt.get_prompt_system(),
+            user_input=unknown_prompt.get_user_prompt(),
+            parameters_json=unknown_prompt.get_parameters()
+        )
+        
+        if not success:
+            self.node.get_logger().error(f"There was a problem with prompt: {message}")
+            return super().unknown_message(), COMMANDS.UNKNOWN, provider_used, model_used
+        
+        self.node.get_logger().info(f"LLM for Unknown Prompt:\n{response}")
+
+        return response
