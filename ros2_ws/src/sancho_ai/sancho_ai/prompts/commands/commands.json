@@ -14,6 +14,33 @@
             "user": "Pedro"
           }
         }
+      },
+      {
+        "input": "elimina a Marta",
+        "output": {
+          "intent": "DELETE_USER",
+          "arguments": {
+            "user": "Marta"
+          }
+        }
+      },
+      {
+        "input": "quiero borrar a Juan del sistema",
+        "output": {
+          "intent": "DELETE_USER",
+          "arguments": {
+            "user": "Sistema"
+          }
+        }
+      },
+      {
+        "input": "puedes quitar al usuario Ana",
+        "output": {
+          "intent": "DELETE_USER",
+          "arguments": {
+            "user": "Ana"
+          }
+        }
       }
     ]
   },
@@ -28,6 +55,27 @@
           "intent": "WHAT_YOU_SEE",
           "arguments": {}
         }
+      },
+      {
+        "input": "qué ves ahora",
+        "output": {
+          "intent": "WHAT_YOU_SEE",
+          "arguments": {}
+        }
+      },
+      {
+        "input": "puedes decirme qué estás viendo",
+        "output": {
+          "intent": "WHAT_YOU_SEE",
+          "arguments": {}
+        }
+      },
+      {
+        "input": "describe lo que tienes delante",
+        "output": {
+          "intent": "WHAT_YOU_SEE",
+          "arguments": {}
+        }
       }
     ]
   },
@@ -38,6 +86,27 @@
     "examples": [
       {
         "input": "cómo te encuentras hoy",
+        "output": {
+          "intent": "HOW_ARE_YOU",
+          "arguments": {}
+        }
+      },
+      {
+        "input": "cómo estás",
+        "output": {
+          "intent": "HOW_ARE_YOU",
+          "arguments": {}
+        }
+      },
+      {
+        "input": "qué tal te encuentras",
+        "output": {
+          "intent": "HOW_ARE_YOU",
+          "arguments": {}
+        }
+      },
+      {
+        "input": "cómo va todo contigo",
         "output": {
           "intent": "HOW_ARE_YOU",
           "arguments": {}
