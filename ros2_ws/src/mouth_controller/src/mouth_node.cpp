@@ -3,6 +3,8 @@
 #include <random>
 #include <cmath>
 #include <algorithm>
+#include <string>
+#include <fstream>
 
 class MouthNode : public rclcpp::Node
 {
@@ -25,7 +27,6 @@ private:
 
         std::vector<int16_t> samples(SAMPLES);
 
-        // Simulamos una onda senoidal con amplitud variable (como si hablara)
         double time = this->get_clock()->now().seconds();
         double amplitude = 16384.0 + 16384.0 * std::sin(2 * M_PI * 0.5 * time);
 
@@ -48,10 +49,30 @@ private:
             sum_sq += static_cast<double>(s) * s;
 
         double rms = std::sqrt(sum_sq / samples.size());
-        int level = static_cast<int>(std::round((rms / 32768.0) * 5.0)); // ver si usar rms o promedio de abs
-        level = std::clamp(level, 0, 5);
+        double normalized = std::clamp(rms / 32768.0, 0.0, 1.0);
 
-        RCLCPP_INFO(get_logger(), "Enviando a la boca nivel de intensidad: %d", level);
+        int level = static_cast<int>(normalized * 4.999); // 0, 1, 2, 3, 4
+
+        static const char *LEVEL_NAMES[] = {
+            "LOW", "MEDIUM_LOW", "MEDIUM", "MEDIUM_HIGH", "HIGH"};
+
+        const char *level_str = LEVEL_NAMES[level];
+
+        RCLCPP_INFO(get_logger(), "Enviando a la boca nivel de intensidad: %s", level_str);
+        send_to_esp32(level_str);
+    }
+
+    void send_to_esp32(const std::string &level)
+    {
+        std::ofstream serial("/dev/ttyUSB0");
+        if (!serial.is_open())
+        {
+            RCLCPP_ERROR(get_logger(), "No se pudo abrir /dev/ttyUSB0");
+            return;
+        }
+        serial << level << "\n";
+        serial.flush();
+        serial.close();
     }
 
     rclcpp::TimerBase::SharedPtr timer_;
