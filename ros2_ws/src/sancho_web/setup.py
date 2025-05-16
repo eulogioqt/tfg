@@ -13,6 +13,10 @@ setup(
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name + "/commands", glob(package_name + '/commands/*.json'))
     ],
+    package_data={
+        package_name: ['database/*.db'],
+    },
+    include_package_data=True,
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='eulogioqt',

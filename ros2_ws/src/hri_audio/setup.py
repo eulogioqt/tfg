@@ -12,9 +12,12 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        ('share/' + package_name + "/sounds", glob(package_name + '/sounds/*')),
         (os.path.join('share', package_name), glob('launch/*launch.[pxy][yma]*')),
     ],
+    package_data={
+        package_name: ['sounds/*', 'utils/models/*'],
+    },
+    include_package_data=True,
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='mapir',

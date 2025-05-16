@@ -11,6 +11,10 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
     ],
+    package_data={
+        package_name: ['tts/tts_models/*'],
+    },
+    include_package_data=True,
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='ubuntu',
