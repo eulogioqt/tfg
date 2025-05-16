@@ -1,7 +1,9 @@
+import os
 import dlib
 import cv2
 
-face_landmark_predictor = dlib.shape_predictor('install/hri_vision/share/hri_vision/models/shape_predictor_68_face_landmarks.dat')
+face_landmark_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "models/shape_predictor_68_face_landmarks.dat")
+face_landmark_predictor = dlib.shape_predictor(face_landmark_path)
 
 def align_face(frame, face_position):
     """Aligns the face, using dlib landmarks

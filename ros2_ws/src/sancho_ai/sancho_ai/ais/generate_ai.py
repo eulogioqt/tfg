@@ -82,8 +82,43 @@ class GenerateAI(AI):
         return self.do_semantic_response_prompt(user_input, result, chat_history)
 
     def unknown_message(self, user_input, chat_history=[]):
-        unknown_prompt = UnknownPrompt(user_input)
+        actual_people_json = self.hri_engine.get_actual_people_request()
+        actual_people = json.loads(actual_people_json)
+        visible_people = [person for person, time_on_screen in actual_people.items() if time_on_screen < 1]
 
+        faceprints_json = self.hri_engine.get_faceprint_request(json.dumps({"fields": ["id", "name"]}))
+        faceprints = json.loads(faceprints_json)
+        known_people = [fp["name"] for fp in faceprints]
+
+        sessions_json = self.hri_engine.get_sessions_request()
+        sessions = json.loads(sessions_json)
+        times_seen = {}
+        last_seen = {}
+
+        robot_context = {
+            "visible_people": visible_people,
+            "known_people": known_people,
+            "times_seen": {
+                "Lucía": 5,
+                "Pedro": 2,
+                "Ana": 7
+            },
+            "last_seen": {
+                "Lucía": "2025-05-16 10:22",
+                "Pedro": "2025-05-15 17:50",
+                "Ana": "2025-05-14 09:15"
+            }
+        }
+
+        robot_context = {
+            "visible_people": visible_people,
+            "known_people": known_people,
+            "times_seen": times_seen,
+            "last_seen": last_seen
+        }
+
+        unknown_prompt = UnknownPrompt(user_input, robot_context)
+        self.node.get_logger().info(f"Prompt system: {unknown_prompt.get_prompt_system()}")
         self.node.get_logger().info(f"User: {user_input}")
         response, provider_used, model_used, message, success = self.llm_engine.prompt_request(
             messages_json=json.dumps(chat_history), # Ultimos 5 turnos

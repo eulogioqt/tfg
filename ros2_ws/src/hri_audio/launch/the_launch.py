@@ -1,0 +1,102 @@
+from launch import LaunchDescription
+from launch_ros.actions import Node
+
+from speech_tools.models import STT_MODELS, TTS_MODELS, TTS_SPEAKERS
+from llm_tools.models import PROVIDER, MODELS
+from sancho_web.apis import API_LIST
+
+
+def generate_launch_description():
+    return LaunchDescription([
+        Node(
+            package='speech_tools',
+            executable='tts',
+            name='tts',
+            output='screen',
+            parameters=[{
+                "load_models": f"[['{TTS_MODELS.PIPER}', '']]",
+                "active_model": f"{TTS_MODELS.PIPER}",
+                "active_speaker": f"{TTS_SPEAKERS.PIPER.DAVEFX}"
+            }]
+        ),
+        Node(
+            package='speech_tools',
+            executable='stt',
+            name='stt',
+            output='screen',
+            parameters=[{
+                "load_models": f"[['{STT_MODELS.WHISPER}', '']]",
+                "active_model": f"{STT_MODELS.WHISPER}"
+            }]
+        ),
+        Node(
+            package='llm_tools',
+            executable='llm',
+            name='llm',
+            output='screen',
+            parameters=[{
+                "llm_load_models": f"[['{PROVIDER.DEEPSEEK}', ['{MODELS.LLM.DEEPSEEK.DEEPSEEK_CHAT}'], '']]",
+                "llm_active_provider": f"{PROVIDER.DEEPSEEK}",
+                "llm_active_model": f"{MODELS.LLM.DEEPSEEK.DEEPSEEK_CHAT}",         
+            }]
+        ),
+        
+        Node(
+            package='sancho_ai',
+            executable='sancho_ai',
+            name='sancho_ai',
+            output='screen'
+        ),
+        Node(
+            package='ros2web',
+            executable='server',
+            name='r2w_server',
+            output='screen'
+        ),
+        Node(
+            package='sancho_web',
+            executable='sancho_web',
+            name='sancho_web',
+            output='screen'
+        ),
+        Node(
+            package='sancho_web',
+            executable='api_rest',
+            name='api_rest',
+            output='screen',
+            parameters=[{
+                "apis": f"['{API_LIST.TTS_MODELS}', '{API_LIST.STT_MODELS}', '{API_LIST.LLM_MODELS}', '{API_LIST.FACEPRINTS}', '{API_LIST.SESSIONS}']"
+            }]
+        ),
+
+        Node(
+            package='hri_vision',
+            executable='video',
+            name='video',
+            output='screen'
+        ),
+        Node(
+            package='hri_vision',
+            executable='detector',
+            name='detector',
+            output='screen'
+        ),
+        Node(
+            package='hri_vision',
+            executable='recognizer',
+            name='recognizer',
+            output='screen'
+        ),
+        Node(
+            package='hri_vision',
+            executable='logic',
+            name='logic',
+            output='screen',
+        ),
+        Node(
+            package='rumi_web',
+            executable='session_manager',
+            name='session_manager',
+            output='screen'
+        ),
+    ])

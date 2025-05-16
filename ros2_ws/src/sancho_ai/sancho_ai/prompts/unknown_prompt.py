@@ -24,6 +24,7 @@ Rules:
 - NO emojis or special characters.
 """
 
+# Montar RAG con toda la base de datos o algo, que tenga toda la info de cada faceprint para poder sacar lo que sea de ahi
 class UnknownPrompt(Prompt):
     def __init__(self, user_input: str, robot_context: dict = {}):
         self.user_input = user_input.strip()
@@ -34,32 +35,36 @@ class UnknownPrompt(Prompt):
         lines = []
 
         # known_people
-        if ctx.get("known_people"):
-            names = ", ".join(ctx["known_people"])
-            lines.append(f"You know {names}.")
+        known = ctx.get("known_people", [])
+        if known:
+            lines.append(f"You currently know {len(known)} people.")
+            lines.append("Their names are: " + ", ".join(known) + ".")
         else:
             lines.append("You currently don't know anyone.")
 
         # visible_people
-        if ctx.get("visible_people"):
-            names = ", ".join(ctx["visible_people"])
-            lines.append(f"You are currently seeing {names}.")
+        visible = ctx.get("visible_people", [])
+        if visible:
+            lines.append(f"You are currently seeing {len(visible)} person{'s' if len(visible) > 1 else ''}.")
+            lines.append("Right now you see: " + ", ".join(visible) + ".")
         else:
-            lines.append("You are not seeing anyone right now.")
+            lines.append("You are not seeing anyone at the moment.")
 
         # times_seen
-        if ctx.get("times_seen"):
-            phrases = [f"{name} {count} times" for name, count in ctx["times_seen"].items()]
-            lines.append("You have seen " + ", ".join(phrases) + ".")
+        times_seen = ctx.get("times_seen", {})
+        if times_seen:
+            phrases = [f"{name} ({count} time{'s' if count != 1 else ''})" for name, count in times_seen.items()]
+            lines.append("You have seen these people: " + ", ".join(phrases) + ".")
         else:
-            lines.append("You have no record of how many times you've seen people.")
+            lines.append("You don't have any record of how many times you've seen someone.")
 
         # last_seen
-        if ctx.get("last_seen"):
-            phrases = [f"{name} was {timestamp}" for name, timestamp in ctx["last_seen"].items()]
-            lines.append("The last time you saw them: " + ", ".join(phrases) + ".")
+        last_seen = ctx.get("last_seen", {})
+        if last_seen:
+            phrases = [f"{name} at {timestamp}" for name, timestamp in last_seen.items()]
+            lines.append("The last time you saw each person was: " + "; ".join(phrases) + ".")
         else:
-            lines.append("You have no memory of when you last saw anyone.")
+            lines.append("You don't remember when you last saw anyone.")
 
         return "\n".join(lines)
 

@@ -166,11 +166,17 @@ class HumanFaceRecognizer(Node):
         args = json.loads(request.args) if request.args else {}
         id = args.get("id", "").strip()
         name = args.get("name", "").strip()
+        fields = args.get("fields", [])
+
+        def filter_fields(obj):
+            return {k: obj[k] for k in fields if k in obj} if fields else obj
 
         if id:
             result = self.classifier.db.get_by_id(id)
+            result = filter_fields(result) if result else {}
         else:
             result = self.classifier.db.get_all(name)
+            result = [filter_fields(fp) for fp in result]
 
         response.text = json.dumps(result)
         return response

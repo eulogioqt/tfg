@@ -1,7 +1,8 @@
 import json
 
 from std_msgs.msg import String
-from hri_msgs.srv import GetString, Training
+from hri_msgs.srv import GetString as GetStringHRI, Training
+from rumi_msgs.srv import GetString as GetStringRUMI
 
 from .service_engine import ServiceEngine
 
@@ -10,8 +11,9 @@ class HRIEngine(ServiceEngine):
     def __init__(self, node):
         super().__init__(node)
 
-        self.get_faceprint_cli = self.create_client(GetString, 'recognition/get_faceprint', wait=False)
-        self.actual_people_cli = self.create_client(GetString, "logic/get/actual_people", wait=False)
+        self.get_sessions_cli = self.create_client(GetStringRUMI, 'rumi/sessions/get', wait=False)
+        self.get_faceprint_cli = self.create_client(GetStringHRI, 'recognition/get_faceprint', wait=False)
+        self.actual_people_cli = self.create_client(GetStringHRI, "logic/get/actual_people", wait=False)
         self.training_cli = self.create_client(Training, 'recognition/training', wait=False)
 
         self.node.get_logger().info("HRI Engine initializated succesfully")
@@ -44,7 +46,7 @@ class HRIEngine(ServiceEngine):
 
     # Info
     def get_faceprint_request(self, args_msg=""):
-        req = GetString.Request()
+        req = GetStringHRI.Request()
         req.args = args_msg
 
         result = self.call_service(self.get_faceprint_cli, req)
@@ -54,10 +56,20 @@ class HRIEngine(ServiceEngine):
         return result.text
 
     def get_actual_people_request(self):
-        req = GetString.Request()
+        req = GetStringHRI.Request()
 
         result = self.call_service(self.actual_people_cli, req)
         if result is None:
             return "{}"
         
+        return result.text
+
+    def get_sessions_request(self, args_msg=""):
+        req = GetStringRUMI.Request()
+        req.args = args_msg
+
+        result = self.call_service(self.get_sessions_cli, req)
+        if result is None:
+            return "[]"
+
         return result.text
