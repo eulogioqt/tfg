@@ -44,6 +44,7 @@ class TTS_SPEAKERS:
         ALMA_MARIA = "Alma María"
         ANA_FLORENCE = "Ana Florence"
         LUIS_MORAY = "Luis Moray"
+        VIKTOR_EKA = "Viktor Eka"
         MARCOS_RUDASKI = "Marcos Rudaski"
         FERRAN_SIMEN = "Ferran Simen"
         XAVIER_HAYASAKA = "Xavier Hayasaka"

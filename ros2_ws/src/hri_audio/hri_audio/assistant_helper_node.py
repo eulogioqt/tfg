@@ -85,11 +85,14 @@ class AssistantHelper:
             rclpy.spin_once(self.node)
 
     def process_name_mode(self, new_audio):
+        import time
+        a = time.time()
         if self.hotword_detector.detect(new_audio, self.sample_rate):
             self.helper_state = HELPER_STATE.COMMAND
 
             play(ACTIVATION_SOUND)
             self.node.get_logger().info(f"✅✅✅ '{self.name.upper()}' DETECTED")
+        self.node.get_logger().info(f"{time.time() - a}")
 
     def process_command_mode(self, new_audio):
         self.check_audio = self.check_audio + new_audio

@@ -10,4 +10,4 @@ class XTTS(CoquiMultiTTS):
         )
 
     def get_speakers(self) -> list[str]:
-        return ["Ferran Simen"]
+        return ["Viktor Eka"]

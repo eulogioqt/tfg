@@ -10,8 +10,8 @@ load_dotenv()
 
 
 # Cambia esto por la ruta a tu archivo .ppn personalizado con la palabra "Sancho"
-CUSTOM_WAKE_WORD_PATH = "sancho_linux.ppn"  # Asegúrate de que esta ruta es correcta
-PICOVOICE_API_KEY = os.environ.get("PICOVOICE_API_KEY")
+CUSTOM_WAKE_WORD_PATH = "sancho_linux_sancho.ppn"  # Asegúrate de que esta ruta es correcta
+PICOVOICE_API_KEY = os.environ.get("PICOVOICE_API_KEY_SANCHO")
 MODEL_PATH = "porcupine_params_es.pv"
 
 def main():
