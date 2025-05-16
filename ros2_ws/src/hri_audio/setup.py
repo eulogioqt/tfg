@@ -21,7 +21,7 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='mapir',
-    maintainer_email='famoreno@uma.es',
+    maintainer_email='eulogioquemada@uma.es',
     description='TODO: Package description',
     license='Apache-2.0',
     tests_require=['pytest'],
