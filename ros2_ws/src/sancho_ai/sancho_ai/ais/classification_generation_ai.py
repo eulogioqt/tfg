@@ -64,19 +64,48 @@ class ClassificationGenerationAI(GenerateAI):
         
         intent = classification_response["intent"]
 
-        if intent == COMMANDS.HOW_ARE_YOU:
-            response = self.how_are_you(user_input, chat_history)
-        elif intent == COMMANDS.WHAT_YOU_SEE:
-            actual_people_json = self.hri_engine.get_actual_people_request()
-            actual_people = json.loads(actual_people_json)
-
-            response = self.what_you_see(actual_people, user_input, chat_history)
-        elif intent == COMMANDS.DELETE_USER:
+        if intent == COMMANDS.DELETE_USER:
             user = classification_response["arguments"]["user"]
-            result = self.hri_engine.delete_request(user)
-            result = "success" if result >= 0 else "failure"
+            if not user:
+                response = f"No he eliminado a nadie, no sé a quién te refieres"
+            else:
+                user_obj_json = self.hri_engine.get_faceprint_request(json.dumps({"name": user}))
+                user_obj = json.loads(user_obj_json)
+                if user_obj:
+                    result = self.hri_engine.delete_request(user_obj["id"])
+                    if result >= 0:
+                        response = f"He eliminado a {user} correctamente"
+                    else:
+                        response = f"No he podido borrar a {user}"
+                else:
+                    response = f"No he encontrado a nadie con el nombre {user}"
 
-            response = self.delete_user(user, result, user_input, chat_history)
+        elif intent == COMMANDS.RENAME_USER:
+            old_name = classification_response["arguments"]["old_name"]
+            new_name = classification_response["arguments"]["new_name"]
+            if not old_name:
+                response = f"No he renombrado a nadie, no sé a quién te refieres"
+            elif not new_name:
+                response = f"No he renombrado a {old_name}, no sé que otro nombre le quieres poner"
+            else:
+                user_obj_json = self.hri_engine.get_faceprint_request(json.dumps({"name": old_name}))
+                user_obj = json.loads(user_obj_json)
+                if user_obj:
+                    result = self.hri_engine.rename_request(old_name, new_name)
+                    if result >= 0:
+                        response = f"Le he cambiado el nombre a {old_name} por {new_name} correctamente"
+                    else:
+                        response = f"No he podido cambiarle el nombre a {old_name} por {new_name}"
+                else:
+                    response = f"No he encontrado a nadie con el nombre {old_name}"
+
+        elif intent == COMMANDS.TAKE_PICTURE:
+            image = self.hri_engine.take_picture_request()
+            if not image:
+                response = "No he podido tomar una foto"
+            else:
+                response = "Foto tomada correctamente"
+
         else:
             response = self.unknown_message(user_input, chat_history)
 

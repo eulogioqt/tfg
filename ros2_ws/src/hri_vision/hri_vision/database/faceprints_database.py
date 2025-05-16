@@ -19,9 +19,9 @@ class FaceprintsDatabase:
         with self._lock:
             return list(self.faceprints.keys())
 
-    def get_all(self):
+    def get_all(self, name=""):
         with self._lock:
-            return list(self.faceprints.values())
+            return [fp for fp in self.faceprints.values() if not name or fp.name.lower() == name.lower()]
 
     def get_by_id(self, id):
         with self._lock:

@@ -29,7 +29,7 @@
         "output": {
           "intent": "DELETE_USER",
           "arguments": {
-            "user": "Sistema"
+            "user": "Juan"
           }
         }
       },
@@ -45,70 +45,85 @@
     ]
   },
   {
-    "name": "WHAT_YOU_SEE",
-    "description": "Saber qué está observando el robot o qué se ve por la cámara.",
-    "arguments": {},
+    "name": "RENAME_USER",
+    "description": "Cambiar el nombre de un usuario conocido por uno nuevo.",
+    "arguments": {
+      "old_name": "Nombre actual del usuario.",
+      "new_name": "Nuevo nombre que se le quiere dar."
+    },
     "examples": [
       {
-        "input": "qué estás viendo ahora mismo",
+        "input": "cambia el nombre de Lucía a Ana",
         "output": {
-          "intent": "WHAT_YOU_SEE",
-          "arguments": {}
+          "intent": "RENAME_USER",
+          "arguments": {
+            "old_name": "Lucía",
+            "new_name": "Ana"
+          }
         }
       },
       {
-        "input": "qué ves ahora",
+        "input": "renombra a Juan como Pedro",
         "output": {
-          "intent": "WHAT_YOU_SEE",
-          "arguments": {}
+          "intent": "RENAME_USER",
+          "arguments": {
+            "old_name": "Juan",
+            "new_name": "Pedro"
+          }
         }
       },
       {
-        "input": "puedes decirme qué estás viendo",
+        "input": "quiero cambiar el nombre de Marcos por Leo",
         "output": {
-          "intent": "WHAT_YOU_SEE",
-          "arguments": {}
+          "intent": "RENAME_USER",
+          "arguments": {
+            "old_name": "Marcos",
+            "new_name": "Leo"
+          }
         }
       },
       {
-        "input": "describe lo que tienes delante",
+        "input": "puedes renombrar a Clara a nombre Cristina",
         "output": {
-          "intent": "WHAT_YOU_SEE",
-          "arguments": {}
+          "intent": "RENAME_USER",
+          "arguments": {
+            "old_name": "Clara",
+            "new_name": "Cristina"
+          }
         }
       }
     ]
   },
   {
-    "name": "HOW_ARE_YOU",
-    "description": "Conocer el estado emocional o físico del robot.",
+    "name": "TAKE_PICTURE",
+    "description": "Tomar una foto con la cámara del robot.",
     "arguments": {},
     "examples": [
       {
-        "input": "cómo te encuentras hoy",
+        "input": "haz una foto",
         "output": {
-          "intent": "HOW_ARE_YOU",
+          "intent": "TAKE_PICTURE",
           "arguments": {}
         }
       },
       {
-        "input": "cómo estás",
+        "input": "saca una foto ahora",
         "output": {
-          "intent": "HOW_ARE_YOU",
+          "intent": "TAKE_PICTURE",
           "arguments": {}
         }
       },
       {
-        "input": "qué tal te encuentras",
+        "input": "puedes hacer una foto",
         "output": {
-          "intent": "HOW_ARE_YOU",
+          "intent": "TAKE_PICTURE",
           "arguments": {}
         }
       },
       {
-        "input": "cómo va todo contigo",
+        "input": "toma una fotografía de lo que ves",
         "output": {
-          "intent": "HOW_ARE_YOU",
+          "intent": "TAKE_PICTURE",
           "arguments": {}
         }
       }

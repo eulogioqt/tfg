@@ -163,18 +163,16 @@ class HumanFaceRecognizer(Node):
         self.faceprint_event_pub.publish(faceprint_event)
 
     def get_people(self, request, response):
-        args = request.args
+        args = json.loads(request.args) if request.args else {}
+        id = args.get("id", "").strip()
+        name = args.get("name", "").strip()
 
-        if args:
-            args = json.loads(args)
-            id = args["id"]
-
-            faceprint = self.classifier.db.get_by_id(id)
-            response.text = json.dumps(faceprint)
+        if id:
+            result = self.classifier.db.get_by_id(id)
         else:
-            faceprints = self.classifier.db.get_all()
-            response.text = json.dumps(faceprints)
+            result = self.classifier.db.get_all(name)
 
+        response.text = json.dumps(result)
         return response
 
     def save_data(self):

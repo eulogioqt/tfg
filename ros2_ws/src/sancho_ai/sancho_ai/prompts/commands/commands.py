@@ -2,7 +2,7 @@ from enum import Enum
 
 class COMMANDS(str, Enum):
     DELETE_USER = "DELETE_USER",
-    WHAT_YOU_SEE = "WHAT_YOU_SEE",
-    HOW_ARE_YOU = "HOW_ARE_YOU"
+    RENAME_USER = "RENAME_USER",
+    TAKE_PICTURE = "TAKE_PICTURE"
     
     UNKNOWN = "UNKNOWN"
