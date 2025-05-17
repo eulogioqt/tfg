@@ -31,7 +31,9 @@ const ChatMessageModal = ({ isOpen, handleClose, message }) => {
                     <strong>{message.intent || "Sin intención detectada"}</strong>
                 </div>
                 {message.arguments && Object.keys(message.arguments).length > 0 && (
-                    <div className="mt-2">{formatArgs(message.arguments)}</div>
+                    <div className="mt-1" style={{ lineHeight: "1rem" }}>
+                        {formatArgs(message.arguments)}
+                    </div>
                 )}
             </>
         );
