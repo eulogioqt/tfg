@@ -2,6 +2,7 @@ import json
 
 from .response_generator import ResponseGenerator
 
+from ...log_manager import LogManager
 from ...prompts import UnknownPrompt, SemanticResultPrompt
 from ...engines import LLMEngine, HRIEngine
 
@@ -16,7 +17,7 @@ class LLMGenerator(ResponseGenerator):
                           arguments: dict, user_input: str, chat_history: list) -> str:
         semantic_result = SemanticResultPrompt.build_semantic_result(intent, arguments, status, details)
         semantic_response_prompt = SemanticResultPrompt(semantic_result, user_input, chat_history)
-        print(f"PROMPT SYSTEM:\n{semantic_response_prompt.get_prompt_system()}")
+        LogManager.info(f"PROMPT SYSTEM:\n{semantic_response_prompt.get_prompt_system()}")
         
         response, provider_used, model_used, message, success = self.llm_engine.prompt_request(
             prompt_system=semantic_response_prompt.get_prompt_system(),
@@ -25,10 +26,10 @@ class LLMGenerator(ResponseGenerator):
         )
 
         if not success:
-            print(f"There was a problem with generation prompt: {message}")
+            LogManager.error(f"There was a problem with generation prompt: {message}")
             return semantic_result["details"]
         
-        print(f"LLM for Generation Prompt:\n{response}")
+        LogManager.info(f"LLM for Generation Prompt:\n{response}")
 
         return response, provider_used, model_used
 
@@ -71,11 +72,11 @@ class LLMGenerator(ResponseGenerator):
         }
 
         b = time.time() - a
-        print(f"Time building context: {b}")
+        LogManager.info(f"Time building context: {b}")
 
         unknown_prompt = UnknownPrompt(user_input, robot_context)
-        print(f"Prompt system: {unknown_prompt.get_prompt_system()}")
-        print(f"User: {user_input}")
+        LogManager.info(f"Prompt system: {unknown_prompt.get_prompt_system()}")
+        LogManager.info(f"User: {user_input}")
         response, provider_used, model_used, message, success = self.llm_engine.prompt_request(
             messages_json=json.dumps(chat_history), # Ultimos 5 turnos
             prompt_system=unknown_prompt.get_prompt_system(),
@@ -84,9 +85,9 @@ class LLMGenerator(ResponseGenerator):
         )
         
         if not success:
-            print(f"There was a problem with unknown prompt: {message}")
+            LogManager.error(f"There was a problem with unknown prompt: {message}")
             return "Lo siento, no te he entendido"
         
-        print(f"LLM for Unknown Prompt:\n{response}")
+        LogManager.info(f"LLM for Unknown Prompt:\n{response}")
 
         return response, provider_used, model_used

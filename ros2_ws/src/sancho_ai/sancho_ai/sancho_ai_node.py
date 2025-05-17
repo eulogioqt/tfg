@@ -4,6 +4,7 @@ from rclpy.node import Node
 
 from hri_msgs.srv import SanchoPrompt
 
+from .log_manager import LogManager
 from .ais import create_sancho_ai, AIType
 
 
@@ -18,6 +19,7 @@ class SanchoAINode(Node):
 
         self.chats = {}
 
+        LogManager.set_node(self)
         self.get_logger().info("SanchoAI Node initializated successfully")
 
     def prompt_service(self, request, response):
