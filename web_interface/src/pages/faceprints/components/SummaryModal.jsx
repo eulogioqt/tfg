@@ -22,11 +22,10 @@ const SummaryModal = ({ isOpen, handleClose }) => {
     const { faceprintsData } = useFaceprints();
     const { showToast } = useToast();
 
-    const [sessionMap, setSessionMap] = useState({});
-    const [loading, setLoading] = useState(false);
+    const [sessionMap, setSessionMap] = useState(undefined);
 
     const fetchSummary = async () => {
-        setLoading(true);
+        setSessionMap(undefined);
         const sessionResponse = await sessions.getSummary();
         if (isResponseOk(sessionResponse)) {
             const map = {};
@@ -36,8 +35,8 @@ const SummaryModal = ({ isOpen, handleClose }) => {
             setSessionMap(map);
         } else {
             showToast("Error al obtener sesiones", sessionResponse.data.detail, "red");
+            setSessionMap(null);
         }
-        setLoading(false);
     };
 
     useEffect(() => {
@@ -59,19 +58,23 @@ const SummaryModal = ({ isOpen, handleClose }) => {
                     </button>
                 </div>
 
-                {loading ? (
-                    <div className="alert alert-info d-flex align-items-center" role="alert">
-                        <div className="spinner-border spinner-border-sm text-primary me-2" role="status" />
-                        Cargando resumen de sesiones...
+                {sessionMap === undefined ? (
+                    <div className="d-flex align-items-center justify-content-center p-4">
+                        <div className="spinner-border text-primary me-3" role="status" />
+                        <span className="fs-5">Cargando resumen de sesiones...</span>
+                    </div>
+                ) : sessionMap === null ? (
+                    <div className="alert alert-danger text-center">
+                        Error al cargar el resumen de sesiones. Verifica la conexión o pulsa en recargar.
                     </div>
                 ) : faceprintsData.length === 0 ? (
                     <div className="alert alert-warning text-center" role="alert">
                         No hay rostros registrados en el sistema.
                     </div>
                 ) : (
-                    <div className="table-responsive">
-                        <table className="table table-hover table-bordered align-middle">
-                            <thead className="table-light">
+                    <div className="table-responsive rounded border shadow-sm">
+                        <table className="table table-hover align-middle mb-0">
+                            <thead className="table-light text-secondary small text-uppercase">
                                 <tr className="text-center">
                                     <th>Imagen</th>
                                     <th>Nombre</th>
