@@ -11,7 +11,7 @@ const PANELS = [
     { key: "stt", label: "STT", icon: "bi-mic-fill", component: <STTPanel /> },
     { key: "llm", label: "LLM", icon: "bi-cpu-fill", component: <LLMPanel /> },
     //{ key: "embeddings", label: "EMBEDDINGS", icon: "bi-graph-up", component: <span>Sin implementar</span> },
-    { key: "ai_method", label: "AI Method", icon: "bi-kanban-fill", component: <span>Sin implementar</span> },
+    //{ key: "ai_method", label: "AI Method", icon: "bi-kanban-fill", component: <span>Sin implementar</span> },
 ];
 
 const ModulesPage = () => {
@@ -22,8 +22,8 @@ const ModulesPage = () => {
     return (
         <div className="container pt-4" style={{ marginTop: "76px" }}>
             <div className="text-start mb-4">
-                <h2 className="fw-bold mb-1">Gestión de módulos</h2>
-                <p className="text-muted mb-0">Personaliza libremente los distintos módulos del sistema.</p>
+                <h2 className="fw-bold mb-1">Gestión de modelos</h2>
+                <p className="text-muted mb-0">Carga, activa y libera modelos del sistema.</p>
             </div>
 
             <div className="row">
@@ -49,7 +49,7 @@ const ModulesPage = () => {
                         <div className="card-header d-flex justify-content-between align-items-center bg-light fw-semibold">
                             <div>
                                 <i className="bi bi-gear me-2" />
-                                Módulo {activePanel?.label || ""}
+                                Modelos {activePanel?.label || ""}
                             </div>
 
                             <button className="btn btn-outline-secondary" onClick={() => fetchFunctions[activeTab]()}>

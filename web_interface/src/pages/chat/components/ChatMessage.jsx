@@ -39,7 +39,7 @@ const ChatMessage = ({ message, onSelect }) => {
                     <span className="px-0 py-0 badge text-muted">{timeStr}</span>
                 </div>
 
-                <div style={{ cursor: "pointer" }} onClick={() => onSelect()}>
+                <div className="clickable clickable-07" style={{ cursor: "pointer" }} onClick={() => onSelect()}>
                     {data.map(
                         (item, index) =>
                             item.value && (
