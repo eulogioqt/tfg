@@ -41,6 +41,28 @@ async def get_sessions(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/summary", tags=["Sessions CRUD endpoints"], response_model=Session)
+async def get_sessions_summary(
+    request: Request,
+    fields: Optional[str] = Query(None, description="Campos específicos a devolver"),
+    sort: Optional[str] = Query(None, description="Campos por los que ordenar, separados por comas"),
+    offset: int = Query(default=0, description="Índice de inicio para los resultados de la paginación"),
+    limit: int = Query(default=10, description="Cantidad de marcadores a devolver, por defecto 10"),
+    hateoas: Optional[bool] = Query(default=False, description="Incluir enlace HATEOAS")
+):
+    APIUtils.check_accept_json(request)
+    
+    try:
+        response = session_api.get_sessions_summary()
+
+        return response.to_fastapi()
+    
+    except HTTPException as e:
+        raise e 
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/{id}", tags=["Sessions CRUD endpoints"], response_model=Session)
 async def get_sessions_by_id(
     request: Request,
@@ -55,28 +77,6 @@ async def get_sessions_by_id(
     
     try:
         response = session_api.get_session_by_id(id)
-
-        return response.to_fastapi()
-    
-    except HTTPException as e:
-        raise e 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.get("/summary", tags=["Sessions CRUD endpoints"], response_model=Session)
-async def get_sessions_by_id(
-    request: Request,
-    fields: Optional[str] = Query(None, description="Campos específicos a devolver"),
-    sort: Optional[str] = Query(None, description="Campos por los que ordenar, separados por comas"),
-    offset: int = Query(default=0, description="Índice de inicio para los resultados de la paginación"),
-    limit: int = Query(default=10, description="Cantidad de marcadores a devolver, por defecto 10"),
-    hateoas: Optional[bool] = Query(default=False, description="Incluir enlace HATEOAS")
-):
-    APIUtils.check_accept_json(request)
-    
-    try:
-        response = session_api.get_sessions_summary()
 
         return response.to_fastapi()
     

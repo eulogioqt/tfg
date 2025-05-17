@@ -127,6 +127,7 @@ class SessionManagerNode(Node):
             result.append(stats)
 
         response.text = json.dumps(result)
+        
         return response
 
 def main(args=None):
