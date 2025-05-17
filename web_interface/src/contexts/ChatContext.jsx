@@ -70,7 +70,7 @@ export const ChatProvider = ({ children }) => {
                 setMessages((prev) => prev.filter((m) => m.id !== e.id));
             } else {
                 setMessages((prev) =>
-                    prev.map((m) => m.isHuman && m.id === e.id ? { ...m, sttModel: e.model, value: e.value } : m)
+                    prev.map((m) => (m.isHuman && m.id === e.id ? { ...m, sttModel: e.model, value: e.value } : m))
                 );
             }
         };
@@ -118,7 +118,8 @@ export const ChatProvider = ({ children }) => {
             };
 
             if (sendMessage(JSON.stringify(message))) {
-                addHumanMessage({ id, audio, sampleRate });
+                const value = { data: {}, text: undefined };
+                addHumanMessage({ id, audio, sampleRate, value });
             }
         } else {
             const message = {
@@ -132,17 +133,18 @@ export const ChatProvider = ({ children }) => {
         }
     };
 
-    const handleSend = (value) => {
-        if (value.length > 0) {
+    const handleSend = (inputMessage) => {
+        if (inputMessage.length > 0) {
             const id = uuidv4();
             const wantTts = settings.enableTTS;
 
             const messageWithId = {
                 type: "PROMPT",
-                data: { id, wantTts, value },
+                data: { id, wantTts, value: inputMessage },
             };
 
             if (sendMessage(JSON.stringify(messageWithId))) {
+                const value = { data: {}, text: inputMessage };
                 addHumanMessage({ id, value }, true);
             }
         }

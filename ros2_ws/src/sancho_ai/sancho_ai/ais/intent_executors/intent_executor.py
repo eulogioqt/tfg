@@ -20,6 +20,8 @@ class IntentExecutor:
         elif intent == COMMANDS.TAKE_PICTURE:
             return self.take_picture(arguments)
 
+        raise ValueError(f"Invalid intent: {intent}")
+
     def delete_user(self, arguments):
         user = arguments["user"]
         if not user:
@@ -74,7 +76,7 @@ class IntentExecutor:
 
         return details, status, {}
 
-    def take_picture(self):
+    def take_picture(self, _):
         image = self.hri_engine.get_last_frame_request()
         if not image:
             details = "No he podido tomar una foto"

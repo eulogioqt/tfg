@@ -23,11 +23,12 @@ class ModularAI(ABC):
                     details, status, intent, arguments, user_input, chat_history
                 )
         else:
+            data = {}
             response, provider_used, model_used = \
                 self.response_generator.continue_conversation(user_input, chat_history)
 
         value = {
-            "response": response,
+            "text": response,
             "data": data
         }
 

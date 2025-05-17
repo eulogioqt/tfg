@@ -62,7 +62,7 @@ class Assistant:
         rclpy.spin_until_future_complete(self.node, future_sancho_prompt)
         result_sancho_prompt = future_sancho_prompt.result()
 
-        return json.loads(result_sancho_prompt.value_json)["response"]
+        return json.loads(result_sancho_prompt.value_json)["text"]
 
     def tts_request(self, text):
         tts_request = TTS.Request()

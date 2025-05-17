@@ -14,7 +14,7 @@ class DummyAI(AI):
         arguments = {}
 
         value = {
-            "response": message[::-1],
+            "text": message[::-1],
             "data": {}
         }
 

@@ -3,6 +3,7 @@ import { useAudio } from "../../../contexts/AudioContext";
 import { useChat } from "../../../contexts/ChatContext";
 
 const ChatMessage = ({ message }) => {
+    console.log(message);
     const { settings } = useChat();
     const { playAudio, stopCurrentAudio, activeAudioId } = useAudio();
 
@@ -11,10 +12,10 @@ const ChatMessage = ({ message }) => {
     const isHuman = message.isHuman;
     const backgroundColor = isHuman ? "#E0E0E0" : "#FFFFFF";
     const shadowColor = isHuman ? "#C0C0C0" : "#DDDDDD";
-    
+
     useEffect(() => {
         let intervalId;
-        if (message.value != undefined) {
+        if (message.value.text != undefined) {
             if (timer > 0) setTimer(0);
         } else {
             intervalId = setInterval(() => {
@@ -23,7 +24,7 @@ const ChatMessage = ({ message }) => {
         }
 
         return () => clearInterval(intervalId);
-    }, [message.value]);
+    }, [message.value.text]);
 
     const getMessageFooter = (isHuman, data, timestamp) => {
         const timeStr = new Date(timestamp).toLocaleTimeString([], {
@@ -90,8 +91,25 @@ const ChatMessage = ({ message }) => {
             >
                 {/* Contenido del mensaje */}
                 <div className="d-flex flex-column align-items-start justify-content-between text-justify">
+                    {message.value.data.image && (
+                        <img
+                            className="border border-dark bg-dark border-4 rounded shadow-lg mb-2"
+                            src={`data:image/jpeg;base64,${message.value.data.image}`}
+                            alt="Imagen"
+                            style={{
+                                maxWidth: "100%",
+                                width: "auto",
+                                height: "auto",
+                                display: "block",
+                                objectFit: "contain",
+                            }}
+                        />
+                    )}
+
                     <span className="w-100 text-start">
-                        {message.value != undefined ? message.value : "Transcribiendo... (" + (timer / 1000).toFixed(1) + "s)"}
+                        {message.value.text != undefined
+                            ? message.value.text
+                            : "Transcribiendo... (" + (timer / 1000).toFixed(1) + "s)"}
                     </span>
                 </div>
 

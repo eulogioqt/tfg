@@ -38,5 +38,11 @@ class LLMClassifier(IntentClassifier):
         
         intent = classification_response["intent"]
         arguments = classification_response["arguments"]
+        
+        if intent not in list(COMMANDS):
+            intent = COMMANDS.UNKNOWN
+            arguments = {}
+            
+            LogManager.error(f"❌❌❌❌❌ PROMPT CLASSIFIED AS INVALID INTENT: {classification_response['intent']}")
 
         return intent, arguments, provider_used, model_used
