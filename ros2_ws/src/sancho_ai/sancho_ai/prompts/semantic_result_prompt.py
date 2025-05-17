@@ -1,7 +1,7 @@
-import os
 import json
 
 from .prompt import Prompt
+from .commands import CommandRegistry 
 
 PROMPT_TEMPLATE = """
 You are Sancho, a friendly humanoid robot who speaks Spanish like a real person.
@@ -35,14 +35,10 @@ class SemanticResultPrompt(Prompt):
         self.semantic_result = semantic_result
         self.user_input = user_input.strip()
         self.chat_history = chat_history
-        self.intent_descriptions = self._load_intent_descriptions() # Hacer singleton
+        self.intent_descriptions = self._load_intent_descriptions()
 
     def _load_intent_descriptions(self):
-        current_dir = os.path.dirname(__file__)
-        commands_path = os.path.join(current_dir, 'commands', 'commands.json')
-        with open(commands_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            return {cmd["name"]: cmd["description"] for cmd in data}
+        return {cmd["name"]: cmd["description"] for cmd in CommandRegistry.get_commands()}
 
     def get_prompt_system(self):
         details = self.semantic_result.get("output", {}).get("details", "").strip()

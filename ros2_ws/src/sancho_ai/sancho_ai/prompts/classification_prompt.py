@@ -1,8 +1,8 @@
-import os
 import re
 import json
 
 from .prompt import Prompt
+from .commands import CommandRegistry 
 
 PROMPT_TEMPLATE = """
 You are an intent classifier for a conversational humanoid robot. Your task is to analyze the user's last message in the context of the previous conversation, and return a JSON object with this exact format:
@@ -45,11 +45,7 @@ class ClassificationPrompt(Prompt):
         self.user_input = user_input.strip()
         self.chat_history = chat_history
 
-        current_dir = os.path.dirname(__file__)
-        commands_path = os.path.join(current_dir, 'commands', 'commands.json')
-
-        with open(commands_path, 'r', encoding='utf-8') as f:
-            self.commands = json.load(f)
+        self.commands = CommandRegistry.get_commands()
 
         self.intents_definitions_str = self._format_intents()
         self.examples_str = self._format_examples()
@@ -91,7 +87,7 @@ class ClassificationPrompt(Prompt):
                               .replace("{user_input}", self.user_input)
 
     def get_user_prompt(self):
-        return ""  # El input ya se pasa como parte del prompt
+        return ""
 
     def get_parameters(self):
         return json.dumps({
