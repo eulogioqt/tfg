@@ -79,6 +79,8 @@ class LLMGenerator(ResponseGenerator):
         for summary in sessions_summary:
             fp_id = int(summary["faceprint_id"])
             name = id_to_name.get(fp_id)
+            if not name: # Esta persona ya no existe (habria q hacer q borrar un faceprint lo borre de sessions)
+                continue
             
             dt = datetime.fromtimestamp(float(summary["last_seen"]))
             last_seen[name] = dt.strftime("%Y-%m-%d %H:%M")

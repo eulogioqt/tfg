@@ -4,11 +4,13 @@ import { useFaceprints } from "../../contexts/FaceprintsContext";
 
 import NewFaceprintModal from "./components/NewFaceprintModal";
 import FaceprintList from "./components/FaceprintList";
+import SummaryModal from "./components/SummaryModal";
 
 const FaceprintListPage = () => {
     const { doAddFaceprint, fetchFaceprintsData, loadingFaceprints, faceprintsData } = useFaceprints();
 
     const [isOpenFaceModal, setIsOpenFaceModal] = useState(false);
+    const [isSummaryOpen, setIsSummaryOpen] = useState(false);
 
     return (
         <>
@@ -18,6 +20,8 @@ const FaceprintListPage = () => {
                 doAddFaceprint={doAddFaceprint}
             />
 
+            <SummaryModal isOpen={isSummaryOpen} handleClose={() => setIsSummaryOpen(false)} />
+
             <div className="container" style={{ marginTop: "76px" }}>
                 <div className="d-flex justify-content-between align-items-center mb-4 pt-4">
                     <div className="text-start">
@@ -26,6 +30,9 @@ const FaceprintListPage = () => {
                     </div>
 
                     <div>
+                        <button className="btn btn-outline-primary me-2" onClick={() => setIsSummaryOpen(true)}>
+                            <i className="bi bi-bar-chart-line" />
+                        </button>
                         <button className="btn btn-primary me-2" onClick={() => setIsOpenFaceModal(true)}>
                             <i className="bi bi-database-add me-2" /> Añadir cara
                         </button>

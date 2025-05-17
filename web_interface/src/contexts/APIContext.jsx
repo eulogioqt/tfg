@@ -65,6 +65,8 @@ export const APIProvider = ({ children }) => {
 
     const faceprintsAPI = createEndpointMethods("faceprints");
     const sessionsAPI = createEndpointMethods("sessions", {
+        getSummary: (version = "v1") =>
+            apiMethods.get(`${BASE_URL}/api/${version}/sessions/summary`, getAuthorizationHeader()),
         create: () => alert("Not implemented"),
         update: () => alert("Not implemented"),
         delete: () => alert("Not implemented"),

@@ -32,7 +32,7 @@ const FaceprintDetailPage = () => {
         } else {
             showToast("Error al obtener sesiones", sessionResponse.data.detail, "red");
         }
-    }
+    };
 
     useEffect(() => {
         const getActualFaceprint = async () => {
@@ -71,7 +71,7 @@ const FaceprintDetailPage = () => {
 
     if (!faceprint) {
         return (
-            <div className="text-center" style={{ marginTop: "76px"}}>
+            <div className="text-center" style={{ marginTop: "76px" }}>
                 <div className="spinner-border text-primary" role="status" />
             </div>
         );
@@ -95,7 +95,7 @@ const FaceprintDetailPage = () => {
                 action={() => handleDelete(faceprint.id)}
             />
 
-            <div className="container" style={{ marginTop: "76px"}}>
+            <div className="container" style={{ marginTop: "76px" }}>
                 <button className="btn btn-secondary my-4" onClick={() => navigate("/faceprints")}>
                     Volver
                 </button>
