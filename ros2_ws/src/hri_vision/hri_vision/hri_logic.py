@@ -28,6 +28,7 @@ class HRILogicNode(Node):
         self.data_queue = Queue(maxsize = 1) # Queremos que olvide frames antiguos, siempre a por los mas nuevos
         
         self.get_actual_people_service = self.create_service(GetString, 'logic/get/actual_people', self.hri_logic.get_actual_people_service)
+        self.get_last_frame_service = self.create_service(GetString, 'logic/get/last_frame', self.hri_logic.get_last_frame_service)
 
         self.subscription_camera = self.create_subscription(Image, 'camera/color/image_raw', self.frame_callback, 1)
 
@@ -80,6 +81,8 @@ class HRILogic():
         self.show_distance = show_distance
         self.show_score = show_score
 
+        self.last_frame = None
+
         self.node = HRILogicNode(self)
         self.people = PeopleManager(self.node)
     
@@ -101,6 +104,7 @@ class HRILogic():
         """
 
         frame = self.node.br.imgmsg_to_cv2(frame_msg, "bgr8")
+        self.last_frame = frame
 
         positions_msg, scores_msg = self.detection_request(frame_msg)                   # Detection
         positions, scores = self.node.br.msg_to_detector(positions_msg, scores_msg)
@@ -288,6 +292,11 @@ class HRILogic():
         actual_people_time = self.people.get_all_last_seen()
         actual_people_json = json.dumps(actual_people_time)
         response.text = actual_people_json
+
+        return response
+
+    def get_last_frame_service(self, request, response):
+        response.text = self.node.br.cv2_to_base64(self.last_frame, quality=100)
 
         return response
 
