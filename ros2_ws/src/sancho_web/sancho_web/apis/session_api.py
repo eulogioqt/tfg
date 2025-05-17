@@ -24,3 +24,9 @@ class SessionAPI:
         session = json.loads(session_json)
 
         return JSONResponse(content=session)
+
+    def get_sessions_summary(self) -> APIResponse:
+        sessions_summary_json = self.engine.get_sessions_summary_request()
+        sessions_summary = json.loads(sessions_summary_json)
+
+        return JSONResponse(content=sessions_summary)    

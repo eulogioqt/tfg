@@ -8,6 +8,7 @@ class SessionEngine(ServiceEngine):
         super().__init__(node)
 
         self.get_sessions_cli = self.create_client(GetString, 'rumi/sessions/get')
+        self.get_sessions_summary_cli = self.create_client(GetString, 'rumi/sessions/get_summary')
 
         self.node.get_logger().info("Session Engine initializated successfully")
 
@@ -18,3 +19,10 @@ class SessionEngine(ServiceEngine):
         result = self.call_service(self.get_sessions_cli, req)
 
         return result.text
+    
+    def get_sessions_summary_request(self):
+        req = GetString.Request()
+
+        result = self.call_service(self.get_sessions_summary_cli, req)
+
+        return result.text  

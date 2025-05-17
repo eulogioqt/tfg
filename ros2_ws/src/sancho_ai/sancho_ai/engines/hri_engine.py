@@ -12,6 +12,8 @@ class HRIEngine(ServiceEngine):
         super().__init__(node)
 
         self.get_sessions_cli = self.create_client(GetStringRUMI, 'rumi/sessions/get', wait=False)
+        self.get_sessions_summary_cli = self.create_client(GetStringRUMI, 'rumi/sessions/get_summary', wait=False)
+
         self.get_faceprint_cli = self.create_client(GetStringHRI, 'recognition/get_faceprint', wait=False)
         self.actual_people_cli = self.create_client(GetStringHRI, "logic/get/actual_people", wait=False)
         self.get_last_frame_cli = self.create_client(GetStringHRI, "logic/get/last_frame", wait=False)
@@ -72,6 +74,16 @@ class HRIEngine(ServiceEngine):
 
         return result.text
     
+    def get_sessions_summary_request(self, args_msg=""):
+        req = GetStringRUMI.Request()
+        req.args = args_msg
+
+        result = self.call_service(self.get_sessions_cli, req)
+        if result is None:
+            return "[]"
+
+        return result.text
+
     def get_last_frame_request(self):
         req = GetStringHRI.Request()
 
