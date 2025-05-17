@@ -78,7 +78,7 @@ class HRIEngine(ServiceEngine):
         req = GetStringRUMI.Request()
         req.args = args_msg
 
-        result = self.call_service(self.get_sessions_cli, req)
+        result = self.call_service(self.get_sessions_summary_cli, req)
         if result is None:
             return "[]"
 

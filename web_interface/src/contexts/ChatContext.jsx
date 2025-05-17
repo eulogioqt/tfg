@@ -54,11 +54,12 @@ export const ChatProvider = ({ children }) => {
     useEffect(() => {
         const processR = (e) => {
             setMessages((prevMessages) => {
+                const { intent, arguments: args, ...rest } = e;
                 const updatedMessages = prevMessages.map((m) =>
-                    m.isHuman && m.id === e.id ? { ...m, intent: e.intent } : m
+                    m.isHuman && m.id === e.id ? { ...m, intent: intent, arguments: args } : m
                 );
 
-                return [...updatedMessages, { ...e, timestamp: Date.now(), isHuman: false }];
+                return [...updatedMessages, { ...rest, timestamp: Date.now(), isHuman: false }];
             });
         };
         const processPT = (e) => {
@@ -69,8 +70,9 @@ export const ChatProvider = ({ children }) => {
                 showToast("Transcripción vacía", "El audio enviado no contenía voz reconocible.", "red");
                 setMessages((prev) => prev.filter((m) => m.id !== e.id));
             } else {
+                const value = { data: {}, text: e.value };
                 setMessages((prev) =>
-                    prev.map((m) => (m.isHuman && m.id === e.id ? { ...m, sttModel: e.model, value: e.value } : m))
+                    prev.map((m) => (m.isHuman && m.id === e.id ? { ...m, sttModel: e.model, value } : m))
                 );
             }
         };

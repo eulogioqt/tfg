@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAudio } from "../../../contexts/AudioContext";
 import { useChat } from "../../../contexts/ChatContext";
 
-const ChatMessage = ({ message }) => {
-    console.log(message);
+const ChatMessage = ({ message, onSelect }) => {
     const { settings } = useChat();
     const { playAudio, stopCurrentAudio, activeAudioId } = useAudio();
 
@@ -40,7 +39,7 @@ const ChatMessage = ({ message }) => {
                     <span className="px-0 py-0 badge text-muted">{timeStr}</span>
                 </div>
 
-                <div>
+                <div style={{ cursor: "pointer" }} onClick={() => onSelect()}>
                     {data.map(
                         (item, index) =>
                             item.value && (
