@@ -29,12 +29,13 @@ Sentence:
 Response:
 """
 
-class SemanticResponsePrompt(Prompt):
-    def __init__(self, user_input: str, semantic_result: dict, chat_history: list = []):
-        self.user_input = user_input.strip()
+
+class SemanticResultPrompt(Prompt):
+    def __init__(self, semantic_result: dict, user_input: str, chat_history: list = []):
         self.semantic_result = semantic_result
+        self.user_input = user_input.strip()
         self.chat_history = chat_history
-        self.intent_descriptions = self._load_intent_descriptions()
+        self.intent_descriptions = self._load_intent_descriptions() # Hacer singleton
 
     def _load_intent_descriptions(self):
         current_dir = os.path.dirname(__file__)
@@ -63,3 +64,14 @@ class SemanticResponsePrompt(Prompt):
             "temperature": 0.6,
             "max_tokens": 50
         })
+
+    @staticmethod
+    def build_semantic_result(intent, arguments, status, details):
+        return {
+            "intent": intent,
+            "arguments": arguments,
+            "output": {
+                "status": status,
+                "details": details
+            }
+        }

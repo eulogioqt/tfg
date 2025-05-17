@@ -1,12 +1,13 @@
 from enum import Enum
 from typing import Type
 
-from .ai import AI
+from .base.ai import AI
 
 from .dummy_ai import DummyAI
-from .simple_ai import SimpleAI
-from .classification_templates_ai import ClassificationTemplatesAI
-from .classification_generation_ai import ClassificationGenerationAI
+from .simple_templates_ai import SimpleTemplatesAI
+from .llm_classifier_templates_ai import LLMClassifierTemplatesAI
+from .llm_classifier_generator_ai import LLMClassifierGeneratorAI
+
 
 class SmartStrEnum(str, Enum):
     def __str__(self):
@@ -17,16 +18,16 @@ class SmartStrEnum(str, Enum):
     
 class AIType(SmartStrEnum):
     DUMMY = "DUMMY"
-    SIMPLE = "SIMPLE"
-    CLASSIFICATION_TEMPLATES = "CLASSIFICATION_TEMPLATES"
-    CLASSIFICATION_GENERATION = "CLASSIFICATION_GENERATION"
+    SIMPLE_TEMPLATES = "SIMPLE"
+    LLM_CLASSIFIER_TEMPLATES = "LLM_CLASSIFIER_TEMPLATES"
+    LLM_CLASSIFIER_GENERATOR = "LLM_CLASSIFIER_GENERATOR"
 
 
 AI_CLASSES: dict[AIType, Type[AI]] = {
     AIType.DUMMY: DummyAI,
-    AIType.SIMPLE: SimpleAI,
-    AIType.CLASSIFICATION_TEMPLATES: ClassificationTemplatesAI,
-    AIType.CLASSIFICATION_GENERATION: ClassificationGenerationAI
+    AIType.SIMPLE_TEMPLATES: SimpleTemplatesAI,
+    AIType.LLM_CLASSIFIER_TEMPLATES: LLMClassifierTemplatesAI,
+    AIType.LLM_CLASSIFIER_GENERATOR: LLMClassifierGeneratorAI
 }
 
 def create_sancho_ai(ai_type: AIType) -> AI:

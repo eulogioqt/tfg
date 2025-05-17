@@ -1,9 +1,10 @@
+import json
 import rclpy
 from rclpy.node import Node
 
 from hri_msgs.srv import SanchoPrompt
 
-from .ais.factory import create_sancho_ai, AIType
+from .ais import create_sancho_ai, AIType
 
 
 class SanchoAINode(Node):
@@ -22,8 +23,7 @@ class SanchoAINode(Node):
     def prompt_service(self, request, response):
         chat_history = self.chats.get(request.user, [])
 
-        ai_response, intent, provider, model = self.sancho_ai.on_message(request.text, chat_history)
-        args_json = "{}"
+        ai_response, intent, arguments, provider, model = self.sancho_ai.on_message(request.text, chat_history)
 
         chat_history.append({"role": "user", "content": request.text})
         chat_history.append({"role": "assistant", "content": ai_response})
@@ -33,7 +33,7 @@ class SanchoAINode(Node):
         response.text = ai_response
         response.method = self.type
         response.intent = intent
-        response.args_json = args_json
+        response.args_json = json.dumps(arguments)
         response.provider = provider
         response.model = model
 
@@ -43,7 +43,7 @@ class SanchoAINode(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    node = SanchoAINode(AIType.CLASSIFICATION_GENERATION)
+    node = SanchoAINode(AIType.LLM_CLASSIFIER_GENERATOR)
 
     rclpy.spin(node)
     rclpy.shutdown()

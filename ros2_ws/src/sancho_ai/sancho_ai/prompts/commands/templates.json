@@ -20,7 +20,7 @@
         "No conseguí eliminar a {user}.",
         "Hubo un problema al eliminar al usuario {user}."
       ],
-      "NOARG": [
+      "MISSING_ARGUMENT": [
         "No me dijiste a quién tenía que borrar.",
         "No sé qué usuario querías que eliminara.",
         "Necesito saber a quién quieres que borre.",
@@ -52,7 +52,7 @@
         "No he conseguido renombrar correctamente.",
         "No he logrado sustituir el nombre de {old_name}."
       ],
-      "NOARG": [
+      "MISSING_ARGUMENT": [
         "No me diste el nombre original y el nuevo para renombrar.",
         "Me faltan los datos para cambiar el nombre de alguien.",
         "Necesito saber cómo se llamaba antes y cómo se debe llamar ahora.",

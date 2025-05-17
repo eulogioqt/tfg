@@ -1,7 +1,18 @@
-from .ai import AI
+from .base import AI
+
+from ..prompts.commands import COMMANDS
 
 
 class DummyAI(AI):
 
-    def on_message(self, message):
-        return message[::-1]
+    def __init__(self):
+        self.provider_used = "Dummy"
+        self.model_used = "Dummy"
+
+    def on_message(self, message, chat_history=[]):
+        intent = COMMANDS.UNKNOWN
+        arguments = {}
+
+        response = message[::-1]
+
+        return response, intent, arguments, self.provider_used, self.model_used
