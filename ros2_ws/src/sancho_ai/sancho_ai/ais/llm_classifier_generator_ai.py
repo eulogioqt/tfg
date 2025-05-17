@@ -9,14 +9,12 @@ from ..engines import HRIEngine, LLMEngine
 class LLMClassifierGeneratorAI(ModularAI):
 
     def __init__(self):
-        super().__init__()
-
         node = HRIEngine.create_client_node()
         hri_engine = HRIEngine(node)
         llm_engine = LLMEngine(node)
 
         llm_classifier = LLMClassifier(llm_engine)
         intent_executor = IntentExecutor(hri_engine)
-        llm_generator = LLMGenerator(llm_engine)
+        llm_generator = LLMGenerator(hri_engine, llm_engine)
 
         super().__init__(llm_classifier, intent_executor, llm_generator)

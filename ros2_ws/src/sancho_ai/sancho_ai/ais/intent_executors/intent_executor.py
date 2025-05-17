@@ -62,10 +62,10 @@ class IntentExecutor:
                 user_obj = users_obj[0]
                 result_action = self.hri_engine.rename_request(user_obj["id"], new_name)
                 if result_action >= 0:
-                    details = f"Le he cambiado el nombre a {old_name} por {new_name} correctamente"
+                    details = f"He cambiado el nombre de {old_name} por {new_name} correctamente"
                     status = COMMAND_RESUITS.SUCCESS
                 else:
-                    details = f"No he podido cambiarle el nombre a {old_name} por {new_name}"
+                    details = f"No he podido cambiar el nombre de {old_name} por {new_name}"
                     status = COMMAND_RESUITS.FAILURE
             else:
                 details = f"No he encontrado a nadie con el nombre {old_name}"

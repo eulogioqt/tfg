@@ -9,8 +9,6 @@ from ..engines import HRIEngine, LLMEngine
 class LLMClassifierTemplatesAI(ModularAI):
 
     def __init__(self):
-        super().__init__()
-
         node = HRIEngine.create_client_node()
         hri_engine = HRIEngine(node)
         llm_engine = LLMEngine(node)
