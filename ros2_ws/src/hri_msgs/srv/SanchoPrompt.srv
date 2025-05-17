@@ -1,7 +1,7 @@
 string user
 string text
 ---
-string text
+string value_json
 string method
 string intent
 string args_json

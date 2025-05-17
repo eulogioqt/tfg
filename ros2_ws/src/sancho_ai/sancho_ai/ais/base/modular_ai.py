@@ -17,7 +17,7 @@ class ModularAI(ABC):
         intent, arguments, cl_provider_used, cl_model_used = self.classifier.classify(user_input, chat_history)
         
         if intent != COMMANDS.UNKNOWN:
-            details, status = self.executor.execute(intent, arguments)
+            details, status, data = self.executor.execute(intent, arguments)
             response, provider_used, model_used = \
                 self.response_generator.generate_response(
                     details, status, intent, arguments, user_input, chat_history
@@ -26,4 +26,9 @@ class ModularAI(ABC):
             response, provider_used, model_used = \
                 self.response_generator.continue_conversation(user_input, chat_history)
 
-        return response, intent, arguments, provider_used, model_used
+        value = {
+            "response": response,
+            "data": data
+        }
+
+        return value, intent, arguments, provider_used, model_used

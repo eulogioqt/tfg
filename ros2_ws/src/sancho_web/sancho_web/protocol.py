@@ -35,11 +35,12 @@ class JSONMessage(ABC):
 
 
 class ResponseMessage(JSONMessage):
-    def __init__(self, id, response, method, intent, provider, model):
+    def __init__(self, id, value, method, intent, arguments, provider, model):
         self.id = id
-        self.response = response
+        self.value = value
         self.method = method
         self.intent = intent
+        self.arguments = arguments
         self.provider = provider
         self.model = model
     
@@ -50,9 +51,10 @@ class ResponseMessage(JSONMessage):
                 "id": self.id,
                 "method": self.method,
                 "intent": self.intent,
+                "arguments": self.arguments,
                 "provider": self.provider,
                 "model": self.model,
-                "value": self.response
+                "value": self.value
             }
         }
 

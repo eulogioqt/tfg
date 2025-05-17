@@ -1,3 +1,4 @@
+import json
 import rclpy
 import sounddevice as sd
 from rclpy.node import Node
@@ -41,6 +42,7 @@ class Assistant:
             if not self.node.queue.empty():
                 user_text = self.node.queue.get()
                 ai_response = self.sancho_prompt_request(user_text)
+    
                 self.node.get_logger().info(f"✅✅✅ Respuesta recibida '{ai_response}'")
 
                 audio, sample_rate = self.tts_request(ai_response)
@@ -60,7 +62,7 @@ class Assistant:
         rclpy.spin_until_future_complete(self.node, future_sancho_prompt)
         result_sancho_prompt = future_sancho_prompt.result()
 
-        return result_sancho_prompt.text
+        return json.loads(result_sancho_prompt.value_json)["response"]
 
     def tts_request(self, text):
         tts_request = TTS.Request()

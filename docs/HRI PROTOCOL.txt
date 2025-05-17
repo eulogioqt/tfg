@@ -6,9 +6,21 @@ Respuestas a prompts con ID:
         id: uuid,
         method: str,
         intent: str,
+        arguments: {
+            arg1: value1
+            arg2: value2
+            ...
+        }
         provider: str,
         model: str,
-        value: ...
+        value: {
+            response: str,
+            data: {
+                data1: value1
+                data2: value2
+                ...
+            }
+        }
     }
 }
 { // El cliente envia un AUDIO_PROMPT y el servidor responde con la transcripcion mientras genera la respuesta

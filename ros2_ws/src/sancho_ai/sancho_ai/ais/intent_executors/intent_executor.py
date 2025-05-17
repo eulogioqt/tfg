@@ -44,11 +44,12 @@ class IntentExecutor:
                 details = f"No he encontrado a nadie con el nombre {user}"
                 status = COMMAND_RESUITS.FAILURE
 
-        return details, status
+        return details, status, {}
 
     def rename_user(self, arguments):
         old_name = arguments["old_name"]
         new_name = arguments["new_name"]
+
         if not old_name:
             details = f"No he renombrado a nadie, no sé a quién te refieres"
             status = COMMAND_RESUITS.MISSING_ARGUMENT
@@ -71,15 +72,17 @@ class IntentExecutor:
                 details = f"No he encontrado a nadie con el nombre {old_name}"
                 status = COMMAND_RESUITS.FAILURE
 
-        return details, status
+        return details, status, {}
 
     def take_picture(self):
-        image = self.hri_engine.take_picture_request()
+        image = self.hri_engine.get_last_frame_request()
         if not image:
             details = "No he podido tomar una foto"
-            status = COMMAND_RESUITS.SUCCESS
+            status = COMMAND_RESUITS.FAILURE
+            data = {}
         else:
             details = "Foto tomada correctamente"
             status = COMMAND_RESUITS.SUCCESS
-
-        return details, status
+            data = { "image": image }
+        
+        return details, status, data

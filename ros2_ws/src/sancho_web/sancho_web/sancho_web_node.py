@@ -1,3 +1,4 @@
+import json
 import rclpy
 from rclpy.node import Node
 
@@ -79,11 +80,11 @@ class SanchoWeb:
         if type == MessageType.PROMPT:
             prompt = PromptMessage(data)
 
-            response, method, intent, provider, model = self.sancho_prompt_request(prompt.value, key)
-            self.send_message(key, ResponseMessage(prompt.id, response, method, intent, provider, model))
+            value, method, intent, arguments, provider, model = self.sancho_prompt_request(prompt.value, key)
+            self.send_message(key, ResponseMessage(prompt.id, value, method, intent, arguments, provider, model))
 
             if prompt.want_tts:
-                audio, sample_rate, model, speaker = self.tts_request(response)
+                audio, sample_rate, model, speaker = self.tts_request(value["response"])
                 self.send_message(key, AudioResponseMessage(prompt.id, audio, sample_rate, model, speaker))
         elif type == MessageType.AUDIO_PROMPT:
             audio_prompt = AudioPromptMessage(data)
@@ -92,11 +93,11 @@ class SanchoWeb:
             self.send_message(key, PromptTranscriptionMessage(audio_prompt.id, transcription, model))
             
             if transcription: # Si hay transcripcion
-                response, method, intent, provider, model = self.sancho_prompt_request(transcription, key)
-                self.send_message(key, ResponseMessage(audio_prompt.id, response, method, intent, provider, model))
+                value, method, intent, arguments, provider, model = self.sancho_prompt_request(transcription, key)
+                self.send_message(key, ResponseMessage(audio_prompt.id, value, method, intent, arguments, provider, model))
 
                 if audio_prompt.want_tts: # Si quiere TTS
-                    audio, sample_rate, model, speaker = self.tts_request(response)
+                    audio, sample_rate, model, speaker = self.tts_request(value["response"])
                     self.send_message(key, AudioResponseMessage(audio_prompt.id, audio, sample_rate, model, speaker))
         elif type == MessageType.TRANSCRIPTION_REQUEST:
             transcription_request = TranscriptionRequestMessage(data)
@@ -113,8 +114,8 @@ class SanchoWeb:
         rclpy.spin_until_future_complete(self.node, future)
         result = future.result()
 
-        return result.text, result.method, result.intent, result.provider, result.model
-        #result.args_json
+        return json.loads(result.value_json), result.method, result.intent, \
+            json.loads(result.args_json), result.provider, result.model
 
     def stt_request(self, audio, sample_rate):
         if not self.node.sancho_prompt_client.service_is_ready():

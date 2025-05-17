@@ -13,6 +13,9 @@ class DummyAI(AI):
         intent = COMMANDS.UNKNOWN
         arguments = {}
 
-        response = message[::-1]
+        value = {
+            "response": message[::-1],
+            "data": {}
+        }
 
-        return response, intent, arguments, self.provider_used, self.model_used
+        return value, intent, arguments, self.provider_used, self.model_used
