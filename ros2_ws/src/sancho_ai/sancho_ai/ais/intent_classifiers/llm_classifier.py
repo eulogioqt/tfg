@@ -36,8 +36,11 @@ class LLMClassifier(IntentClassifier):
             LogManager.error(f"Error on JSON loads.")
             return COMMANDS.UNKNOWN, {}, provider_used, model_used
         
-        intent = classification_response["intent"]
-        arguments = classification_response["arguments"]
+        intent = classification_response.get("intent", "")
+        arguments = classification_response.get("arguments", {})
+        if not intent:
+            LogManager.error(f"The JSON response does not contain an intent.")
+            return COMMANDS.UNKNOWN, {}, provider_used, model_used
         
         if intent not in list(COMMANDS):
             intent = COMMANDS.UNKNOWN
