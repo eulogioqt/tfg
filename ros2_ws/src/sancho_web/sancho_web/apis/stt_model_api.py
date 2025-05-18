@@ -1,5 +1,7 @@
+import json
 from ..engines import STTModelEngine
 from .api_responses import HTTPException, JSONResponse, APIResponse
+from sancho_web.database.system_database import CONSTANTS
 
 
 class STTModelAPI:
@@ -45,6 +47,11 @@ class STTModelAPI:
         results = self.engine.load_model_request([[model, api_key]])
         [_, message, success] = results[0]
 
+        if success:
+            log_message = f"Se ha cargado correctamente el modelo STT {model} desde la web"
+            metadata_json = json.dumps({ "model": model })
+            self.engine.create_log(CONSTANTS.ACTION.LOAD_STT_MODEL, "stt_node", log_message, metadata_json)
+
         return JSONResponse(content={
             "message": message,
             "success": success
@@ -54,6 +61,11 @@ class STTModelAPI:
         results = self.engine.unload_model_request([model])
         [_, message, success] = results[0]
 
+        if success:
+            log_message = f"Se ha liberado correctamente el modelo STT {model} desde la web"
+            metadata_json = json.dumps({ "model": model })
+            self.engine.create_log(CONSTANTS.ACTION.UNLOAD_STT_MODEL, "stt_node", log_message, metadata_json)
+
         return JSONResponse(content={
             "message": message,
             "success": success
@@ -61,6 +73,11 @@ class STTModelAPI:
 
     def set_active_stt_model(self, model: str) -> APIResponse:
         message, success = self.engine.set_active_model_request(model)
+
+        if success:
+            log_message = f"Se ha activado correctamente el modelo STT {model} desde la web"
+            metadata_json = json.dumps({ "model": model })
+            self.engine.create_log(CONSTANTS.ACTION.ACTIVE_STT_MODEL, "stt_node", log_message, metadata_json)
 
         return JSONResponse(content={
             "message": message,

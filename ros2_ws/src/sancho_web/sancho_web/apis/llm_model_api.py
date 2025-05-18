@@ -1,5 +1,7 @@
+import json
 from ..engines import LLMModelEngine
 from .api_responses import HTTPException, JSONResponse, APIResponse
+from sancho_web.database.system_database import CONSTANTS
 
 
 class LLMModelAPI:
@@ -65,6 +67,11 @@ class LLMModelAPI:
         results = self.engine.load_model_request([[provider, [model], api_key]])
         [_, _, message, success] = results[0]
 
+        if success:
+            log_message = f"Se ha cargado correctamente el LLM {model} del provider {provider} desde la web"
+            metadata_json = json.dumps({ "provider": provider, "model": model })
+            self.engine.create_log(CONSTANTS.ACTION.LOAD_LLM_MODEL, "llm_node", log_message, metadata_json)
+
         return JSONResponse(content={
             "message": message,
             "success": success
@@ -74,6 +81,11 @@ class LLMModelAPI:
         results = self.engine.unload_model_request([[provider, [model]]])
         [_, _, message, success] = results[0]
 
+        if success:
+            log_message = f"Se ha liberado correctamente el LLM {model} del provider {provider} desde la web"
+            metadata_json = json.dumps({ "provider": provider, "model": model })
+            self.engine.create_log(CONSTANTS.ACTION.UNLOAD_LLM_MODEL, "llm_node", log_message, metadata_json)
+
         return JSONResponse(content={
             "message": message,
             "success": success
@@ -81,6 +93,11 @@ class LLMModelAPI:
 
     def set_active_llm_model(self, provider: str, model: str) -> APIResponse:
         [message, success] = self.engine.set_active_model_request(provider, model)
+
+        if success:
+            log_message = f"Se ha activado el LLM {model} del provider {provider} desde la web"
+            metadata_json = json.dumps({ "provider": provider, "model": model })
+            self.engine.create_log(CONSTANTS.ACTION.LOAD_LLM_MODEL, "llm_node", log_message, metadata_json)
 
         return JSONResponse(content={
             "message": message,

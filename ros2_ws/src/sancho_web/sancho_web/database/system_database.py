@@ -22,6 +22,18 @@ class CONSTANTS:
         ADD_FEATURES = "add_features"
         UPDATE_FACE = "update_face"
 
+        LOAD_LLM_MODEL = "load_llm_model"
+        UNLOAD_LLM_MODEL = "unload_llm_model"
+        ACTIVE_LLM_MODEL = "active_llm_model"
+
+        LOAD_TTS_MODEL = "load_tts_model"
+        UNLOAD_TTS_MODEL = "unload_tts_model"
+        ACTIVE_TTS_MODEL = "active_tts_model"
+
+        LOAD_STT_MODEL = "load_stt_model"
+        UNLOAD_STT_MODEL = "unload_stt_model"
+        ACTIVE_STT_MODEL = "active_stt_model"
+
 class SystemDatabase:
     def __init__(self, db_path='system.db'):
         self.conn = sqlite3.connect(db_path)

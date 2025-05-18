@@ -1,5 +1,7 @@
+import json
 from ..engines import TTSModelEngine
 from .api_responses import HTTPException, JSONResponse, APIResponse
+from sancho_web.database.system_database import CONSTANTS
 
 
 class TTSModelAPI:
@@ -43,6 +45,11 @@ class TTSModelAPI:
         results = self.engine.load_model_request([[model, api_key]])
         [_, message, success] = results[0]
 
+        if success:
+            log_message = f"Se ha cargado correctamente el modelo TTS {model} desde la web"
+            metadata_json = json.dumps({ "model": model })
+            self.engine.create_log(CONSTANTS.ACTION.LOAD_TTS_MODEL, "tts_node", log_message, metadata_json)
+
         return JSONResponse(content={
             "message": message,
             "success": success
@@ -52,6 +59,11 @@ class TTSModelAPI:
         results = self.engine.unload_model_request([model])
         [_, message, success] = results[0]
 
+        if success:
+            log_message = f"Se ha liberado correctamente el modelo TTS {model} desde la web"
+            metadata_json = json.dumps({ "model": model })
+            self.engine.create_log(CONSTANTS.ACTION.UNLOAD_TTS_MODEL, "tts_node", log_message, metadata_json)
+
         return JSONResponse(content={
             "message": message,
             "success": success
@@ -59,6 +71,11 @@ class TTSModelAPI:
     
     def set_active_tts_model(self, model: str, speaker: str) -> APIResponse:
         message, success = self.engine.set_active_model_request(model, speaker)
+
+        if success:
+            log_message = f"Se ha cargado correctamente el modelo TTS {model} con la voz {speaker} desde la web"
+            metadata_json = json.dumps({ "model": model, "speaker": speaker })
+            self.engine.create_log(CONSTANTS.ACTION.ACTIVE_TTS_MODEL, "tts_node", log_message, metadata_json)
 
         return JSONResponse(content={
             "message": message,

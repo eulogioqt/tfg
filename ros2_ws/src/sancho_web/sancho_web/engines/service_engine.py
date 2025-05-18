@@ -4,12 +4,29 @@ from rclpy.client import Client
 
 from abc import ABC
 
+from hri_msgs.msg import Log
+
+from sancho_web.database.system_database import CONSTANTS
+
 
 class ServiceEngine(ABC):
     
     def __init__(self, node: Node):
         self.node = node
         self.clients = {} 
+
+        self.publisher_log = self.node.create_publisher(Log, 'logs/add', 10)
+
+    def create_log(self, action, target, message="", metadata_json="", level=CONSTANTS.LEVEL.INFO):
+        self.publisher_log.publish(Log(
+            level=level,
+            origin=CONSTANTS.ORIGIN.WEB,
+            actor="An user",
+            action=action,
+            target=target,
+            message=message,
+            metadata_json=metadata_json
+        ))
 
     def create_client(self, srv_type, srv_name):
         if srv_name in self.clients:

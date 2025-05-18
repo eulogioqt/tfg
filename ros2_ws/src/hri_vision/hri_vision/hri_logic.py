@@ -115,7 +115,9 @@ class HRILogic():
                 self.node.br.msg_to_recognizer(face_aligned_msg, features_msg, classified_name_msg, distance_msg, pos_msg)
  
             if face_updated:
-                self.create_log(CONSTANTS.ACTION.UPDATE_FACE, classified_id)
+                log_message = f"Se ha actualizado la imagen de la cara con id {classified_id}"
+                metadata_json = json.dumps({ "faceprint_id": classified_id })
+                self.create_log(CONSTANTS.ACTION.UPDATE_FACE, classified_id, log_message, metadata_json)
 
             if distance < self.LOWER_BOUND: # No sabe quien es (en teoria nunca lo ha visto), pregunta por el nombre
                 classified_name = None
@@ -140,7 +142,10 @@ class HRILogic():
                             self.people.process_detection(classified_id, scores[i], distance)
 
                             self.read_text("Bienvenido " + classified_name + ", no te conocía")
-                            self.create_log(CONSTANTS.ACTION.ADD_CLASS, classified_id)
+
+                            log_message = f"Se ha creado una nueva clase con id {classified_id}"
+                            metadata_json = json.dumps({ "faceprint_id": classified_id })
+                            self.create_log(CONSTANTS.ACTION.ADD_CLASS, classified_id, log_message, metadata_json)
                         else:
                             self.node.get_logger().info(f">> ERROR: Algo salio mal al agregar una nueva clase: {message}")
 
@@ -159,7 +164,10 @@ class HRILogic():
 
                         if output >= 0:
                             self.read_text("Gracias " + classified_name + ", me gusta confirmar que estoy reconociendo bien")
-                            self.create_log(CONSTANTS.ACTION.ADD_FEATURES, classified_id)
+                            
+                            log_message = f"Se ha añadido un nuevo vector de características independiente a la clase {classified_id}"
+                            metadata_json = json.dumps({ "faceprint_id": classified_id })
+                            self.create_log(CONSTANTS.ACTION.ADD_FEATURES, classified_id, log_message, metadata_json)
                         else:
                             self.node.get_logger().info(f">> ERROR: Algo salio mal al agregar features a una clase")
                     else: # Si dice que no, le pregunta el nombre
@@ -182,7 +190,10 @@ class HRILogic():
                                 self.people.process_detection(classified_id, scores[i], distance)
 
                                 self.read_text("Encantando de conocerte " + classified_name + ", perdona por confundirte")
-                                self.create_log(CONSTANTS.ACTION.ADD_CLASS, classified_id)
+                                
+                                log_message = f"Se ha creado una nueva clase con id {classified_id}"
+                                metadata_json = json.dumps({ "faceprint_id": classified_id })
+                                self.create_log(CONSTANTS.ACTION.ADD_CLASS, classified_id, log_message, metadata_json)
                             else:
                                 self.node.get_logger().info(f">> ERROR: Algo salio mal al agregar una nueva clase: {message}")
 
@@ -305,15 +316,15 @@ class HRILogic():
         self.node.get_logger().info(f"[SANCHO] {text}")
         self.node.input_tts.publish(String(data=text))
     
-    def create_log(self, action, faceprint_id):
+    def create_log(self, action, faceprint_id, message="", metadata_json=""):
         self.node.publisher_log.publish(Log(
             level=CONSTANTS.LEVEL.INFO,
             origin=CONSTANTS.ORIGIN.ROS,
             actor="logic_node",
             action=action,
             target=faceprint_id,
-            message="",
-            metadata_json=""
+            message=message,
+            metadata_json=metadata_json
         ))
 
 def main(args=None):
