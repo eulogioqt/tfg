@@ -8,6 +8,7 @@ endif()
 # Dependencias ROS
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
 
 # PortAudio y FFTW
 find_package(PkgConfig REQUIRED)
@@ -15,7 +16,7 @@ pkg_check_modules(PORTAUDIO REQUIRED portaudio-2.0)
 
 # Ejecutable
 add_executable(mouth_node src/mouth_node.cpp)
-ament_target_dependencies(mouth_node rclcpp)
+ament_target_dependencies(mouth_node rclcpp std_msgs)
 
 target_include_directories(mouth_node PRIVATE
   ${PORTAUDIO_INCLUDE_DIRS}

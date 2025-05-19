@@ -72,4 +72,10 @@ def generate_launch_description():
             name='sancho_ai',
             output='screen'
         ),
+        Node(
+            package='mouth_controller',
+            executable='mouth_node',
+            name='mouth_node',
+            output='screen'
+        ),
     ])

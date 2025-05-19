@@ -29,7 +29,7 @@ public:
         else
         {
             RCLCPP_INFO(get_logger(), "Puerto serie /dev/ttyUSB1 abierto correctamente");
-            send_to_esp32("color_white");
+            send_to_esp32("idle");
         }
 
         mode_subscription_ = create_subscription<std_msgs::msg::String>(

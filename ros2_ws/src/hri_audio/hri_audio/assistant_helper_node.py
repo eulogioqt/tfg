@@ -62,7 +62,7 @@ class AssistantHelper:
 
         self.sample_rate = -1 # Will set on mic callbacks
         self.helper_chunk_size = 0.5 # Revisar este valor
-        self.intensity_threshold = 750
+        self.intensity_threshold = 1500
 
         self.audio = []
         self.check_audio = []
@@ -94,7 +94,7 @@ class AssistantHelper:
 
             play(ACTIVATION_SOUND)
             self.node.get_logger().info(f"✅✅✅ '{self.name.upper()}' DETECTED")
-        self.node.get_logger().info(f"{time.time() - a}")
+        #self.node.get_logger().info(f"{time.time() - a}")
 
     def process_command_mode(self, new_audio):
         self.check_audio = self.check_audio + new_audio
