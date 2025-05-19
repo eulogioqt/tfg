@@ -15,6 +15,7 @@ class AssistantNode(Node):
     def __init__(self):
         super().__init__("assistant")
 
+        self.mouth_mode_pub = self.create_publisher(String, "mouth/mode", 10)
         self.text_sub = self.create_subscription(String, 'hri_audio/assistant_helper/transcription', self.text_callback, 10)
 
         self.sancho_prompt_client = self.create_client(SanchoPrompt, "sancho_ai/prompt")
@@ -41,15 +42,19 @@ class Assistant:
         while rclpy.ok():
             if not self.node.queue.empty():
                 user_text = self.node.queue.get()
+
+                self.node.mouth_mode_pub.publish(String(data="thinking"))
                 ai_response = self.sancho_prompt_request(user_text)
     
                 self.node.get_logger().info(f"✅✅✅ Respuesta recibida '{ai_response}'")
 
+                self.node.mouth_mode_pub.publish(String(data="speaking"))
                 audio, sample_rate = self.tts_request(ai_response)
                 self.node.get_logger().info(f"✅✅✅ Reproduciendo por audio la respuesta")
 
                 sd.play(audio, samplerate=sample_rate)
                 sd.wait()
+                self.node.mouth_mode_pub.publish(String(data="idle"))
 
             rclpy.spin_once(self.node)
 
