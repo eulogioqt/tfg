@@ -3,6 +3,16 @@ import time
 
 #USAR UN LLM PORQUE ESTO ES MUY MALO
 """
+
+https://chatgpt.com/c/682ba1f1-99a8-800f-8f5c-91a3b2ced388
+
+pedirle si uso un modelo para todo y ya o que y pedirle ayuda con los prompt system para que tmb saque la emocion y eso
+y acotar las emociones
+
+"""
+
+
+"""
 🧠 RESUMEN: LÓGICA EMOCIONAL DEL ROBOT
 
 - El robot tiene 4 modos: idle, listening, thinking, speaking.
