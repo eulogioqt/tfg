@@ -5,13 +5,28 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# find dependencies
+# Dependencias ROS
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 
+# PortAudio y FFTW
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(PORTAUDIO REQUIRED portaudio-2.0)
+
+# Ejecutable
 add_executable(mouth_node src/mouth_node.cpp)
 ament_target_dependencies(mouth_node rclcpp)
 
+target_include_directories(mouth_node PRIVATE
+  ${PORTAUDIO_INCLUDE_DIRS}
+)
+
+target_link_libraries(mouth_node
+  ${PORTAUDIO_LIBRARIES}
+  fftw3
+)
+
+# Instalación
 install(TARGETS
   mouth_node
   DESTINATION lib/${PROJECT_NAME})
