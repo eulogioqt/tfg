@@ -33,8 +33,8 @@ class MODELS:
         class PHI(SmartStrEnum):
             PHI_2 = "microsoft/phi-2"
 
-        class QWEN(SmartStrEnum): # Qwen/Qwen2.5-Omni-7B y 32B
-            QWEN_7B = "Qwen/Qwen1.5-7B-Chat"
+        class QWEN(SmartStrEnum): # Qwen/Qwen2.5-Omni-7B y 32B, 72B, pecha modelos, falcon, gemma, yi. Buscar cual puede ser el mejor para cada tarea y en general
+            QWEN_1_5_7B = "Qwen/Qwen1.5-7B-Chat" # de deepseek buscar mejores, el v3, de mas parametros
 
         class DEEPSEEK(SmartStrEnum):
             DEEPSEEK_CHAT = "deepseek-ai/deepseek-llm-7b-chat"
