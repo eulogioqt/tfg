@@ -54,7 +54,7 @@ private:
         int level = static_cast<int>(normalized * 4.999); // 0, 1, 2, 3, 4
 
         static const char *LEVEL_NAMES[] = {
-            "LOW", "MEDIUM_LOW", "MEDIUM", "MEDIUM_HIGH", "HIGH"};
+            "low", "medium-low", "medium", "medium_high", "high"};
 
         const char *level_str = LEVEL_NAMES[level];
 
@@ -64,10 +64,10 @@ private:
 
     void send_to_esp32(const std::string &level)
     {
-        std::ofstream serial("/dev/ttyUSB0");
+        std::ofstream serial("/dev/ttyUSB1");
         if (!serial.is_open())
         {
-            RCLCPP_ERROR(get_logger(), "No se pudo abrir /dev/ttyUSB0");
+            RCLCPP_ERROR(get_logger(), "No se pudo abrir /dev/ttyUSB1");
             return;
         }
         serial << level << "\n";
