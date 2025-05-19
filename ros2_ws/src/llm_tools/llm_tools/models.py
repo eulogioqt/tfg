@@ -33,7 +33,7 @@ class MODELS:
         class PHI(SmartStrEnum):
             PHI_2 = "microsoft/phi-2"
 
-        class QWEN(SmartStrEnum): # Qwen/Qwen2.5-Omni-7B
+        class QWEN(SmartStrEnum): # Qwen/Qwen2.5-Omni-7B y 32B
             QWEN_7B = "Qwen/Qwen1.5-7B-Chat"
 
         class DEEPSEEK(SmartStrEnum):

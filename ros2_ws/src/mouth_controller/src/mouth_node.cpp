@@ -7,17 +7,15 @@
 #include <memory>
 #include <portaudio.h>
 #include <thread>
-#include <fftw3.h>
 #include <chrono>
 #include <cstdint>
-
 
 class MouthNode : public rclcpp::Node
 {
 public:
     MouthNode() : Node("mouth_node")
     {
-        declare_parameter<double>("send_interval_sec", 0.1);  // valor por defecto
+        declare_parameter<double>("send_interval_sec", 0.1);
         get_parameter("send_interval_sec", chunk_send_interval_);
         RCLCPP_INFO(get_logger(), "Intervalo de envío configurado: %.2f s", chunk_send_interval_);
 
@@ -111,7 +109,7 @@ private:
                 if (accumulated_samples_.size() >= target_samples)
                 {
                     std::vector<int16_t> chunk(accumulated_samples_.begin(), accumulated_samples_.begin() + target_samples);
-                    handle_chunk(chunk, sampleRate_);
+                    handle_chunk(chunk);
                     accumulated_samples_.erase(accumulated_samples_.begin(), accumulated_samples_.begin() + target_samples);
                 }
             }
@@ -122,26 +120,42 @@ private:
         });
     }
 
-    void handle_chunk(const std::vector<int16_t> &samples, double sampleRate)
+    void handle_chunk(const std::vector<int16_t> &samples)
     {
         if (samples.empty())
             return;
 
-        // Calcular RMS directamente desde la señal
         double sum_sq = 0.0;
         for (int16_t s : samples)
             sum_sq += static_cast<double>(s) * s;
 
         double rms = std::sqrt(sum_sq / samples.size());
 
-        // Normalizar entre 0 y 32768 (máximo valor int16_t posible en módulo)
-        double normalized = std::clamp(rms / 32768.0, 0.0, 1.0);
+        // Actualizar el RMS máximo si el valor actual es mayor
+        if (rms > max_rms_)
+            max_rms_ = rms;
 
-        // Escalar a N niveles (en este caso 5 niveles: 0 a 4)
+        // Detectar racha de silencio (rms == 0.0)
+        if (rms < 1.0)  // ruido de fondo despreciable
+        {
+            silent_duration_ += chunk_send_interval_;
+            if (silent_duration_ >= 3.0)
+            {
+                RCLCPP_INFO(get_logger(), "3 segundos de silencio detectados. Reiniciando max_rms.");
+                max_rms_ = 0.0;
+                silent_duration_ = 0.0;
+            }
+        }
+        else
+        {
+            silent_duration_ = 0.0;
+        }
+
+        // Normalizar en base al max_rms_
+        double normalized = (max_rms_ > 0.0) ? std::clamp(rms / max_rms_, 0.0, 1.0) : 0.0;
+
         const int num_levels = 5;
         int level = static_cast<int>(normalized * (num_levels - 1) + 0.5);
-
-        // Asegurar que no se sale del rango
         level = std::clamp(level, 0, num_levels - 1);
 
         static const char *LEVEL_NAMES[] = {
@@ -149,12 +163,10 @@ private:
         };
 
         const char *level_str = LEVEL_NAMES[level];
-
-        RCLCPP_INFO(get_logger(), "RMS: %.2f | Nivel: %s", rms, level_str);
+        RCLCPP_INFO(get_logger(), "RMS: %.2f | Norm: %.2f | Nivel: %s", rms, normalized, level_str);
 
         send_to_esp32(level_str);
     }
-
 
     void send_to_esp32(const std::string &level)
     {
@@ -172,6 +184,10 @@ private:
     double sampleRate_ = 48000;
     double chunk_send_interval_ = 0.5;
     std::vector<int16_t> accumulated_samples_;
+
+    // Estado para normalización dinámica
+    double max_rms_ = 0.0;
+    double silent_duration_ = 0.0;
 };
 
 int main(int argc, char **argv)
