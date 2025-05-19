@@ -1,4 +1,5 @@
 #include "rclcpp/rclcpp.hpp"
+#include <std_msgs/msg/string.hpp>
 #include <vector>
 #include <cmath>
 #include <algorithm>
@@ -9,6 +10,7 @@
 #include <thread>
 #include <chrono>
 #include <cstdint>
+#include <mutex>
 
 class MouthNode : public rclcpp::Node
 {
@@ -30,6 +32,10 @@ public:
             send_to_esp32("color_white");
         }
 
+        mode_subscription_ = create_subscription<std_msgs::msg::String>(
+            "mouth/mode", 10,
+            std::bind(&MouthNode::mode_callback, this, std::placeholders::_1));
+
         start_audio_monitoring();
     }
 
@@ -44,6 +50,22 @@ public:
     }
 
 private:
+    void mode_callback(const std_msgs::msg::String::SharedPtr msg)
+    {
+        static const std::vector<std::string> valid_modes = {"idle", "listening", "thinking", "speaking"};
+        if (std::find(valid_modes.begin(), valid_modes.end(), msg->data) != valid_modes.end())
+        {
+            std::lock_guard<std::mutex> lock(mode_mutex_);
+            current_mode_ = msg->data;
+            RCLCPP_INFO(get_logger(), "Modo actualizado a: %s", current_mode_.c_str());
+            send_to_esp32(current_mode_);
+        }
+        else
+        {
+            RCLCPP_ERROR(get_logger(), "Modo no válido recibido: %s", msg->data.c_str());
+        }
+    }
+
     void start_audio_monitoring()
     {
         Pa_Initialize();
@@ -87,8 +109,7 @@ private:
             frames_per_chunk,
             paClipOff,
             nullptr,
-            nullptr
-        );
+            nullptr);
         if (err != paNoError)
         {
             RCLCPP_ERROR(get_logger(), "No se pudo abrir el stream de audio: %s", Pa_GetErrorText(err));
@@ -98,10 +119,22 @@ private:
         Pa_StartStream(stream);
         RCLCPP_INFO(get_logger(), "Captura de audio iniciada con el dispositivo 'pulse'.");
 
-        audio_thread_ = std::thread([this, stream, frames_per_chunk]() {
+        audio_thread_ = std::thread([this, stream, frames_per_chunk]()
+                                    {
             std::vector<int16_t> buffer(frames_per_chunk);
             while (rclcpp::ok() && running_)
             {
+                std::string mode;
+                {
+                    std::lock_guard<std::mutex> lock(mode_mutex_);
+                    mode = current_mode_;
+                }
+                if (mode != "speaking")
+                {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                    continue;
+                }
+
                 Pa_ReadStream(stream, buffer.data(), frames_per_chunk);
                 accumulated_samples_.insert(accumulated_samples_.end(), buffer.begin(), buffer.end());
 
@@ -116,8 +149,7 @@ private:
 
             Pa_StopStream(stream);
             Pa_CloseStream(stream);
-            Pa_Terminate();
-        });
+            Pa_Terminate(); });
     }
 
     void handle_chunk(const std::vector<int16_t> &samples)
@@ -131,12 +163,10 @@ private:
 
         double rms = std::sqrt(sum_sq / samples.size());
 
-        // Actualizar el RMS máximo si el valor actual es mayor
         if (rms > max_rms_)
             max_rms_ = rms;
 
-        // Detectar racha de silencio (rms == 0.0)
-        if (rms < 1.0)  // ruido de fondo despreciable
+        if (rms < 1.0)
         {
             silent_duration_ += chunk_send_interval_;
             if (silent_duration_ >= 3.0)
@@ -151,7 +181,6 @@ private:
             silent_duration_ = 0.0;
         }
 
-        // Normalizar en base al max_rms_
         double normalized = (max_rms_ > 0.0) ? std::clamp(rms / max_rms_, 0.0, 1.0) : 0.0;
 
         const int num_levels = 5;
@@ -159,8 +188,7 @@ private:
         level = std::clamp(level, 0, num_levels - 1);
 
         static const char *LEVEL_NAMES[] = {
-            "low", "medium-low", "medium", "medium-high", "high"
-        };
+            "low", "medium-low", "medium", "medium-high", "high"};
 
         const char *level_str = LEVEL_NAMES[level];
         RCLCPP_INFO(get_logger(), "RMS: %.2f | Norm: %.2f | Nivel: %s", rms, normalized, level_str);
@@ -184,10 +212,12 @@ private:
     double sampleRate_ = 48000;
     double chunk_send_interval_ = 0.5;
     std::vector<int16_t> accumulated_samples_;
-
-    // Estado para normalización dinámica
     double max_rms_ = 0.0;
     double silent_duration_ = 0.0;
+
+    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr mode_subscription_;
+    std::string current_mode_ = "idle";
+    std::mutex mode_mutex_;
 };
 
 int main(int argc, char **argv)
