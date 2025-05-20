@@ -12,8 +12,7 @@ from speech_msgs.srv import STT
 from .utils.sound import play
 from .utils.sounds import ACTIVATION_SOUND
 
-from .utils.stt_hotword import STTHotword
-from .utils.pvporcupine_hotword import PVPorcupineHotword
+from .utils import STTHotword, PVPorcupineHotword, IntensityAttachCriterion, SileroVADAttachCriterion
 
 
 class AUDIO_STATE(int, Enum):
@@ -70,6 +69,9 @@ class AssistantHelper:
 
         #self.hotword_detector = STTHotword(self.stt_request, name=name)
         self.hotword_detector = PVPorcupineHotword() # Hacer un de esto para usar intensity o VAD para meter chunks
+        self.chunk_attach_criterion = IntensityAttachCriterion(self.intensity_threshold)
+        #self.chunk_attach_criterion = SileroVADAttachCriterion()
+        
         self.node = AssistantHelperNode()
 
     def spin(self):
@@ -86,24 +88,18 @@ class AssistantHelper:
             rclpy.spin_once(self.node)
 
     def process_name_mode(self, new_audio):
-        import time
-        a = time.time()
         if self.hotword_detector.detect(new_audio, self.sample_rate):
             self.node.mouth_mode_pub.publish(String(data="listening"))
             self.helper_state = HELPER_STATE.COMMAND
 
             play(ACTIVATION_SOUND)
             self.node.get_logger().info(f"✅✅✅ '{self.name.upper()}' DETECTED")
-        #self.node.get_logger().info(f"{time.time() - a}")
 
     def process_command_mode(self, new_audio):
         self.check_audio = self.check_audio + new_audio
         
         if self.is_audio_length(self.check_audio, self.helper_chunk_size):
-            avg_intensity = self.audio_average_intensity(self.check_audio)
-            self.node.get_logger().info(f"Chunk of {self.helper_chunk_size}s: {avg_intensity:.2f} avg intensity")
-
-            if avg_intensity >= self.intensity_threshold: # Si hay intensidad, lo añadimos
+            if self.chunk_attach_criterion.should_attach_chunk(self.check_audio, self.sample_rate):
                 if self.audio_state == AUDIO_STATE.NO_AUDIO: # Por si es en END, no pase a SOME
                     self.audio_state = AUDIO_STATE.SOME_AUDIO
 
@@ -116,9 +112,9 @@ class AssistantHelper:
                 self.audio_state = AUDIO_STATE.END_AUDIO
 
                 self.audio = self.audio + self.check_audio # Para que no se corte el audio, metemos tmb este ultimo
-                self.node.get_logger().info("No more audio detected...")
+                self.node.get_logger().info("No more audio detected. Closing chunk window")
             else: # Si no hay intensidad ni audio, pues aun no hay audio
-                self.node.get_logger().info("No audio detected yet")
+                self.node.get_logger().info("Listening for command but no audio detected yet")
 
             self.previous_chunk = self.check_audio
             self.check_audio = []
@@ -158,13 +154,6 @@ class AssistantHelper:
     def is_audio_length(self, audio, seconds):
         return len(audio) >= seconds * self.sample_rate
 
-    def audio_average_intensity(self, audio):
-        average_intensity = np.mean(np.abs(audio))
-        if average_intensity < 0:
-            average_intensity = 32767
-            
-        return average_intensity
-    
 
 def main(args=None):
     rclpy.init(args=args)
