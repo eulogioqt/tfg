@@ -13,7 +13,7 @@ from .models import PROVIDER, MODELS, NEEDS_API_KEY, EXECUTED_LOCALLY
 # PHI NO FUNCIONA, DEEPSEEK SI LE METES UN "" EL MAX TOKENS DE SALIDA FALLA, AUNQUE ESTE A 60 SALEN MAS, REVISAR
 class LLMNode(Node):
 
-    PROVIDER_CLASS_MAP = { # Poner esto mas cool, solo con el nombre camelcase se puede hacer, lo demas no es necesario
+    PROVIDER_CLASS_MAP = {
         PROVIDER.OPENAI: ("llm_tools.providers.openai_provider", "OpenAIProvider"),
         PROVIDER.MISTRAL: ("llm_tools.providers.mistral_provider", "MistralProvider"),
         PROVIDER.PHI: ("llm_tools.providers.phi_provider", "PhiProvider"),
@@ -23,6 +23,9 @@ class LLMNode(Node):
         PROVIDER.SBERT: ("llm_tools.providers.sbert_provider", "SBERTProvider"),
         PROVIDER.E5: ("llm_tools.providers.e5_provider", "E5Provider"),
         PROVIDER.BAAI: ("llm_tools.providers.baai_provider", "BAAIProvider"),
+        PROVIDER.GEMMA: ("llm_tools.providers.gemma_provider", "GemmaProvider"),
+        PROVIDER.FALCON: ("llm_tools.providers.falcon_provider", "FalconProvider"),
+        PROVIDER.YI: ("llm_tools.providers.yi_provider", "YIProvider"),
     }
 
     def __init__(self):
