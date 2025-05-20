@@ -11,6 +11,9 @@
 #include <chrono>
 #include <cstdint>
 #include <mutex>
+#include <sstream>
+#include <fcntl.h>
+#include <unistd.h>
 
 class MouthNode : public rclcpp::Node
 {
@@ -21,8 +24,10 @@ public:
         get_parameter("send_interval_sec", chunk_send_interval_);
         RCLCPP_INFO(get_logger(), "Intervalo de envío configurado: %.2f s", chunk_send_interval_);
 
-        serial_ = std::make_unique<std::ofstream>("/dev/ttyUSB1");
-        if (!serial_->is_open())
+        serial_out_ = std::make_unique<std::ofstream>("/dev/ttyUSB1");
+        serial_in_fd_ = open("/dev/ttyUSB1", O_RDONLY | O_NONBLOCK);
+
+        if (!serial_out_->is_open() || serial_in_fd_ == -1)
         {
             RCLCPP_ERROR(get_logger(), "No se pudo abrir /dev/ttyUSB1");
         }
@@ -30,6 +35,25 @@ public:
         {
             RCLCPP_INFO(get_logger(), "Puerto serie /dev/ttyUSB1 abierto correctamente");
             send_to_esp32("idle");
+
+            serial_thread_ = std::thread([this]() {
+                std::string buffer;
+                char c;
+                while (rclcpp::ok())
+                {
+                    ssize_t len = read(serial_in_fd_, &c, 1);
+                    if (len > 0)
+                    {
+                        if (c == '\n') {
+                            RCLCPP_INFO(get_logger(), "[ESP32]: %s", buffer.c_str());
+                            buffer.clear();
+                        } else {
+                            buffer += c;
+                        }
+                    }
+                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                }
+            });
         }
 
         mode_subscription_ = create_subscription<std_msgs::msg::String>(
@@ -45,8 +69,14 @@ public:
         if (audio_thread_.joinable())
             audio_thread_.join();
 
-        if (serial_ && serial_->is_open())
-            serial_->close();
+        if (serial_thread_.joinable())
+            serial_thread_.join();
+
+        if (serial_out_ && serial_out_->is_open())
+            serial_out_->close();
+
+        if (serial_in_fd_ != -1)
+            close(serial_in_fd_);
     }
 
 private:
@@ -119,9 +149,11 @@ private:
         Pa_StartStream(stream);
         RCLCPP_INFO(get_logger(), "Captura de audio iniciada con el dispositivo 'pulse'.");
 
-        audio_thread_ = std::thread([this, stream, frames_per_chunk]()
-                                    {
+        audio_thread_ = std::thread([this, stream, frames_per_chunk]() {
             std::vector<int16_t> buffer(frames_per_chunk);
+            auto chunk_start = std::chrono::steady_clock::now();
+            std::vector<int16_t> current_chunk;
+
             while (rclcpp::ok() && running_)
             {
                 std::string mode;
@@ -136,20 +168,23 @@ private:
                 }
 
                 Pa_ReadStream(stream, buffer.data(), frames_per_chunk);
-                accumulated_samples_.insert(accumulated_samples_.end(), buffer.begin(), buffer.end());
+                current_chunk.insert(current_chunk.end(), buffer.begin(), buffer.end());
 
-                size_t target_samples = static_cast<size_t>(chunk_send_interval_ * sampleRate_);
-                if (accumulated_samples_.size() >= target_samples)
+                auto now = std::chrono::steady_clock::now();
+                double elapsed = std::chrono::duration<double>(now - chunk_start).count();
+
+                if (elapsed >= chunk_send_interval_)
                 {
-                    std::vector<int16_t> chunk(accumulated_samples_.begin(), accumulated_samples_.begin() + target_samples);
-                    handle_chunk(chunk);
-                    accumulated_samples_.erase(accumulated_samples_.begin(), accumulated_samples_.begin() + target_samples);
+                    handle_chunk(current_chunk);
+                    current_chunk.clear();
+                    chunk_start = now;
                 }
             }
 
             Pa_StopStream(stream);
             Pa_CloseStream(stream);
-            Pa_Terminate(); });
+            Pa_Terminate();
+        });
     }
 
     void handle_chunk(const std::vector<int16_t> &samples)
@@ -166,7 +201,7 @@ private:
         if (rms > max_rms_)
             max_rms_ = rms;
 
-        if (rms < 1.0)
+        if (rms < 100.0)
         {
             silent_duration_ += chunk_send_interval_;
             if (silent_duration_ >= 3.0)
@@ -183,12 +218,12 @@ private:
 
         double normalized = (max_rms_ > 0.0) ? std::clamp(rms / max_rms_, 0.0, 1.0) : 0.0;
 
-        const int num_levels = 5;
+        const int num_levels = 6;
         int level = static_cast<int>(normalized * (num_levels - 1) + 0.5);
         level = std::clamp(level, 0, num_levels - 1);
 
         static const char *LEVEL_NAMES[] = {
-            "low", "medium-low", "medium", "medium-high", "high"};
+            "low", "medium_low", "medium", "medium_high", "high", "full"};
 
         const char *level_str = LEVEL_NAMES[level];
         RCLCPP_INFO(get_logger(), "RMS: %.2f | Norm: %.2f | Nivel: %s", rms, normalized, level_str);
@@ -198,20 +233,21 @@ private:
 
     void send_to_esp32(const std::string &level)
     {
-        if (serial_ && serial_->is_open())
+        if (serial_out_ && serial_out_->is_open())
         {
-            *serial_ << level << "\n";
-            serial_->flush();
+            *serial_out_ << level << "0";
+            serial_out_->flush();
         }
     }
 
-    std::unique_ptr<std::ofstream> serial_;
+    std::unique_ptr<std::ofstream> serial_out_;
+    int serial_in_fd_ = -1;
+    std::thread serial_thread_;
     std::thread audio_thread_;
     bool running_ = true;
 
     double sampleRate_ = 48000;
-    double chunk_send_interval_ = 0.5;
-    std::vector<int16_t> accumulated_samples_;
+    double chunk_send_interval_ = 0.1;
     double max_rms_ = 0.0;
     double silent_duration_ = 0.0;
 
