@@ -92,7 +92,7 @@ const ChatMessage = ({ message, onSelect }) => {
                 <div className="d-flex flex-column align-items-start justify-content-between text-justify">
                     {message.value.data.image && (
                         <img
-                            className="border border-dark bg-dark border-4 rounded shadow-lg mb-2"
+                            className="border border-dark bg-dark border-4 rounded mb-2"
                             src={`data:image/jpeg;base64,${message.value.data.image}`}
                             alt="Imagen"
                             style={{
