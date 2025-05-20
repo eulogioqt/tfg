@@ -22,7 +22,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'llm = llm_tools.llm_node:main'
+            'llm = llm_tools.llm_node:main',
+            'test_all = llm_tools.test_all_node:main'
         ],
     },
 )
