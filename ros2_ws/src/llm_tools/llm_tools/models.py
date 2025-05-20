@@ -18,6 +18,9 @@ class PROVIDER(SmartStrEnum):
     SBERT = "sbert"
     E5 = "e5"
     BAAI = "baai"
+    GEMMA = "gemma"
+    FALCON = "falcon"
+    YI = "yi"
 
 class MODELS:
     class LLM:
@@ -34,13 +37,35 @@ class MODELS:
             PHI_2 = "microsoft/phi-2"
 
         class QWEN(SmartStrEnum): # Qwen/Qwen2.5-Omni-7B y 32B, 72B, pecha modelos, falcon, gemma, yi. Buscar cual puede ser el mejor para cada tarea y en general
-            QWEN_1_5_7B = "Qwen/Qwen1.5-7B-Chat" # de deepseek buscar mejores, el v3, de mas parametros
+            QWEN_1_5_7B_CHAT = "Qwen/Qwen1.5-7B-Chat"
+            QWEN_2_5_7B_IT = "Qwen/Qwen2.5-7B-Instruct"
+            QWEN_2_5_14B_IT = "Qwen/Qwen2.5-14B-Instruct"
+            QWEN_2_5_32B_IT = "Qwen/Qwen2.5-32B-Instruct"
+            QWEN_2_5_72B_IT = "Qwen/Qwen2.5-72B-Instruct"
 
         class DEEPSEEK(SmartStrEnum):
-            DEEPSEEK_CHAT = "deepseek-ai/deepseek-llm-7b-chat"
+            DEEPSEEK_LLM_7B_CHAT = "deepseek-ai/deepseek-llm-7b-chat"
+            DEEPSEEK_LLM_67B_CHAT = "deepseek-ai/deepseek-llm-67b-chat"
+
+            DEEPSEEK_R1_DISTILL_LLAMA_70B = "deepseek-ai/DeepSeek-R1-Distill-Llama-70B"
+            DEEPSEEK_R1_DISTILL_QWEN_32B = "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
+
+            DEEPSEEK_V3 = "deepseek-ai/DeepSeek-V3" 
 
         class GEMINI(SmartStrEnum):
             GEMINI_FLASH = "gemini-1.5-flash-latest"
+
+        class GEMMA(SmartStrEnum):
+            GEMMA_2_27B = "google/gemma-2-27b"
+            GEMMA_3_27B_IT = "google/gemma-3-27b-it"
+        
+        class FALCON(SmartStrEnum):
+            FALCON_40B_IT = "tiiuae/Falcon-40B-Instruct"
+            FALCON_3_10B_IT = "tiiuae/Falcon3-10B-Instruct"
+        
+        class YI(SmartStrEnum):
+            YI_1_5_9B_CHAT = "01-ai/Yi-1.5-9B-Chat"
+            YI_1_5_34B_CHAT = "01-ai/Yi-1.5-34B-Chat"
 
     class EMBEDDING:
         class OPENAI(SmartStrEnum):
@@ -69,6 +94,7 @@ NEEDS_API_KEY = {
     PROVIDER.GEMINI,
     PROVIDER.MISTRAL,
     PROVIDER.OPENAI,
+    PROVIDER.GEMMA,
 }
 
 EXECUTED_LOCALLY = {
