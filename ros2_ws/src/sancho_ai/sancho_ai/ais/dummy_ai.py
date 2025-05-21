@@ -15,6 +15,7 @@ class DummyAI(AI):
 
         value = {
             "text": message[::-1],
+            "emotion": "neutral",
             "data": {}
         }
 

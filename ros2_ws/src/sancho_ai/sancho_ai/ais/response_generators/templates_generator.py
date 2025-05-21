@@ -26,11 +26,13 @@ class TemplatesGenerator(ResponseGenerator):
         templates_for_status = self.templates[intent][status]
         template = random.choice(templates_for_status)
         response = template.format(**arguments)
+        emotion = "neutral"
 
-        return response, self.provider_used, self.model_used
+        return response, emotion, self.provider_used, self.model_used
 
     def continue_conversation(self, user_input: str, chat_history: list) -> tuple[str, str, str]:
         templates = self.templates[COMMANDS.UNKNOWN]["MISSING_ARGUMENT"]
         response = random.choice(templates)
+        emotion = "neutral"
 
-        return response, self.provider_used, self.model_used
+        return response, emotion, self.provider_used, self.model_used

@@ -26,7 +26,7 @@ class SanchoAINode(Node):
         chat_history = self.chats.get(request.user, [])
 
         value, intent, arguments, provider, model = self.sancho_ai.on_message(request.text, chat_history)
-
+        
         chat_history.append({"role": "user", "content": request.text})
         chat_history.append({"role": "assistant", "content": value["text"]})
 

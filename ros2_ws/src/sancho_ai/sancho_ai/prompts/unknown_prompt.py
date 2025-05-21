@@ -32,7 +32,7 @@ Rules:
 VERY IMPORTANT:
 - You **must ALWAYS output a valid JSON object**.
 - The JSON must have exactly two fields: "response" and "emotion".
-- The value of "emotion" must be EXACTLY one of the following: "happy", "sad", "angry", "bored", "suspicious", or "neutral".
+- The value of "emotion" must be EXACTLY one of the following: "happy", "surprised", "sad", "angry", "bored", "suspicious", or "neutral".
 - Do NOT invent new emotions or change the field names.
 - Do NOT include any explanation outside the JSON.
 
@@ -40,7 +40,7 @@ Here is the required JSON format:
 
 {
   "response": "your full reply in Spanish here",
-  "emotion": "happy | sad | angry | bored | suspicious | neutral"
+  "emotion": "happy | surprised | sad | angry | bored | suspicious | neutral"
 }
 
 Below is your memory:

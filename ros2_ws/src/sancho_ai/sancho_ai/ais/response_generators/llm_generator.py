@@ -14,8 +14,7 @@ class LLMGenerator(ResponseGenerator):
         self.hri_engine = hri_engine
         self.llm_engine = llm_engine
     
-    def generate_response(self, details: str, status: str, intent: str, 
-                          arguments: dict, user_input: str, chat_history: list) -> str:
+    def generate_response(self, details: str, status: str, intent: str, arguments: dict, user_input: str, chat_history: list) -> str:
         semantic_result = SemanticResultPrompt.build_semantic_result(intent, arguments, status, details)
         semantic_response_prompt = SemanticResultPrompt(semantic_result, user_input, chat_history)
         LogManager.info(f"PROMPT SYSTEM:\n{semantic_response_prompt.get_prompt_system()}")
@@ -31,14 +30,13 @@ class LLMGenerator(ResponseGenerator):
             return semantic_result["details"]
         
         LogManager.info(f"LLM for Generation Prompt:\n{response}")
+        
+        emotion = "neutral"
 
-        return response, provider_used, model_used
+        return response, emotion, provider_used, model_used
 
     def continue_conversation(self, user_input: str, chat_history: list) -> str:
-        import time
-        start_time = time.time()
         robot_context = self._build_robot_context()
-        LogManager.info(f"Time building context: {round(time.time() - start_time, 3)}s")
 
         unknown_prompt = UnknownPrompt(user_input, robot_context)
         LogManager.info(f"Prompt system: {unknown_prompt.get_prompt_system()}")
@@ -53,11 +51,32 @@ class LLMGenerator(ResponseGenerator):
 
         if not success:
             LogManager.error(f"There was a problem with unknown prompt: {message}")
-            return "Lo siento, no te he entendido"
+            return "Lo siento, no te he entendido", "sad", provider_used, model_used
+        
+        LogManager.info(f"LLM for Classification Prompt:\n{response}")
+        classification_response_json = SemanticResultPrompt.extract_json_from_code_block(response) # Gemini usually puts the response in ```json block
+        if not classification_response_json:
+            LogManager.error(f"No JSON format found.")
+            return "Lo siento, no te he entendido", "sad", provider_used, model_used
 
-        LogManager.info(f"LLM for Unknown Prompt:\n{response}")
+        classification_response = SemanticResultPrompt.try_json_loads(classification_response_json)
+        if not classification_response:
+            LogManager.error(f"Error on JSON loads.")
+            return "Lo siento, no te he entendido", "sad", provider_used, model_used
+        
+        text_response = classification_response.get("response", "")
+        emotion = classification_response.get("emotion", "")
+        if not text_response:
+            LogManager.error(f"The JSON response does not contain a text response.")
+            return "Lo siento, no te he entendido", "sad", provider_used, model_used
+        
+        if not emotion or emotion not in ["happy", "surprised", "sad", "angry", "bored", "suspicious", "neutral"]:
+            LogManager.error(f"❌❌❌❌❌ EMOTION {emotion} INVALID. Default to neutral.")
+            emotion = "neutral"
 
-        return response, provider_used, model_used
+        LogManager.info(f"LLM for Unknown Prompt:\n{text_response}\nEmotion:\n{emotion}")
+
+        return text_response, emotion, provider_used, model_used
     
     def _build_robot_context(self):
         actual_people_json = self.hri_engine.get_actual_people_request()

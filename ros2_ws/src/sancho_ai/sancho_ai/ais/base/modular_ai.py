@@ -18,17 +18,19 @@ class ModularAI(ABC):
         
         if intent != COMMANDS.UNKNOWN:
             details, status, data = self.executor.execute(intent, arguments)
-            response, provider_used, model_used = \
+
+            response, emotion, provider_used, model_used = \
                 self.response_generator.generate_response(
                     details, status, intent, arguments, user_input, chat_history
                 )
         else:
             data = {}
-            response, provider_used, model_used = \
+            response, emotion, provider_used, model_used = \
                 self.response_generator.continue_conversation(user_input, chat_history)
 
         value = {
             "text": response,
+            "emotion": emotion,
             "data": data
         }
 

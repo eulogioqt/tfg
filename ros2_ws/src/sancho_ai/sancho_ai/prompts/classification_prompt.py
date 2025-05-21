@@ -1,4 +1,3 @@
-import re
 import json
 
 from .prompt import Prompt
@@ -94,22 +93,3 @@ class ClassificationPrompt(Prompt):
             "temperature": 0.0,
             "max_tokens": 512
         })
-
-    @staticmethod
-    def try_json_loads(text):
-        try:
-            return json.loads(text)
-        except Exception:
-            return None
-
-    @staticmethod
-    def extract_json_from_code_block(text):
-        match = re.search(r"```json\s*(\{.*?\})\s*```", text, re.DOTALL)
-        if match:
-            return match.group(1).strip()
-        
-        match = re.search(r"(\{.*\})", text, re.DOTALL)
-        if match:
-            return match.group(1).strip()
-        
-        raise None

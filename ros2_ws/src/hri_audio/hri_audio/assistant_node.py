@@ -44,8 +44,9 @@ class Assistant:
                 user_text = self.node.queue.get()
 
                 self.node.mouth_mode_pub.publish(String(data="thinking"))
-                ai_response = self.sancho_prompt_request(user_text)
-    
+                ai_response, emotion, _ = self.sancho_prompt_request(user_text)
+                ai_response = ai_response + f". Estoy {emotion}."
+
                 self.node.get_logger().info(f"✅✅✅ Respuesta recibida '{ai_response}'")
 
                 self.node.mouth_mode_pub.publish(String(data="speaking"))
@@ -67,7 +68,13 @@ class Assistant:
         rclpy.spin_until_future_complete(self.node, future_sancho_prompt)
         result_sancho_prompt = future_sancho_prompt.result()
 
-        return json.loads(result_sancho_prompt.value_json)["text"]
+        value = json.loads(result_sancho_prompt.value_json)
+
+        text = value["text"]
+        emotion = value["emotion"]
+        data = value["data"]
+
+        return text, emotion, data
 
     def tts_request(self, text):
         tts_request = TTS.Request()
