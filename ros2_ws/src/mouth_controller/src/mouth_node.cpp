@@ -44,8 +44,8 @@ public:
                     ssize_t len = read(serial_in_fd_, &c, 1);
                     if (len > 0)
                     {
-                        if (c == '\n') {
-                            RCLCPP_INFO(get_logger(), "[ESP32]: %s", buffer.c_str());
+                        if (c == '0') {
+                            RCLCPP_INFO(get_logger(), "%s", buffer.c_str());
                             buffer.clear();
                         } else {
                             buffer += c;
