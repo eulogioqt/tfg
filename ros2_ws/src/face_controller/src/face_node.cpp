@@ -15,10 +15,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-class MouthNode : public rclcpp::Node
+class FaceNode : public rclcpp::Node
 {
 public:
-    MouthNode() : Node("mouth_node")
+    FaceNode() : Node("face_node")
     {
         declare_parameter<double>("send_interval_sec", 0.5);
         get_parameter("send_interval_sec", chunk_send_interval_);
@@ -36,7 +36,8 @@ public:
             RCLCPP_INFO(get_logger(), "Puerto serie /dev/ttyUSB1 abierto correctamente");
             send_to_esp32("idle");
 
-            serial_thread_ = std::thread([this]() {
+            serial_thread_ = std::thread([this]()
+                                         {
                 std::string buffer;
                 char c;
                 while (rclcpp::ok())
@@ -52,18 +53,17 @@ public:
                         }
                     }
                     std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                }
-            });
+                } });
         }
 
         mode_subscription_ = create_subscription<std_msgs::msg::String>(
-            "mouth/mode", 10,
-            std::bind(&MouthNode::mode_callback, this, std::placeholders::_1));
+            "face/mode", 10,
+            std::bind(&FaceNode::mode_callback, this, std::placeholders::_1));
 
         start_audio_monitoring();
     }
 
-    ~MouthNode()
+    ~FaceNode()
     {
         running_ = false;
         if (audio_thread_.joinable())
@@ -149,7 +149,8 @@ private:
         Pa_StartStream(stream);
         RCLCPP_INFO(get_logger(), "Captura de audio iniciada con el dispositivo 'pulse'.");
 
-        audio_thread_ = std::thread([this, stream, frames_per_chunk]() {
+        audio_thread_ = std::thread([this, stream, frames_per_chunk]()
+                                    {
             std::vector<int16_t> buffer(frames_per_chunk);
             auto chunk_start = std::chrono::steady_clock::now();
             std::vector<int16_t> current_chunk;
@@ -183,8 +184,7 @@ private:
 
             Pa_StopStream(stream);
             Pa_CloseStream(stream);
-            Pa_Terminate();
-        });
+            Pa_Terminate(); });
     }
 
     void handle_chunk(const std::vector<int16_t> &samples)
@@ -259,7 +259,7 @@ private:
 int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<MouthNode>());
+    rclcpp::spin(std::make_shared<FaceNode>());
     rclcpp::shutdown();
     return 0;
 }

@@ -74,9 +74,9 @@ def generate_launch_description():
             }]
         ),
         Node(
-            package='mouth_controller',
-            executable='mouth_node',
-            name='mouth_node',
+            package='face_controller',
+            executable='face_node',
+            name='face_node',
             output='screen'
         ),
     ])

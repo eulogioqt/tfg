@@ -31,7 +31,7 @@ class AssistantHelperNode(Node):
     def __init__(self):
         super().__init__("assistant_helper")
 
-        self.mouth_mode_pub = self.create_publisher(String, "mouth/mode", 10)
+        self.face_mode_pub = self.create_publisher(String, "face/mode", 10)
         self.assistant_text_pub = self.create_publisher(String, 'hri_audio/assistant_helper/transcription', 10)
         self.micro_sub = self.create_subscription(ChunkMono, 'hri_audio/microphone/mono', self.microphone_callback, 10)
         
@@ -90,7 +90,7 @@ class AssistantHelper:
 
     def process_name_mode(self, new_audio):
         if self.hotword_detector.detect(new_audio, self.sample_rate):
-            self.node.mouth_mode_pub.publish(String(data="listening"))
+            self.node.face_mode_pub.publish(String(data="listening"))
             self.helper_state = HELPER_STATE.COMMAND
 
             play(ACTIVATION_SOUND)
