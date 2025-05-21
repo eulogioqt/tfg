@@ -36,4 +36,4 @@ class Prompt(ABC):
         if match:
             return match.group(1).strip()
         
-        raise None
+        return None

@@ -83,12 +83,20 @@ private:
     void mode_callback(const std_msgs::msg::String::SharedPtr msg)
     {
         static const std::vector<std::string> valid_modes = {"idle", "listening", "thinking", "speaking"};
+        static const std::vector<std::string> valid_emotions = {"happy", "surprised", "sad", "angry", "bored", "suspicious", "neutral"};
+
         if (std::find(valid_modes.begin(), valid_modes.end(), msg->data) != valid_modes.end())
         {
             std::lock_guard<std::mutex> lock(mode_mutex_);
             current_mode_ = msg->data;
             RCLCPP_INFO(get_logger(), "Modo actualizado a: %s", current_mode_.c_str());
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 20; i++) // mirar esto y subir baudios
+                send_to_esp32(current_mode_);
+        }
+        else if (std::find(valid_emotions.begin(), valid_emotions.end(), msg->data) != valid_emotions.end())
+        {
+            RCLCPP_INFO(get_logger(), "Emoción recibida a: %s", current_mode_.c_str());
+            for (int i = 0; i < 20; i++) // mirar esto y subir baudios
                 send_to_esp32(current_mode_);
         }
         else

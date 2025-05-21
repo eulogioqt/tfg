@@ -45,11 +45,11 @@ class Assistant:
 
                 self.node.face_mode_pub.publish(String(data="thinking"))
                 ai_response, emotion, _ = self.sancho_prompt_request(user_text)
-                ai_response = ai_response + f". Estoy {emotion}."
 
                 self.node.get_logger().info(f"✅✅✅ Respuesta recibida '{ai_response}'")
 
                 self.node.face_mode_pub.publish(String(data="speaking"))
+                self.node.face_mode_pub.publish(String(data=emotion))
                 audio, sample_rate = self.tts_request(ai_response)
                 self.node.get_logger().info(f"✅✅✅ Reproduciendo por audio la respuesta")
 
