@@ -95,13 +95,13 @@ private:
         }
         else if (std::find(valid_emotions.begin(), valid_emotions.end(), msg->data) != valid_emotions.end())
         {
-            RCLCPP_INFO(get_logger(), "Emoción recibida a: %s", current_mode_.c_str());
+            RCLCPP_INFO(get_logger(), "Emoción recibida: %s", msg->data.c_str());
             for (int i = 0; i < 20; i++) // mirar esto y subir baudios
-                send_to_esp32(current_mode_);
+                send_to_esp32(msg->data);
         }
         else
         {
-            RCLCPP_ERROR(get_logger(), "Modo no v\u00e1lido recibido: %s", msg->data.c_str());
+            RCLCPP_ERROR(get_logger(), "Mensaje recibido no reconocido: %s", msg->data.c_str());
         }
     }
 
