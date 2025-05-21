@@ -1,3 +1,4 @@
+import time
 import numpy as np
 from queue import Queue
 from enum import Enum
@@ -10,7 +11,7 @@ from hri_msgs.msg import ChunkMono
 from speech_msgs.srv import STT
 
 from .utils.sound import play
-from .utils.sounds import ACTIVATION_SOUND
+from .utils.sounds import ACTIVATION_SOUND, TIME_OUT_SOUND
 
 from .utils import STTHotword, PVPorcupineHotword, IntensityAttachCriterion, SileroVADAttachCriterion
 
@@ -62,6 +63,9 @@ class AssistantHelper:
         self.sample_rate = -1 # Will set on mic callbacks
         self.helper_chunk_size = 0.5 # Revisar este valor
         self.intensity_threshold = 1500
+        self.timeout_seconds = 5
+
+        self.hotword_detection_time = 0
 
         self.audio = []
         self.check_audio = []
@@ -93,13 +97,22 @@ class AssistantHelper:
             self.node.face_mode_pub.publish(String(data="listening"))
             self.helper_state = HELPER_STATE.COMMAND
 
+            self.hotword_detection_time = time.time()
+
             play(ACTIVATION_SOUND)
             self.node.get_logger().info(f"✅✅✅ '{self.name.upper()}' DETECTED")
 
     def process_command_mode(self, new_audio):
         self.check_audio = self.check_audio + new_audio
         
-        if self.is_audio_length(self.check_audio, self.helper_chunk_size):
+        if time.time() - self.hotword_detection_time > self.timeout_seconds: # Si timeout, vuelve a idle
+            self.node.face_mode_pub.publish(String(data="idle"))
+            self.helper_state = HELPER_STATE.NAME
+
+            play(TIME_OUT_SOUND)
+            self.node.get_logger().info(f"No audio command detected for {self.timeout_seconds} seconds, timeout.")
+
+        elif self.is_audio_length(self.check_audio, self.helper_chunk_size):
             if self.chunk_attach_criterion.should_attach_chunk(self.check_audio, self.sample_rate):
                 if self.audio_state == AUDIO_STATE.NO_AUDIO: # Por si es en END, no pase a SOME
                     self.audio_state = AUDIO_STATE.SOME_AUDIO
@@ -134,10 +147,16 @@ class AssistantHelper:
 
         rec = self.stt_request(list(map(int, audio)), self.sample_rate)                
         if rec:
-            self.helper_state = HELPER_STATE.NAME
+            if rec.lower().strip() == self.name.lower(): # Si escucha Sancho otra vez, reinicia el timer y eso
+                self.hotword_detection_time = time.time()
 
-            self.node.assistant_text_pub.publish(String(data=rec))
-            self.node.get_logger().info(f"✅✅✅ Text transcribed ({len(audio) / self.sample_rate}s): {rec}")
+                play(ACTIVATION_SOUND)
+                self.node.get_logger().info(f"✅✅✅ '{self.name.upper()}' DETECTED AGAIN")
+            else:
+                self.helper_state = HELPER_STATE.NAME
+
+                self.node.assistant_text_pub.publish(String(data=rec))
+                self.node.get_logger().info(f"✅✅✅ Text transcribed ({len(audio) / self.sample_rate}s): {rec}")
         else:
             self.node.get_logger().info("Transcription result is empty.")
 
