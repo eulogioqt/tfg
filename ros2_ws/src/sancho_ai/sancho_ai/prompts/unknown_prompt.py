@@ -43,11 +43,11 @@ Here is the required JSON format:
   "emotion": "happy | surprised | sad | angry | bored | suspicious | neutral"
 }
 
-Below is your memory:
+This is your memory, this is what you know:
 
 {robot_context}
 
-Now respond appropriately to the user's last message.
+Let's continue the conversation.
 """
 
 
@@ -96,7 +96,7 @@ class UnknownPrompt(Prompt):
 
     def get_prompt_system(self):
         context_text = self._format_robot_context()
-        return UNKNOWN_PROMPT_TEMPLATE + f"\n\nRobot context:\n{context_text}\n\nLet's continue the conversation."
+        return UNKNOWN_PROMPT_TEMPLATE.replace('{robot_context}', context_text)
 
     def get_user_prompt(self):
         return self.user_input

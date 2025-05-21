@@ -74,7 +74,7 @@ class LLMGenerator(ResponseGenerator):
             LogManager.error(f"❌❌❌❌❌ EMOTION {emotion} INVALID. Default to neutral.")
             emotion = "neutral"
 
-        LogManager.info(f"LLM for Unknown Prompt:\n{text_response}\nEmotion:\n{emotion}")
+        LogManager.info(f"LLM for Unknown Prompt:\n{text_response}. Emotion: {emotion}")
 
         return text_response, emotion, provider_used, model_used
     
