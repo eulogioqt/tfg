@@ -76,6 +76,7 @@ class AssistantHelper:
 
     def spin(self):
         while rclpy.ok():
+            #self.node.get_logger().info(f"Queue size: {self.node.chunk_queue.qsize()}")
             if not self.node.chunk_queue.empty(): # Combine audio chunks
                 [new_audio, self.sample_rate] = self.node.chunk_queue.get()
 
@@ -126,6 +127,8 @@ class AssistantHelper:
             self.check_audio = []
             self.audio_state = AUDIO_STATE.NO_AUDIO
 
+            self.node.chunk_queue = Queue() # Limpiar lo que se ha acumulado mientras hace STT, mejor que que procese lo acumulado
+
     def process_audio_command(self, audio):
         self.node.get_logger().info(f"Transcribing {len(self.audio) / self.sample_rate}s chunk...")
 
@@ -137,8 +140,6 @@ class AssistantHelper:
             self.node.get_logger().info(f"✅✅✅ Text transcribed ({len(audio) / self.sample_rate}s): {rec}")
         else:
             self.node.get_logger().info("Transcription result is empty.")
-
-        self.node.get_logger().info(f"Average intensity: {self.audio_average_intensity(audio)}")
 
     def stt_request(self, audio, sample_rate):
         stt_request = STT.Request()

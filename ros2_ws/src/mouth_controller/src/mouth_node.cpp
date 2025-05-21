@@ -20,7 +20,7 @@ class MouthNode : public rclcpp::Node
 public:
     MouthNode() : Node("mouth_node")
     {
-        declare_parameter<double>("send_interval_sec", 0.1);
+        declare_parameter<double>("send_interval_sec", 0.5);
         get_parameter("send_interval_sec", chunk_send_interval_);
         RCLCPP_INFO(get_logger(), "Intervalo de envío configurado: %.2f s", chunk_send_interval_);
 
@@ -247,7 +247,7 @@ private:
     bool running_ = true;
 
     double sampleRate_ = 48000;
-    double chunk_send_interval_ = 0.1;
+    double chunk_send_interval_ = 0.5;
     double max_rms_ = 0.0;
     double silent_duration_ = 0.0;
 

@@ -136,7 +136,7 @@ class LLMNode(Node):
         try:
             provider_name, model_name = self._get_or_active("llm", request.provider, request.model)
             provider = self._get_provider(provider_name)
-            self.get_logger().info(f"Chat history: {request.messages_json}")
+
             result, model_used = provider.prompt(
                 model=model_name,
                 prompt_system=request.prompt_system,
