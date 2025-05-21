@@ -20,9 +20,9 @@ class FaceNode : public rclcpp::Node
 public:
     FaceNode() : Node("face_node")
     {
-        declare_parameter<double>("send_interval_sec", 0.5);
+        declare_parameter<double>("send_interval_sec", 0.1);
         get_parameter("send_interval_sec", chunk_send_interval_);
-        RCLCPP_INFO(get_logger(), "Intervalo de envío configurado: %.2f s", chunk_send_interval_);
+        RCLCPP_INFO(get_logger(), "Intervalo de env\u00edo configurado: %.2f s", chunk_send_interval_);
 
         serial_out_ = std::make_unique<std::ofstream>("/dev/ttyUSB1");
         serial_in_fd_ = open("/dev/ttyUSB1", O_RDONLY | O_NONBLOCK);
@@ -88,11 +88,12 @@ private:
             std::lock_guard<std::mutex> lock(mode_mutex_);
             current_mode_ = msg->data;
             RCLCPP_INFO(get_logger(), "Modo actualizado a: %s", current_mode_.c_str());
-            send_to_esp32(current_mode_);
+            for (int i = 0; i < 10; i++)
+                send_to_esp32(current_mode_);
         }
         else
         {
-            RCLCPP_ERROR(get_logger(), "Modo no válido recibido: %s", msg->data.c_str());
+            RCLCPP_ERROR(get_logger(), "Modo no v\u00e1lido recibido: %s", msg->data.c_str());
         }
     }
 
@@ -115,7 +116,7 @@ private:
 
         if (pulse_device == -1)
         {
-            RCLCPP_ERROR(get_logger(), "No se encontró el dispositivo 'pulse' en PortAudio.");
+            RCLCPP_ERROR(get_logger(), "No se encontr\u00f3 el dispositivo 'pulse' en PortAudio.");
             return;
         }
 
@@ -198,25 +199,24 @@ private:
 
         double rms = std::sqrt(sum_sq / samples.size());
 
+        if (min_rms_ == -1.0 || rms < min_rms_)
+            min_rms_ = rms;
+
         if (rms > max_rms_)
             max_rms_ = rms;
 
-        if (rms < 100.0)
+        auto now = std::chrono::steady_clock::now();
+        double seconds_since_last_send = std::chrono::duration<double>(now - last_send_time_).count();
+
+        if (seconds_since_last_send > 3.0)
         {
-            silent_duration_ += chunk_send_interval_;
-            if (silent_duration_ >= 3.0)
-            {
-                RCLCPP_INFO(get_logger(), "3 segundos de silencio detectados. Reiniciando max_rms.");
-                max_rms_ = 0.0;
-                silent_duration_ = 0.0;
-            }
-        }
-        else
-        {
-            silent_duration_ = 0.0;
+            RCLCPP_INFO(get_logger(), "3 segundos de silencio detectados. Reiniciando min y max rms.");
+            max_rms_ = 0.0;
+            min_rms_ = -1.0;
+            last_send_time_ = now;
         }
 
-        double normalized = (max_rms_ > 0.0) ? std::clamp(rms / max_rms_, 0.0, 1.0) : 0.0;
+        double normalized = (max_rms_ > 0.0 && min_rms_ >= 0.0) ? std::clamp((rms - min_rms_) / (max_rms_ - min_rms_), 0.0, 1.0) : 0.0;
 
         const int num_levels = 6;
         int level = static_cast<int>(normalized * (num_levels - 1) + 0.5);
@@ -229,6 +229,7 @@ private:
         RCLCPP_INFO(get_logger(), "RMS: %.2f | Norm: %.2f | Nivel: %s", rms, normalized, level_str);
 
         send_to_esp32(level_str);
+        last_send_time_ = now;
     }
 
     void send_to_esp32(const std::string &level)
@@ -247,9 +248,11 @@ private:
     bool running_ = true;
 
     double sampleRate_ = 48000;
-    double chunk_send_interval_ = 0.5;
+    double chunk_send_interval_ = 0.1;
+    double min_rms_ = -1.0;
     double max_rms_ = 0.0;
-    double silent_duration_ = 0.0;
+
+    std::chrono::steady_clock::time_point last_send_time_ = std::chrono::steady_clock::now();
 
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr mode_subscription_;
     std::string current_mode_ = "idle";
