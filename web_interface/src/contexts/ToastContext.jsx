@@ -28,7 +28,7 @@ export const ToastProvider = ({ children }) => {
             }}
         >
             <div
-                className="toast-container position-fixed bottom-0 start-0 p-3"
+                className="toast-container position-fixed bottom-0 end-0 p-3"
                 style={{
                     zIndex: 1055,
                     maxWidth: "90%", // Para pantallas móviles
