@@ -10,12 +10,12 @@ from .providers.base_provider import BaseProvider
 from .models import PROVIDER, MODELS, NEEDS_API_KEY, EXECUTED_LOCALLY
 
 
-# PHI NO FUNCIONA, DEEPSEEK SI LE METES UN "" EL MAX TOKENS DE SALIDA FALLA, AUNQUE ESTE A 60 SALEN MAS, REVISAR
 class LLMNode(Node):
 
     PROVIDER_CLASS_MAP = {
         PROVIDER.OPENAI: ("llm_tools.providers.openai_provider", "OpenAIProvider"),
         PROVIDER.MISTRAL: ("llm_tools.providers.mistral_provider", "MistralProvider"),
+        PROVIDER.MISTRAL: ("llm_tools.providers.llama_provider", "LLaMaProvider"),
         PROVIDER.PHI: ("llm_tools.providers.phi_provider", "PhiProvider"),
         PROVIDER.QWEN: ("llm_tools.providers.qwen_provider", "QwenProvider"),
         PROVIDER.DEEPSEEK: ("llm_tools.providers.deepseek_provider", "DeepSeekProvider"),

@@ -10,6 +10,7 @@ class SmartStrEnum(str, Enum):
 
 class PROVIDER(SmartStrEnum):
     OPENAI = "openai"
+    LLAMA = "llama"
     MISTRAL = "mistral"
     PHI = "phi"
     QWEN = "qwen"
@@ -59,7 +60,7 @@ class MODELS:
             GEMINI_FLASH = "gemini-1.5-flash-latest"
 
         class GEMMA(SmartStrEnum):
-            GEMMA_2_27B = "google/gemma-2-27b-it"
+            GEMMA_2_27B_IT = "google/gemma-2-27b-it"
             GEMMA_3_27B_IT = "google/gemma-3-27b-it"
         
         class FALCON(SmartStrEnum):
@@ -95,9 +96,10 @@ class MODELS:
 
 NEEDS_API_KEY = {
     PROVIDER.GEMINI,
+    PROVIDER.LLAMA,
     PROVIDER.MISTRAL,
     PROVIDER.OPENAI,
-    PROVIDER.GEMMA,
+    PROVIDER.GEMMA
 }
 
 EXECUTED_LOCALLY = {

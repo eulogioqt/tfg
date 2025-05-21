@@ -43,7 +43,7 @@ class TestAllModelsNode(Node):
             return os.environ.get("OPENAI_API_KEY", "")
         elif provider == PROVIDER.GEMINI:
             return os.environ.get("GEMINI_API_KEY", "")
-        elif provider in {PROVIDER.MISTRAL, PROVIDER.GEMMA}:
+        elif provider in {PROVIDER.MISTRAL, PROVIDER.GEMMA, PROVIDER.LLAMA}:
             return os.environ.get("HUGGING_FACE_API_KEY", "")
         return ""
 
