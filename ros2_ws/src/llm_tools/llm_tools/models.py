@@ -29,14 +29,17 @@ class MODELS:
             GPT_4 = "gpt-4"
             GPT_4O = "gpt-4o"
 
+        class LLAMA(SmartStrEnum):
+            LLAMA_3_1_8B_INSTRUCT = "meta-llama/Llama-3.1-8B-Instruct"
+            LLAMA_3_3_70B_INSTRUCT = "meta-llama/Llama-3.3-70B-Instruct"
+
         class MISTRAL(SmartStrEnum):
             MISTRAL_7B = "mistralai/Mistral-7B-Instruct-v0.1"
-            MIXTRAL_8X7B = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 
         class PHI(SmartStrEnum):
             PHI_2 = "microsoft/phi-2"
 
-        class QWEN(SmartStrEnum): # Qwen/Qwen2.5-Omni-7B y 32B, 72B, pecha modelos, falcon, gemma, yi. Buscar cual puede ser el mejor para cada tarea y en general
+        class QWEN(SmartStrEnum):
             QWEN_1_5_7B_CHAT = "Qwen/Qwen1.5-7B-Chat"
             QWEN_2_5_7B_IT = "Qwen/Qwen2.5-7B-Instruct"
             QWEN_2_5_14B_IT = "Qwen/Qwen2.5-14B-Instruct"
@@ -56,7 +59,7 @@ class MODELS:
             GEMINI_FLASH = "gemini-1.5-flash-latest"
 
         class GEMMA(SmartStrEnum):
-            GEMMA_2_27B = "google/gemma-2-27b"
+            GEMMA_2_27B = "google/gemma-2-27b-it"
             GEMMA_3_27B_IT = "google/gemma-3-27b-it"
         
         class FALCON(SmartStrEnum):
