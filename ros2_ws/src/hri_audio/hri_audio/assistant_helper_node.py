@@ -30,6 +30,8 @@ class HELPER_STATE(int, Enum):
 # PROBAR EL VAD Y PROBAR A PONER QUE SI TE ACABA DE RESPONDER ESTE 5S ESCUCHANDOTE Y SI NO HAGA TIMEOUT SABE
 # QUE CUANDO HABLES NO CAMBIE A NAME SINO QUE SIGA EN COMMAND PERO CLARO TIENE QUE SER DESPUES DE QUE ÉL TERMINE DE HABLAR SINO SE ESCUCHA A SI MISMO
 
+# arreglar ojos lo que pasa eso y mirad los baudios y lo del for 20
+
 """
 export ROS_DOMAIN_ID=42  # Un número distinto de 0 para evitar interferencias
 export ROS_DISCOVERY_SERVER=discovery.csar.uedge.mapir
