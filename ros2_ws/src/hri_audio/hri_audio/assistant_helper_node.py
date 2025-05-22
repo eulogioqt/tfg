@@ -99,8 +99,14 @@ class AssistantHelper:
 
             self.hotword_detection_time = time.time()
 
-            play(ACTIVATION_SOUND)
             self.node.get_logger().info(f"✅✅✅ '{self.name.upper()}' DETECTED")
+
+            play(ACTIVATION_SOUND, wait_for_end=True)
+            
+            self.node.queue = Queue()
+            self.audio = []
+            self.audio_chunk = []
+            self.previous_chunk = []
 
     def process_command_mode(self, new_audio):
         self.check_audio = self.check_audio + new_audio
