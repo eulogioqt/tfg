@@ -3,8 +3,8 @@ from dotenv import load_dotenv
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
-from speech_tools.speech_tools.models import STT_MODELS, TTS_MODELS, TTS_SPEAKERS
-from llm_tools.llm_tools.models import PROVIDER, MODELS
+from speech_tools.models import STT_MODELS, TTS_MODELS, TTS_SPEAKERS
+from llm_tools.models import PROVIDER, MODELS
 
 load_dotenv()
 GOOGLE_STT_API_KEY = os.environ.get("GOOGLE_STT_API_KEY")
