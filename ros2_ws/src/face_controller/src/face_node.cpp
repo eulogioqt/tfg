@@ -24,16 +24,16 @@ public:
         get_parameter("send_interval_sec", chunk_send_interval_);
         RCLCPP_INFO(get_logger(), "Intervalo de env\u00edo configurado: %.2f s", chunk_send_interval_);
 
-        serial_out_ = std::make_unique<std::ofstream>("/dev/ttyUSB1");
-        serial_in_fd_ = open("/dev/ttyUSB1", O_RDONLY | O_NONBLOCK);
+        serial_out_ = std::make_unique<std::ofstream>("/dev/ttyUSB2");
+        serial_in_fd_ = open("/dev/ttyUSB2", O_RDONLY | O_NONBLOCK);
 
         if (!serial_out_->is_open() || serial_in_fd_ == -1)
         {
-            RCLCPP_ERROR(get_logger(), "No se pudo abrir /dev/ttyUSB1");
+            RCLCPP_ERROR(get_logger(), "No se pudo abrir /dev/ttyUSB2");
         }
         else
         {
-            RCLCPP_INFO(get_logger(), "Puerto serie /dev/ttyUSB1 abierto correctamente");
+            RCLCPP_INFO(get_logger(), "Puerto serie /dev/ttyUSB2 abierto correctamente");
             send_to_esp32("idle");
 
             serial_thread_ = std::thread([this]()
@@ -96,8 +96,9 @@ private:
         else if (std::find(valid_emotions.begin(), valid_emotions.end(), msg->data) != valid_emotions.end())
         {
             RCLCPP_INFO(get_logger(), "Emoción recibida: %s", msg->data.c_str());
+            std::string modified = "1" + msg->data;
             for (int i = 0; i < 20; i++) // mirar esto y subir baudios
-                send_to_esp32(msg->data);
+                send_to_esp32(modified);
         }
         else
         {
