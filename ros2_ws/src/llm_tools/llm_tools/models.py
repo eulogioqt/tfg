@@ -54,13 +54,13 @@ class MODELS:
             DEEPSEEK_R1_DISTILL_LLAMA_70B = "deepseek-ai/DeepSeek-R1-Distill-Llama-70B"
             DEEPSEEK_R1_DISTILL_QWEN_32B = "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
 
-            DEEPSEEK_V3 = "deepseek-ai/DeepSeek-V3" 
+            #no cabe DEEPSEEK_V3 = "deepseek-ai/DeepSeek-V3" 
 
         class GEMINI(SmartStrEnum):
             GEMINI_FLASH = "gemini-1.5-flash-latest"
 
         class GEMMA(SmartStrEnum):
-            GEMMA_2_27B_IT = "google/gemma-2-27b-it"
+            #system role not supported GEMMA_2_27B_IT = "google/gemma-2-27b-it"
             GEMMA_3_27B_IT = "google/gemma-3-27b-it"
         
         class FALCON(SmartStrEnum):
