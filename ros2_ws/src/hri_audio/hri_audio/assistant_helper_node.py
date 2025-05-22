@@ -27,6 +27,15 @@ class HELPER_STATE(int, Enum):
 
 
 # A futuro hacer que la forma de mezclar los chunks sea con un VAD no con threshold de intensidad
+# PROBAR EL VAD Y PROBAR A PONER QUE SI TE ACABA DE RESPONDER ESTE 5S ESCUCHANDOTE Y SI NO HAGA TIMEOUT SABE
+# QUE CUANDO HABLES NO CAMBIE A NAME SINO QUE SIGA EN COMMAND PERO CLARO TIENE QUE SER DESPUES DE QUE ÉL TERMINE DE HABLAR SINO SE ESCUCHA A SI MISMO
+
+"""
+export ROS_DOMAIN_ID=42  # Un número distinto de 0 para evitar interferencias
+export ROS_DISCOVERY_SERVER=discovery.csar.uedge.mapir
+"""
+
+# METER EL HELPER STATE.SPEAKING EN EL QUE NO SE PUEDE HACER NADA Y CUANDO TERMINE PUES SE PONE OTRA VEZ A COMMAND Y YA HACE TIME OUT SI NO
 class AssistantHelperNode(Node):
 
     def __init__(self):
@@ -102,7 +111,7 @@ class AssistantHelper:
             self.node.get_logger().info(f"✅✅✅ '{self.name.upper()}' DETECTED")
 
             play(ACTIVATION_SOUND, wait_for_end=True)
-            
+
             self.node.queue = Queue()
             self.audio = []
             self.audio_chunk = []
@@ -111,7 +120,7 @@ class AssistantHelper:
     def process_command_mode(self, new_audio):
         self.check_audio = self.check_audio + new_audio
         
-        if time.time() - self.hotword_detection_time > self.timeout_seconds: # Si timeout, vuelve a idle
+        if len(self.audio) == 0 and time.time() - self.hotword_detection_time > self.timeout_seconds: # Si timeout, vuelve a idle
             self.node.face_mode_pub.publish(String(data="idle"))
             self.helper_state = HELPER_STATE.NAME
 
