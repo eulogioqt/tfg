@@ -4,7 +4,7 @@ from queue import Queue
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
-from std_msgs.msg import String
+from std_msgs.msg import String, Empty
 from hri_msgs.srv import Detection, Recognition, Training, GetString, TriggerUserInteraction
 from hri_msgs.msg import Log, FaceNameResponse, FaceQuestionResponse
 from rumi_msgs.msg import SessionMessage
@@ -32,7 +32,8 @@ class HRILogicNode(Node):
         self.get_last_frame_service = self.create_service(GetString, 'logic/get/last_frame', self.hri_logic.get_last_frame_service)
 
         self.face_name_response_sub = self.create_subscription(FaceNameResponse, 'gui/face_name_response', self.face_name_response_callback)
-        self.face_name_response_sub = self.create_subscription(FaceQuestionResponse, 'gui/face_question_response', self.face_question_response_callback)
+        self.face_question_response_sub = self.create_subscription(FaceQuestionResponse, 'gui/face_question_response', self.face_question_response_callback)
+        self.face_timeout_response_sub = self.create_subscription(Empty, 'gui/face_timeout_response', self.face_timeout_response_callback)
         self.subscription_camera = self.create_subscription(Image, 'camera/color/image_raw', self.frame_callback, 1)
 
         self.publisher_log = self.create_publisher(Log, 'logs/add', 10)
@@ -70,6 +71,9 @@ class HRILogicNode(Node):
 
     def face_question_response_callback(self, msg):
         self.face_question_queue.put([msg.name, msg.features, msg.answer])
+    
+    def face_timeout_response_callback(self, _):
+        self.hri_logic.gui_request_sent_info = None
 
 class HRILogic():
 

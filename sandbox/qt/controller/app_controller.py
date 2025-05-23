@@ -1,41 +1,78 @@
 from PyQt6.QtCore import QTimer
 from model.app_model import AppModel
-from view.main_view import MainView
+from view.main_window import MainWindow
 
 class AppController:
     def __init__(self, app, splash):
         self.app = app
         self.model = AppModel()
-        self.view = MainView()
+        self.view = MainWindow()
         self.splash = splash
+        self.timeout_timer = QTimer()
+        self.timeout_timer.setSingleShot(True)
+        self.timeout_timer.timeout.connect(self.handle_timeout)
 
-        # Conectar acciones
-        self.view.button.clicked.connect(self.submit_name)
-
-    def start(self):
-        QTimer.singleShot(2000, self.finish_splash)
+        self.view.ask_name_screen.send_button.clicked.connect(self.submit_name)
+        self.view.ask_if_name_screen.button_yes.clicked.connect(lambda: self.submit_confirmation(True))
+        self.view.ask_if_name_screen.button_no.clicked.connect(lambda: self.submit_confirmation(False))
 
     def finish_splash(self):
         self.splash.close()
         self.view.show()
         self.set_mode_normal()
 
+    def is_priority_mode(self):
+        return self.model.mode in ["ask_name", "ask_if_name"]
+
     def set_mode_normal(self):
         self.model.mode = "normal"
-        self.view.show_normal_mode()
+        self.view.set_screen("normal")
 
-    def set_mode_ask_name(self, photo_path): # hacerlo con la imagen de ros o cv2 o base64
+    def set_mode_ask_name(self, photo_path):
+        if self.is_priority_mode():
+            return
         self.model.mode = "ask_name"
         self.model.photo_path = photo_path
-        self.view.show_ask_name_mode(photo_path)
+        self.view.set_screen("ask_name", photo_path=photo_path)
+        self.timeout_timer.start(20000)
+
+    def set_mode_ask_if_name(self, photo_path, name):
+        if self.is_priority_mode():
+            return
+        self.model.mode = "ask_if_name"
+        self.model.photo_path = photo_path
+        self.model.ask_if_name_person = name
+        self.view.set_screen("ask_if_name", photo_path=photo_path, name=name)
+        self.timeout_timer.start(20000)
 
     def set_mode_show_photo(self, photo_path):
+        if self.is_priority_mode():
+            return
         self.model.mode = "show_photo"
         self.model.photo_path = photo_path
-        self.view.show_photo_mode(photo_path, self.set_mode_normal)
+        self.view.set_screen("photo", photo_path=photo_path, callback=self.set_mode_normal)
 
     def submit_name(self):
-        name = self.view.input_field.text()
-        self.model.name_input = name
-        print(f"Nombre recibido: {name}")
+        if self.model.mode != "ask_name":
+            return
+        name = self.view.ask_name_screen.input_field.text().strip()
+        if not name:
+            self.view.ask_name_screen.show_warning("El nombre no puede estar vacío.")
+            return
+        if len(name) > 20:
+            self.view.ask_name_screen.show_warning("El nombre es demasiado largo.")
+            return
+        self.timeout_timer.stop()
+        print(f"[get_name] Nombre recibido: {name}")
+        self.set_mode_normal()
+
+    def submit_confirmation(self, response: bool):
+        if self.model.mode != "ask_if_name":
+            return
+        self.timeout_timer.stop()
+        print(f"[ask_if_name] Respuesta del usuario: {'Sí' if response else 'No'}")
+        self.set_mode_normal()
+
+    def handle_timeout(self):
+        print(f"[timeout] No hubo respuesta en 20 segundos.")
         self.set_mode_normal()
