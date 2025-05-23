@@ -1,5 +1,6 @@
 import React from "react";
 import SimpleModal from "../../../components/SimpleModal";
+import { emotionToIcon } from "./ChatMessage";
 
 const ChatMessageModal = ({ isOpen, handleClose, message }) => {
     if (!isOpen || !message) return null;
@@ -78,8 +79,15 @@ const ChatMessageModal = ({ isOpen, handleClose, message }) => {
                         </div>
                     )}
                     {message.model && (
-                        <div>
+                        <div className="mb-1">
                             <strong>Modelo:</strong> {message.model}
+                        </div>
+                    )}
+                    {message.value.emotion && (
+                        <div>
+                            <strong>Emoción:</strong>{" "}
+                            <i className={"bi bi-" + emotionToIcon[message.value.emotion]}></i> ({message.value.emotion}
+                            )
                         </div>
                     )}
                 </>

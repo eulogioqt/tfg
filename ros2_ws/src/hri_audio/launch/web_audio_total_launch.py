@@ -35,9 +35,9 @@ def generate_launch_description():
             name='llm',
             output='screen',
             parameters=[{
-                "llm_load_models": f"[['{PROVIDER.QWEN}', ['{MODELS.LLM.QWEN.QWEN_2_5_14B_IT}'], '']]",
-                "llm_active_provider": f"{PROVIDER.QWEN}",
-                "llm_active_model": f"{MODELS.LLM.QWEN.QWEN_2_5_14B_IT}",        
+                #"llm_load_models": f"[['{PROVIDER.GEMINI}', ['{MODELS.LLM.GEMINI.GEMINI_FLASH}'], '']]",
+                #"llm_active_provider": f"{PROVIDER.GEMINI}",
+                #"llm_active_model": f"{MODELS.LLM.GEMINI.GEMINI_FLASH}",        
                 #"embedding_load_models": f"[['{PROVIDER.GEMINI}', ['{MODELS.LLM.GEMINI.GEMINI_FLASH}'], '']]",
                 #"embedding_active_provider": f"{PROVIDER.GEMINI}",
                 #"embedding_active_model": f"{MODELS.LLM.GEMINI.GEMINI_FLASH}",

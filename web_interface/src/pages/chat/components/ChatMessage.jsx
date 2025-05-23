@@ -2,6 +2,16 @@ import React, { useEffect, useState } from "react";
 import { useAudio } from "../../../contexts/AudioContext";
 import { useChat } from "../../../contexts/ChatContext";
 
+export const emotionToIcon = {
+    happy: "emoji-smile",
+    surprised: "emoji-dizzy",
+    sad: "emoji-tear",
+    angry: "emoji-angry",
+    suspicious: "emoji-expressionless",
+    neutral: "emoji-neutral",
+    bored: "emoji-frown",
+};
+
 const ChatMessage = ({ message, onSelect }) => {
     const { settings } = useChat();
     const { playAudio, stopCurrentAudio, activeAudioId } = useAudio();
@@ -132,6 +142,7 @@ const ChatMessage = ({ message, onSelect }) => {
                         [
                             { value: message.provider, icon: "robot" },
                             { value: message.ttsModel, icon: "volume-up-fill" },
+                            { value: message.value.emotion, icon: emotionToIcon[message.value.emotion] },
                         ],
                         message.timestamp
                     )}

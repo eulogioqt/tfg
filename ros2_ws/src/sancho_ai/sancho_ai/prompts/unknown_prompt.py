@@ -27,7 +27,7 @@ Rules:
 - NEVER refer to yourself as "Sancho" in third person.
 - If the user says "¿eh?", "repite", "explícamelo", etc., respond accordingly.
 - NEVER respond in English.
-- NO emojis or special characters.
+- NO emojis or special characters. NEVER SEND AN EMOJI.
 
 VERY IMPORTANT:
 - You **must ALWAYS output a valid JSON object**.
@@ -103,6 +103,6 @@ class UnknownPrompt(Prompt):
 
     def get_parameters(self):
         return json.dumps({
-            "temperature": 0.7,
-            "max_tokens": 60
+            "temperature": 0.6,
+            "max_tokens": 256
         })

@@ -28,7 +28,7 @@ class SanchoAINode(Node):
         value, intent, arguments, provider, model = self.sancho_ai.on_message(request.text, chat_history)
         
         chat_history.append({"role": "user", "content": request.text})
-        chat_history.append({"role": "assistant", "content": value["text"]})
+        chat_history.append({"role": "assistant", "content": json.dumps({"response": value["text"], "emotion": value["emotion"]}) })
 
         self.chats[request.user] = chat_history[-10:]  # 5 turnos
 
