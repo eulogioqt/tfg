@@ -19,15 +19,17 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/FacePosition.msg"
   "msg/ChunkStereo.msg"
   "msg/ChunkMono.msg"
-  "msg/FaceGuiRequest.msg"
   "msg/FaceprintEvent.msg"
   "msg/Log.msg"
+  "msg/GuiRequest.msg"
+  "msg/FaceNameResponse.msg"
   
   "srv/Detection.srv"
   "srv/Recognition.srv"
   "srv/Training.srv"
   "srv/GetString.srv"
   "srv/SanchoPrompt.srv"
+  "srv/TriggerUserInteraction.srv"
 
   DEPENDENCIES sensor_msgs std_msgs
 )
