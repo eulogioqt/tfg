@@ -21,8 +21,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/ChunkMono.msg"
   "msg/FaceprintEvent.msg"
   "msg/Log.msg"
-  "msg/GuiRequest.msg"
   "msg/FaceNameResponse.msg"
+  "msg/FaceQuestionResponse.msg"
   
   "srv/Detection.srv"
   "srv/Recognition.srv"

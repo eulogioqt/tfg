@@ -1,2 +1,1 @@
-string id
 string name

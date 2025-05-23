@@ -1,4 +1,3 @@
-import os
 import json
 from queue import Queue
 
@@ -6,15 +5,15 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from std_msgs.msg import String
-from hri_msgs.srv import Detection, Recognition, Training, GetString
-from hri_msgs.msg import Log
+from hri_msgs.srv import Detection, Recognition, Training, GetString, TriggerUserInteraction
+from hri_msgs.msg import Log, FaceNameResponse, FaceQuestionResponse
 from rumi_msgs.msg import SessionMessage
 
 from sancho_web.database.system_database import CONSTANTS
 from .database.people_manager import PeopleManager
+from .api._old_gui import mark_face
 
 from .hri_bridge import HRIBridge
-from .api.gui import get_name, ask_if_name, mark_face
 
 
 class HRILogicNode(Node):
@@ -25,11 +24,15 @@ class HRILogicNode(Node):
         super().__init__('hri_logic')
 
         self.hri_logic = hri_logic
-        self.data_queue = Queue(maxsize = 1) # Queremos que olvide frames antiguos, siempre a por los mas nuevos
-        
+        self.data_queue = Queue(maxsize=1) # Queremos que olvide frames antiguos, siempre a por los mas nuevos
+        self.face_name_queue = Queue()
+        self.face_question_queue = Queue()
+
         self.get_actual_people_service = self.create_service(GetString, 'logic/get/actual_people', self.hri_logic.get_actual_people_service)
         self.get_last_frame_service = self.create_service(GetString, 'logic/get/last_frame', self.hri_logic.get_last_frame_service)
 
+        self.face_name_response_sub = self.create_subscription(FaceNameResponse, 'gui/face_name_response', self.face_name_response_callback)
+        self.face_name_response_sub = self.create_subscription(FaceQuestionResponse, 'gui/face_question_response', self.face_question_response_callback)
         self.subscription_camera = self.create_subscription(Image, 'camera/color/image_raw', self.frame_callback, 1)
 
         self.publisher_log = self.create_publisher(Log, 'logs/add', 10)
@@ -48,6 +51,10 @@ class HRILogicNode(Node):
         self.training_client = self.create_client(Training, 'recognition/training')
         while not self.training_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('Training service not available, waiting again...')
+
+        self.gui_client = self.create_client(TriggerUserInteraction, 'gui/request')
+        while not self.gui_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('GUI service not available, waiting again...')
         
         self.input_tts = self.create_publisher(String, 'input_tts', 10)
         self.br = HRIBridge()
@@ -55,9 +62,14 @@ class HRILogicNode(Node):
         self.get_logger().info("HRI Logic Node initializated succesfully")
 
     def frame_callback(self, frame_msg):
-        if self.data_queue.empty(): # We don't want blocking
+        if self.data_queue.empty():
             self.data_queue.put(frame_msg)
+    
+    def face_name_response_callback(self, msg):
+        self.face_name_queue.put([msg.name, msg.features, msg.image_base64, msg.score])
 
+    def face_question_response_callback(self, msg):
+        self.face_question_queue.put([msg.name, msg.features, msg.answer])
 
 class HRILogic():
 
@@ -82,6 +94,7 @@ class HRILogic():
         self.show_score = show_score
 
         self.last_frame = None
+        self.gui_request_sent_info = None
 
         self.node = HRILogicNode(self)
         self.people = PeopleManager(self.node)
@@ -93,7 +106,15 @@ class HRILogic():
             if not self.node.data_queue.empty():
                 frame_msg = self.node.data_queue.get()
                 self.process_frame(frame_msg)
-                
+            
+            if not self.node.face_name_queue.empty():
+                name = self.node.face_name_queue.get()
+                self.process_face_name_response(name)
+    
+            if not self.node.face_question_queue.empty():
+                answer = self.node.face_question_queue.get()
+                self.process_face_question_response(answer)
+
             rclpy.spin_once(self.node)
 
     def process_frame(self, frame_msg):
@@ -122,80 +143,23 @@ class HRILogic():
             if distance < self.LOWER_BOUND: # No sabe quien es (en teoria nunca lo ha visto), pregunta por el nombre
                 classified_name = None
                 classified_id = None
+
                 if scores[i] >= 1 and self.ask_unknowns: # Si la imagen es buena, pregunta por el nombre, para que no coja una imagen mala
-                    self.read_text("¿Cual es tu nombre?")
-                    classified_name = get_name(face_aligned) # Poner aqui una lista o si no que meta un nuevo a mano, pero por si ya es que seleccione
-                    if classified_name is not None:
+                    if not self.gui_request_sent_info: # Si no hay ninguna cosa enviada
                         face_aligned_base64 = self.node.br.cv2_to_base64(face_aligned)
-                        result, message = self.training_request(String(data="add_class"), String(data=json.dumps({
-                            "class_name": classified_name,
-                            "features": features,
-                            "face": face_aligned_base64,
-                            "score": scores[i]
-                        }))) # Añadimos clase (en teoria es alguien nuevo)
-
-                        if result >= 0:
-                            distance = 1
-                            classified_id = message
-
-                            self.node.get_logger().info(f"Nueva clase con id {classified_id}")
-                            self.people.process_detection(classified_id, scores[i], distance)
-
-                            self.read_text("Bienvenido " + classified_name + ", no te conocía")
-
-                            log_message = f"Se ha creado una nueva clase con id {classified_id}"
-                            metadata_json = json.dumps({ "faceprint_id": classified_id })
-                            self.create_log(CONSTANTS.ACTION.ADD_CLASS, classified_id, log_message, metadata_json)
+                        if self.gui_request("get_name", json.dumps({"image": face_aligned_base64})):
+                            self.gui_request_sent_info = [classified_id, classified_name, face_aligned_base64, features, scores[i], distance]
+                            self.read_text("¿Cual es tu nombre?")
                         else:
-                            self.node.get_logger().info(f">> ERROR: Algo salio mal al agregar una nueva clase: {message}")
+                            self.node.get_logger().info("Error al enviar una petición de nombre a la GUI")
 
             elif distance < self.MIDDLE_BOUND: # Cree que es alguien, pide confirmacion
                 if scores[i] > 1 and self.ask_unknowns: # Pero solo si la foto es buena
-                    self.read_text("Creo que eres " + classified_name + ", ¿es cierto?")
-                    answer = ask_if_name(face_aligned, f"{classified_name} (ID {classified_id})")
-                    if answer: # Si dice que si es esa persona
-                        self.people.process_detection(classified_id, scores[i], distance)
-
-                        output, message = self.training_request(String(data="add_features"), String(data=json.dumps({
-                            "class_id": classified_id,
-                            "features": features,
-                        }))) # Añadimos otro vector distinto de features a la clase
-                        self.node.get_logger().info(message)
-
-                        if output >= 0:
-                            self.read_text("Gracias " + classified_name + ", me gusta confirmar que estoy reconociendo bien")
-                            
-                            log_message = f"Se ha añadido un nuevo vector de características independiente a la clase {classified_id}"
-                            metadata_json = json.dumps({ "faceprint_id": classified_id })
-                            self.create_log(CONSTANTS.ACTION.ADD_FEATURES, classified_id, log_message, metadata_json)
-                        else:
-                            self.node.get_logger().info(f">> ERROR: Algo salio mal al agregar features a una clase")
-                    else: # Si dice que no, le pregunta el nombre
-                        self.read_text("Entonces, ¿Cual es tu nombre?")
-                        classified_name = get_name(face_aligned)
-                        if classified_name is not None:
-                            face_aligned_base64 = self.node.br.cv2_to_base64(face_aligned)
-                            result, message = self.training_request(String(data="add_class"), String(data=json.dumps({
-                                "class_name": classified_name,
-                                "features": features,
-                                "face": face_aligned_base64,
-                                "score": scores[i]
-                            }))) # Añadimos clase (en teoria es alguien nuevo)
-
-                            if result >= 0:                            
-                                distance = 1
-                                classified_id = message
-
-                                self.node.get_logger().info(f"Nueva clase con id {classified_id}")
-                                self.people.process_detection(classified_id, scores[i], distance)
-
-                                self.read_text("Encantando de conocerte " + classified_name + ", perdona por confundirte")
-                                
-                                log_message = f"Se ha creado una nueva clase con id {classified_id}"
-                                metadata_json = json.dumps({ "faceprint_id": classified_id })
-                                self.create_log(CONSTANTS.ACTION.ADD_CLASS, classified_id, log_message, metadata_json)
-                            else:
-                                self.node.get_logger().info(f">> ERROR: Algo salio mal al agregar una nueva clase: {message}")
+                    if not self.gui_request_sent_info:
+                        face_aligned_base64 = self.node.br.cv2_to_base64(face_aligned)
+                        if self.gui_request("ask_if_name", json.dumps({"image": face_aligned_base64, "name": classified_name})):
+                            self.gui_request_sent_info = [classified_id, classified_name, face_aligned_base64, features, scores[i], distance]
+                            self.read_text("Creo que eres " + classified_name + ", ¿es cierto?")
 
             elif distance < self.UPPER_BOUND: # Sabe que es alguien pero lo detecta un poco raro
                 self.people.process_detection(classified_id, scores[i], distance)
@@ -221,6 +185,60 @@ class HRILogic():
         actual_people_json = json.dumps(actual_people_time)
         self.node.publisher_people.publish(String(data=actual_people_json))
         self.node.publisher_recognition.publish(self.node.br.cv2_to_imgmsg(frame, "bgr8"))
+
+    def process_face_name_response(self, name):
+        [_, _, face_aligned_base64, features, score, _] = self.gui_request_sent_info
+        self.gui_request_sent_info = None
+
+        result, message = self.training_request(String(data="add_class"), String(data=json.dumps({
+            "class_name": name,
+            "features": features,
+            "face": face_aligned_base64,
+            "score": score
+        }))) # Añadimos clase (en teoria es alguien nuevo)
+
+        if result >= 0:
+            distance = 1
+            classified_id = message
+
+            self.node.get_logger().info(f"Nueva clase con id {classified_id}")
+            self.people.process_detection(classified_id, score, distance)
+
+            self.read_text("Bienvenido " + name + ", no te conocía")
+
+            log_message = f"Se ha creado una nueva clase con id {classified_id}"
+            metadata_json = json.dumps({ "faceprint_id": classified_id })
+            self.create_log(CONSTANTS.ACTION.ADD_CLASS, classified_id, log_message, metadata_json)
+        else:
+            self.node.get_logger().info(f">> ERROR: Algo salio mal al agregar una nueva clase: {message}")
+
+    def process_face_question_response(self, answer):
+        [classified_id, classified_name, face_aligned_base64, features, score, distance] = self.gui_request_sent_info
+        self.gui_request_sent_info = None
+
+        if answer: # Si dice que si es esa persona
+            self.people.process_detection(classified_id, score, distance)
+
+            output, message = self.training_request(String(data="add_features"), String(data=json.dumps({
+                "class_id": classified_id,
+                "features": features,
+            }))) # Añadimos otro vector distinto de features a la clase
+            self.node.get_logger().info(message)
+
+            if output >= 0:
+                self.read_text("Gracias " + classified_name + ", me gusta confirmar que estoy reconociendo bien")
+                
+                log_message = f"Se ha añadido un nuevo vector de características independiente a la clase {classified_id}"
+                metadata_json = json.dumps({ "faceprint_id": classified_id })
+                self.create_log(CONSTANTS.ACTION.ADD_FEATURES, classified_id, log_message, metadata_json)
+            else:
+                self.node.get_logger().info(f">> ERROR: Algo salio mal al agregar features a una clase")
+        else: # Si dice que no, le pregunta el nombre
+            if self.gui_request("get_name", json.dumps({"image": face_aligned_base64})):
+                self.gui_request_sent_info = [classified_id, classified_name, face_aligned_base64, features, score, distance]
+                self.read_text("Entonces, ¿Cual es tu nombre?")
+            else:
+                self.node.get_logger().info("Error al enviar una petición de nombre a la GUI")
 
     # Clients
     def detection_request(self, frame_msg):
@@ -297,6 +315,17 @@ class HRILogic():
         result_training = future_training.result()
 
         return result_training.result, result_training.message.data
+
+    def gui_request(self, mode, data_json):
+        req = TriggerUserInteraction.Request()
+        req.mode = mode
+        req.data_json = data_json
+
+        future = self.node.gui_client.call_async(req)
+        rclpy.spin_until_future_complete(self.node, future)
+        result = future.result()
+
+        return result.accepted
 
     # Services
     def get_actual_people_service(self, request, response):

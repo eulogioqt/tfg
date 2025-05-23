@@ -1,3 +1,4 @@
-hri_msgs/GuiRequest request
+string mode
+string data_json
 ---
 bool accepted
