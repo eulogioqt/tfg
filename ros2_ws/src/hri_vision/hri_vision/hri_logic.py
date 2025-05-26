@@ -31,9 +31,9 @@ class HRILogicNode(Node):
         self.get_actual_people_service = self.create_service(GetString, 'logic/get/actual_people', self.hri_logic.get_actual_people_service)
         self.get_last_frame_service = self.create_service(GetString, 'logic/get/last_frame', self.hri_logic.get_last_frame_service)
 
-        self.face_name_response_sub = self.create_subscription(FaceNameResponse, 'gui/face_name_response', self.face_name_response_callback)
-        self.face_question_response_sub = self.create_subscription(FaceQuestionResponse, 'gui/face_question_response', self.face_question_response_callback)
-        self.face_timeout_response_sub = self.create_subscription(Empty, 'gui/face_timeout_response', self.face_timeout_response_callback)
+        self.face_name_response_sub = self.create_subscription(FaceNameResponse, 'gui/face_name_response', self.face_name_response_callback, 10)
+        self.face_question_response_sub = self.create_subscription(FaceQuestionResponse, 'gui/face_question_response', self.face_question_response_callback, 10)
+        self.face_timeout_response_sub = self.create_subscription(Empty, 'gui/face_timeout_response', self.face_timeout_response_callback, 10)
         self.subscription_camera = self.create_subscription(Image, 'camera/color/image_raw', self.frame_callback, 1)
 
         self.publisher_log = self.create_publisher(Log, 'logs/add', 10)

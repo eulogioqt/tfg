@@ -34,6 +34,7 @@ setup(
             'detector = hri_vision.human_face_detector:main',       
             'recognizer = hri_vision.human_face_recognizer:main',
             'logic = hri_vision.hri_logic:main',
+            'gui = hri_vision.hri_gui:main',
         ],
     },
 )

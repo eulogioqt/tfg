@@ -31,6 +31,12 @@ def generate_launch_description():
             output='screen',
         ),
         Node(
+            package='hri_vision',
+            executable='gui',
+            name='gui',
+            output='screen',
+        ),
+        Node(
             package='ros2web',
             executable='server',
             name='r2w_server',
