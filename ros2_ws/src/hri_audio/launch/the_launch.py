@@ -25,8 +25,8 @@ def generate_launch_description():
             name='stt',
             output='screen',
             parameters=[{
-                "load_models": f"[['{STT_MODELS.WHISPER}', '']]",
-                "active_model": f"{STT_MODELS.WHISPER}"
+                "load_models": f"[['{STT_MODELS.GOOGLE}', '{GOOGLE_STT_API_KEY}']]",
+                "active_model": f"{STT_MODELS.GOOGLE}"
             }]
         ),
         Node(
@@ -35,12 +35,32 @@ def generate_launch_description():
             name='llm',
             output='screen',
             parameters=[{
-                "llm_load_models": f"[['{PROVIDER.QWEN}', ['{MODELS.LLM.QWEN.QWEN_2_5_14B_IT}'], '']]",
-                "llm_active_provider": f"{PROVIDER.QWEN}",
-                "llm_active_model": f"{MODELS.LLM.QWEN.QWEN_2_5_14B_IT}",  
+                "llm_load_models": f"[['{PROVIDER.GEMINI}', ['{MODELS.LLM.GEMINI.GEMINI_FLASH}'], '{GEMINI_API_KEY}']]",
+                "llm_active_provider": f"{PROVIDER.GEMINI}",
+                "llm_active_model": f"{MODELS.LLM.GEMINI.GEMINI_FLASH}",         
+                #"embedding_load_models": f"[['{PROVIDER.GEMINI}', ['{MODELS.LLM.GEMINI.GEMINI_FLASH}'], '{GEMINI_API_KEY}']]",
+                #"embedding_active_provider": f"{PROVIDER.GEMINI}",
+                #"embedding_active_model": f"{MODELS.LLM.GEMINI.GEMINI_FLASH}",
             }]
         ),
-        
+        Node(
+            package='hri_audio',
+            executable='microphone',
+            name='microphone',
+            output='screen',
+        ),
+        Node(
+            package='hri_audio',
+            executable='assistant_helper',
+            name='assistant_helper',
+            output='screen'
+        ),
+        Node(
+            package='hri_audio',
+            executable='assistant',
+            name='assistant',
+            output='screen'
+        ),
         Node(
             package='sancho_ai',
             executable='sancho_ai',
@@ -51,6 +71,9 @@ def generate_launch_description():
             package='ros2web',
             executable='server',
             name='r2w_server',
+            parameters=[{
+                'topics': "[['/camera/color/recognition', 'IMAGE'], ['/logic/info/actual_people', 'ACTUAL_PEOPLE']]"
+            }],
             output='screen'
         ),
         Node(
@@ -94,9 +117,21 @@ def generate_launch_description():
             output='screen',
         ),
         Node(
+            package='hri_vision',
+            executable='gui',
+            name='gui',
+            output='screen',
+        ),
+        Node(
             package='rumi_web',
             executable='session_manager',
             name='session_manager',
+            output='screen'
+        ),
+        Node(
+            package='face_controller',
+            executable='face_node',
+            name='face_node',
             output='screen'
         ),
     ])
