@@ -32,7 +32,7 @@ const SessionList = ({ faceprint, sessions }) => {
                         />
                     ))
                 ) : (
-                    <div className="alert alert-info" role="alert">
+                    <div className="alert alert-warning" role="alert">
                         No hay ninguna sesion registrada para {faceprint.name} (ID {faceprint.id}).
                     </div>
                 )}

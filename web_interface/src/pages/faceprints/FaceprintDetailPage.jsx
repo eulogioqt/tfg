@@ -71,8 +71,9 @@ const FaceprintDetailPage = () => {
 
     if (!faceprint) {
         return (
-            <div className="text-center" style={{ marginTop: "76px" }}>
-                <div className="spinner-border text-primary" role="status" />
+            <div className="d-flex align-items-center justify-content-center p-4">
+                <div className="spinner-border text-primary me-3" role="status" />
+                <span className="fs-5">Cargando información...</span>
             </div>
         );
     }
@@ -192,8 +193,9 @@ const FaceprintDetailPage = () => {
 
                     <div className="mb-5">
                         {!sessionList ? (
-                            <div className="text-center py-5">
-                                <div className="spinner-border text-primary" role="status" />
+                            <div className="d-flex align-items-center justify-content-center p-4">
+                                <div className="spinner-border text-primary me-3" role="status" />
+                                <span className="fs-5">Cargando lista de sesiones...</span>
                             </div>
                         ) : (
                             <SessionList faceprint={faceprint} sessions={sessionList} />

@@ -49,7 +49,10 @@ const LogsPage = () => {
             <LogModal log={selectedLog} onClose={() => setSelectedLog(undefined)} />
 
             {logsList === undefined ? (
-                <div className="alert alert-info text-center">Cargando...</div>
+                <div className="d-flex align-items-center justify-content-center p-4">
+                    <div className="spinner-border text-primary me-3" role="status" />
+                    <span className="fs-5">Cargando logs...</span>
+                </div>
             ) : logsList === null ? (
                 <div className="alert alert-danger text-center">
                     Error al cargar los logs. Verifica la conexión o pulsa en recargar.
