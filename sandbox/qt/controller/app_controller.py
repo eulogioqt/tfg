@@ -18,7 +18,7 @@ class AppController:
 
     def finish_splash(self):
         self.splash.close()
-        self.view.show()
+        self.view.showMaximized()
         self.set_mode_normal()
 
     def is_priority_mode(self):
@@ -28,29 +28,32 @@ class AppController:
         self.model.mode = "normal"
         self.view.set_screen("normal")
 
-    def set_mode_ask_name(self, photo_path):
+    def set_mode_ask_name(self, photo_base64):
         if self.is_priority_mode():
+            print(f"Se ha intentado poner en modo ask name pero hay una pantalla prioritaria activa: {self.model.mode}")
             return
         self.model.mode = "ask_name"
-        self.model.photo_path = photo_path
-        self.view.set_screen("ask_name", photo_path=photo_path)
+        self.model.photo_base64 = photo_base64
+        self.view.set_screen("ask_name", photo_base64=photo_base64)
         self.timeout_timer.start(20000)
 
-    def set_mode_ask_if_name(self, photo_path, name):
+    def set_mode_ask_if_name(self, photo_base64, name):
         if self.is_priority_mode():
+            print(f"Se ha intentado poner en modo ask IF name pero hay una pantalla prioritaria activa: {self.model.mode}")
             return
         self.model.mode = "ask_if_name"
-        self.model.photo_path = photo_path
+        self.model.photo_base64 = photo_base64
         self.model.ask_if_name_person = name
-        self.view.set_screen("ask_if_name", photo_path=photo_path, name=name)
+        self.view.set_screen("ask_if_name", photo_base64=photo_base64, name=name)
         self.timeout_timer.start(20000)
 
-    def set_mode_show_photo(self, photo_path):
+    def set_mode_show_photo(self, photo_base64):
         if self.is_priority_mode():
+            print(f"Se ha intentado poner en modo show photo pero hay una pantalla prioritaria activa: {self.model.mode}")
             return
         self.model.mode = "show_photo"
-        self.model.photo_path = photo_path
-        self.view.set_screen("photo", photo_path=photo_path, callback=self.set_mode_normal)
+        self.model.photo_base64 = photo_base64
+        self.view.set_screen("photo", photo_base64=photo_base64, callback=self.set_mode_normal)
 
     def submit_name(self):
         if self.model.mode != "ask_name":
