@@ -80,9 +80,9 @@ class HRIGUI:
         return response
 
     def start_timeout(self, seconds: float):
-        self.stop()
+        self.stop_timeout()
         self.node.get_logger().info(f"Iniciando timeout de {seconds} segundos...")
-        self.timeout_timer = self.node.create_timer(seconds, self.controller.handle_timeout)
+        self.timeout_timer = self.node.create_timer(seconds, lambda: self.handle_timeout(seconds))
 
     def stop_timeout(self):
         if self.timeout_timer is not None:
@@ -91,7 +91,8 @@ class HRIGUI:
             self.node.destroy_timer(self.timeout_timer)
             self.timeout_timer = None
     
-    def handle_timeout(self):
+    def handle_timeout(self, seconds):
+        self.node.get_logger().info(f"[{self.controller.model.mode}] Timeout after {seconds}s")
         if self.controller.model.mode in ["get_name", "ask_if_name"]:
             self.send_face_timeout_response()
             

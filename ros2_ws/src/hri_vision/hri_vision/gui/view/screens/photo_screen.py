@@ -12,7 +12,7 @@ class PhotoScreen(QWidget):
         self.image_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(self.image_label)
 
-    def update_content(self, photo_base64=None, callback=None):
+    def update_content(self, photo_base64=None):
         if photo_base64:
             pixmap = QPixmap()
             pixmap.loadFromData(base64.b64decode(photo_base64))
@@ -20,5 +20,3 @@ class PhotoScreen(QWidget):
                 1200, 800, Qt.AspectRatioMode.KeepAspectRatio,
                 Qt.TransformationMode.SmoothTransformation
             ))
-        if callback:
-            QTimer.singleShot(5000, callback)

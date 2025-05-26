@@ -80,7 +80,7 @@ class AppController:
         
         self.model.mode = "show_photo"
         self.model.photo_base64 = photo_base64
-        self.view.set_screen("photo", photo_base64=photo_base64, callback=self.set_mode_normal)
+        self.view.set_screen("photo", photo_base64=photo_base64)
 
         return True
 
