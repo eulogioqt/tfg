@@ -5,7 +5,7 @@ from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
 
 
-class AskNameScreen(QWidget):
+class GetNameScreen(QWidget):
     def __init__(self):
         super().__init__()
         self.layout = QVBoxLayout(self)

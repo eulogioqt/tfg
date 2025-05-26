@@ -1,8 +1,7 @@
-import os
-import sys
 import json
 import rclpy
 import base64
+import threading
 
 from rclpy.node import Node
 from std_msgs.msg import Empty
@@ -10,11 +9,7 @@ from std_msgs.msg import Empty
 from hri_msgs.msg import FaceNameResponse, FaceQuestionResponse
 from hri_msgs.srv import TriggerUserInteraction
 
-from PyQt6.QtWidgets import QApplication
-from PyQt6.QtCore import QTimer
-
-from .gui.controller.app_controller import AppController
-from .gui.view.splash_screen import SplashScreen
+from .gui import AppController
 
 def encode_image_base64(path):
     with open(path, "rb") as img_file:
@@ -36,37 +31,44 @@ class HRIGUINode(Node): # Hay que meter que se pueda decir el nombre con voz y u
 
 class HRIGUI:
     def __init__(self):
-        app = QApplication(sys.argv)
-
-        style_path = os.path.join(os.path.dirname(__file__), "gui/style/app_style.qss")
-        with open(style_path, "r") as style_file:
-            app.setStyleSheet(style_file.read())
-
-        splash = SplashScreen()
-        splash.show()
-
-        self.controller = AppController(app, splash)
-
-        img_path = os.path.join(os.path.dirname(__file__), "gui/resources/splash_logo.png")
-        img_b64 = encode_image_base64(img_path)
-
-        QTimer.singleShot(2000, lambda: self.controller.finish_splash())
-        QTimer.singleShot(4000, lambda: self.controller.set_mode_show_photo(img_b64))
-        QTimer.singleShot(11000, lambda: self.controller.set_mode_ask_name(img_b64))
-        QTimer.singleShot(16000, lambda: self.controller.set_mode_ask_if_name(img_b64, "María"))
-
-        sys.exit(app.exec())
-
+        self.controller = AppController(self)
         self.node = HRIGUINode(self)
 
-    def spin(self):
-        while rclpy.ok():
+        self.ros_thread = threading.Thread(target=lambda: rclpy.spin(self.node), daemon=True)
+        self.ros_thread.start()
 
-            rclpy.spin_once(self.node)
+    def spin(self):
+        self.controller.start()
+
+    def send_face_name_response(self, name):
+        self.node.face_name_pub.publish(FaceNameResponse(name=name))
+
+    def send_face_question_response(self, answer):
+        self.node.face_question_pub.publish(FaceQuestionResponse(answer=answer))
+
+    def send_face_timeout_response(self):
+        self.node.face_timeout_pub.publish(Empty())
 
     def user_interaction_service(self, request, response):
         mode = request.mode
         data = json.loads(request.data_json)
+
+        if mode == "get_name":
+            image_base64 = data["image"]
+
+            response.accepted = self.controller.set_mode_get_name(image_base64)
+        elif mode == "ask_if_name":
+            image_base64 = data["image"]
+            name = data["name"]
+            
+            response.accepted = self.controller.set_mode_ask_if_name(image_base64, name)
+        elif mode == "show_photo":
+            image_base64 = data["image"]
+
+            response.accepted = self.controller.set_mode_show_photo(image_base64)
+        else:
+            self.node.get_logger().info(f"Pantalla no reconocida: {mode}")
+            response.accepted = False
 
         return response
 

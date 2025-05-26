@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QStackedWidget
-from .screens.ask_name_screen import AskNameScreen
+from .screens.get_name_screen import GetNameScreen
 from .screens.ask_if_name_screen import AskIfNameScreen
 from .screens.photo_screen import PhotoScreen
 from .screens.normal_screen import NormalScreen
@@ -8,13 +8,13 @@ from .screens.normal_screen import NormalScreen
 class MainWindow(QStackedWidget):
     def __init__(self):
         super().__init__()
-        self.ask_name_screen = AskNameScreen()
+        self.get_name_screen = GetNameScreen()
         self.ask_if_name_screen = AskIfNameScreen()
         self.photo_screen = PhotoScreen()
         self.normal_screen = NormalScreen()
 
         self.screens = {
-            "ask_name": self.ask_name_screen,
+            "get_name": self.get_name_screen,
             "ask_if_name": self.ask_if_name_screen,
             "photo": self.photo_screen,
             "normal": self.normal_screen

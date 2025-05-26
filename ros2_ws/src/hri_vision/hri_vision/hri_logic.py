@@ -164,6 +164,8 @@ class HRILogic():
                         if self.gui_request("ask_if_name", json.dumps({"image": face_aligned_base64, "name": classified_name})):
                             self.gui_request_sent_info = [classified_id, classified_name, face_aligned_base64, features, scores[i], distance]
                             self.read_text("Creo que eres " + classified_name + ", ¿es cierto?")
+                        else:
+                            self.node.get_logger().info("Error al enviar una petición de preguntar nombre a la GUI")
 
             elif distance < self.UPPER_BOUND: # Sabe que es alguien pero lo detecta un poco raro
                 self.people.process_detection(classified_id, scores[i], distance)
