@@ -4,6 +4,7 @@ import base64
 import threading
 
 from rclpy.node import Node
+from rclpy.timer import Timer
 from std_msgs.msg import Empty
 
 from hri_msgs.msg import FaceNameResponse, FaceQuestionResponse
@@ -31,8 +32,9 @@ class HRIGUINode(Node): # Hay que meter que se pueda decir el nombre con voz y u
 
 class HRIGUI:
     def __init__(self):
-        self.controller = AppController(self)
+        self.controller = AppController(self.send_face_name_response, self.send_face_question_response)
         self.node = HRIGUINode(self)
+        self.timeout_timer: Timer | None = None
 
         self.ros_thread = threading.Thread(target=lambda: rclpy.spin(self.node), daemon=True)
         self.ros_thread.start()
@@ -41,9 +43,11 @@ class HRIGUI:
         self.controller.start()
 
     def send_face_name_response(self, name):
+        self.stop_timeout()
         self.node.face_name_pub.publish(FaceNameResponse(name=name))
 
     def send_face_question_response(self, answer):
+        self.stop_timeout()
         self.node.face_question_pub.publish(FaceQuestionResponse(answer=answer))
 
     def send_face_timeout_response(self):
@@ -57,21 +61,41 @@ class HRIGUI:
             image_base64 = data["image"]
 
             response.accepted = self.controller.set_mode_get_name(image_base64)
+            self.start_timeout(20)
         elif mode == "ask_if_name":
             image_base64 = data["image"]
             name = data["name"]
             
             response.accepted = self.controller.set_mode_ask_if_name(image_base64, name)
+            self.start_timeout(20)
         elif mode == "show_photo":
             image_base64 = data["image"]
 
             response.accepted = self.controller.set_mode_show_photo(image_base64)
+            self.start_timeout(5)
         else:
             self.node.get_logger().info(f"Pantalla no reconocida: {mode}")
             response.accepted = False
 
         return response
 
+    def start_timeout(self, seconds: float):
+        self.stop()
+        self.node.get_logger().info(f"Iniciando timeout de {seconds} segundos...")
+        self.timeout_timer = self.node.create_timer(seconds, self.controller.handle_timeout)
+
+    def stop_timeout(self):
+        if self.timeout_timer is not None:
+            self.node.get_logger().info("Cancelando timeout anterior.")
+            self.timeout_timer.cancel()
+            self.node.destroy_timer(self.timeout_timer)
+            self.timeout_timer = None
+    
+    def handle_timeout(self):
+        if self.controller.model.mode in ["get_name", "ask_if_name"]:
+            self.send_face_timeout_response()
+            
+        self.controller.set_mode_normal()
 
 def main(args=None):
     rclpy.init(args=args)

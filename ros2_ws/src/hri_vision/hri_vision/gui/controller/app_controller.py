@@ -10,19 +10,15 @@ from ..view.splash_screen import SplashScreen
 
 
 class AppController:
-    def __init__(self, hri_gui):
-        self.hri_gui = hri_gui
+    def __init__(self, name_callback, question_callback):
+        self.name_callback = name_callback
+        self.question_callback = question_callback
 
         self.app = QApplication(sys.argv)
         self.model = AppModel()
         self.view = MainWindow()
         self.splash = SplashScreen()
         
-        self.timeout_time = 20
-        self.timeout_timer = QTimer()
-        self.timeout_timer.setSingleShot(True)
-        self.timeout_timer.timeout.connect(self.handle_timeout)
-
         self.view.get_name_screen.send_button.clicked.connect(self.submit_name)
         self.view.ask_if_name_screen.button_yes.clicked.connect(lambda: self.submit_confirmation(True))
         self.view.ask_if_name_screen.button_no.clicked.connect(lambda: self.submit_confirmation(False))
@@ -62,7 +58,6 @@ class AppController:
         self.model.mode = "get_name"
         self.model.photo_base64 = photo_base64
         self.view.set_screen("get_name", photo_base64=photo_base64)
-        self.timeout_timer.start(self.timeout_time * 1000)
         
         return True
 
@@ -75,7 +70,6 @@ class AppController:
         self.model.photo_base64 = photo_base64
         self.model.ask_if_name_person = name
         self.view.set_screen("ask_if_name", photo_base64=photo_base64, name=name)
-        self.timeout_timer.start(self.timeout_time * 1000)
 
         return True
 
@@ -100,25 +94,17 @@ class AppController:
         if len(name) > 20:
             self.view.get_name_screen.show_warning("El nombre es demasiado largo.")
             return
-        self.timeout_timer.stop()
 
         print(f"[get_name] Nombre: {name}")
-        self.hri_gui.send_face_name_response(name)
+        self.name_callback(name)
 
         self.set_mode_normal()
 
-    def submit_confirmation(self, response: bool):
+    def submit_confirmation(self, answer: bool):
         if self.model.mode != "ask_if_name":
             return
-        self.timeout_timer.stop()
 
-        print(f"[ask_if_name] Respuesta del usuario: {'Sí' if response else 'No'}")
-        self.hri_gui.send_face_question_response(response)
-
-        self.set_mode_normal()
-
-    def handle_timeout(self):
-        print(f"[timeout] No hubo respuesta en {self.timeout_time} segundos.")
-        self.hri_gui.send_face_timeout_response()
+        print(f"[ask_if_name] Respuesta del usuario: {'Sí' if answer else 'No'}")
+        self.question_callback(answer)
 
         self.set_mode_normal()

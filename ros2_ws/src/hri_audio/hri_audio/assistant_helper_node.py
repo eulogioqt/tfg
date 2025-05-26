@@ -24,7 +24,8 @@ class AUDIO_STATE(int, Enum):
 class HELPER_STATE(int, Enum): # hacer esto y que funcione solo pa cuando hay una persona hablando y no mil personas
     NAME = 0, # igualmente esta bien hacerlo para que mientras este en speaking no se escuche a si mismo, porque haora mismo si dice Sancho se autoescucha
     SPEKAING = 1,
-    COMMAND = 2
+    COMMAND = 2,
+    ASKING_GUI = 3
 
 
 # A futuro hacer que la forma de mezclar los chunks sea con un VAD no con threshold de intensidad

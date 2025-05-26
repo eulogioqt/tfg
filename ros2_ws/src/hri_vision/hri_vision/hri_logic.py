@@ -67,10 +67,10 @@ class HRILogicNode(Node):
             self.data_queue.put(frame_msg)
     
     def face_name_response_callback(self, msg):
-        self.face_name_queue.put([msg.name, msg.features, msg.image_base64, msg.score])
+        self.face_name_queue.put(msg.name)
 
     def face_question_response_callback(self, msg):
-        self.face_question_queue.put([msg.name, msg.features, msg.answer])
+        self.face_question_queue.put(msg.answer)
     
     def face_timeout_response_callback(self, _):
         self.hri_logic.gui_request_sent_info = None
@@ -213,7 +213,7 @@ class HRILogic():
             self.read_text("Bienvenido " + name + ", no te conocía")
 
             log_message = f"Se ha creado una nueva clase con id {classified_id}"
-            metadata_json = json.dumps({ "faceprint_id": classified_id })
+            metadata_json = json.dumps({ "faceprint_id": classified_id, "name": name, "face_score": score })
             self.create_log(CONSTANTS.ACTION.ADD_CLASS, classified_id, log_message, metadata_json)
         else:
             self.node.get_logger().info(f">> ERROR: Algo salio mal al agregar una nueva clase: {message}")

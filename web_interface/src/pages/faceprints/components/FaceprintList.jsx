@@ -17,7 +17,7 @@ const FaceprintList = ({ faceprints }) => {
                 {pageData && pageData.length > 0 ? (
                     pageData.map((faceprint) => <FaceprintItem key={faceprint.id} faceprint={faceprint} />)
                 ) : (
-                    <p className="text-center text-secondary">No se encontraron rostros.</p>
+                    <p className="alert alert-warning text-center">No se encontraron rostros.</p>
                 )}
             </div>
 
