@@ -9,7 +9,7 @@ from std_msgs.msg import String
 from hri_msgs.srv import SanchoPrompt, TriggerUserInteraction
 from speech_msgs.srv import TTS
 
-from sancho_ai.sancho_ai.prompts.commands import COMMANDS
+from sancho_ai.prompts.commands import COMMANDS
 
 
 class AssistantNode(Node):
