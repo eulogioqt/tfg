@@ -22,22 +22,33 @@ public:
     {
         declare_parameter<double>("send_interval_sec", 0.1);
         get_parameter("send_interval_sec", chunk_send_interval_);
-        RCLCPP_INFO(get_logger(), "Intervalo de env\u00edo configurado: %.2f s", chunk_send_interval_);
+        RCLCPP_INFO(get_logger(), "Intervalo de envío configurado: %.2f s", chunk_send_interval_);
 
-        serial_out_ = std::make_unique<std::ofstream>("/dev/ttyUSB2");
-        serial_in_fd_ = open("/dev/ttyUSB2", O_RDONLY | O_NONBLOCK);
-
-        if (!serial_out_->is_open() || serial_in_fd_ == -1)
-        {
-            RCLCPP_ERROR(get_logger(), "No se pudo abrir /dev/ttyUSB2");
+        std::string serial_out_path = "/dev/ttyUSB1";
+        serial_out_ = std::make_unique<std::ofstream>(serial_out_path);
+        if (!serial_out_->is_open()) {
+            serial_out_path = "/dev/ttyUSB2";
+            serial_out_ = std::make_unique<std::ofstream>(serial_out_path);
         }
-        else
-        {
-            RCLCPP_INFO(get_logger(), "Puerto serie /dev/ttyUSB2 abierto correctamente");
+
+        std::string serial_in_path = "/dev/ttyUSB2";
+        serial_in_fd_ = open(serial_in_path.c_str(), O_RDONLY | O_NONBLOCK);
+        if (serial_in_fd_ == -1) {
+            serial_in_path = "/dev/ttyUSB1";
+            serial_in_fd_ = open(serial_in_path.c_str(), O_RDONLY | O_NONBLOCK);
+        }
+
+        if (!serial_out_->is_open() || serial_in_fd_ == -1) {
+            RCLCPP_ERROR(get_logger(), "No se pudieron abrir los puertos serie.");
+        } else {
+            RCLCPP_INFO(get_logger(), "Puertos serie abiertos correctamente:");
+            RCLCPP_INFO(get_logger(), "Salida -> %s", serial_out_path.c_str());
+            RCLCPP_INFO(get_logger(), "Entrada -> %s", serial_in_path.c_str());
+
             send_to_esp32("idle");
 
             serial_thread_ = std::thread([this]()
-                                         {
+            {
                 std::string buffer;
                 char c;
                 while (rclcpp::ok())
@@ -53,7 +64,8 @@ public:
                         }
                     }
                     std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                } });
+                }
+            });
         }
 
         mode_subscription_ = create_subscription<std_msgs::msg::String>(
@@ -61,22 +73,6 @@ public:
             std::bind(&FaceNode::mode_callback, this, std::placeholders::_1));
 
         start_audio_monitoring();
-    }
-
-    ~FaceNode()
-    {
-        running_ = false;
-        if (audio_thread_.joinable())
-            audio_thread_.join();
-
-        if (serial_thread_.joinable())
-            serial_thread_.join();
-
-        if (serial_out_ && serial_out_->is_open())
-            serial_out_->close();
-
-        if (serial_in_fd_ != -1)
-            close(serial_in_fd_);
     }
 
 private:
@@ -115,11 +111,12 @@ private:
         for (int i = 0; i < numDevices; ++i)
         {
             const PaDeviceInfo *info = Pa_GetDeviceInfo(i);
+            RCLCPP_INFO(get_logger(), "Dispositivo: %s", info->name);
             if (info && std::string(info->name).find("pulse") != std::string::npos)
             {
                 RCLCPP_INFO(get_logger(), "Usando dispositivo PortAudio: %s", info->name);
                 pulse_device = i;
-                break;
+                //break;
             }
         }
 
