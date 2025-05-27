@@ -97,13 +97,6 @@ def generate_launch_description():
                 "apis": f"['{API_LIST.TTS_MODELS}', '{API_LIST.STT_MODELS}', '{API_LIST.LLM_MODELS}', '{API_LIST.FACEPRINTS}', '{API_LIST.SESSIONS}']"
             }]
         ),
-
-        Node(
-            package='hri_vision',
-            executable='video',
-            name='video',
-            output='screen'
-        ),
         Node(
             package='hri_vision',
             executable='detector',
