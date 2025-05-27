@@ -80,7 +80,7 @@ class SanchoWeb:
         if type == MessageType.PROMPT:
             prompt = PromptMessage(data)
 
-            value, method, intent, arguments, provider, model = self.sancho_prompt_request(prompt.value, key)
+            value, method, intent, arguments, provider, model = self.sancho_prompt_request(prompt.value, prompt.chat_id)
             self.send_message(key, ResponseMessage(prompt.id, value, method, intent, arguments, provider, model))
 
             if prompt.want_tts:
@@ -93,7 +93,7 @@ class SanchoWeb:
             self.send_message(key, PromptTranscriptionMessage(audio_prompt.id, transcription, model))
             
             if transcription: # Si hay transcripcion
-                value, method, intent, arguments, provider, model = self.sancho_prompt_request(transcription, key)
+                value, method, intent, arguments, provider, model = self.sancho_prompt_request(transcription, audio_prompt.chat_id)
                 self.send_message(key, ResponseMessage(audio_prompt.id, value, method, intent, arguments, provider, model))
 
                 if audio_prompt.want_tts: # Si quiere TTS
@@ -105,10 +105,10 @@ class SanchoWeb:
             transcription, model = self.stt_request(transcription_request.audio, transcription_request.sample_rate)
             self.send_message(key, PromptTranscriptionMessage(transcription_request.id, transcription, model))   
 
-    def sancho_prompt_request(self, text, user):
+    def sancho_prompt_request(self, text, chat_id):
         req = SanchoPrompt.Request()
         req.text = text
-        req.user = user
+        req.chat_id = chat_id
 
         future = self.node.sancho_prompt_client.call_async(req)
         rclpy.spin_until_future_complete(self.node, future)

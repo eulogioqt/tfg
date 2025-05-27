@@ -24,6 +24,9 @@ export const ChatProvider = ({ children }) => {
     const { width } = useWindowSize();
     const { showToast } = useToast();
 
+    const [chatId, setChatId] = useState(uuidv4());
+    const resetChatId = () => setChatId(uuidv4());
+
     const [messages, setMessages] = useState([]);
     const clearMessages = () => setMessages([]);
     const addHumanMessage = (message) => {
@@ -116,7 +119,7 @@ export const ChatProvider = ({ children }) => {
         if (settings.autoSendTranscription) {
             const message = {
                 type: "AUDIO_PROMPT",
-                data: { id, wantTts: settings.enableTTS, audio, sampleRate },
+                data: { id, chatId, wantTts: settings.enableTTS, audio, sampleRate },
             };
 
             if (sendMessage(JSON.stringify(message))) {
@@ -142,7 +145,7 @@ export const ChatProvider = ({ children }) => {
 
             const messageWithId = {
                 type: "PROMPT",
-                data: { id, wantTts, value: inputMessage },
+                data: { id, chatId, wantTts, value: inputMessage },
             };
 
             if (sendMessage(JSON.stringify(messageWithId))) {
@@ -157,7 +160,7 @@ export const ChatProvider = ({ children }) => {
             value={{
                 messages,
                 clearMessages,
-
+                
                 collapsed,
                 setCollapsed,
                 textAreaValue,
@@ -170,6 +173,7 @@ export const ChatProvider = ({ children }) => {
 
                 handleAudio,
                 handleSend,
+                resetChatId,
             }}
         >
             <NotConnectedModal isOpen={isOpenNCModal} handleClose={() => setIsOpenNCModal(false)} />

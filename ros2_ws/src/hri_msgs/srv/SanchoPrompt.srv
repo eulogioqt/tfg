@@ -1,4 +1,4 @@
-string user
+string chat_id
 string text
 ---
 string value_json

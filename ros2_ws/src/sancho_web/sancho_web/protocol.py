@@ -8,12 +8,14 @@ from abc import ABC, abstractmethod
 class PromptMessage():
     def __init__(self, msg):
         self.id = msg["id"]
+        self.chat_id = msg["chatId"]
         self.want_tts = msg["wantTts"]
         self.value = msg["value"]
 
 class AudioPromptMessage():
     def __init__(self, msg):
         self.id = msg["id"]
+        self.chat_id = msg["chatId"]
         self.want_tts = msg["wantTts"]
         self.audio = msg["audio"]
         self.sample_rate = msg["sampleRate"]

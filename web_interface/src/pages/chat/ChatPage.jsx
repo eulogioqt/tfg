@@ -9,13 +9,15 @@ import { useWindowSize, BREAKPOINTS } from "../../hooks/useWindowSize";
 import { useChat } from "../../contexts/ChatContext";
 
 const ChatPage = () => {
-    const { setCollapsed, clearMessages } = useChat();
+    const { setCollapsed, clearMessages, resetChatId } = useChat();
     const { width } = useWindowSize();
 
     const chatAreaRef = useRef(null);
 
     const handleNewChat = () => {
         clearMessages();
+        resetChatId();
+        
         chatAreaRef.current?.clear();
         if (width < BREAKPOINTS.MD) setCollapsed(true);
     };

@@ -23,14 +23,14 @@ class SanchoAINode(Node):
         self.get_logger().info("SanchoAI Node initializated successfully")
 
     def prompt_service(self, request, response):
-        chat_history = self.chats.get(request.user, [])
+        chat_history = self.chats.get(request.chat_id, [])
 
         value, intent, arguments, provider, model = self.sancho_ai.on_message(request.text, chat_history)
         
         chat_history.append({"role": "user", "content": request.text})
         chat_history.append({"role": "assistant", "content": json.dumps({"response": value["text"], "emotion": value["emotion"]}) })
 
-        self.chats[request.user] = chat_history[-10:]  # 5 turnos
+        self.chats[request.chat_id] = chat_history[-10:]  # 5 turnos
 
         response.value_json = json.dumps(value)
         response.method = self.type
