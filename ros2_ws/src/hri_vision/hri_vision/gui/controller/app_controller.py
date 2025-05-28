@@ -30,7 +30,7 @@ class AppController:
         sys.exit(self.app.exec())
 
     def apply_styles(self):
-        style_path = os.path.join(os.path.dirname(os.path.dirname(__file__),), "style/app_style.qss")
+        style_path = os.path.join(os.path.dirname(os.path.dirname(__file__),), "app_style.qss")
         with open(style_path, "r") as style_file:
             self.app.setStyleSheet(style_file.read())
 

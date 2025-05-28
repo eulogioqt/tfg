@@ -9,7 +9,7 @@ from launch.actions import ExecuteProcess
 
 def generate_launch_description():
     usb_cam_param_file = os.path.join(
-        get_package_share_directory('sancho_bringup'),
+        get_package_share_directory('hri_vision'),
         'config',
         'params_mid.yaml'
     )
@@ -23,15 +23,15 @@ def generate_launch_description():
             ('/image_raw', '/sancho_camera/image_raw'),  # Remapear a namespace ordenado
             ('/camera_info', '/sancho_camera/camera_info')
         ]
-    ),
+    )
     image_proc_node = Node(
             package='image_proc',
             executable='rectify_node',
             name='usb_cam_rectify_node',
             output='screen',
             remappings=[
-                ('image', '/camera/color/image_original'),
-                ('camera_info', '/camera/color/camera_info'),
+                ('image', '/sancho_camera/image_raw'),
+                ('camera_info', '/sancho_camera/camera_info'),
                 ('image_rect', '/camera/color/image_raw')
             ]
         )

@@ -57,7 +57,7 @@ public:
                     if (len > 0)
                     {
                         if (c == '0') {
-                            RCLCPP_INFO(get_logger(), "%s", buffer.c_str());
+                            //RCLCPP_INFO(get_logger(), "%s", buffer.c_str());
                             buffer.clear();
                         } else {
                             buffer += c;

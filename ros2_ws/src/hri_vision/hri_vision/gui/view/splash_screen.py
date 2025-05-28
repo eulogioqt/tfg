@@ -5,7 +5,7 @@ import os
 
 class SplashScreen(QSplashScreen):
     def __init__(self):
-        splash_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "resources/splash_logo.png")
+        splash_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "splash_logo.png")
         pixmap = QPixmap(splash_path)
 
         max_width = 500

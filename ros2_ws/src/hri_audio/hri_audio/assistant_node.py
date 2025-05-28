@@ -55,7 +55,8 @@ class Assistant:
                 self.node.get_logger().info(f"✅✅✅ Respuesta recibida '{ai_response}'")
 
                 if intent == COMMANDS.TAKE_PICTURE:
-                    self.gui_request("show_photo", data) # Show photo
+                    data_json = json.dumps(data)
+                    self.gui_request("show_photo", data_json) # Show photo
 
                 self.node.face_mode_pub.publish(String(data="speaking"))
                 self.node.face_mode_pub.publish(String(data=emotion.lower()))
