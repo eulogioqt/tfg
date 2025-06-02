@@ -6,32 +6,66 @@ from .response_generator import ResponseGenerator
 from ...log_manager import LogManager
 from ...prompts import UnknownPrompt, SemanticResultPrompt
 from ...engines import LLMEngine, HRIEngine
+from ...prompts.commands import COMMAND_RESUITS
 
 
 class LLMGenerator(ResponseGenerator):
+
+    EMOTION_MAP = {
+        COMMAND_RESUITS.FAILURE: "sad",
+        COMMAND_RESUITS.MISSING_ARGUMENT: "neutral",
+        COMMAND_RESUITS.SUCCESS: "happy"
+    }
 
     def __init__(self, hri_engine: HRIEngine, llm_engine: LLMEngine):
         self.hri_engine = hri_engine
         self.llm_engine = llm_engine
     
     def generate_response(self, details: str, status: str, intent: str, arguments: dict, user_input: str, chat_history: list) -> str:
+        status_emotion = self.EMOTION_MAP[status]
+
         semantic_result = SemanticResultPrompt.build_semantic_result(intent, arguments, status, details)
-        semantic_response_prompt = SemanticResultPrompt(semantic_result, user_input, chat_history)
-        LogManager.info(f"PROMPT SYSTEM:\n{semantic_response_prompt.get_prompt_system()}")
-        
+        semantic_result_prompt = SemanticResultPrompt(semantic_result, user_input, chat_history)
+        LogManager.info(f"User: {user_input}")
+        LogManager.info(f"Semantic Result Prompt system: {semantic_result_prompt.get_prompt_system()}")
+
         response, provider_used, model_used, message, success = self.llm_engine.prompt_request(
-            prompt_system=semantic_response_prompt.get_prompt_system(),
-            user_input=semantic_response_prompt.get_user_prompt(),
-            parameters_json=semantic_response_prompt.get_parameters()
+            prompt_system=semantic_result_prompt.get_prompt_system(),
+            user_input=semantic_result_prompt.get_user_prompt(),
+            parameters_json=semantic_result_prompt.get_parameters()
         )
 
         if not success:
             LogManager.error(f"There was a problem with generation prompt: {message}")
             return semantic_result["details"]
+   
+        LogManager.info(f"LLM for Semantic Result Prompt:\n{response}")
+        semantic_result_json = SemanticResultPrompt.extract_json_from_code_block(response) # Gemini usually puts the response in ```json block
+        if not semantic_result_json:
+            LogManager.error(f"No JSON format found.")
+
+            if "{" not in response and "}" not in response:
+                semantic_result_json = json.dumps({ "response": response, "emotion": status_emotion})
+                LogManager.info(f"Assuming response is only text.")
+            else:
+                return details, status_emotion, provider_used, model_used
+
+        semantic_result = SemanticResultPrompt.try_json_loads(semantic_result_json)
+        if not semantic_result:
+            LogManager.error(f"Error on JSON loads.")
+            return details, status_emotion, provider_used, model_used
         
-        LogManager.info(f"LLM for Generation Prompt:\n{response}")
+        text_response = semantic_result.get("response", "")
+        emotion = semantic_result.get("emotion", "")
+        if not text_response:
+            LogManager.error(f"The JSON response does not contain a text response.")
+            return details, status_emotion, provider_used, model_used
         
-        emotion = "neutral"
+        if not emotion or emotion not in ["happy", "surprised", "sad", "angry", "bored", "suspicious", "neutral"]:
+            LogManager.error(f"❌❌❌❌❌ EMOTION {emotion} INVALID. Default to neutral.")
+            emotion = status_emotion
+
+        LogManager.info(f"LLM for Semantic Result Prompt:\n{response}")
 
         return response, emotion, provider_used, model_used
 
@@ -39,8 +73,8 @@ class LLMGenerator(ResponseGenerator):
         robot_context = self._build_robot_context()
 
         unknown_prompt = UnknownPrompt(user_input, robot_context)
-        LogManager.info(f"Prompt system: {unknown_prompt.get_prompt_system()}")
         LogManager.info(f"User: {user_input}")
+        LogManager.info(f"Unknown Prompt system: {unknown_prompt.get_prompt_system()}")
 
         response, provider_used, model_used, message, success = self.llm_engine.prompt_request(
             messages_json=json.dumps(chat_history),
