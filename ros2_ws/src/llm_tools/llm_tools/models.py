@@ -75,7 +75,6 @@ class MODELS:
         class OPENAI(SmartStrEnum):
             SMALL_3 = "text-embedding-3-small"
             ADA_002 = "text-embedding-ada-002"
-            BABBAGE_001 = "text-embedding-babbage-001"
             LARGE_3 = "text-embedding-3-large"
 
         class QWEN(SmartStrEnum):

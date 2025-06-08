@@ -3,17 +3,17 @@ from .intent_classifiers import EmbeddingClassifier
 from .intent_executors import IntentExecutor
 from .response_generators import TemplatesGenerator
 
-from ..engines import HRIEngine, LLMEngine
+from ..engines import HRIEngine, EmbeddingEngine
 
 
-class LLMClassifierTemplatesAI(ModularAI):
+class EmbeddingClassifierTemplatesAI(ModularAI):
 
     def __init__(self):
         node = HRIEngine.create_client_node()
         hri_engine = HRIEngine(node)
-        llm_engine = LLMEngine(node)
+        embedding_engine = EmbeddingEngine(node)
 
-        llm_classifier = EmbeddingClassifier(llm_engine)
+        llm_classifier = EmbeddingClassifier(embedding_engine)
         intent_executor = IntentExecutor(hri_engine)
         templates_generator = TemplatesGenerator()
 

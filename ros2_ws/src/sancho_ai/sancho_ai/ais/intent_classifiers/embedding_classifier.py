@@ -13,11 +13,8 @@ class EmbeddingClassifier(IntentClassifier):
 
     SIMILARITY_THRESHOLD = 0.8
 
-    def __init__(self, embedding_engine: EmbeddingEngine, examples_path: str, provider: str, model: str):
+    def __init__(self, embedding_engine: EmbeddingEngine):
         self.embedding_engine = embedding_engine
-        self.examples_path = examples_path
-        self.provider = provider
-        self.model = model
 
         with open(self.examples_path, 'r') as f:
             self.examples = json.load(f)
@@ -26,8 +23,6 @@ class EmbeddingClassifier(IntentClassifier):
         LogManager.info(f"User: {user_input}")
 
         user_embedding, provider_used, model_used, message, success = self.embedding_engine.embedding_request(
-            provider=self.provider,
-            model=self.model,
             user_input=user_input
         )
 
@@ -42,8 +37,8 @@ class EmbeddingClassifier(IntentClassifier):
 
         for intent, examples in self.examples.items():
             for phrase, models in examples.items():
-                if self.model in models:
-                    example_embedding = np.array(models[self.model])
+                if model_used in models:
+                    example_embedding = np.array(models[model_used])
                     similarity = self.cosine_similarity(user_embedding, example_embedding)
                     if similarity > best_similarity:
                         best_similarity = similarity

@@ -11,6 +11,8 @@ from llm_msgs.srv import Prompt, LoadModel, UnloadModel
 from llm_msgs.msg import LoadModel as LoadModelMsg, ProviderModel
 from llm_tools.models import PROVIDER, MODELS, NEEDS_API_KEY
 
+# mejorar este nodo que tambien saque metricas de tiempo y que no use magic strings
+
 def safe_json_parse(text: str) -> Any:
     try:
         return json.loads(text)
