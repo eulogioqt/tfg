@@ -1,4 +1,5 @@
 import time
+import json
 import numpy as np
 from queue import Queue
 from enum import Enum
@@ -17,14 +18,14 @@ from .utils import STTHotword, PVPorcupineHotword, IntensityAttachCriterion, Sil
 
 
 class AUDIO_STATE(int, Enum):
-    NO_AUDIO = -1,
-    SOME_AUDIO = 0,
+    NO_AUDIO = -1
+    SOME_AUDIO = 0
     END_AUDIO = 1
 
 class HELPER_STATE(int, Enum):
-    NAME = 0,
-    SPEKAING = 1,
-    COMMAND = 2,
+    NAME = 0
+    SPEAKING = 1
+    COMMAND = 2
     ASKING = 3
 
 
@@ -42,18 +43,20 @@ export ROS_DISCOVERY_SERVER=discovery.csar.uedge.mapir
 # METER EL HELPER STATE.SPEAKING EN EL QUE NO SE PUEDE HACER NADA Y CUANDO TERMINE PUES SE PONE OTRA VEZ A COMMAND Y YA HACE TIME OUT SI NO
 class AssistantHelperNode(Node):
 
-    def __init__(self):
+    def __init__(self, assistant_helper: "AssistantHelper"):
         super().__init__("assistant_helper")
+
+        self.assistant_helper = assistant_helper
 
         self.face_mode_pub = self.create_publisher(String, "face/mode", 10)
         self.assistant_text_pub = self.create_publisher(String, 'hri_audio/assistant_helper/transcription', 10)
         self.micro_sub = self.create_subscription(ChunkMono, 'hri_audio/microphone/mono', self.microphone_callback, 10)
-        
+        self.mode_sub = self.create_subscription(String, 'hri_audio/assistant_helper/mode', self.mode_callback, 10)
+
         self.stt_client = self.create_client(STT, 'speech_tools/stt')
         while not self.stt_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('STT service not available, waiting again...')
             
-        self.transcribe_queue = Queue(maxsize=1)
         self.chunk_queue = Queue()
 
         self.get_logger().info("Assistant Helper Node initializated succesfully.")
@@ -63,6 +66,23 @@ class AssistantHelperNode(Node):
         sample_rate = msg.sample_rate
         
         self.chunk_queue.put([new_audio, sample_rate])
+    
+    def mode_callback(self, msg):
+        data = json.loads(msg.data)
+        helper_state = data["helper_state"]
+
+        if helper_state in [e.value for e in HELPER_STATE]:
+            self.assistant_helper.helper_state = HELPER_STATE(helper_state)
+            state_name = HELPER_STATE(helper_state).name
+            self.get_logger().info(f"Helper state changed to: {state_name}")
+
+            if self.assistant_helper.helper_state == HELPER_STATE.ASKING:
+                asking_mode = data["asking_mode"]
+
+                self.assistant_helper.asking_mode = asking_mode
+                self.get_logger().info(f"With asking mode: {asking_mode}")
+        else:
+            self.get_logger().info(f"Invalid helper state mode: {helper_state}")
 
 
 class AssistantHelper:
@@ -72,6 +92,7 @@ class AssistantHelper:
 
         self.audio_state = AUDIO_STATE.NO_AUDIO
         self.helper_state = HELPER_STATE.NAME
+        self.asking_mode = None
 
         self.sample_rate = -1 # Will set on mic callbacks
         self.helper_chunk_size = 0.5 # Revisar este valor
@@ -93,14 +114,13 @@ class AssistantHelper:
 
     def spin(self):
         while rclpy.ok():
-            #self.node.get_logger().info(f"Queue size: {self.node.chunk_queue.qsize()}")
             if not self.node.chunk_queue.empty(): # Combine audio chunks
                 [new_audio, self.sample_rate] = self.node.chunk_queue.get()
-
+                
                 if self.helper_state == HELPER_STATE.NAME: # Si NAME mode
                     self.process_name_mode(new_audio)
 
-                elif self.helper_state == HELPER_STATE.COMMAND: # Si COMMAND mode
+                elif self.helper_state in [HELPER_STATE.COMMAND, HELPER_STATE.ASKING]: # Si COMMAND mode
                     self.process_command_mode(new_audio)
 
             rclpy.spin_once(self.node)
@@ -116,7 +136,7 @@ class AssistantHelper:
 
             play(ACTIVATION_SOUND, wait_for_end=True)
 
-            self.node.queue = Queue()
+            self.node.chunk_queue = Queue()
             self.audio = []
             self.audio_chunk = []
             self.previous_chunk = []
@@ -124,11 +144,11 @@ class AssistantHelper:
     def process_command_mode(self, new_audio):
         self.check_audio = self.check_audio + new_audio
         
-        if len(self.audio) == 0 and time.time() - self.hotword_detection_time > self.timeout_seconds: # Si timeout, vuelve a idle
+        if self.helper_state != HELPER_STATE.ASKING and len(self.audio) == 0 and time.time() - self.hotword_detection_time > self.timeout_seconds: # Si timeout, vuelve a idle
             self.node.face_mode_pub.publish(String(data="idle"))
             self.helper_state = HELPER_STATE.NAME
 
-            play(TIME_OUT_SOUND)
+            play(TIME_OUT_SOUND, wait_for_end=True)
             self.node.get_logger().info(f"No audio command detected for {self.timeout_seconds} seconds, timeout.")
 
         elif self.is_audio_length(self.check_audio, self.helper_chunk_size):
@@ -172,9 +192,11 @@ class AssistantHelper:
                 play(ACTIVATION_SOUND)
                 self.node.get_logger().info(f"✅✅✅ '{self.name.upper()}' DETECTED AGAIN")
             else:
-                self.helper_state = HELPER_STATE.NAME
-
-                self.node.assistant_text_pub.publish(String(data=rec))
+                self.node.assistant_text_pub.publish(String(data=json.dumps({
+                    "text": rec,
+                    **({"asking_mode": self.asking_mode} if self.asking_mode else {})
+                })))
+                
                 self.node.get_logger().info(f"✅✅✅ Text transcribed ({len(audio) / self.sample_rate}s): {rec}")
         else:
             self.node.get_logger().info("Transcription result is empty.")

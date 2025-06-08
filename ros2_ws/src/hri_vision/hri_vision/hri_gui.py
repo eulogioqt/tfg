@@ -5,7 +5,7 @@ import threading
 
 from rclpy.node import Node
 from rclpy.timer import Timer
-from std_msgs.msg import Empty
+from std_msgs.msg import Empty, String, Bool
 
 from hri_msgs.msg import FaceNameResponse, FaceQuestionResponse
 from hri_msgs.srv import TriggerUserInteraction
@@ -27,8 +27,22 @@ class HRIGUINode(Node): # Hay que meter que se pueda decir el nombre con voz y u
         self.face_question_pub = self.create_publisher(FaceQuestionResponse, 'gui/face_question_response', 10)
         self.face_timeout_pub = self.create_publisher(Empty, 'gui/face_timeout_response', 10)
 
+        self.name_answer_sub = self.create_subscription(String, "gui/name_answer", self.name_answer_callback, 10)
+        self.confirm_name_sub = self.create_subscription(Bool, "gui/confirm_name", self.confirm_name_callback, 10)
+
         self.trigger_interaction_srv = self.create_service(TriggerUserInteraction, 'gui/request', self.hri_gui.user_interaction_service)
 
+    def name_answer_callback(self, msg):
+        name = str(msg.data)
+        
+        self.hri_gui.send_face_name_response(name)
+        self.hri_gui.controller.set_mode_normal()
+
+    def confirm_name_callback(self, msg):
+        answer = bool(msg.data)
+        
+        self.hri_gui.send_face_question_response(answer)
+        self.hri_gui.controller.set_mode_normal()
 
 class HRIGUI:
     def __init__(self):
@@ -61,13 +75,13 @@ class HRIGUI:
             image_base64 = data["image"]
 
             response.accepted = self.controller.set_mode_get_name(image_base64)
-            self.start_timeout(20)
+            self.start_timeout(300)
         elif mode == "ask_if_name":
             image_base64 = data["image"]
             name = data["name"]
             
             response.accepted = self.controller.set_mode_ask_if_name(image_base64, name)
-            self.start_timeout(20)
+            self.start_timeout(300)
         elif mode == "show_photo":
             image_base64 = data["image"]
 

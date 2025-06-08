@@ -10,6 +10,7 @@ from hri_msgs.msg import Log, FaceNameResponse, FaceQuestionResponse
 from rumi_msgs.msg import SessionMessage
 
 from sancho_web.database.system_database import CONSTANTS
+
 from .database.people_manager import PeopleManager
 from .api._old_gui import mark_face
 
@@ -153,7 +154,7 @@ class HRILogic():
                         face_aligned_base64 = self.node.br.cv2_to_base64(face_aligned)
                         if self.gui_request("get_name", json.dumps({"image": face_aligned_base64})):
                             self.gui_request_sent_info = [classified_id, classified_name, face_aligned_base64, features, scores[i], distance]
-                            self.read_text("¿Cual es tu nombre?")
+                            self.read_text("¿Cual es tu nombre?", asking_mode="get_name")
                         else:
                             self.node.get_logger().info("Error al enviar una petición de nombre a la GUI")
 
@@ -163,7 +164,7 @@ class HRILogic():
                         face_aligned_base64 = self.node.br.cv2_to_base64(face_aligned)
                         if self.gui_request("ask_if_name", json.dumps({"image": face_aligned_base64, "name": classified_name})):
                             self.gui_request_sent_info = [classified_id, classified_name, face_aligned_base64, features, scores[i], distance]
-                            self.read_text("Creo que eres " + classified_name + ", ¿es cierto?")
+                            self.read_text("Creo que eres " + classified_name + ", ¿es cierto?", asking_mode="confirm_name")
                         else:
                             self.node.get_logger().info("Error al enviar una petición de preguntar nombre a la GUI")
 
@@ -242,7 +243,7 @@ class HRILogic():
         else: # Si dice que no, le pregunta el nombre
             if self.gui_request("get_name", json.dumps({"image": face_aligned_base64})):
                 self.gui_request_sent_info = [classified_id, classified_name, face_aligned_base64, features, score, distance]
-                self.read_text("Entonces, ¿Cual es tu nombre?")
+                self.read_text("Entonces, ¿Cual es tu nombre?", asking_mode="get_name")
             else:
                 self.node.get_logger().info("Error al enviar una petición de nombre a la GUI")
 
@@ -347,9 +348,12 @@ class HRILogic():
         return response
 
     # Utils
-    def read_text(self, text):
+    def read_text(self, text, asking_mode=""):
         self.node.get_logger().info(f"[SANCHO] {text}")
-        self.node.input_tts.publish(String(data=text))
+        self.node.input_tts.publish(String(data=json.dumps({
+            "text": text,
+            "asking_mode": asking_mode
+        })))
     
     def create_log(self, action, faceprint_id, message="", metadata_json=""):
         self.node.publisher_log.publish(Log(

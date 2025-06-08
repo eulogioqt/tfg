@@ -205,6 +205,20 @@
       "intent_correct_args_wrong": 0,
       "empty_response": 0,
       "total_time_sec": 243.143208218
+    },
+    "deepseek-ai/DeepSeek-R1-Distill-Llama-70B": {
+      "total_tests": 74,
+      "valid_json": 70,
+      "invalid_json": 4,
+      "intent_correct": 71,
+      "intent_and_args_correct": 71,
+      "intent_missing": 4,
+      "intent_wrong": 0,
+      "unknown_misclassified": 3,
+      "made_up_intent": 0,
+      "intent_correct_args_wrong": 0,
+      "empty_response": 0,
+      "total_time_sec": 3778.7851831912994
     }
   }
 }

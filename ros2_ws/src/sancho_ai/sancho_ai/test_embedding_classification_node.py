@@ -109,7 +109,7 @@ class TestEmbeddingClassificationNode(Node):
             for model in model_enum:
                 model_name = str(model)
                 if model_name in self.results[provider.value]:
-                    self.get_logger().info(f"⏭️  Saltando {provider}/{model_name} (ya evaluado)")
+                    self.get_logger().info(f"⏭️ Saltando {provider}/{model_name} (ya evaluado)")
                     continue
 
                 self.get_logger().info(f"🚀 Evaluando {provider}/{model_name}")
