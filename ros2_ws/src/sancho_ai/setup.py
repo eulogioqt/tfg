@@ -31,6 +31,7 @@ setup(
             'embedding_generator = sancho_ai.embedding_generator_node:main',
             'test_llm_classification = sancho_ai.test_llm_classification_node:main',
             'test_embedding_classification = sancho_ai.test_embedding_classification_node:main',
+            'test_asking = sancho_ai.test_asking_node:main',
         ],
     },
 )

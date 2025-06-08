@@ -44,8 +44,8 @@ class ServiceEngine(ABC):
         return result_holder["value"]
 
     @staticmethod
-    def create_client_node():
-        node = rclpy.create_node("service_engine_client")
+    def create_client_node(name="service_engine_client"):
+        node = rclpy.create_node(name)
 
         executor = SingleThreadedExecutor()
         executor.add_node(node)

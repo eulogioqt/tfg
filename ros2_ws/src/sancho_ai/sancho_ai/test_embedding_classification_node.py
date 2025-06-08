@@ -63,8 +63,8 @@ class TestEmbeddingClassificationNode(Node):
         self.service_node = EmbeddingEngine.create_client_node()
 
         self.base_dir = Path(__file__).parent
-        self.tests_file = self.base_dir / 'prompts/commands/tests_dataset.json'
-        self.results_file = self.base_dir / 'prompts/commands/results_embeddings.json'
+        self.tests_file = self.base_dir / 'prompts/tests/tests_classification_dataset.json'
+        self.results_file = self.base_dir / 'prompts/tests/results_embeddings.json'
 
         self.results = self.load_results()
 

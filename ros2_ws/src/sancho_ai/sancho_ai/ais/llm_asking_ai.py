@@ -1,5 +1,7 @@
 import json
 
+from rclpy.node import Node
+
 from .base import AskingAI
 
 from ..engines import LLMEngine
@@ -9,9 +11,8 @@ from ..log_manager import LogManager
 
 
 class LLMAskingAI(AskingAI):
-    def __init__(self, provider: str = None, model: str = None):
-        node = LLMEngine.create_client_node()
-        self.llm_engine = LLMEngine(node)
+    def __init__(self, node: Node = None, provider: str = None, model: str = None):
+        self.llm_engine = LLMEngine(node if node else LLMEngine.create_client_node())
         self.provider = provider
         self.model = model
 
