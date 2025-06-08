@@ -40,9 +40,9 @@ def generate_launch_description():
             name='llm',
             output='screen',
             parameters=[{
-                "llm_load_models": f"[['{PROVIDER.GEMINI}', ['{MODELS.LLM.GEMINI.GEMINI_FLASH}'], '{GEMINI_API_KEY}']]",
+                "llm_load_models": f"[['{PROVIDER.GEMINI}', ['{MODELS.LLM.GEMINI.GEMINI_1_5_FLASH}'], '{GEMINI_API_KEY}']]",
                 "llm_active_provider": f"{PROVIDER.GEMINI}",
-                "llm_active_model": f"{MODELS.LLM.GEMINI.GEMINI_FLASH}",         
+                "llm_active_model": f"{MODELS.LLM.GEMINI.GEMINI_1_5_FLASH}",         
             }]
         ),
     ])

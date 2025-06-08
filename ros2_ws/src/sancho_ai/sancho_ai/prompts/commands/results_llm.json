@@ -1,0 +1,32 @@
+{
+  "openai": {
+    "gpt-3.5-turbo": {
+      "total_tests": 74,
+      "valid_json": 74,
+      "invalid_json": 0,
+      "intent_correct": 68,
+      "intent_and_args_correct": 66,
+      "intent_missing": 0,
+      "intent_wrong": 0,
+      "unknown_misclassified": 6,
+      "made_up_intent": 0,
+      "intent_correct_args_wrong": 2,
+      "empty_response": 0,
+      "total_time_sec": 52.851749420166016
+    },
+    "gpt-4": {
+      "total_tests": 74,
+      "valid_json": 74,
+      "invalid_json": 0,
+      "intent_correct": 72,
+      "intent_and_args_correct": 72,
+      "intent_missing": 0,
+      "intent_wrong": 0,
+      "unknown_misclassified": 2,
+      "made_up_intent": 0,
+      "intent_correct_args_wrong": 0,
+      "empty_response": 0,
+      "total_time_sec": 252.0700466632843
+    }
+  }
+}
