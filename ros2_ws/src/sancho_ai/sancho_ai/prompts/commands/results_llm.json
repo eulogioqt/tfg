@@ -27,6 +27,184 @@
       "intent_correct_args_wrong": 0,
       "empty_response": 0,
       "total_time_sec": 252.0700466632843
+    },
+    "gpt-4o": {
+      "total_tests": 74,
+      "valid_json": 74,
+      "invalid_json": 0,
+      "intent_correct": 68,
+      "intent_and_args_correct": 68,
+      "intent_missing": 0,
+      "intent_wrong": 0,
+      "unknown_misclassified": 6,
+      "made_up_intent": 0,
+      "intent_correct_args_wrong": 0,
+      "empty_response": 0,
+      "total_time_sec": 62.23188018798828
+    }
+  },
+  "llama": {
+    "meta-llama/Llama-3.1-8B-Instruct": {
+      "total_tests": 74,
+      "valid_json": 74,
+      "invalid_json": 0,
+      "intent_correct": 73,
+      "intent_and_args_correct": 68,
+      "intent_missing": 0,
+      "intent_wrong": 0,
+      "unknown_misclassified": 1,
+      "made_up_intent": 0,
+      "intent_correct_args_wrong": 5,
+      "empty_response": 0,
+      "total_time_sec": 35.66837286949158
+    },
+    "meta-llama/Llama-3.3-70B-Instruct": {
+      "total_tests": 74,
+      "valid_json": 74,
+      "invalid_json": 0,
+      "intent_correct": 73,
+      "intent_and_args_correct": 72,
+      "intent_missing": 0,
+      "intent_wrong": 0,
+      "unknown_misclassified": 1,
+      "made_up_intent": 0,
+      "intent_correct_args_wrong": 1,
+      "empty_response": 0,
+      "total_time_sec": 362.18049788475037
+    }
+  },
+  "mistral": {
+    "mistralai/Mistral-7B-Instruct-v0.1": {
+      "total_tests": 74,
+      "valid_json": 0,
+      "invalid_json": 74,
+      "intent_correct": 40,
+      "intent_and_args_correct": 40,
+      "intent_missing": 74,
+      "intent_wrong": 0,
+      "unknown_misclassified": 34,
+      "made_up_intent": 0,
+      "intent_correct_args_wrong": 0,
+      "empty_response": 0,
+      "total_time_sec": 143.65470147132874
+    }
+  },
+  "phi": {
+    "microsoft/phi-2": {
+      "total_tests": 74,
+      "valid_json": 0,
+      "invalid_json": 74,
+      "intent_correct": 40,
+      "intent_and_args_correct": 40,
+      "intent_missing": 74,
+      "intent_wrong": 0,
+      "unknown_misclassified": 34,
+      "made_up_intent": 0,
+      "intent_correct_args_wrong": 0,
+      "empty_response": 0,
+      "total_time_sec": 517.6980926990509
+    }
+  },
+  "qwen": {
+    "Qwen/Qwen1.5-7B-Chat": {
+      "total_tests": 74,
+      "valid_json": 74,
+      "invalid_json": 0,
+      "intent_correct": 73,
+      "intent_and_args_correct": 68,
+      "intent_missing": 0,
+      "intent_wrong": 0,
+      "unknown_misclassified": 1,
+      "made_up_intent": 0,
+      "intent_correct_args_wrong": 5,
+      "empty_response": 0,
+      "total_time_sec": 28.19222092628479
+    },
+    "Qwen/Qwen2.5-7B-Instruct": {
+      "total_tests": 74,
+      "valid_json": 74,
+      "invalid_json": 0,
+      "intent_correct": 74,
+      "intent_and_args_correct": 71,
+      "intent_missing": 0,
+      "intent_wrong": 0,
+      "unknown_misclassified": 0,
+      "made_up_intent": 0,
+      "intent_correct_args_wrong": 3,
+      "empty_response": 0,
+      "total_time_sec": 27.133866548538208
+    },
+    "Qwen/Qwen2.5-14B-Instruct": {
+      "total_tests": 74,
+      "valid_json": 74,
+      "invalid_json": 0,
+      "intent_correct": 74,
+      "intent_and_args_correct": 73,
+      "intent_missing": 0,
+      "intent_wrong": 0,
+      "unknown_misclassified": 0,
+      "made_up_intent": 0,
+      "intent_correct_args_wrong": 1,
+      "empty_response": 0,
+      "total_time_sec": 60.49110674858093
+    },
+    "Qwen/Qwen2.5-32B-Instruct": {
+      "total_tests": 74,
+      "valid_json": 74,
+      "invalid_json": 0,
+      "intent_correct": 73,
+      "intent_and_args_correct": 73,
+      "intent_missing": 0,
+      "intent_wrong": 0,
+      "unknown_misclassified": 1,
+      "made_up_intent": 0,
+      "intent_correct_args_wrong": 0,
+      "empty_response": 0,
+      "total_time_sec": 130.81551909446716
+    },
+    "Qwen/Qwen2.5-72B-Instruct": {
+      "total_tests": 74,
+      "valid_json": 74,
+      "invalid_json": 0,
+      "intent_correct": 71,
+      "intent_and_args_correct": 71,
+      "intent_missing": 0,
+      "intent_wrong": 0,
+      "unknown_misclassified": 3,
+      "made_up_intent": 0,
+      "intent_correct_args_wrong": 0,
+      "empty_response": 0,
+      "total_time_sec": 321.242573261261
+    }
+  },
+  "deepseek": {
+    "deepseek-ai/deepseek-llm-7b-chat": {
+      "total_tests": 74,
+      "valid_json": 74,
+      "invalid_json": 0,
+      "intent_correct": 74,
+      "intent_and_args_correct": 67,
+      "intent_missing": 0,
+      "intent_wrong": 0,
+      "unknown_misclassified": 0,
+      "made_up_intent": 0,
+      "intent_correct_args_wrong": 7,
+      "empty_response": 0,
+      "total_time_sec": 36.187703371047974
+    },
+    "deepseek-ai/deepseek-llm-67b-chat": {
+      "total_tests": 74,
+      "valid_json": 74,
+      "invalid_json": 0,
+      "intent_correct": 72,
+      "intent_and_args_correct": 72,
+      "intent_missing": 0,
+      "intent_wrong": 0,
+      "unknown_misclassified": 2,
+      "made_up_intent": 0,
+      "intent_correct_args_wrong": 0,
+      "empty_response": 0,
+      "total_time_sec": 243.143208218
     }
   }
 }

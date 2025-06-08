@@ -19,6 +19,7 @@ class AssistantNode(Node):
 
         self.face_mode_pub = self.create_publisher(String, "face/mode", 10)
         self.text_sub = self.create_subscription(String, 'hri_audio/assistant_helper/transcription', self.text_callback, 10)
+        self.tts_sub = self.create_subscription(String, 'input_tts', self.tts_callback, 10)
 
         self.sancho_prompt_client = self.create_client(SanchoPrompt, "sancho_ai/prompt")
         while not self.sancho_prompt_client.wait_for_service(timeout_sec=1.0):
@@ -32,13 +33,19 @@ class AssistantNode(Node):
         while not self.gui_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('GUI service not available, waiting again...')
         
-
         self.queue = Queue(maxsize=1)
+        self.tts_queue = Queue(maxsize=1)
+
         self.get_logger().info("Assistant Node initializated succesfully.")
 
     def text_callback(self, msg):
         if self.queue.qsize() < 1:
             self.queue.put(msg.data)
+
+    def tts_callback(self, msg):
+        if self.tts_queue.qsize() < 1:
+            self.tts_queue.put(msg.data)
+
 
 class Assistant:
 
@@ -58,13 +65,13 @@ class Assistant:
                     data_json = json.dumps(data)
                     self.gui_request("show_photo", data_json) # Show photo
 
-                self.node.face_mode_pub.publish(String(data="speaking"))
-                self.node.face_mode_pub.publish(String(data=emotion.lower()))
-                audio, sample_rate = self.tts_request(ai_response)
-                self.node.get_logger().info(f"✅✅✅ Reproduciendo por audio la respuesta")
+                self.play_tts(ai_response, emotion.lower())
 
-                self.play_audio(audio, sample_rate)
-                self.node.face_mode_pub.publish(String(data="idle"))
+            if not self.node.tts_queue.empty():
+                tts_text = self.node.tts_queue.get()
+
+                self.play_tts(tts_text, "neutral")
+
 
             rclpy.spin_once(self.node)
 
@@ -106,10 +113,19 @@ class Assistant:
 
         return result.accepted
 
-    def play_audio(self, audio, sample_rate, wait=True):
+    def play_tts(self, text, emotion, wait=True):
+        self.node.face_mode_pub.publish(String(data="speaking"))
+        if emotion:
+            self.node.face_mode_pub.publish(String(data=emotion.lower()))
+
+        audio, sample_rate = self.tts_request(text)
+        self.node.get_logger().info(f"✅✅✅ Reproduciendo por audio: {text}")
+
         sd.play(audio, samplerate=sample_rate)
         if wait:
             sd.wait()
+
+        self.node.face_mode_pub.publish(String(data="idle"))
 
 
 def main(args=None):

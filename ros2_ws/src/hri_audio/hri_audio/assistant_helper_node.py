@@ -21,11 +21,11 @@ class AUDIO_STATE(int, Enum):
     SOME_AUDIO = 0,
     END_AUDIO = 1
 
-class HELPER_STATE(int, Enum): # hacer esto y que funcione solo pa cuando hay una persona hablando y no mil personas
-    NAME = 0, # igualmente esta bien hacerlo para que mientras este en speaking no se escuche a si mismo, porque haora mismo si dice Sancho se autoescucha
+class HELPER_STATE(int, Enum):
+    NAME = 0,
     SPEKAING = 1,
     COMMAND = 2,
-    ASKING_GUI = 3
+    ASKING = 3
 
 
 # A futuro hacer que la forma de mezclar los chunks sea con un VAD no con threshold de intensidad
@@ -75,7 +75,7 @@ class AssistantHelper:
 
         self.sample_rate = -1 # Will set on mic callbacks
         self.helper_chunk_size = 0.5 # Revisar este valor
-        self.intensity_threshold = 1500
+        self.intensity_threshold = 1400
         self.timeout_seconds = 5
 
         self.hotword_detection_time = 0
