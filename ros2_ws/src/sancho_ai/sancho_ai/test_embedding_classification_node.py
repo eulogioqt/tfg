@@ -1,5 +1,6 @@
-import os
+import os 
 import json
+import time
 from pathlib import Path
 from typing import Dict, Any
 
@@ -7,111 +8,71 @@ import rclpy
 from rclpy.node import Node
 from dotenv import load_dotenv
 
-from llm_msgs.srv import Prompt, LoadModel, UnloadModel
+from llm_msgs.srv import LoadModel, UnloadModel
 from llm_msgs.msg import LoadModel as LoadModelMsg, ProviderModel
 from llm_tools.models import PROVIDER, MODELS, NEEDS_API_KEY
 
-# mejorar este nodo que tambien saque metricas de tiempo y que no use magic strings
+from .ais.intent_classifiers import EmbeddingClassifier
+from .engines import EmbeddingEngine
+from .prompts.commands.commands import COMMANDS
 
-def safe_json_parse(text: str) -> Any:
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        return None
-
-def compute_metrics_for_model(node, provider: str, model: str, tests: list) -> Dict[str, Any]:
-    total = len(tests)
-
-    results = {
-        "total_tests": total,
-        "valid_json": 0,
-        "invalid_json": 0,
+def compute_embedding_metrics(classifier: EmbeddingClassifier, tests: list, logger) -> Dict[str, Any]:
+    metrics = {
+        "total_tests": len(tests),
         "intent_correct": 0,
-        "intent_and_args_correct": 0,
-        "intent_missing": 0,
         "intent_wrong": 0,
         "unknown_misclassified": 0,
         "made_up_intent": 0,
-        "intent_correct_args_wrong": 0,
-        "empty_response": 0
+        "total_time_sec": 0.0
     }
 
-    for i, test in enumerate(tests):
-        req = node.cli_prompt.srv_type.Request()
-        req.provider = provider
-        req.model = model
-        req.prompt_system = "You are a helpful assistant."
-        req.messages_json = json.dumps(test["chat_history"])
-        req.user_input = ""
-        req.parameters_json = json.dumps({"temperature": 0.0, "max_tokens": 200})
-
-        res = node.call_sync(node.cli_prompt, req)
-
-        if not res or not res.success:
-            results["empty_response"] += 1
-            continue
-
-        output = safe_json_parse(res.response)
-        if output is None:
-            results["invalid_json"] += 1
-            continue
-
-        results["valid_json"] += 1
+    for idx, test in enumerate(tests):
+        chat_history = test["chat_history"][:-1]
+        user_input = test["chat_history"][-1]["content"]
         expected = test["expected_output"]
 
-        if "intent" not in output:
-            results["intent_missing"] += 1
-            continue
+        logger.info(f"🧪 Test {idx+1}/{len(tests)}: '{user_input}'")
 
-        predicted_intent = output["intent"]
-        expected_intent = expected["intent"]
+        start = time.time()
+        intent, _, _, _ = classifier.classify(user_input, chat_history)
+        duration = time.time() - start
+        metrics["total_time_sec"] += duration
 
-        if predicted_intent == expected_intent:
-            results["intent_correct"] += 1
+        logger.info(f"    🔍 Predicted: {intent} | Expected: {expected['intent']} | Time: {duration:.3f}s")
 
-            # Comparar argumentos exactos
-            expected_args = expected.get("arguments", {})
-            predicted_args = output.get("arguments", {})
-            if predicted_args == expected_args:
-                results["intent_and_args_correct"] += 1
-            else:
-                results["intent_correct_args_wrong"] += 1
+        if intent == COMMANDS.UNKNOWN and expected["intent"] != COMMANDS.UNKNOWN:
+            metrics["unknown_misclassified"] += 1
+        elif intent == expected["intent"]:
+            metrics["intent_correct"] += 1
         else:
-            results["intent_wrong"] += 1
+            metrics["intent_wrong"] += 1
+            if intent not in list(COMMANDS):
+                metrics["made_up_intent"] += 1
 
-            # ¿Era UNKNOWN y falló?
-            if expected_intent == "UNKNOWN":
-                results["unknown_misclassified"] += 1
-
-            # ¿Intención inventada?
-            allowed = {"DELETE_USER", "RENAME_USER", "TAKE_PICTURE", "UNKNOWN"}
-            if predicted_intent not in allowed:
-                results["made_up_intent"] += 1
-
-    return results
+    return metrics
 
 
-class TestClassificationNode(Node):
+class TestEmbeddingClassificationNode(Node):
 
     def __init__(self):
-        super().__init__('intent_eval_node')
+        super().__init__('intent_eval_embedding_node')
         load_dotenv()
 
-        self.cli_prompt = self.create_client(Prompt, 'llm_tools/prompt')
         self.cli_load = self.create_client(LoadModel, 'llm_tools/load_model')
         self.cli_unload = self.create_client(UnloadModel, 'llm_tools/unload_model')
+        self.service_node = EmbeddingEngine.create_client_node()
 
         self.base_dir = Path(__file__).parent
-        self.results_file = self.base_dir / 'results.json'
-        self.tests_file = self.base_dir / 'prompts/commands/tests.json'
-        self.load_results()
+        self.tests_file = self.base_dir / 'prompts/commands/tests_dataset.json'
+        self.results_file = self.base_dir / 'prompts/commands/results_embeddings.json'
+
+        self.results = self.load_results()
 
     def load_results(self):
         if self.results_file.exists():
             with open(self.results_file, 'r') as f:
-                self.results = json.load(f)
-        else:
-            self.results = {}
+                return json.load(f)
+        return {}
 
     def save_results(self):
         with open(self.results_file, 'w') as f:
@@ -138,8 +99,8 @@ class TestClassificationNode(Node):
             tests = json.load(f)
 
         for provider in PROVIDER:
-            model_enum = getattr(MODELS.LLM, provider.name.upper(), None)
-            if model_enum is None:
+            model_enum = getattr(MODELS.EMBEDDING, provider.name.upper(), None)
+            if not model_enum:
                 continue
 
             if provider.value not in self.results:
@@ -152,18 +113,25 @@ class TestClassificationNode(Node):
                     continue
 
                 self.get_logger().info(f"🚀 Evaluando {provider}/{model_name}")
-                success = self.load_model(provider, model_name)
-                if not success:
+
+                if not self.load_model(provider, model_name):
+                    self.get_logger().error(f"❌ No se pudo cargar el modelo {provider}/{model_name}")
                     self.results[provider.value][model_name] = {"error": "No se pudo cargar el modelo"}
                     self.save_results()
                     continue
 
-                metrics = compute_metrics_for_model(self, provider.value, model_name, tests)
+                engine = EmbeddingEngine(self.service_node)
+                classifier = EmbeddingClassifier(
+                    embedding_engine=engine,
+                    provider=provider.value,
+                    model=model_name
+                )
+                metrics = compute_embedding_metrics(classifier, tests, self.get_logger())
                 self.results[provider.value][model_name] = metrics
                 self.save_results()
                 self.unload_model(provider, model_name)
 
-        self.get_logger().info("✅ Evaluación finalizada.")
+        self.get_logger().info("✅ Evaluación embeddings finalizada.")
 
     def load_model(self, provider, model_name):
         if not self.wait_for_service(self.cli_load):
@@ -176,7 +144,7 @@ class TestClassificationNode(Node):
 
     def unload_model(self, provider, model_name):
         if not self.wait_for_service(self.cli_unload):
-            return
+            return False
         req = UnloadModel.Request()
         item = ProviderModel(provider=provider.value, models=[model_name])
         req.items = [item]
@@ -185,7 +153,9 @@ class TestClassificationNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = TestClassificationNode()
+
+    node = TestEmbeddingClassificationNode()
     node.run_all_tests()
     node.destroy_node()
+
     rclpy.shutdown()

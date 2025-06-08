@@ -2,10 +2,8 @@ from .intent_classifier import IntentClassifier
 
 from ...log_manager import LogManager
 from ...engines import EmbeddingEngine
-from ...prompts.commands.commands import COMMANDS
+from ...prompts.commands import COMMANDS, IntentExamplesEmbeddingRegistry
 
-import json
-import os
 import numpy as np
 
 
@@ -13,23 +11,25 @@ class EmbeddingClassifier(IntentClassifier):
 
     SIMILARITY_THRESHOLD = 0.8
 
-    def __init__(self, embedding_engine: EmbeddingEngine):
+    def __init__(self, embedding_engine: EmbeddingEngine, provider: str = None, model: str = None):
         self.embedding_engine = embedding_engine
+        self.provider = provider
+        self.model = model
 
-        with open(self.examples_path, 'r') as f:
-            self.examples = json.load(f)
+        self.examples = IntentExamplesEmbeddingRegistry.get_intent_examples()
 
     def classify(self, user_input, _):
         LogManager.info(f"User: {user_input}")
-
+        
         user_embedding, provider_used, model_used, message, success = self.embedding_engine.embedding_request(
-            user_input=user_input
+            user_input=user_input,
+            **{"provider": self.provider, "model": self.model} if (self.provider and self.model) else {}
         )
-
+        
         if not success:
             LogManager.error(f"Error in embedding request: {message}")
             return COMMANDS.UNKNOWN, {}, provider_used, model_used
-
+        
         user_embedding = np.array(user_embedding)
 
         best_intent = COMMANDS.UNKNOWN

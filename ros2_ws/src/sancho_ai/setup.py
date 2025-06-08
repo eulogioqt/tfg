@@ -28,8 +28,9 @@ setup(
     entry_points={
         'console_scripts': [
             'sancho_ai = sancho_ai.sancho_ai_node:main',
-            'test_classification = sancho_ai.test_classification_node:main',
-            'embedding_generator = sancho_ai.embedding_generator_node:main'
+            'embedding_generator = sancho_ai.embedding_generator_node:main',
+            'test_llm_classification = sancho_ai.test_llm_classification_node:main',
+            'test_embedding_classification = sancho_ai.test_embedding_classification_node:main',
         ],
     },
 )

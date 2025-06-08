@@ -13,7 +13,7 @@ class EmbeddingEngine(ServiceEngine):
 
         self.embeddings_cli = self.create_client(Embedding, "llm_tools/embedding")
 
-        self.node.get_logger().info("Prompt Engine initializated succesfully")
+        self.node.get_logger().info("Embedding Engine initializated succesfully")
     
     def embedding_request(self, provider="", model="", user_input=""):
         req = Embedding.Request()
