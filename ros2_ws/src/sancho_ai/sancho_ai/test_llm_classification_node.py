@@ -45,6 +45,7 @@ def compute_metrics_for_model(classifier: LLMClassifier, tests: list, logger) ->
         metrics["total_time_sec"] += duration
 
         logger.info(f"    🔍 Predicted: {intent} | Expected: {expected['intent']} | Time: {duration:.3f}s")
+        logger.info(f"      Real response: {meta['real_response']}")
 
         if meta["empty_response"]:
             metrics["empty_response"] += 1

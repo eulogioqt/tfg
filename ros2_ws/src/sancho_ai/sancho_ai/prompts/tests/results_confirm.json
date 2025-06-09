@@ -1,0 +1,164 @@
+{
+  "openai": {
+    "gpt-3.5-turbo": {
+      "total_tests": 23,
+      "correct": 14,
+      "valid_json": 23,
+      "present_field": 23,
+      "field_match": 14,
+      "field_present_but_wrong": 9,
+      "empty_response": 0,
+      "total_time_sec": 16.655824899673462
+    },
+    "gpt-4": {
+      "total_tests": 23,
+      "correct": 19,
+      "valid_json": 23,
+      "present_field": 23,
+      "field_match": 19,
+      "field_present_but_wrong": 4,
+      "empty_response": 0,
+      "total_time_sec": 50.09445881843567
+    },
+    "gpt-4o": {
+      "total_tests": 23,
+      "correct": 21,
+      "valid_json": 23,
+      "present_field": 23,
+      "field_match": 21,
+      "field_present_but_wrong": 2,
+      "empty_response": 0,
+      "total_time_sec": 19.21194076538086
+    }
+  },
+  "llama": {
+    "meta-llama/Llama-3.1-8B-Instruct": {
+      "total_tests": 23,
+      "correct": 19,
+      "valid_json": 23,
+      "present_field": 23,
+      "field_match": 19,
+      "field_present_but_wrong": 4,
+      "empty_response": 0,
+      "total_time_sec": 15.230222463607788
+    },
+    "meta-llama/Llama-3.3-70B-Instruct": {
+      "total_tests": 23,
+      "correct": 22,
+      "valid_json": 23,
+      "present_field": 23,
+      "field_match": 22,
+      "field_present_but_wrong": 1,
+      "empty_response": 0,
+      "total_time_sec": 112.97340250015259
+    }
+  },
+  "mistral": {
+    "mistralai/Mistral-7B-Instruct-v0.1": {
+      "total_tests": 23,
+      "correct": 3,
+      "valid_json": 0,
+      "present_field": 0,
+      "field_match": 0,
+      "field_present_but_wrong": 0,
+      "empty_response": 0,
+      "total_time_sec": 44.753427505493164
+    }
+  },
+  "phi": {
+    "microsoft/phi-2": {
+      "total_tests": 23,
+      "correct": 3,
+      "valid_json": 0,
+      "present_field": 0,
+      "field_match": 0,
+      "field_present_but_wrong": 0,
+      "empty_response": 0,
+      "total_time_sec": 81.44237065315247
+    }
+  },
+  "qwen": {
+    "Qwen/Qwen1.5-7B-Chat": {
+      "total_tests": 23,
+      "correct": 16,
+      "valid_json": 23,
+      "present_field": 23,
+      "field_match": 16,
+      "field_present_but_wrong": 7,
+      "empty_response": 0,
+      "total_time_sec": 9.883157730102539
+    },
+    "Qwen/Qwen2.5-7B-Instruct": {
+      "total_tests": 23,
+      "correct": 18,
+      "valid_json": 23,
+      "present_field": 23,
+      "field_match": 18,
+      "field_present_but_wrong": 5,
+      "empty_response": 0,
+      "total_time_sec": 7.025538682937622
+    },
+    "Qwen/Qwen2.5-14B-Instruct": {
+      "total_tests": 23,
+      "correct": 19,
+      "valid_json": 23,
+      "present_field": 23,
+      "field_match": 19,
+      "field_present_but_wrong": 4,
+      "empty_response": 0,
+      "total_time_sec": 14.019624471664429
+    },
+    "Qwen/Qwen2.5-32B-Instruct": {
+      "total_tests": 23,
+      "correct": 22,
+      "valid_json": 23,
+      "present_field": 23,
+      "field_match": 22,
+      "field_present_but_wrong": 1,
+      "empty_response": 0,
+      "total_time_sec": 32.28618025779724
+    },
+    "Qwen/Qwen2.5-72B-Instruct": {
+      "total_tests": 23,
+      "correct": 3,
+      "valid_json": 0,
+      "present_field": 0,
+      "field_match": 0,
+      "field_present_but_wrong": 0,
+      "empty_response": 23,
+      "total_time_sec": 9.175321817398071
+    }
+  },
+  "deepseek": {
+    "deepseek-ai/deepseek-llm-7b-chat": {
+      "total_tests": 23,
+      "correct": 14,
+      "valid_json": 23,
+      "present_field": 23,
+      "field_match": 14,
+      "field_present_but_wrong": 9,
+      "empty_response": 0,
+      "total_time_sec": 9.276262760162354
+    },
+    "deepseek-ai/deepseek-llm-67b-chat": {
+      "total_tests": 23,
+      "correct": 20,
+      "valid_json": 23,
+      "present_field": 23,
+      "field_match": 20,
+      "field_present_but_wrong": 3,
+      "empty_response": 0,
+      "total_time_sec": 62.308454751968384
+    },
+    "deepseek-ai/DeepSeek-R1-Distill-Llama-70B": {
+      "total_tests": 23,
+      "correct": 7,
+      "valid_json": 4,
+      "present_field": 4,
+      "field_match": 4,
+      "field_present_but_wrong": 0,
+      "empty_response": 0,
+      "total_time_sec": 965.6317019462585
+    }
+  }
+}

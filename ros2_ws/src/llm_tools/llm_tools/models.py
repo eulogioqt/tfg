@@ -63,7 +63,6 @@ class MODELS:
             GEMMA_3_27B_IT = "google/gemma-3-27b-it"
         
         class FALCON(SmartStrEnum):
-            FALCON_40B_IT = "tiiuae/Falcon-40B-Instruct"
             FALCON_3_10B_IT = "tiiuae/Falcon3-10B-Instruct"
         
         class YI(SmartStrEnum):

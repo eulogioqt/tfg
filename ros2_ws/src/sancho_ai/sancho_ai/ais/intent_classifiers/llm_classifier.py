@@ -27,7 +27,8 @@ class LLMClassifier(IntentClassifier):
         meta = {
             "empty_response": not success or not response.strip(),
             "valid_json": False,
-            "intent_present": False
+            "intent_present": False,
+            "real_response": response
         }
 
         if not success:
