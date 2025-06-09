@@ -1,5 +1,5 @@
 SEGMENTACION:
-CLIENT <=> SERVIDOR
+CLIENT <=> SERVIDOR (ChunkMessage)
 {
     id: uuid,
     type: "CHUNK",
@@ -8,21 +8,21 @@ CLIENT <=> SERVIDOR
     data: ...
 }
 
-CLIENTE => SERVIDOR
+CLIENTE => SERVIDOR (Message)
 El cliente envia un mensaje cualquiera:
 {
     type: "MESSAGE",
     data: ...
 }
 
-SERVIDOR => CLIENTE
+SERVIDOR => CLIENTE (Message)
 El servidor envia un mensaje cualquiera:
 {
     type: "MESSAGE",
     data: ...
 }
 
-El servidor envia un mensaje de un topic a todos los clientes:
+SERVIDOR => CLIENTE (TopicMessage)
 {
     type: "TOPIC",
     data: {
@@ -31,5 +31,3 @@ El servidor envia un mensaje de un topic a todos los clientes:
         value: ...
     }
 }
-
-hacer mensaje INFO con cosas tipo se ha subscrito a este topic automaticamente

@@ -54,28 +54,10 @@
     }
   },
   "mistral": {
-    "mistralai/Mistral-7B-Instruct-v0.1": {
-      "total_tests": 23,
-      "correct": 3,
-      "valid_json": 0,
-      "present_field": 0,
-      "field_match": 0,
-      "field_present_but_wrong": 0,
-      "empty_response": 0,
-      "total_time_sec": 44.821943521499634
-    }
+
   },
   "phi": {
-    "microsoft/phi-2": {
-      "total_tests": 23,
-      "correct": 3,
-      "valid_json": 0,
-      "present_field": 0,
-      "field_match": 0,
-      "field_present_but_wrong": 0,
-      "empty_response": 0,
-      "total_time_sec": 81.46913170814514
-    }
+
   },
   "qwen": {
     "Qwen/Qwen1.5-7B-Chat": {
@@ -117,16 +99,6 @@
       "field_present_but_wrong": 0,
       "empty_response": 0,
       "total_time_sec": 30.223602294921875
-    },
-    "Qwen/Qwen2.5-72B-Instruct": {
-      "total_tests": 23,
-      "correct": 3,
-      "valid_json": 0,
-      "present_field": 0,
-      "field_match": 0,
-      "field_present_but_wrong": 0,
-      "empty_response": 23,
-      "total_time_sec": 8.579871892929077
     }
   },
   "deepseek": {
@@ -159,6 +131,74 @@
       "field_present_but_wrong": 0,
       "empty_response": 0,
       "total_time_sec": 965.9571354389191
+    }
+  },
+  "gemini": {
+    "gemini-1.5-flash-latest": {
+      "total_tests": 23,
+      "correct": 18,
+      "valid_json": 15,
+      "present_field": 15,
+      "field_match": 15,
+      "field_present_but_wrong": 0,
+      "empty_response": 8,
+      "total_time_sec": 8.612621307373047
+    },
+    "gemini-2.0-flash-lite": {
+      "total_tests": 23,
+      "correct": 3,
+      "valid_json": 0,
+      "present_field": 0,
+      "field_match": 0,
+      "field_present_but_wrong": 0,
+      "empty_response": 23,
+      "total_time_sec": 0.02158832550048828
+    },
+    "gemini-2.5-flash": {
+      "total_tests": 23,
+      "correct": 3,
+      "valid_json": 0,
+      "present_field": 0,
+      "field_match": 0,
+      "field_present_but_wrong": 0,
+      "empty_response": 23,
+      "total_time_sec": 0.021686315536499023
+    }
+  },
+  "gemma": {
+    "google/gemma-3-27b-it": {
+      "total_tests": 23,
+      "correct": 3,
+      "valid_json": 0,
+      "present_field": 0,
+      "field_match": 0,
+      "field_present_but_wrong": 0,
+      "empty_response": 23,
+      "total_time_sec": 477.79745626449585
+    }
+  },
+  "falcon": {
+    "tiiuae/Falcon3-10B-Instruct": {
+      "total_tests": 23,
+      "correct": 23,
+      "valid_json": 23,
+      "present_field": 23,
+      "field_match": 23,
+      "field_present_but_wrong": 0,
+      "empty_response": 0,
+      "total_time_sec": 13.733581066131592
+    }
+  },
+  "yi": {
+    "01-ai/Yi-1.5-9B-Chat": {
+      "total_tests": 23,
+      "correct": 12,
+      "valid_json": 10,
+      "present_field": 10,
+      "field_match": 10,
+      "field_present_but_wrong": 0,
+      "empty_response": 0,
+      "total_time_sec": 165.90828394889832
     }
   }
 }

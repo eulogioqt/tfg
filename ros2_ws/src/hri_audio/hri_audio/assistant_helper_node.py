@@ -29,18 +29,8 @@ class HELPER_STATE(int, Enum):
     ASKING = 3
 
 
-# A futuro hacer que la forma de mezclar los chunks sea con un VAD no con threshold de intensidad
 # PROBAR EL VAD Y PROBAR A PONER QUE SI TE ACABA DE RESPONDER ESTE 5S ESCUCHANDOTE Y SI NO HAGA TIMEOUT SABE
-# QUE CUANDO HABLES NO CAMBIE A NAME SINO QUE SIGA EN COMMAND PERO CLARO TIENE QUE SER DESPUES DE QUE ÉL TERMINE DE HABLAR SINO SE ESCUCHA A SI MISMO
-
 # arreglar ojos lo que pasa eso y mirad los baudios y lo del for 20
-
-"""
-export ROS_DOMAIN_ID=42  # Un número distinto de 0 para evitar interferencias
-export ROS_DISCOVERY_SERVER=discovery.csar.uedge.mapir
-"""
-
-# METER EL HELPER STATE.SPEAKING EN EL QUE NO SE PUEDE HACER NADA Y CUANDO TERMINE PUES SE PONE OTRA VEZ A COMMAND Y YA HACE TIME OUT SI NO
 class AssistantHelperNode(Node):
 
     def __init__(self, assistant_helper: "AssistantHelper"):

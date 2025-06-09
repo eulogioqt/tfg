@@ -29,7 +29,8 @@ class LLMAskingAI(AskingAI):
         meta = {
             "empty_response": not success or not response.strip(),
             "valid_json": False,
-            "name_said_present": False
+            "name_said_present": False,
+            "real_response": response
         }
 
         if not success:
@@ -69,7 +70,8 @@ class LLMAskingAI(AskingAI):
         meta = {
             "empty_response": not success or not response.strip(),
             "valid_json": False,
-            "answer_said_present": False
+            "answer_said_present": False,
+            "real_response": response
         }
 
         if not success:

@@ -13,7 +13,7 @@ class JSONMessage(ABC):
     def to_json(self) -> str:
         return json.dumps(self.to_dict())
     
-class Message(JSONMessage): # Cambiar a GeneralMessage o algo asi para no confundir, seria MessageMessage
+class Message(JSONMessage):
     def __init__(self, data):
         self.data = data
     

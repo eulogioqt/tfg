@@ -140,6 +140,7 @@ class TestAskingNode(Node):
 
                         icon = "✅" if correct else "❌"
                         self.get_logger().info(f"    {icon} Result: {result} | Expected: {expected} | Time: {elapsed:.3f}s")
+                        self.get_logger().info(f"       Real response: {meta['real_response']}")
                         #metrics_name["test_results"].append({"input": user_input, "result": result, "expected": expected, "success": correct})
 
                     self.results_name[provider.value][model_name] = metrics_name
@@ -170,6 +171,7 @@ class TestAskingNode(Node):
 
                         icon = "✅" if correct else "❌"
                         self.get_logger().info(f"    {icon} Result: {result} | Expected: {expected} | Time: {elapsed:.3f}s")
+                        self.get_logger().info(f"       Real response: {meta['real_response']}")
                         #metrics_confirm["test_results"].append({"input": user_input, "result": result, "expected": expected, "success": correct})
 
                     self.results_confirm[provider.value][model_name] = metrics_confirm
