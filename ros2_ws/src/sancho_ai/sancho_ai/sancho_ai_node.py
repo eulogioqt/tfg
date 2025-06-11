@@ -48,7 +48,7 @@ class SanchoAINode(Node):
         chat_history.append({"role": "user", "content": text})
         chat_history.append({"role": "assistant", "content": json.dumps({"response": value["text"], "emotion": value["emotion"]}) })
 
-        self.chats[chat_id] = chat_history[-10:]  # 5 turnos
+        self.chats[chat_id] = chat_history[-20:]  # 10 turnos
 
         response.value_json = json.dumps(value)
         response.method = self.type

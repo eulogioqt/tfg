@@ -1,6 +1,8 @@
 ros2_ws/build/
 ros2_ws/install/
 ros2_ws/log/
+widerface_data
+widerface_data/*
 ros2_ws/src/usb_cam
 intent_embeddings.json
 .vscode
