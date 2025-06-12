@@ -54,10 +54,28 @@
     }
   },
   "mistral": {
-
+    "mistralai/Mistral-7B-Instruct-v0.1": {
+      "total_tests": 23,
+      "correct": 0,
+      "valid_json": 0,
+      "present_field": 0,
+      "field_match": 0,
+      "field_present_but_wrong": 0,
+      "empty_response": 0,
+      "total_time_sec": 13465.59733510017395
+    }
   },
   "phi": {
-
+    "microsoft/phi-2": {
+      "total_tests": 23,
+      "correct": 0,
+      "valid_json": 0,
+      "present_field": 0,
+      "field_match": 0,
+      "field_present_but_wrong": 0,
+      "empty_response": 0,
+      "total_time_sec": 12112.97340250015259
+    }
   },
   "qwen": {
     "Qwen/Qwen1.5-7B-Chat": {
