@@ -1,0 +1,3 @@
+calcular el numero de caras que hay en todas las imagenes
+el tiempo por cara medio
+el score

@@ -11,24 +11,19 @@ if gpus:
     except RuntimeError as e:
         print(e)
 
-
-
 from keras_facenet import FaceNet
 import numpy as np
 
-model = FaceNet()
+from .base_encoder import BaseEncoder
 
-def encode_face(face):
-    '''Encondes a given cutted face using FaceNet.
-    
-    Args:
-        face (Image): The cutted face.
-    
-    Returns:
-        features (Array: float): Embeddings/features vector.
-    '''
 
-    shapeFace = np.expand_dims(face, axis=0)
-    features = model.embeddings(shapeFace)[0]
+class FacenetEncoder(BaseEncoder):
 
-    return features
+    def __init__(self):
+        self.model = FaceNet()
+
+    def encode_face(self, face):
+        shapeFace = np.expand_dims(face, axis=0)
+        features = self.model.embeddings(shapeFace)[0]
+
+        return features

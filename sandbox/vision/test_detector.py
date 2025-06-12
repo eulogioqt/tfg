@@ -8,6 +8,10 @@ from typing import List, Tuple, Callable
 from torchvision.datasets import WIDERFace
 import torchvision.transforms as T
 
+import os
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = "false"
+
 from .detectors import (
     CV2Detector, DLIBCNNDetector, DLIBFrontalDetector,
     MTCNNDetector, EfficientFaceDetector,
@@ -48,6 +52,22 @@ def match_detections(preds, gts, iou_thresh=0.5):
     return matches, ious
 
 
+def draw_boxes_on_image(image_path, gt_boxes, pred_boxes, output_path):
+    image = cv2.imread(image_path)
+    if image is None:
+        print(f"[ERROR] No se pudo leer la imagen: {image_path}")
+        return
+
+    for (x, y, w, h) in gt_boxes:
+        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)  # Verde (GT)
+
+    for (x, y, w, h) in pred_boxes:
+        cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)  # Azul (Pred)
+
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    cv2.imwrite(output_path, image)
+
+
 def evaluate_detector(get_faces: Callable, dataset: List[Tuple[str, List[Tuple[int, int, int, int]]]], iou_thresh=0.5):
     total_tp = 0
     total_fp = 0
@@ -72,9 +92,13 @@ def evaluate_detector(get_faces: Callable, dataset: List[Tuple[str, List[Tuple[i
         total_tp += len(matches)
         total_fp += len(pred_boxes) - len(matched_pred_idxs)
         total_fn += len(gt_boxes) - len(matched_gt_idxs)
-
         iou_total += sum(ious)
         iou_count += len(ious)
+
+        # Guardar imagen con cajas
+        img_name = os.path.splitext(os.path.basename(img_path))[0]
+        output_img_path = os.path.join(os.path.dirname(__file__), "results", "tests", f"{img_name}_result.jpg")
+        #draw_boxes_on_image(img_path, gt_boxes, pred_boxes, output_img_path)
 
     precision = total_tp / (total_tp + total_fp + 1e-8)
     recall = total_tp / (total_tp + total_fn + 1e-8)
@@ -105,11 +129,10 @@ if __name__ == "__main__":
 
         boxes_torch = target["bbox"]
         boxes = [
-            (int(xmin), int(ymin), int(xmax - xmin), int(ymax - ymin))
-            for xmin, ymin, xmax, ymax in boxes_torch
+            (int(xmin), int(ymin), int(width), int(height))
+            for xmin, ymin, width, height in boxes_torch
         ]
 
-        # Filtrar: solo imágenes con entre 0 y 5 rostros
         if not (0 <= len(boxes) <= 5):
             continue
 
@@ -119,12 +142,11 @@ if __name__ == "__main__":
 
     print(f"[INFO] Total de imágenes filtradas: {len(dataset)}")
 
-    # Ruta para guardar resultados
+    # Cargar resultados previos si existen
     results_dir = os.path.join(os.path.dirname(__file__), "results")
     os.makedirs(results_dir, exist_ok=True)
     results_path = os.path.join(results_dir, "test_detector_results.json")
 
-    # Cargar resultados previos si existen
     if os.path.exists(results_path):
         with open(results_path, "r") as f:
             results = json.load(f)
@@ -157,7 +179,6 @@ if __name__ == "__main__":
             results[name] = metrics
 
             with open(results_path, "w") as f:
-                print(f"[INFO] Guardando en {results_path}")
                 json.dump(results, f, indent=4)
             print(f"[INFO] Resultados guardados para {name}")
         except Exception as e:

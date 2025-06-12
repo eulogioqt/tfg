@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
 
-class BaseDetector(ABC):
+class BaseEncoder(ABC):
 
     @abstractmethod
-    def get_faces(self, frame):
+    def encode_face(self, face):
         pass
