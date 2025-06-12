@@ -25,6 +25,9 @@ class SmartStrEnum(str, Enum):
     def __repr__(self):
         return self.value
 
+class DBMode(SmartStrEnum):
+    SAVE = "save",
+    NO_SAVE = "no_save"
 
 class EncoderType(SmartStrEnum):
     FACENET = "facenet"
@@ -52,6 +55,7 @@ class HumanFaceRecognizer(Node):
 
         self.show_metrics = self.declare_parameter("show_metrics", False).value
         encoder_name = self.declare_parameter("encoder_name", EncoderType.FACENET).value.lower()
+        db_mode = self.declare_parameter("db_mode", DBMode.SAVE).value.lower()
 
         try:
             encoder_type = EncoderType(encoder_name)
@@ -68,7 +72,7 @@ class HumanFaceRecognizer(Node):
 
         self.faceprint_event_pub = self.create_publisher(FaceprintEvent, "recognition/event", 10)
 
-        self.classifier = ComplexClassifier()
+        self.classifier = ComplexClassifier(db_mode)
         self.save_db_timer = self.create_timer(10.0, self.save_data)
 
         self.training_dispatcher = {

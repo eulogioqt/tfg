@@ -1,19 +1,21 @@
 import os
 import cv2
-import json
 import base64
 
 from ..api.utils import normalized_cosine_similarity_distance
 from ..database.faceprints_database import FaceprintsDatabase
 
+from hri_vision.human_face_recognizer import DBMode
+
 
 class ComplexClassifier:
 
-    def __init__(self):
+    def __init__(self, db_mode=DBMode.SAVE):
         '''Inits classifier'''
 
+        self.db_mode = db_mode
         self.db_path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "database/faceprints_db.json"))
-        self.db = FaceprintsDatabase(self.db_path)
+        self.db = FaceprintsDatabase(self.db_path, self.db_mode)
 
         self.print_people()
 

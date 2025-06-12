@@ -4,10 +4,11 @@ import os
 import json
 import cv2
 import time
+import random
 import numpy as np
 from tqdm import tqdm
+from enum import Enum
 from torchvision.datasets import WIDERFace
-import torchvision.transforms as T
 
 from .detectors import (
     CV2Detector, DLIBCNNDetector, DLIBFrontalDetector,
@@ -15,11 +16,19 @@ from .detectors import (
     RetinaFaceDetector, YOLOv5FaceDetector, YOLOv8FaceDetector
 )
 
+class DatasetType(Enum):
+    WIDERFACE = 'widerface'
+    MAPIR = 'mapir'
+
 class TestDetectorNode(Node):
     def __init__(self):
-        super().__init__('face_evaluator_node')
+        super().__init__('test_detector_node')
+        self.declare_parameter('dataset_type', DatasetType.WIDERFACE.value)
 
-        self.get_logger().info('Inicializando evaluación de detectores...')
+        self.dataset_type = DatasetType(self.get_parameter('dataset_type').get_parameter_value().string_value)
+        self.mapir_dataset_path = "/home/ubuntu/tfg/sandbox/mapir_dataset"
+
+        self.get_logger().info(f"Inicializando evaluación con dataset: {self.dataset_type.name}")
 
     def compute_iou(self, boxA, boxB):
         xA = max(boxA[0], boxB[0])
@@ -35,10 +44,7 @@ class TestDetectorNode(Node):
         return interArea / unionArea if unionArea > 0 else 0
 
     def match_detections(self, preds, gts, iou_thresh=0.5):
-        matches = []
-        used_pred = set()
-        used_gt = set()
-        ious = []
+        matches, used_pred, used_gt, ious = [], set(), set(), []
         for i, gt in enumerate(gts):
             for j, pred in enumerate(preds):
                 if j in used_pred:
@@ -90,12 +96,36 @@ class TestDetectorNode(Node):
             "avg_inference_time": round(avg_time, 4)
         }
 
-    def evaluate_all_detectors(self):
+    def load_mapir_dataset(self):
+        dataset = []
+        for class_name in sorted(os.listdir(self.mapir_dataset_path)):
+            class_dir = os.path.join(self.mapir_dataset_path, class_name)
+            if not os.path.isdir(class_dir):
+                continue
+            for fname in os.listdir(class_dir):
+                if fname.startswith("record-") and fname.endswith(".json"):
+                    fpath = os.path.join(class_dir, fname)
+                    with open(fpath, "r") as f:
+                        records = json.load(f)
+                    for entry in records:
+                        img_name = entry.get("rgb_image")
+                        bbox = entry.get("bbox")
+                        if img_name and bbox:
+                            x, y, x2, y2 = bbox
+                            w, h = x2 - x, y2 - y
+                            full_path = os.path.join(class_dir, img_name)
+                            dataset.append((full_path, [(x, y, w, h)]))
+
+        random.shuffle(dataset)
+        self.get_logger().info(f"Dataset MAPIR cargado: {len(dataset)} muestras.")
+
+        return dataset
+
+    def load_widerface_dataset(self):
         self.get_logger().info("Cargando dataset WIDER FACE (val)...")
         dataset_wider = WIDERFace(root="widerface_data", split="val", download=True)
         dataset = []
         os.makedirs("widerface_data/tmp", exist_ok=True)
-
         for idx in range(len(dataset_wider)):
             img, target = dataset_wider[idx]
             img_np = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
@@ -105,10 +135,19 @@ class TestDetectorNode(Node):
             path = f"widerface_data/tmp/img_{idx}.jpg"
             cv2.imwrite(path, img_np)
             dataset.append((path, boxes))
+        
+        return dataset
+
+    def evaluate_all_detectors(self):
+        if self.dataset_type == DatasetType.WIDERFACE:
+            dataset = self.load_widerface_dataset()
+        else:
+            dataset = self.load_mapir_dataset()
 
         results_dir = os.path.join(os.path.dirname(__file__), "results")
         os.makedirs(results_dir, exist_ok=True)
-        results_path = os.path.join(results_dir, "test_detector_results.json")
+        suffix = "_mapir" if self.dataset_type == DatasetType.MAPIR else "_widerface"
+        results_path = os.path.join(results_dir, f"test_detector_results{suffix}.json")
         results = {}
 
         detector_classes = {
@@ -136,11 +175,10 @@ class TestDetectorNode(Node):
 
         self.get_logger().info(f"Evaluación completada. Resultados: {results_path}")
 
-
 def main(args=None):
     rclpy.init(args=args)
 
     node = TestDetectorNode()
     node.evaluate_all_detectors()
-    
+
     rclpy.shutdown()

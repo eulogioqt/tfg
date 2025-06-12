@@ -4,9 +4,12 @@ import json
 from datetime import datetime
 from threading import RLock
 
+from hri_vision.human_face_recognizer import DBMode
+
 
 class FaceprintsDatabase:
-    def __init__(self, db_path='faceprints_db.json'):
+    def __init__(self, db_path='faceprints_db.json', db_mode=DBMode.SAVE):
+        self.db_mode = db_mode
         self.db_path = db_path
         self._lock = RLock()
 
@@ -67,6 +70,9 @@ class FaceprintsDatabase:
             return str(id)
 
     def save(self):
+        if self.db_mode != DBMode.SAVE:
+            return
+        
         with self._lock:
             database = {
                 "next_id": self.next_id,
@@ -77,6 +83,9 @@ class FaceprintsDatabase:
                 json.dump(database, f, indent=4)
 
     def load(self):
+        if self.db_mode != DBMode.SAVE:
+            return
+        
         with self._lock:
             os.makedirs(os.path.dirname(self.db_path) or ".", exist_ok=True)
 
