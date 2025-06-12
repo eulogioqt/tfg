@@ -1,25 +1,22 @@
 import cv2
-import insightface
 from insightface.app import FaceAnalysis
 from .base_detector import BaseDetector
 
-class EfficientFaceDetector(BaseDetector):
-    def __init__(self, conf_thresh=0.6, providers=None):
-        self.conf_thresh = conf_thresh
-        self.app = FaceAnalysis(allowed_modules=['detection'], providers=providers or ['cpu'])
+
+class InsightFaceDetector(BaseDetector):
+    def __init__(self):
+        self.app = FaceAnalysis(allowed_modules=['detection'], providers=['cuda'])
         self.app.prepare(ctx_id=0, det_size=(640, 640))
 
     def get_faces(self, frame, verbose=False):
-        # frame se asume en RGB
         faces = self.app.get(frame)
         face_positions = []
         face_scores = []
 
         for face in faces:
-            box = face.bbox.astype(int)  # [x1, y1, x2, y2]
+            box = face.bbox.astype(int)
             score = face.det_score
-            if score < self.conf_thresh:
-                continue
+
             x1, y1, x2, y2 = box
             face_positions.append((x1, y1, x2 - x1, y2 - y1))
             face_scores.append(float(score))

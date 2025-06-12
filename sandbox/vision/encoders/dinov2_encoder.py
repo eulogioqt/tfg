@@ -8,7 +8,7 @@ from transformers import AutoImageProcessor, AutoModel
 from .base_encoder import BaseEncoder
 
 class DinoV2Encoder(BaseEncoder):
-    def __init__(self, device='cuda' if torch.cuda.is_available() else 'cpu'):
+    def __init__(self):
         load_dotenv()
         hf_token = os.getenv("HUGGING_FACE_API_KEY")
 
@@ -18,6 +18,8 @@ class DinoV2Encoder(BaseEncoder):
             raise EnvironmentError("HUGGING_FACE_API_KEY no encontrada en .env")
 
         model_name = "facebook/dinov2-base"
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        
         self.processor = AutoImageProcessor.from_pretrained(model_name, token=hf_token)
         self.model = AutoModel.from_pretrained(model_name, token=hf_token).to(device)
         self.device = device

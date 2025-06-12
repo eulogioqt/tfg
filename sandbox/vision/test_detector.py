@@ -14,7 +14,7 @@ os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = "false"
 
 from .detectors import (
     CV2Detector, DLIBCNNDetector, DLIBFrontalDetector,
-    MTCNNDetector, EfficientFaceDetector,
+    MTCNNDetector, InsightFaceDetector,
     RetinaFaceDetector, YOLOv5FaceDetector, YOLOv8FaceDetector
 )
 
@@ -125,6 +125,7 @@ if __name__ == "__main__":
     dataset = []
     os.makedirs("widerface_data/tmp", exist_ok=True)
 
+    total_faces = 0
     for idx in range(len(dataset_wider)):
         img, target = dataset_wider[idx]
         img_np = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
@@ -142,7 +143,9 @@ if __name__ == "__main__":
         cv2.imwrite(tmp_path, img_np)
         dataset.append((tmp_path, boxes))
 
-    print(f"[INFO] Total de imágenes filtradas: {len(dataset)}")
+        total_faces += len(boxes)
+
+    print(f"[INFO] Total de imágenes filtradas: {len(dataset)}. Con un total de caras: {total_faces}")
 
     # Cargar resultados previos si existen
     results_dir = os.path.join(os.path.dirname(__file__), "results")
@@ -165,7 +168,7 @@ if __name__ == "__main__":
         "yolov5": YOLOv5FaceDetector,
         "yolov8": YOLOv8FaceDetector,
         "retinaface": RetinaFaceDetector,
-        "efficientface": EfficientFaceDetector
+        "insightface": InsightFaceDetector
     }
 
     # Evaluar detectores

@@ -4,11 +4,11 @@ from yolo5face.get_model import get_model
 from .base_detector import BaseDetector
 
 class YOLOv5FaceDetector(BaseDetector):
-    def __init__(self, model_type="yolov5n", min_face=24, device=None):
+    def __init__(self):
         self.model = get_model(
-            model_type,
-            device=device,
-            min_face=min_face
+            "yolov5n",
+            device="cuda",
+            min_face=24
         )
 
     def get_faces(self, frame, verbose=False):

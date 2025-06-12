@@ -12,7 +12,7 @@ class YOLOv8FaceDetector(BaseDetector):
             cv2.imwrite(temp_path, frame)
 
         try:
-            bboxes = list(get_bbox(temp_path))
+            bboxes = list(get_bbox(temp_path).cpu().numpy().tolist())
         finally:
             os.remove(temp_path)
 

@@ -5,7 +5,7 @@ import traceback
 
 from .detectors import (
     CV2Detector, DLIBCNNDetector, DLIBFrontalDetector,
-    MTCNNDetector, EfficientFaceDetector,
+    MTCNNDetector, InsightFaceDetector,
     RetinaFaceDetector, YOLOv5FaceDetector, YOLOv8FaceDetector
 )
 
@@ -18,6 +18,7 @@ def test_detector(name, detector_cls, image_path):
             raise ValueError("No se pudo cargar la imagen. Verifica que el archivo existe y es válido.")
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         boxes, _ = detector.get_faces(image_rgb)
+        print(boxes)
 
         if not boxes:
             raise ValueError("No se detectaron caras.")
@@ -38,7 +39,7 @@ if __name__ == "__main__":
         "yolov5": YOLOv5FaceDetector,
         "yolov8": YOLOv8FaceDetector,
         "retinaface": RetinaFaceDetector,
-        "efficientface": EfficientFaceDetector
+        "insightface": InsightFaceDetector
     }
 
     current_dir = os.path.dirname(os.path.abspath(__file__))

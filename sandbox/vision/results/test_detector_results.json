@@ -30,5 +30,37 @@
         "f1_score": 0.6389,
         "mean_iou": 0.7992,
         "avg_inference_time": 0.2181
+    },
+    "yolov5": {
+        "true_positives": 3494,
+        "precision": 0.9684,
+        "recall": 0.8413,
+        "f1_score": 0.9004,
+        "mean_iou": 0.8105,
+        "avg_inference_time": 0.0756
+    },
+    "yolov8": {
+        "true_positives": 3319,
+        "precision": 0.9051,
+        "recall": 0.7992,
+        "f1_score": 0.8488,
+        "mean_iou": 0.8341,
+        "avg_inference_time": 0.0924
+    },
+    "retinaface": {
+        "true_positives": 3731,
+        "precision": 0.9693,
+        "recall": 0.8984,
+        "f1_score": 0.9325,
+        "mean_iou": 0.8378,
+        "avg_inference_time": 0.2886
+    },
+    "insightface": {
+        "true_positives": 3710,
+        "precision": 0.9629,
+        "recall": 0.8933,
+        "f1_score": 0.9268,
+        "mean_iou": 0.8378,
+        "avg_inference_time": 0.0557
     }
 }
