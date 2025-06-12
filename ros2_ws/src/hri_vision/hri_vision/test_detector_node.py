@@ -26,7 +26,7 @@ class TestDetectorNode(Node):
         self.declare_parameter('dataset_type', DatasetType.WIDERFACE.value)
 
         self.dataset_type = DatasetType(self.get_parameter('dataset_type').get_parameter_value().string_value)
-        self.mapir_dataset_path = "/home/ubuntu/tfg/sandbox/mapir_dataset"
+        self.mapir_dataset_path = "/home/ubuntu/tfg/sandbox/vision/mapir_dataset"
 
         self.get_logger().info(f"Inicializando evaluación con dataset: {self.dataset_type.name}")
 

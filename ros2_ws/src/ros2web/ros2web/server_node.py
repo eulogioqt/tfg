@@ -44,7 +44,7 @@ class Server(StoppableNode):
 
         self.node = ServerNode()
         self.ws = WebSocketServer(self.on_message_chunked, self.on_user_connect, self.on_user_disconnect)
-        self.http_server = HTTPServer(port=8173, open_on_start=self.node.declare_parameter("open_on_start", False).get_parameter_value().bool_value)
+        self.http_server = HTTPServer(port=8173, open_on_start=self.node.declare_parameter("open_on_start", True).get_parameter_value().bool_value)
 
         self.chunk_manager = ChunkManager()
 

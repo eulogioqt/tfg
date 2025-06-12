@@ -149,7 +149,7 @@ class HRILogic():
                 classified_name = None
                 classified_id = None
 
-                if scores[i] >= 1 and self.ask_unknowns: # Si la imagen es buena, pregunta por el nombre, para que no coja una imagen mala
+                if scores[i] >= 0.6 and self.ask_unknowns: # Si la imagen es buena, pregunta por el nombre, para que no coja una imagen mala
                     if not self.gui_request_sent_info: # Si no hay ninguna cosa enviada
                         face_aligned_base64 = self.node.br.cv2_to_base64(face_aligned)
                         if self.gui_request("get_name", json.dumps({"image": face_aligned_base64})):
@@ -159,7 +159,7 @@ class HRILogic():
                             self.node.get_logger().info("Error al enviar una petición de nombre a la GUI")
 
             elif distance < self.MIDDLE_BOUND: # Cree que es alguien, pide confirmacion
-                if scores[i] > 1 and self.ask_unknowns: # Pero solo si la foto es buena
+                if scores[i] > 0.6 and self.ask_unknowns: # Pero solo si la foto es buena
                     if not self.gui_request_sent_info:
                         face_aligned_base64 = self.node.br.cv2_to_base64(face_aligned)
                         if self.gui_request("ask_if_name", json.dumps({"image": face_aligned_base64, "name": classified_name})):

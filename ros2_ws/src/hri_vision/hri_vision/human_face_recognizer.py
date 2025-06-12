@@ -63,8 +63,8 @@ class HumanFaceRecognizer(Node):
             self.get_logger().warn(f"Encoder '{encoder_name}' no reconocido. Usando 'facenet' por defecto.")
             encoder_type = EncoderType.FACENET
 
-        self.get_logger().info(f"Encoder seleccionado: {encoder_type}")
         self.encoder: BaseEncoder = ENCODER_CLASS_MAP[encoder_type]()
+        self.get_logger().info(f"Encoder seleccionado: {encoder_type} ({self.encoder.__class__.__name__})")
 
         self.recognition_service = self.create_service(Recognition, "recognition", self.recognition)
         self.training_service = self.create_service(Training, "recognition/training", self.training)
@@ -93,8 +93,6 @@ class HumanFaceRecognizer(Node):
         self.br = HRIBridge()
 
     def recognition(self, request, response):
-        start_recognition = time.time()
-
         frame = self.br.imgmsg_to_cv2(request.frame, "bgr8")
         position = [
             request.position.x,
@@ -105,7 +103,11 @@ class HumanFaceRecognizer(Node):
         score = request.score
 
         face_aligned = align_face(frame, position)
+
+        start_recognition = time.time()
         features = self.encoder.encode_face(face_aligned)
+        recognition_time = time.time() - start_recognition
+        
         faceprint, distance, pos = self.classifier.classify_face(features)
 
         classified_id = faceprint["id"] if faceprint else None
@@ -113,7 +115,7 @@ class HumanFaceRecognizer(Node):
 
         UPPER_BOUND = 0.9
         face_updated = False
-        if faceprint and score >= 1 and distance >= UPPER_BOUND:
+        if faceprint and score >= 0.6 and distance >= UPPER_BOUND:
             face_updated = self.classifier.save_face(classified_id, face_aligned, score)
             if face_updated:
                 self.send_faceprint_event(FaceprintEvent.UPDATE, classified_id, FaceprintEvent.ORIGIN_ROS)
@@ -129,8 +131,7 @@ class HumanFaceRecognizer(Node):
         response.distance = distance_msg
         response.pos = pos_msg
         response.face_updated = face_updated
-
-        recognition_time = time.time() - start_recognition
+        
         response.recognition_time = recognition_time
         if self.show_metrics:
             self.get_logger().info("Recognition time: " + str(recognition_time))

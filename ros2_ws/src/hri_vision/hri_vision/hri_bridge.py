@@ -99,10 +99,10 @@ class HRIBridge:
         positions_msg = []
         for x, y, w, h in positions:
             pos = FacePosition()
-            pos.x = x
-            pos.y = y
-            pos.w = w
-            pos.h = h
+            pos.x = int(x)
+            pos.y = int(y)
+            pos.w = int(w)
+            pos.h = int(h)
             positions_msg.append(pos)
 
         scores_msg = scores

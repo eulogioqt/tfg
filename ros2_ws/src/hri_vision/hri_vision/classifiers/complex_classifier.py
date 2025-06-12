@@ -5,12 +5,10 @@ import base64
 from ..api.utils import normalized_cosine_similarity_distance
 from ..database.faceprints_database import FaceprintsDatabase
 
-from hri_vision.human_face_recognizer import DBMode
-
 
 class ComplexClassifier:
 
-    def __init__(self, db_mode=DBMode.SAVE):
+    def __init__(self, db_mode="save"):
         '''Inits classifier'''
 
         self.db_mode = db_mode
