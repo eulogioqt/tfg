@@ -4,13 +4,12 @@ import retinaface.RetinaFace as retinaface
 from .base_detector import BaseDetector
 
 class RetinaFaceDetector(BaseDetector):
-    def __init__(self, threshold=0.1):
-        self.threshold = threshold
+    def __init__(self):
         self.model = retinaface.build_model()
 
     def get_faces(self, frame, verbose=False):
         frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) 
-        detections = retinaface.detect_faces(frame_bgr, threshold=self.threshold, model=self.model)
+        detections = retinaface.detect_faces(frame_bgr, model=self.model)
 
         face_positions = []
         face_scores = []
