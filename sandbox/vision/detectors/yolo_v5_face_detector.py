@@ -12,8 +12,7 @@ class YOLOv5FaceDetector(BaseDetector):
         )
 
     def get_faces(self, frame, verbose=False):
-        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        boxes, points, scores = self.model.detector.predict(rgb, target_size=640)
+        boxes, points, scores = self.model.detector.predict(frame, target_size=640)
 
         face_positions = [
             (int(x), int(y), int(w - x), int(h - y)) for x, y, w, h in boxes

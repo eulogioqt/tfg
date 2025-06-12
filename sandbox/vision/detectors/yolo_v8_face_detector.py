@@ -7,11 +7,9 @@ from .base_detector import BaseDetector
 class YOLOv8FaceDetector(BaseDetector):
 
     def get_faces(self, frame, verbose=False):
-        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
         with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
             temp_path = tmp.name
-            cv2.imwrite(temp_path, rgb)
+            cv2.imwrite(temp_path, frame)
 
         try:
             bboxes = list(get_bbox(temp_path))

@@ -81,9 +81,11 @@ def evaluate_detector(get_faces: Callable, dataset: List[Tuple[str, List[Tuple[i
         if frame is None:
             print(f"[ERROR] No se pudo leer la imagen: {img_path}")
             continue
+        
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
         start = time.time()
-        pred_boxes, _ = get_faces(frame)
+        pred_boxes, _ = get_faces(frame_rgb)
         total_time += time.time() - start
 
         matches, ious = match_detections(pred_boxes, gt_boxes, iou_thresh)

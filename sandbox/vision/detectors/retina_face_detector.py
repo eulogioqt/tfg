@@ -1,35 +1,34 @@
 import cv2
 import numpy as np
-
+import retinaface.RetinaFace as retinaface
 from .base_detector import BaseDetector
 
-
 class RetinaFaceDetector(BaseDetector):
-
-    def __init__(self):
-        from retinaface import RetinaFace
-        pass  # RetinaFace usa modelo embebido
+    def __init__(self, threshold=0.1):
+        self.threshold = threshold
+        self.model = retinaface.build_model()
 
     def get_faces(self, frame, verbose=False):
-        frame_copy = frame.copy()
-        results = RetinaFace.detect_faces(frame)
-        
+        frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) 
+        detections = retinaface.detect_faces(frame_bgr, threshold=self.threshold, model=self.model)
+
         face_positions = []
-        scores = []
+        face_scores = []
 
-        if isinstance(results, dict):
-            for key in results:
-                facial_area = results[key]["facial_area"]
-                x1, y1, x2, y2 = facial_area
-                x, y = int(x1), int(y1)
-                w, h = int(x2 - x1), int(y2 - y1)
-                face_positions.append((x, y, w, h))
-                scores.append(results[key].get("score", 1.0))
+        for face_data in detections.values():
+            x1, y1, x2, y2 = face_data["facial_area"]
+            score = face_data.get("score", 1.0)
+            x, y = int(x1), int(y1)
+            w, h = int(x2 - x1), int(y2 - y1)
+            face_positions.append((x, y, w, h))
+            face_scores.append(float(score))
 
-                if verbose:
-                    cv2.rectangle(frame_copy, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            if verbose:
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-        if verbose:
-            cv2.imshow('RetinaFace Detection', frame_copy)
+        if verbose and face_positions:
+            cv2.imshow("RetinaFace Detection", frame)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
 
-        return face_positions, scores
+        return face_positions, face_scores
