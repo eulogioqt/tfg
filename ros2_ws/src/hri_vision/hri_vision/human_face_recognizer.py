@@ -1,6 +1,6 @@
 import json
 import time
-import math
+from enum import Enum
 
 import rclpy
 from rclpy.node import Node
@@ -11,22 +11,56 @@ from hri_msgs.srv import Recognition, Training, GetString
 
 from .hri_bridge import HRIBridge
 from .aligners.aligner_dlib import align_face
-from .encoders.encoder_facenet import encode_face
 from .classifiers.complex_classifier import ComplexClassifier
 
-# esta bien que aqui se lancen los eventos de faceprint, ya que aqui se hace todo de los faceprints
-# tmb esta  bien que en el recognizer se guarde una cara mejor si es el caso, esta bien asi, solo que hay que usar constantes
-# lo que si hace falta un poco de refactor
+from .encoders import ( BaseEncoder,
+    FacenetEncoder, ArcFaceEncoder, DinoV2Encoder,
+    OpenFaceEncoder, SFaceEncoder, VGGFaceEncoder
+)
+
+class SmartStrEnum(str, Enum):
+    def __str__(self):
+        return self.value
+
+    def __repr__(self):
+        return self.value
+
+
+class EncoderType(SmartStrEnum):
+    FACENET = "facenet"
+    ARCFACE = "arcface"
+    DINOV2 = "dinov2"
+    OPENFACE = "openface"
+    SFACE = "sface"
+    VGGFACE = "vggface"
+
+
+ENCODER_CLASS_MAP = {
+    EncoderType.FACENET: FacenetEncoder,
+    EncoderType.ARCFACE: ArcFaceEncoder,
+    EncoderType.DINOV2: DinoV2Encoder,
+    EncoderType.OPENFACE: OpenFaceEncoder,
+    EncoderType.SFACE: SFaceEncoder,
+    EncoderType.VGGFACE: VGGFaceEncoder,
+}
+
+
 class HumanFaceRecognizer(Node):
 
     def __init__(self):
-        """Initializes the recognizer node"""
-
         super().__init__("human_face_recognizer")
 
-        show_metrics_param = self.declare_parameter("show_metrics", False)
-        self.show_metrics = show_metrics_param.get_parameter_value().bool_value
-        self.get_logger().info(f"Show Metrics: {self.show_metrics}")
+        self.show_metrics = self.declare_parameter("show_metrics", False).value
+        encoder_name = self.declare_parameter("encoder_name", EncoderType.FACENET).value.lower()
+
+        try:
+            encoder_type = EncoderType(encoder_name)
+        except ValueError:
+            self.get_logger().warn(f"Encoder '{encoder_name}' no reconocido. Usando 'facenet' por defecto.")
+            encoder_type = EncoderType.FACENET
+
+        self.get_logger().info(f"Encoder seleccionado: {encoder_type}")
+        self.encoder: BaseEncoder = ENCODER_CLASS_MAP[encoder_type]()
 
         self.recognition_service = self.create_service(Recognition, "recognition", self.recognition)
         self.training_service = self.create_service(Training, "recognition/training", self.training)
@@ -40,10 +74,9 @@ class HumanFaceRecognizer(Node):
         self.training_dispatcher = {
             "refine_class": self.classifier.refine_class,
             "add_features": self.classifier.add_features,
-            "add_class": self.classifier.add_class, # y este igual realmente, pensarlo bien porque en vd si es train "nueva clase"
-
-            "rename_class": self.classifier.rename_class, # cambiar estos
-            "delete_class": self.classifier.delete_class # porque no son training, simplemente por significado
+            "add_class": self.classifier.add_class,
+            "rename_class": self.classifier.rename_class,
+            "delete_class": self.classifier.delete_class
         }
 
         self.faceprint_event_map = {
@@ -56,16 +89,6 @@ class HumanFaceRecognizer(Node):
         self.br = HRIBridge()
 
     def recognition(self, request, response):
-        """Recognition service
-
-        Args:
-            request (Recognition.srv): Frame and a face position
-
-        Returns:
-            response (Recognition.srv): Face aligned, features, class predicted, distance (score) and p
-                osition of the vector in the class with highest distance (score).
-        """
-
         start_recognition = time.time()
 
         frame = self.br.imgmsg_to_cv2(request.frame, "bgr8")
@@ -76,26 +99,24 @@ class HumanFaceRecognizer(Node):
             request.position.h,
         ]
         score = request.score
-        size = math.sqrt(position[2]**2 + position[3]**2)
-        
+
         face_aligned = align_face(frame, position)
-        
-        features = encode_face(face_aligned)
+        features = self.encoder.encode_face(face_aligned)
         faceprint, distance, pos = self.classifier.classify_face(features)
+
         classified_id = faceprint["id"] if faceprint else None
         classified_name = faceprint["name"] if faceprint else None
 
-        UPPER_BOUND = 0.9 # IMPORTANTE: QUE DEVUELVA SI SE HA CAMBIADO LA CARA PARA HACER UN LOG
-        if faceprint and score >= 1 and distance >= UPPER_BOUND: # Si la cara es buena y estamos seguro de que es esa persona
-            face_updated = self.classifier.save_face(classified_id, face_aligned, score) # lo bueno de asi es que siempre tiene una cara reciente
+        UPPER_BOUND = 0.9
+        face_updated = False
+        if faceprint and score >= 1 and distance >= UPPER_BOUND:
+            face_updated = self.classifier.save_face(classified_id, face_aligned, score)
             if face_updated:
-                self.send_faceprint_event(FaceprintEvent.UPDATE, classified_id, FaceprintEvent.ORIGIN_ROS) # Podria hacer que en el update se mandasen tambien que fields se han cambiado...
-        else:
-            face_updated = False
+                self.send_faceprint_event(FaceprintEvent.UPDATE, classified_id, FaceprintEvent.ORIGIN_ROS)
 
         face_aligned_msg, features_msg, classified_name_msg, distance_msg, pos_msg = (
             self.br.recognizer_to_msg(face_aligned, features, classified_name, distance, pos)
-        )   
+        )
 
         response.face_aligned = face_aligned_msg
         response.features = features_msg
@@ -103,7 +124,7 @@ class HumanFaceRecognizer(Node):
         response.classified_name = classified_name_msg
         response.distance = distance_msg
         response.pos = pos_msg
-        response.face_updated = face_updated 
+        response.face_updated = face_updated
 
         recognition_time = time.time() - start_recognition
         response.recognition_time = recognition_time
@@ -113,21 +134,6 @@ class HumanFaceRecognizer(Node):
         return response
 
     def training(self, request, response):
-        """
-        Handles training-related service requests by dispatching them to the corresponding handler
-        based on the command type and arguments.
-
-        Args:
-            request (Training.srv): Contains the command type and arguments (in JSON format).
-            response (Training.srv): Will be filled with the result and a message.
-
-        Returns:
-            Training.srv: Response object with result code and message.
-                result = -1 → error
-                result = 0  → something not totally ok
-                result = 1  → success class already existed (only meaningful for cmd_type == "add_class")
-        """
-
         try:
             cmd_type = request.cmd_type.data
             args = json.loads(request.args.data)
@@ -143,7 +149,7 @@ class HumanFaceRecognizer(Node):
         except Exception as e:
             result, message = -1, f"Error executing {cmd_type}: {e}"
 
-        if result >= 0 and "class_name" in args: # Send faceprint event
+        if result >= 0 and "class_name" in args:
             event = self.faceprint_event_map.get(cmd_type)
             if event is not None:
                 id = message if cmd_type == "add_class" else args["class_id"]
@@ -151,7 +157,6 @@ class HumanFaceRecognizer(Node):
 
         response.result = result
         response.message = String(data=str(message))
-
         return response
 
     def send_faceprint_event(self, event, id, origin):
@@ -159,7 +164,6 @@ class HumanFaceRecognizer(Node):
         faceprint_event.event = event
         faceprint_event.id = id
         faceprint_event.origin = origin
-        
         self.faceprint_event_pub.publish(faceprint_event)
 
     def get_people(self, request, response):
@@ -184,10 +188,9 @@ class HumanFaceRecognizer(Node):
     def save_data(self):
         self.classifier.db.save()
 
+
 def main(args=None):
     rclpy.init(args=args)
-
-    human_face_recognizer = HumanFaceRecognizer()
-
-    rclpy.spin(human_face_recognizer)
+    node = HumanFaceRecognizer()
+    rclpy.spin(node)
     rclpy.shutdown()

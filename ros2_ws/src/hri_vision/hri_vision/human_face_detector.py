@@ -1,37 +1,65 @@
 import cv2
 import rclpy
 import time
-from rclpy.node import Node
+from enum import Enum
 
+from rclpy.node import Node
 from hri_msgs.srv import Detection
 
 from .hri_bridge import HRIBridge
+from .detectors import ( BaseDetector,
+    CV2Detector, DLIBCNNDetector, DLIBFrontalDetector,
+    MTCNNDetector, InsightFaceDetector,
+    RetinaFaceDetector, YOLOv5FaceDetector, YOLOv8FaceDetector
+)
+
+
+class SmartStrEnum(str, Enum):
+    def __str__(self):
+        return self.value
+
+    def __repr__(self):
+        return self.value
+
+class DetectorType(SmartStrEnum):
+    CV2 = "cv2"
+    DLIB_CNN = "dlib_cnn"
+    DLIB_FRONTAL = "dlib_frontal"
+    MTCNN = "mtcnn"
+    YOLOV5 = "yolov5"
+    YOLOV8 = "yolov8"
+    RETINAFACE = "retinaface"
+    INSIGHTFACE = "insightface"
+
+
+DETECTOR_CLASS_MAP = {
+    DetectorType.CV2: CV2Detector,
+    DetectorType.DLIB_CNN: DLIBCNNDetector,
+    DetectorType.DLIB_FRONTAL: DLIBFrontalDetector,
+    DetectorType.MTCNN: MTCNNDetector,
+    DetectorType.YOLOV5: YOLOv5FaceDetector,
+    DetectorType.YOLOV8: YOLOv8FaceDetector,
+    DetectorType.RETINAFACE: RetinaFaceDetector,
+    DetectorType.INSIGHTFACE: InsightFaceDetector,
+}
 
 
 class HumanFaceDetector(Node):
 
     def __init__(self):
-        """Initializes the detector node. Creates publisher for detected faces."""
         super().__init__("human_face_detector")
 
-        show_metrics_param = self.declare_parameter("show_metrics", False)
-        self.show_metrics = show_metrics_param.get_parameter_value().bool_value
-        self.get_logger().info("Show Metrics: " + str(self.show_metrics))
+        self.show_metrics = self.declare_parameter("show_metrics", False).value
+        detector_name = self.declare_parameter("detector_name", DetectorType.INSIGHTFACE).value.lower()
 
-        active_cnn_param = self.declare_parameter("active_cnn", False)
-        active_cnn = active_cnn_param.get_parameter_value().bool_value
-        self.get_logger().info("Active CNN: " + str(active_cnn))
+        try:
+            detector_type = DetectorType(detector_name)
+        except ValueError:
+            self.get_logger().warn(f"Detector '{detector_name}' no reconocido. Usando 'insightface' por defecto.")
+            detector_type = DetectorType.INSIGHTFACE
 
-        self.get_faces = None
-        
-        if active_cnn:
-            from .detectors.detector_dlib_cnn import get_faces
-            self.get_logger().info("Importing DLIB CNN")
-            self.get_faces = get_faces
-        else:
-            from .detectors.detector_dlib_frontal import get_faces
-            self.get_logger().info("Importing DLIB FRONTAL")
-            self.get_faces = get_faces
+        self.get_logger().info(f"Detector seleccionado: {detector_type}")
+        self.detector: BaseDetector = DETECTOR_CLASS_MAP[detector_type]()
 
         self.detection_service = self.create_service(Detection, "detection", self.detection)
 
@@ -39,15 +67,6 @@ class HumanFaceDetector(Node):
         self.br = HRIBridge()
 
     def detection(self, request, response):
-        """Detection service.
-
-        Args:
-            request (Detection.srv): The frame.
-
-        Returns:
-            response (Detection.srv): Array of 4 elements with positions of the faces and array of scores.
-        """
-
         start_detection = time.time()
 
         frame = self.br.imgmsg_to_cv2(request.frame, "bgr8")
@@ -60,9 +79,10 @@ class HumanFaceDetector(Node):
         frame_ycrcb[:, :, 0] = gray_equalized
         frame_equalized = cv2.cvtColor(frame_ycrcb, cv2.COLOR_YCrCb2BGR)
 
-        if self.get_faces:
-            positions, scores, _ = self.get_faces(frame_equalized)
+        if self.detector:
+            positions, scores = self.detector.get_faces(frame_equalized)
             positions_msg, scores_msg = self.br.detector_to_msg(positions, scores)
+
             if len(positions_msg) > 0:
                 self.get_logger().info("Faces detected: " + str(len(positions_msg)))
 
@@ -80,7 +100,7 @@ class HumanFaceDetector(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    human_face_detector = HumanFaceDetector()
+    node = HumanFaceDetector()
+    rclpy.spin(node)
 
-    rclpy.spin(human_face_detector)
     rclpy.shutdown()

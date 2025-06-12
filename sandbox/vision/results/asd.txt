@@ -15,5 +15,9 @@ cambiar desde la web el detector o el encoder porque si lo he evaluado y el mejo
 e ldetector se ha evaluado co n  ese datase para tener varias cara s a la vez y demas el encoder con el de mapir porque nos da igual que haya varias caras o no, este proceso y a es individual de cara en cara y el de mapir nos ofrece eso, asumiendo que la deteccion ha ido bien y demas.
 citar el dataset de mapir
 
+exlpicar los parametros para usar un encoder o un detector distinto
+
 
 CAMBIAR EN E LCODIGO EFFICIENT FACE POR INSIGHT FACE
+
+HACER UN APARTADO EN LA MEMORIA Y EN LA PRESENTACION COMENTADO LA MAGNITUD DEL PROYECTO, AL EMPEZAR LA IMPLEMENTACION Y EXLPICANDO QUE ES COMPLICADO DETALLAR TODO Y QUE ES LAROG AUN AIS

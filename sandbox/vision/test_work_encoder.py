@@ -14,6 +14,7 @@ def test_encoder(name, encoder_cls, image_path):
             raise ValueError("No se pudo cargar la imagen. Verifica que el archivo existe y es válido.")
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         embedding = encoder.encode_face(image)
+        print(type(embedding))
         if embedding is None:
             raise ValueError("El encoder devolvió None. Revisa si detecta cara correctamente.")
         print(f"[OK] {name} funcionando. Dimensión del embedding: {embedding.shape}, Norma: {np.linalg.norm(embedding):.4f}")
