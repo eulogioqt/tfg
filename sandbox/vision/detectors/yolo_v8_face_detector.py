@@ -1,34 +1,38 @@
 import cv2
-from ultralytics import YOLO
-import numpy as np
-
+import tempfile
+import os
+from yolov8face import get_bbox
 from .base_detector import BaseDetector
-
 
 class YOLOv8FaceDetector(BaseDetector):
 
-    def __init__(self, model_path="yolov8n-face.pt"):
-        self.model = YOLO(model_path)
-
     def get_faces(self, frame, verbose=False):
-        frame_copy = frame.copy()
-        results = self.model.predict(frame, conf=0.25, verbose=False)[0]
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
+            temp_path = tmp.name
+            cv2.imwrite(temp_path, rgb)
+
+        try:
+            bboxes = list(get_bbox(temp_path))
+        finally:
+            os.remove(temp_path)
 
         face_positions = []
         scores = []
 
-        for box in results.boxes:
-            x1, y1, x2, y2 = box.xyxy[0].tolist()
-            conf = box.conf.item()
+        for x1, y1, x2, y2 in bboxes or []:
             x, y = int(x1), int(y1)
             w, h = int(x2 - x1), int(y2 - y1)
             face_positions.append((x, y, w, h))
-            scores.append(conf)
+            scores.append(1.0)
 
-            if verbose:
-                cv2.rectangle(frame_copy, (x, y), (x + w, y + h), (255, 0, 0), 2)
-
-        if verbose:
-            cv2.imshow('YOLOv8-Face Detection', frame_copy)
+        if verbose and face_positions:
+            disp = frame.copy()
+            for (x, y, w, h) in face_positions:
+                cv2.rectangle(disp, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            cv2.imshow("YOLOv8-Face Detection", disp)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
 
         return face_positions, scores

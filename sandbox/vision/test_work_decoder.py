@@ -1,34 +1,44 @@
 import os
-import numpy as np
 import cv2
+import numpy as np
 import traceback
 
-from .encoders import FacenetEncoder, ArcFaceEncoder, DinoV2Encoder, OpenFaceEncoder, SFaceEncoder, VGGFaceEncoder
+from .detectors import (
+    CV2Detector, DLIBCNNDetector, DLIBFrontalDetector,
+    MTCNNDetector, EfficientFaceDetector,
+    RetinaFaceDetector, YOLOv5FaceDetector, YOLOv8FaceDetector
+)
 
-def test_encoder(name, encoder_cls, image_path):
-    print(f"\n[INFO] Probando encoder: {name}")
+def test_detector(name, detector_cls, image_path):
+    print(f"\n[INFO] Probando detector: {name}")
     try:
-        encoder = encoder_cls()
+        detector = detector_cls()
         image = cv2.imread(image_path)
         if image is None:
             raise ValueError("No se pudo cargar la imagen. Verifica que el archivo existe y es válido.")
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        embedding = encoder.encode_face(image)
-        if embedding is None:
-            raise ValueError("El encoder devolvió None. Revisa si detecta cara correctamente.")
-        print(f"[OK] {name} funcionando. Dimensión del embedding: {embedding.shape}, Norma: {np.linalg.norm(embedding):.4f}")
+        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        boxes, _ = detector.get_faces(image_rgb)
+
+        if not boxes:
+            raise ValueError("No se detectaron caras.")
+        
+        print(f"[OK] {name} funcionando. Caras detectadas: {len(boxes)}")
+        for i, (x, y, w, h) in enumerate(boxes):
+            print(f" - Cara {i+1}: (x={x}, y={y}, w={w}, h={h})")
     except Exception as e:
         print(f"[ERROR] Fallo en {name}: {e}")
         traceback.print_exc()
 
 if __name__ == "__main__":
-    encoders = {
-        "FaceNet": FacenetEncoder,
-        "ArcFace": ArcFaceEncoder,
-        "DINOv2": DinoV2Encoder,
-        "OpenFace": OpenFaceEncoder,
-        "SFace": SFaceEncoder,
-        "VGGFace": VGGFaceEncoder
+    detectors = {
+        "cv2": CV2Detector,
+        "dlib_cnn": DLIBCNNDetector,
+        "dlib_frontal": DLIBFrontalDetector,
+        "mtcnn": MTCNNDetector,
+        "yolov5": YOLOv5FaceDetector,
+        "yolov8": YOLOv8FaceDetector,
+        "retinaface": RetinaFaceDetector,
+        "efficientface": EfficientFaceDetector
     }
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -37,5 +47,5 @@ if __name__ == "__main__":
     if not os.path.exists(image_path):
         print(f"[ERROR] Imagen face.jpg no encontrada en {current_dir}")
     else:
-        for name, encoder_cls in encoders.items():
-            test_encoder(name, encoder_cls, image_path)
+        for name, detector_cls in detectors.items():
+            test_detector(name, detector_cls, image_path)
