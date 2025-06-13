@@ -17,12 +17,12 @@ setup(
         package_name: ['database/*.db'],
     },
     include_package_data=True,
-    install_requires=['setuptools'],
+        install_requires=['setuptools', 'dotenv', 'fastapi', 'pydantic', 'pytest', 'rclpy', 'uvicorn', 'websockets'],
     zip_safe=True,
     maintainer='eulogioqt',
     maintainer_email='euquemada@gmail.com',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    description='Web APIs exposing Sancho AI services',
+    license='Apache-2.0',
     extras_require={
         'test': ['pytest']
     },

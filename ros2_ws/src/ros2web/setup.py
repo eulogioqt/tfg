@@ -11,11 +11,11 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml'])
     ],
-    install_requires=['setuptools'],
+        install_requires=['setuptools', 'flask', 'pytest', 'rclpy', 'websockets', 'werkzeug'],
     zip_safe=True,
-    maintainer='mapir',
-    maintainer_email='elgameshdpay@gmail.com',
-    description='TODO: Package description',
+    maintainer='eulogioqt',
+    maintainer_email='euquemada@gmail.com',
+    description='Websocket bridge between ROS 2 and web clients',
     license='Apache-2.0',
     extras_require={
         'test': ['pytest']

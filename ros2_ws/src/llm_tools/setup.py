@@ -11,11 +11,11 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
     ],
-    install_requires=['setuptools'],
+        install_requires=['setuptools', 'dotenv', 'openai', 'pytest', 'rclpy', 'torch', 'transformers'],
     zip_safe=True,
-    maintainer='ubuntu',
+    maintainer='eulogioqt',
     maintainer_email='euquemada@gmail.com',
-    description='TODO: Package description',
+    description='Tools and nodes to interact with LLM providers',
     license='Apache-2.0',
     extras_require={
         'test': ['pytest']

@@ -3,8 +3,8 @@
 <package format="3">
   <name>sancho_ai</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="elgameshdpay@gmail.com">mapir</maintainer>
+  <description>AI nodes for LLM-based conversation and embeddings</description>
+  <maintainer email="euquemada@gmail.com">eulogioqt</maintainer>
   <license>Apache-2.0</license>
 
   <test_depend>ament_copyright</test_depend>
@@ -12,6 +12,12 @@
   <test_depend>ament_pep257</test_depend>
   <test_depend>python3-pytest</test_depend>
 
+  <exec_depend>hri_msgs</exec_depend>
+  <exec_depend>llm_msgs</exec_depend>
+  <exec_depend>llm_tools</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>rumi_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
   <export>
     <build_type>ament_python</build_type>
   </export>

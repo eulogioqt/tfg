@@ -18,11 +18,11 @@ setup(
         package_name: ['sounds/*', 'utils/models/*'],
     },
     include_package_data=True,
-    install_requires=['setuptools'],
+        install_requires=['setuptools', 'dotenv', 'launch', 'librosa', 'numpy', 'openai', 'pvporcupine', 'pyaudio', 'pydub', 'pygame', 'pytest', 'pyttsx3', 'rclpy', 'requests', 'scipy', 'sounddevice', 'soundfile', 'torch', 'transformers', 'unidecode'],
     zip_safe=True,
-    maintainer='mapir',
-    maintainer_email='eulogioquemada@uma.es',
-    description='TODO: Package description',
+    maintainer='eulogioqt',
+    maintainer_email='euquemada@gmail.com',
+    description='Audio processing nodes for speech interaction',
     license='Apache-2.0',
     extras_require={
         'test': ['pytest']

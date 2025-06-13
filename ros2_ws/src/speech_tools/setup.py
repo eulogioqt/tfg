@@ -15,11 +15,11 @@ setup(
         package_name: ['tts/tts_models/*'],
     },
     include_package_data=True,
-    install_requires=['setuptools'],
+        install_requires=['setuptools', 'bark', 'gtts', 'numpy', 'pydub', 'pytest', 'rclpy', 'requests', 'scipy', 'sounddevice', 'soundfile', 'torch', 'torchaudio', 'tts'],
     zip_safe=True,
-    maintainer='ubuntu',
+    maintainer='eulogioqt',
     maintainer_email='euquemada@gmail.com',
-    description='TODO: Package description',
+    description='Speech synthesis and recognition tools',
     license='Apache-2.0',
     extras_require={
         'test': ['pytest']

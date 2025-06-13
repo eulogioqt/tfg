@@ -19,12 +19,12 @@ setup(
         package_name: ['models/*', 'fonts/*', 'database/*.json', 'gui/*.qss', 'gui/*.png'],
     },
     include_package_data=True,
-    install_requires=['setuptools'],
+        install_requires=['setuptools', 'deepface', 'dlib', 'dotenv', 'insightface', 'launch', 'mtcnn', 'numpy', 'pyqt6', 'pytest', 'rclpy', 'scipy', 'tensorflow', 'torch', 'torchvision', 'tqdm', 'transformers', 'yolo5face', 'yolov8face'],
     zip_safe=True,
     maintainer='eulogioqt',
     maintainer_email='euquemada@gmail.com',
-    description='Human face recognition',
-    license='Apache License 2.0',
+    description='Computer vision nodes for face detection and recognition',
+    license='Apache-2.0',
     extras_require={
         'test': ['pytest']
     },
