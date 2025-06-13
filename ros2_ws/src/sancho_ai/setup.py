@@ -16,11 +16,11 @@ setup(
         package_name: ['prompts/commands/*.json'],
     },
     include_package_data=True,
-    install_requires=['setuptools'],
+        install_requires=['setuptools', 'dotenv', 'numpy', 'pytest', 'rclpy'],
     zip_safe=True,
-    maintainer='mapir',
-    maintainer_email='elgameshdpay@gmail.com',
-    description='TODO: Package description',
+    maintainer='eulogioqt',
+    maintainer_email='euquemada@gmail.com',
+    description='AI nodes for LLM-based conversation and embeddings',
     license='Apache-2.0',
     extras_require={
         'test': ['pytest']

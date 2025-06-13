@@ -19,12 +19,12 @@ setup(
         package_name: ['database/*.db'],
     },
     include_package_data=True,
-    install_requires=['setuptools'],
+        install_requires=['setuptools', 'pytest', 'rclpy'],
     zip_safe=True,
     maintainer='eulogioqt',
     maintainer_email='euquemada@gmail.com',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    description='Web interface to manage Rumi sessions',
+    license='Apache-2.0',
     extras_require={
         'test': ['pytest']
     },
