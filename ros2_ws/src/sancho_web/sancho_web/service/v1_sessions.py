@@ -22,12 +22,7 @@ def set_session_api(api):
 @router.get("", tags=["Sessions CRUD endpoints"], response_model=List[Session])
 async def get_sessions(
     request: Request,
-    faceprint_id: Optional[str] = Query(None, description="ID de un faceprint"),
-    fields: Optional[str] = Query(None, description="Campos específicos a devolver"),
-    sort: Optional[str] = Query(None, description="Campos por los que ordenar, separados por comas"),
-    offset: int = Query(default=0, description="Índice de inicio para los resultados de la paginación"),
-    limit: int = Query(default=10, description="Cantidad de marcadores a devolver, por defecto 10"),
-    hateoas: Optional[bool] = Query(default=False, description="Incluir enlace HATEOAS")
+    faceprint_id: Optional[str] = Query(None, description="ID de un faceprint")
 ):
     APIUtils.check_accept_json(request)
 
@@ -43,12 +38,7 @@ async def get_sessions(
 
 @router.get("/summary", tags=["Sessions CRUD endpoints"], response_model=Session)
 async def get_sessions_summary(
-    request: Request,
-    fields: Optional[str] = Query(None, description="Campos específicos a devolver"),
-    sort: Optional[str] = Query(None, description="Campos por los que ordenar, separados por comas"),
-    offset: int = Query(default=0, description="Índice de inicio para los resultados de la paginación"),
-    limit: int = Query(default=10, description="Cantidad de marcadores a devolver, por defecto 10"),
-    hateoas: Optional[bool] = Query(default=False, description="Incluir enlace HATEOAS")
+    request: Request
 ):
     APIUtils.check_accept_json(request)
     
@@ -66,12 +56,7 @@ async def get_sessions_summary(
 @router.get("/{id}", tags=["Sessions CRUD endpoints"], response_model=Session)
 async def get_sessions_by_id(
     request: Request,
-    id: str = Path(description="Id de la sesión"),
-    fields: Optional[str] = Query(None, description="Campos específicos a devolver"),
-    sort: Optional[str] = Query(None, description="Campos por los que ordenar, separados por comas"),
-    offset: int = Query(default=0, description="Índice de inicio para los resultados de la paginación"),
-    limit: int = Query(default=10, description="Cantidad de marcadores a devolver, por defecto 10"),
-    hateoas: Optional[bool] = Query(default=False, description="Incluir enlace HATEOAS")
+    id: str = Path(description="Id de la sesión")
 ):
     APIUtils.check_accept_json(request)
     

@@ -21,12 +21,7 @@ def set_log_api(api):
 
 @router.get("", tags=["Logs CRUD endpoints"], response_model=List[Log])
 async def get_logs(
-    request: Request,
-    fields: Optional[str] = Query(None, description="Campos específicos a devolver"),
-    sort: Optional[str] = Query(None, description="Campos por los que ordenar, separados por comas"),
-    offset: int = Query(default=0, description="Índice de inicio para los resultados de la paginación"),
-    limit: int = Query(default=10, description="Cantidad de marcadores a devolver, por defecto 10"),
-    hateoas: Optional[bool] = Query(default=False, description="Incluir enlace HATEOAS")
+    request: Request
 ):
     APIUtils.check_accept_json(request)
 
@@ -43,12 +38,7 @@ async def get_logs(
 @router.get("/{id}", tags=["Logs CRUD endpoints"], response_model=Log)
 async def get_logs_by_id(
     request: Request,
-    id: str = Path(description="Id del log"),
-    fields: Optional[str] = Query(None, description="Campos específicos a devolver"),
-    sort: Optional[str] = Query(None, description="Campos por los que ordenar, separados por comas"),
-    offset: int = Query(default=0, description="Índice de inicio para los resultados de la paginación"),
-    limit: int = Query(default=10, description="Cantidad de marcadores a devolver, por defecto 10"),
-    hateoas: Optional[bool] = Query(default=False, description="Incluir enlace HATEOAS")
+    id: str = Path(description="Id del log")
 ):
     APIUtils.check_accept_json(request)
     

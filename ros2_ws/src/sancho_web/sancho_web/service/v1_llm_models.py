@@ -23,12 +23,7 @@ def set_llm_model_api(api):
 @router.get("", tags=["LLM Models CRUD endpoints"], response_model=List[LLMProvider])
 async def get_llm_providers(
     request: Request,
-    providers: Optional[List[str]] = Query(None, description="Lista de proveedores a buscar"),
-    fields: Optional[str] = Query(None, description="Campos específicos a devolver"),
-    sort: Optional[str] = Query(None, description="Campos por los que ordenar, separados por comas"),
-    offset: int = Query(default=0, description="Índice de inicio para los resultados de la paginación"),
-    limit: int = Query(default=10, description="Cantidad de proveedores a devolver, por defecto 10"),
-    hateoas: Optional[bool] = Query(default=False, description="Incluir enlace HATEOAS")
+    providers: Optional[List[str]] = Query(None, description="Lista de proveedores a buscar")
 ):
     APIUtils.check_accept_json(request)
 
@@ -44,12 +39,7 @@ async def get_llm_providers(
 @router.get("/{provider}", tags=["LLM Models CRUD endpoints"], response_model=LLMProvider)
 async def get_llm_provider(
     request: Request,
-    provider: str = Path(description="Nombre del proveedor"),
-    fields: Optional[str] = Query(None, description="Campos específicos a devolver"),
-    sort: Optional[str] = Query(None, description="Campos por los que ordenar, separados por comas"),
-    offset: int = Query(default=0, description="Índice de inicio para los resultados de la paginación"),
-    limit: int = Query(default=10, description="Cantidad de modelos a devolver, por defecto 10"),
-    hateoas: Optional[bool] = Query(default=False, description="Incluir enlace HATEOAS")
+    provider: str = Path(description="Nombre del proveedor")
 ):
     APIUtils.check_accept_json(request)
 

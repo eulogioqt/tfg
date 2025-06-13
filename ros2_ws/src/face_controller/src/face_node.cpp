@@ -26,21 +26,26 @@ public:
 
         std::string serial_out_path = "/dev/ttyUSB1";
         serial_out_ = std::make_unique<std::ofstream>(serial_out_path);
-        if (!serial_out_->is_open()) {
+        if (!serial_out_->is_open())
+        {
             serial_out_path = "/dev/ttyUSB2";
             serial_out_ = std::make_unique<std::ofstream>(serial_out_path);
         }
 
         std::string serial_in_path = "/dev/ttyUSB2";
         serial_in_fd_ = open(serial_in_path.c_str(), O_RDONLY | O_NONBLOCK);
-        if (serial_in_fd_ == -1) {
+        if (serial_in_fd_ == -1)
+        {
             serial_in_path = "/dev/ttyUSB1";
             serial_in_fd_ = open(serial_in_path.c_str(), O_RDONLY | O_NONBLOCK);
         }
 
-        if (!serial_out_->is_open() || serial_in_fd_ == -1) {
+        if (!serial_out_->is_open() || serial_in_fd_ == -1)
+        {
             RCLCPP_ERROR(get_logger(), "No se pudieron abrir los puertos serie.");
-        } else {
+        }
+        else
+        {
             RCLCPP_INFO(get_logger(), "Puertos serie abiertos correctamente:");
             RCLCPP_INFO(get_logger(), "Salida -> %s", serial_out_path.c_str());
             RCLCPP_INFO(get_logger(), "Entrada -> %s", serial_in_path.c_str());
@@ -48,7 +53,7 @@ public:
             send_to_esp32("idle");
 
             serial_thread_ = std::thread([this]()
-            {
+                                         {
                 std::string buffer;
                 char c;
                 while (rclcpp::ok())
@@ -64,8 +69,7 @@ public:
                         }
                     }
                     std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                }
-            });
+                } });
         }
 
         mode_subscription_ = create_subscription<std_msgs::msg::String>(
@@ -116,7 +120,7 @@ private:
             {
                 RCLCPP_INFO(get_logger(), "Usando dispositivo PortAudio: %s", info->name);
                 pulse_device = i;
-                //break;
+                // break;
             }
         }
 

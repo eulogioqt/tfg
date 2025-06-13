@@ -22,11 +22,6 @@ def set_faceprint_api(api):
 @router.get("", tags=["Faceprints CRUD endpoints"], response_model=List[Faceprint])
 async def get_faceprints(
     request: Request,
-    fields: Optional[str] = Query(None, description="Campos específicos a devolver"),
-    sort: Optional[str] = Query(None, description="Campos por los que ordenar, separados por comas"),
-    offset: int = Query(default=0, description="Índice de inicio para los resultados de la paginación"),
-    limit: int = Query(default=10, description="Cantidad de marcadores a devolver, por defecto 10"),
-    hateoas: Optional[bool] = Query(default=False, description="Incluir enlace HATEOAS")
 ):
     APIUtils.check_accept_json(request)
 
@@ -44,7 +39,6 @@ async def get_faceprints(
 async def get_faceprint_by_id(
     request: Request,
     id: str = Path(description="Id de la persona"),
-    fields: Optional[str] = Query(None, description="Campos específicos a devolver")
 ):
     APIUtils.check_accept_json(request)
     

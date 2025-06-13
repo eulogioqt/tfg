@@ -1,8 +1,3 @@
-[INFO] Total de imágenes filtradas: 2103. Con un total de caras: 4153
-
-calcular el numero de caras que hay en todas las imagenes
-el tiempo por cara medio
-el score
 meter estos nuevos detectors y encoders en el hrivisiony que se pueda poner uno u otro usando un parametro y explicar en implementacion como con el parametro de ros2 se puede usar uno u otro vale engaa
 pensar metricas para los encoders como tiempo aciertos con el pipeline y todo eso y usar para ese pipeline antes de nada el que mejor detector tenga y dataset de mapir
 explicar con cuales nos quedaos sobretodo para el caso de ejecutar el robot localmente y ejecutar en un pc remoto chetao tanto en los detectores y clasificadores disponibles en implementacion como en el apartado especifico de luego de que se ha pensado el sistema para poder lanzarse asi en multiples sitios y todo eso
@@ -12,19 +7,17 @@ y luego para cosas subjetivas, como la voz o el llm que continua la logica mas o
 pero he asumido que lo mejor es whisper y  eso, pues se puede libremente dede la web elegir el que quieras. No le vi mucho sentido a poder
 cambiar desde la web el detector o el encoder porque si lo he evaluado y el mejor es este pues entonces ya esta.
 
-e ldetector se ha evaluado co n  ese datase para tener varias cara s a la vez y demas el encoder con el de mapir porque nos da igual que haya varias caras o no, este proceso y a es individual de cara en cara y el de mapir nos ofrece eso, asumiendo que la deteccion ha ido bien y demas.
-citar el dataset de mapir
-
-exlpicar los parametros para usar un encoder o un detector distinto
-
-PROBAR DETECTORES CON EL DATASET DE MAPIR
-CAMBIAR EN E LCODIGO EFFICIENT FACE POR INSIGHT FACE
-evaluar detectores tambien con el dataset de mapir
-
-EN LAS TABLAS DE DETECCION COMENTAR TODO BIEN LOS TIEMPOS EL RECALL CADA COSA INTERPRETAR DE PUTA MADRE ATOPE A MARDA Y DECIR LAS RESOLUCIONES DE IMAGENES EN AMBOS DATASETS Y DEMAS
-
 HACER UN APARTADO EN LA MEMORIA Y EN LA PRESENTACION COMENTADO LA MAGNITUD DEL PROYECTO, AL EMPEZAR LA IMPLEMENTACION Y EXLPICANDO QUE ES COMPLICADO DETALLAR TODO Y QUE ES LAROG AUN AIS
-EXPOLOICAR ROS2WEB PARAMETRO OPEN ON START DEFAULT TRUE
 FORMULA DISTANCIA COSENO DONDE SE EXPLIQUE EL CLASIFICADOR
 
 EVALUAR EL PIPELINE COMPLETO CON TODO FUNCIONANDO
+
+ESPECIFICACION OPENAPI ANEXO
+
+CUANDO TENGA EL MEJOR LLM PUES EN IMPLEMENTACION REFACTORIZAR LOS PAQUETES Y DECIR EL MEJOR ES ETE
+EL MEJOR ES ESTE Y LUEGO DECIR QUE PARA TTS STT Y LLM DE LOGICA PUES SE DEJA EN LA WEB PONER EL QUE QUEIRAS PORQUE ES SUBJETIVO
+
+
+REPASAR WEB LO DE SANCHO Y ESO
+ACTUALIZAR CODIGO ARDUINO
+RESPOSNIVE ACCESIBLE

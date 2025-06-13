@@ -22,12 +22,7 @@ def set_stt_model_api(api):
 @router.get("", tags=["STT Models CRUD endpoints"], response_model=List[STTModel])
 async def get_stt_models(
     request: Request,
-    models: Optional[List[str]] = Query(None, description="Lista de modelos a buscar"),
-    fields: Optional[str] = Query(None, description="Campos específicos a devolver"),
-    sort: Optional[str] = Query(None, description="Campos por los que ordenar, separados por comas"),
-    offset: int = Query(default=0, description="Índice de inicio para los resultados de la paginación"),
-    limit: int = Query(default=10, description="Cantidad de marcadores a devolver, por defecto 10"),
-    hateoas: Optional[bool] = Query(default=False, description="Incluir enlace HATEOAS")
+    models: Optional[List[str]] = Query(None, description="Lista de modelos a buscar")
 ):
     APIUtils.check_accept_json(request)
 
