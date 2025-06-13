@@ -36,7 +36,7 @@ const FaceprintListPage = () => {
                         <button className="btn btn-primary me-2" onClick={() => setIsOpenFaceModal(true)}>
                             <i className="bi bi-database-add me-2" /> Añadir cara
                         </button>
-                        <button className="btn btn-outline-secondary" onClick={fetchFaceprintsData}>
+                        <button className="btn btn-outline-secondary mt-2 mt-md-0" onClick={fetchFaceprintsData}>
                             <i className="bi bi-arrow-clockwise me-2" /> Recargar
                         </button>
                     </div>

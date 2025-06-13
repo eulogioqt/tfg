@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import sanchoSrc from "/sancho.jpg";
-import Footer from "../../components/Footer";
 
 const HomePage = () => {
     const navigate = useNavigate();
@@ -17,12 +16,17 @@ const HomePage = () => {
                         Plataforma inteligente de interacción humano-robot con reconocimiento facial, conversación
                         natural y gestión remota.
                     </p>
-                    <button className="btn btn-primary btn-lg me-2" onClick={() => navigate("/chat")}>
-                        <i className="bi bi-cpu-fill me-2"></i>Habla con Sancho
-                    </button>
-                    <button className="btn btn-outline-secondary btn-lg" onClick={() => navigate("/models")}>
-                        <i className="bi bi-gear me-2"></i>Gestionar Modelos
-                    </button>
+                    <div className="d-flex flex-column flex-md-row justify-content-center">
+                        <button
+                            className="btn btn-primary btn-lg me-md-3 mb-3 mb-md-0"
+                            onClick={() => navigate("/chat")}
+                        >
+                            <i className="bi bi-cpu-fill me-2"></i>Habla con Sancho
+                        </button>
+                        <button className="btn btn-outline-secondary btn-lg" onClick={() => navigate("/models")}>
+                            <i className="bi bi-gear me-2"></i>Gestionar Modelos
+                        </button>
+                    </div>
                 </div>
             </section>
 
@@ -59,13 +63,38 @@ const HomePage = () => {
             {/* Capturas y evidencia */}
             <section className="bg-white border-top border-bottom py-5">
                 <div className="container">
-                    <h3 className="text-center fw-bold mb-3 fs-1">Sancho</h3>
-                    <div className="row g-4 justify-content-center mb-4">
-                        <div className="col-md-4">
-                            <img src={sanchoSrc} className="img-fluid rounded shadow-sm" alt="Interfaz de rostros" />
+                    <h3 className="text-center fw-bold mb-5 fs-1">Conoce a Sancho</h3>
+                    <div className="row align-items-center justify-content-center g-5">
+                        {/* Imagen del robot */}
+                        <div className="col-lg-6 col-xl-4 text-center">
+                            <img src={sanchoSrc} className="img-fluid rounded shadow-sm" alt="Robot Sancho" />
+                        </div>
+
+                        {/* Descripción del robot */}
+                        <div className="col-lg-6">
+                            <h4 className="fw-bold mb-3 text-dark">El robot social del grupo MAPIR</h4>
+                            <p className="text-muted">
+                                <strong>Sancho</strong> es el robot social del grupo de investigación MAPIR (Universidad
+                                de Málaga), concebido como una plataforma avanzada para experimentar con interacción
+                                humano-robot en contextos reales. Su diseño modular, abierto y extensible lo convierte
+                                en un banco de pruebas ideal para el desarrollo de sistemas inteligentes.
+                            </p>
+                            <p className="text-muted">
+                                Este robot es capaz de{" "}
+                                <strong>ver, escuchar, hablar, reconocer personas y expresar emociones</strong>. Gracias
+                                a su arquitectura basada en ROS 2, Sancho combina visión por computador, procesamiento
+                                de lenguaje natural (LLM), síntesis y transcripción de voz, y control físico de LEDs que
+                                simulan la boca y los ojos. Todo esto permite que interactúe con los usuarios de forma
+                                fluida, natural y personalizada.
+                            </p>
+                            <p className="text-muted">
+                                A través de una interfaz web intuitiva, cualquier persona puede observar su
+                                comportamiento en tiempo real, gestionar modelos de IA, registrar nuevos usuarios o
+                                consultar estadísticas de interacción. Su versatilidad lo convierte en una herramienta
+                                útil para entornos educativos, demostraciones científicas y robótica asistencial.
+                            </p>
                         </div>
                     </div>
-                    <p className="text-center alert alert-danger">Sancho es un robot... RELLENAR</p>
                 </div>
             </section>
 
