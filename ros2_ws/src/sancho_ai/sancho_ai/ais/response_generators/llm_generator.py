@@ -71,9 +71,9 @@ Args:
             LogManager.error(f"Error on JSON loads.")
             return details, status_emotion, provider_used, model_used
         
-        text_response = semantic_result.get("response", "")
+        response = semantic_result.get("response", "")
         emotion = semantic_result.get("emotion", "")
-        if not text_response:
+        if not response:
             LogManager.error(f"The JSON response does not contain a text response.")
             return details, status_emotion, provider_used, model_used
         

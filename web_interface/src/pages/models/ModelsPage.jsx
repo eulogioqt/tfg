@@ -22,8 +22,8 @@ const ModulesPage = () => {
     return (
         <div className="container pt-4" style={{ marginTop: "76px" }}>
             <div className="text-start mb-4">
-                <h2 className="fw-bold mb-1">Gestión de modelos</h2>
-                <p className="text-muted mb-0">Carga, activa y libera modelos del sistema.</p>
+                <h2 className="fw-bold mb-1 text-center text-md-start">Gestión de modelos</h2>
+                <p className="text-muted mb-0 text-center text-md-start">Carga, activa y libera modelos del sistema.</p>
             </div>
 
             <div className="row">
@@ -44,7 +44,7 @@ const ModulesPage = () => {
                     </div>
                 </div>
 
-                <div className="col-md-9">
+                <div className="col-md-9 mt-2 mt-md-0">
                     <div className="card border rounded shadow-sm mb-5">
                         <div className="card-header d-flex justify-content-between align-items-center bg-light fw-semibold">
                             <div>
