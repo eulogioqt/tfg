@@ -12,108 +12,17 @@
           ],
           "summary": "Get Faceprints",
           "operationId": "get_faceprints_api_v1_faceprints_get",
-          "parameters": [
-            {
-              "name": "fields",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos específicos a devolver",
-                "title": "Fields"
-              },
-              "description": "Campos específicos a devolver"
-            },
-            {
-              "name": "sort",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos por los que ordenar, separados por comas",
-                "title": "Sort"
-              },
-              "description": "Campos por los que ordenar, separados por comas"
-            },
-            {
-              "name": "offset",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "type": "integer",
-                "description": "Índice de inicio para los resultados de la paginación",
-                "default": 0,
-                "title": "Offset"
-              },
-              "description": "Índice de inicio para los resultados de la paginación"
-            },
-            {
-              "name": "limit",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "type": "integer",
-                "description": "Cantidad de marcadores a devolver, por defecto 10",
-                "default": 10,
-                "title": "Limit"
-              },
-              "description": "Cantidad de marcadores a devolver, por defecto 10"
-            },
-            {
-              "name": "hateoas",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "boolean"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Incluir enlace HATEOAS",
-                "default": false,
-                "title": "Hateoas"
-              },
-              "description": "Incluir enlace HATEOAS"
-            }
-          ],
           "responses": {
             "200": {
               "description": "Successful Response",
               "content": {
                 "application/json": {
                   "schema": {
-                    "type": "array",
                     "items": {
                       "$ref": "#/components/schemas/Faceprint"
                     },
+                    "type": "array",
                     "title": "Response Get Faceprints Api V1 Faceprints Get"
-                  }
-                }
-              }
-            },
-            "422": {
-              "description": "Validation Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/HTTPValidationError"
                   }
                 }
               }
@@ -127,14 +36,14 @@
           "summary": "Create Faceprint",
           "operationId": "create_faceprint_api_v1_faceprints_post",
           "requestBody": {
-            "required": true,
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/FaceprintCreate"
                 }
               }
-            }
+            },
+            "required": true
           },
           "responses": {
             "200": {
@@ -178,24 +87,6 @@
                 "title": "Id"
               },
               "description": "Id de la persona"
-            },
-            {
-              "name": "fields",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos específicos a devolver",
-                "title": "Fields"
-              },
-              "description": "Campos específicos a devolver"
             }
           ],
           "responses": {
@@ -337,85 +228,6 @@
                 "title": "Faceprint Id"
               },
               "description": "ID de un faceprint"
-            },
-            {
-              "name": "fields",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos específicos a devolver",
-                "title": "Fields"
-              },
-              "description": "Campos específicos a devolver"
-            },
-            {
-              "name": "sort",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos por los que ordenar, separados por comas",
-                "title": "Sort"
-              },
-              "description": "Campos por los que ordenar, separados por comas"
-            },
-            {
-              "name": "offset",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "type": "integer",
-                "description": "Índice de inicio para los resultados de la paginación",
-                "default": 0,
-                "title": "Offset"
-              },
-              "description": "Índice de inicio para los resultados de la paginación"
-            },
-            {
-              "name": "limit",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "type": "integer",
-                "description": "Cantidad de marcadores a devolver, por defecto 10",
-                "default": 10,
-                "title": "Limit"
-              },
-              "description": "Cantidad de marcadores a devolver, por defecto 10"
-            },
-            {
-              "name": "hateoas",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "boolean"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Incluir enlace HATEOAS",
-                "default": false,
-                "title": "Hateoas"
-              },
-              "description": "Incluir enlace HATEOAS"
             }
           ],
           "responses": {
@@ -453,87 +265,6 @@
           ],
           "summary": "Get Sessions Summary",
           "operationId": "get_sessions_summary_api_v1_sessions_summary_get",
-          "parameters": [
-            {
-              "name": "fields",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos específicos a devolver",
-                "title": "Fields"
-              },
-              "description": "Campos específicos a devolver"
-            },
-            {
-              "name": "sort",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos por los que ordenar, separados por comas",
-                "title": "Sort"
-              },
-              "description": "Campos por los que ordenar, separados por comas"
-            },
-            {
-              "name": "offset",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "type": "integer",
-                "description": "Índice de inicio para los resultados de la paginación",
-                "default": 0,
-                "title": "Offset"
-              },
-              "description": "Índice de inicio para los resultados de la paginación"
-            },
-            {
-              "name": "limit",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "type": "integer",
-                "description": "Cantidad de marcadores a devolver, por defecto 10",
-                "default": 10,
-                "title": "Limit"
-              },
-              "description": "Cantidad de marcadores a devolver, por defecto 10"
-            },
-            {
-              "name": "hateoas",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "boolean"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Incluir enlace HATEOAS",
-                "default": false,
-                "title": "Hateoas"
-              },
-              "description": "Incluir enlace HATEOAS"
-            }
-          ],
           "responses": {
             "200": {
               "description": "Successful Response",
@@ -541,16 +272,6 @@
                 "application/json": {
                   "schema": {
                     "$ref": "#/components/schemas/Session"
-                  }
-                }
-              }
-            },
-            "422": {
-              "description": "Validation Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/HTTPValidationError"
                   }
                 }
               }
@@ -576,85 +297,6 @@
                 "title": "Id"
               },
               "description": "Id de la sesión"
-            },
-            {
-              "name": "fields",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos específicos a devolver",
-                "title": "Fields"
-              },
-              "description": "Campos específicos a devolver"
-            },
-            {
-              "name": "sort",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos por los que ordenar, separados por comas",
-                "title": "Sort"
-              },
-              "description": "Campos por los que ordenar, separados por comas"
-            },
-            {
-              "name": "offset",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "type": "integer",
-                "description": "Índice de inicio para los resultados de la paginación",
-                "default": 0,
-                "title": "Offset"
-              },
-              "description": "Índice de inicio para los resultados de la paginación"
-            },
-            {
-              "name": "limit",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "type": "integer",
-                "description": "Cantidad de marcadores a devolver, por defecto 10",
-                "default": 10,
-                "title": "Limit"
-              },
-              "description": "Cantidad de marcadores a devolver, por defecto 10"
-            },
-            {
-              "name": "hateoas",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "boolean"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Incluir enlace HATEOAS",
-                "default": false,
-                "title": "Hateoas"
-              },
-              "description": "Incluir enlace HATEOAS"
             }
           ],
           "responses": {
@@ -688,108 +330,17 @@
           ],
           "summary": "Get Logs",
           "operationId": "get_logs_api_v1_logs_get",
-          "parameters": [
-            {
-              "name": "fields",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos específicos a devolver",
-                "title": "Fields"
-              },
-              "description": "Campos específicos a devolver"
-            },
-            {
-              "name": "sort",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos por los que ordenar, separados por comas",
-                "title": "Sort"
-              },
-              "description": "Campos por los que ordenar, separados por comas"
-            },
-            {
-              "name": "offset",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "type": "integer",
-                "description": "Índice de inicio para los resultados de la paginación",
-                "default": 0,
-                "title": "Offset"
-              },
-              "description": "Índice de inicio para los resultados de la paginación"
-            },
-            {
-              "name": "limit",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "type": "integer",
-                "description": "Cantidad de marcadores a devolver, por defecto 10",
-                "default": 10,
-                "title": "Limit"
-              },
-              "description": "Cantidad de marcadores a devolver, por defecto 10"
-            },
-            {
-              "name": "hateoas",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "boolean"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Incluir enlace HATEOAS",
-                "default": false,
-                "title": "Hateoas"
-              },
-              "description": "Incluir enlace HATEOAS"
-            }
-          ],
           "responses": {
             "200": {
               "description": "Successful Response",
               "content": {
                 "application/json": {
                   "schema": {
-                    "type": "array",
                     "items": {
                       "$ref": "#/components/schemas/Log"
                     },
+                    "type": "array",
                     "title": "Response Get Logs Api V1 Logs Get"
-                  }
-                }
-              }
-            },
-            "422": {
-              "description": "Validation Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/HTTPValidationError"
                   }
                 }
               }
@@ -815,85 +366,6 @@
                 "title": "Id"
               },
               "description": "Id del log"
-            },
-            {
-              "name": "fields",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos específicos a devolver",
-                "title": "Fields"
-              },
-              "description": "Campos específicos a devolver"
-            },
-            {
-              "name": "sort",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos por los que ordenar, separados por comas",
-                "title": "Sort"
-              },
-              "description": "Campos por los que ordenar, separados por comas"
-            },
-            {
-              "name": "offset",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "type": "integer",
-                "description": "Índice de inicio para los resultados de la paginación",
-                "default": 0,
-                "title": "Offset"
-              },
-              "description": "Índice de inicio para los resultados de la paginación"
-            },
-            {
-              "name": "limit",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "type": "integer",
-                "description": "Cantidad de marcadores a devolver, por defecto 10",
-                "default": 10,
-                "title": "Limit"
-              },
-              "description": "Cantidad de marcadores a devolver, por defecto 10"
-            },
-            {
-              "name": "hateoas",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "boolean"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Incluir enlace HATEOAS",
-                "default": false,
-                "title": "Hateoas"
-              },
-              "description": "Incluir enlace HATEOAS"
             }
           ],
           "responses": {
@@ -948,85 +420,6 @@
                 "title": "Models"
               },
               "description": "Lista de modelos a buscar"
-            },
-            {
-              "name": "fields",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos específicos a devolver",
-                "title": "Fields"
-              },
-              "description": "Campos específicos a devolver"
-            },
-            {
-              "name": "sort",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos por los que ordenar, separados por comas",
-                "title": "Sort"
-              },
-              "description": "Campos por los que ordenar, separados por comas"
-            },
-            {
-              "name": "offset",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "type": "integer",
-                "description": "Índice de inicio para los resultados de la paginación",
-                "default": 0,
-                "title": "Offset"
-              },
-              "description": "Índice de inicio para los resultados de la paginación"
-            },
-            {
-              "name": "limit",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "type": "integer",
-                "description": "Cantidad de marcadores a devolver, por defecto 10",
-                "default": 10,
-                "title": "Limit"
-              },
-              "description": "Cantidad de marcadores a devolver, por defecto 10"
-            },
-            {
-              "name": "hateoas",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "boolean"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Incluir enlace HATEOAS",
-                "default": false,
-                "title": "Hateoas"
-              },
-              "description": "Incluir enlace HATEOAS"
             }
           ],
           "responses": {
@@ -1331,85 +724,6 @@
                 "title": "Models"
               },
               "description": "Lista de modelos a buscar"
-            },
-            {
-              "name": "fields",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos específicos a devolver",
-                "title": "Fields"
-              },
-              "description": "Campos específicos a devolver"
-            },
-            {
-              "name": "sort",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos por los que ordenar, separados por comas",
-                "title": "Sort"
-              },
-              "description": "Campos por los que ordenar, separados por comas"
-            },
-            {
-              "name": "offset",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "type": "integer",
-                "description": "Índice de inicio para los resultados de la paginación",
-                "default": 0,
-                "title": "Offset"
-              },
-              "description": "Índice de inicio para los resultados de la paginación"
-            },
-            {
-              "name": "limit",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "type": "integer",
-                "description": "Cantidad de marcadores a devolver, por defecto 10",
-                "default": 10,
-                "title": "Limit"
-              },
-              "description": "Cantidad de marcadores a devolver, por defecto 10"
-            },
-            {
-              "name": "hateoas",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "boolean"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Incluir enlace HATEOAS",
-                "default": false,
-                "title": "Hateoas"
-              },
-              "description": "Incluir enlace HATEOAS"
             }
           ],
           "responses": {
@@ -1714,85 +1028,6 @@
                 "title": "Providers"
               },
               "description": "Lista de proveedores a buscar"
-            },
-            {
-              "name": "fields",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos específicos a devolver",
-                "title": "Fields"
-              },
-              "description": "Campos específicos a devolver"
-            },
-            {
-              "name": "sort",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos por los que ordenar, separados por comas",
-                "title": "Sort"
-              },
-              "description": "Campos por los que ordenar, separados por comas"
-            },
-            {
-              "name": "offset",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "type": "integer",
-                "description": "Índice de inicio para los resultados de la paginación",
-                "default": 0,
-                "title": "Offset"
-              },
-              "description": "Índice de inicio para los resultados de la paginación"
-            },
-            {
-              "name": "limit",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "type": "integer",
-                "description": "Cantidad de proveedores a devolver, por defecto 10",
-                "default": 10,
-                "title": "Limit"
-              },
-              "description": "Cantidad de proveedores a devolver, por defecto 10"
-            },
-            {
-              "name": "hateoas",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "boolean"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Incluir enlace HATEOAS",
-                "default": false,
-                "title": "Hateoas"
-              },
-              "description": "Incluir enlace HATEOAS"
             }
           ],
           "responses": {
@@ -1841,85 +1076,6 @@
                 "title": "Provider"
               },
               "description": "Nombre del proveedor"
-            },
-            {
-              "name": "fields",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos específicos a devolver",
-                "title": "Fields"
-              },
-              "description": "Campos específicos a devolver"
-            },
-            {
-              "name": "sort",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Campos por los que ordenar, separados por comas",
-                "title": "Sort"
-              },
-              "description": "Campos por los que ordenar, separados por comas"
-            },
-            {
-              "name": "offset",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "type": "integer",
-                "description": "Índice de inicio para los resultados de la paginación",
-                "default": 0,
-                "title": "Offset"
-              },
-              "description": "Índice de inicio para los resultados de la paginación"
-            },
-            {
-              "name": "limit",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "type": "integer",
-                "description": "Cantidad de modelos a devolver, por defecto 10",
-                "default": 10,
-                "title": "Limit"
-              },
-              "description": "Cantidad de modelos a devolver, por defecto 10"
-            },
-            {
-              "name": "hateoas",
-              "in": "query",
-              "required": false,
-              "schema": {
-                "anyOf": [
-                  {
-                    "type": "boolean"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "description": "Incluir enlace HATEOAS",
-                "default": false,
-                "title": "Hateoas"
-              },
-              "description": "Incluir enlace HATEOAS"
             }
           ],
           "responses": {
@@ -2097,7 +1253,7 @@
             "learning_date": {
               "type": "string",
               "title": "Learning Date",
-              "default": "1749815819.07641",
+              "default": "1749829178.421725",
               "example": "1712345678"
             },
             "face": {
