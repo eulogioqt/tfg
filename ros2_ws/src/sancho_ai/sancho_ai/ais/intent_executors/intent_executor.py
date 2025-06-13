@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import json
 
 from ...prompts.commands.commands import COMMANDS, COMMAND_RESUITS
@@ -7,10 +8,20 @@ from ...engines import HRIEngine
 
 class IntentExecutor:
 
+"""TODO: Describe class."""
     def __init__(self, hri_engine: HRIEngine):
+    """TODO: Describe __init__.
+Args:
+    hri_engine (:obj:`Any`): TODO.
+"""
         self.hri_engine = hri_engine
     
     def execute(self, intent: str, arguments: dict) -> dict:
+    """TODO: Describe execute.
+Args:
+    intent (:obj:`Any`): TODO.
+    arguments (:obj:`Any`): TODO.
+"""
         if intent == COMMANDS.DELETE_USER:
             return self.delete_user(arguments)
 
@@ -23,6 +34,10 @@ class IntentExecutor:
         raise ValueError(f"Invalid intent: {intent}")
 
     def delete_user(self, arguments):
+    """TODO: Describe delete_user.
+Args:
+    arguments (:obj:`Any`): TODO.
+"""
         user = arguments["user"]
         if not user:
             details = f"No he eliminado a nadie, no sé a quién te refieres"
@@ -49,6 +64,10 @@ class IntentExecutor:
         return details, status, {}
 
     def rename_user(self, arguments):
+    """TODO: Describe rename_user.
+Args:
+    arguments (:obj:`Any`): TODO.
+"""
         old_name = arguments["old_name"]
         new_name = arguments["new_name"]
 
@@ -77,6 +96,10 @@ class IntentExecutor:
         return details, status, {}
 
     def take_picture(self, _):
+    """TODO: Describe take_picture.
+Args:
+    _ (:obj:`Any`): TODO.
+"""
         image = self.hri_engine.get_last_frame_request()
         if not image:
             details = "No he podido tomar una foto"

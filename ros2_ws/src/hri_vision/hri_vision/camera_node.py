@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import cv2
 import rclpy
 from rclpy.node import Node
@@ -8,7 +9,10 @@ from cv_bridge import CvBridge
 
 class Camera(Node):
 
+"""TODO: Describe class."""
     def __init__(self):
+    """TODO: Describe __init__.
+"""
         super().__init__("camera")
 
         self.get_logger().info("Trying to start camera on index 0")
@@ -20,6 +24,8 @@ class Camera(Node):
         self.spin()
 
     def spin(self):
+    """TODO: Describe spin.
+"""
         first_frame = True
         while True:
             ret, frame = self.camera.read()
@@ -37,6 +43,10 @@ class Camera(Node):
         self.camera.release()
 
 def main(args=None):
+"""TODO: Describe main.
+Args:
+    args (:obj:`Any`): TODO.
+"""
     rclpy.init(args=args)
 
     camera = Camera()

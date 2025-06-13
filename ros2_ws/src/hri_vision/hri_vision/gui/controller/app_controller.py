@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import os
 import sys
 
@@ -10,7 +11,13 @@ from ..view.splash_screen import SplashScreen
 
 
 class AppController:
+"""TODO: Describe class."""
     def __init__(self, name_callback, question_callback):
+    """TODO: Describe __init__.
+Args:
+    name_callback (:obj:`Any`): TODO.
+    question_callback (:obj:`Any`): TODO.
+"""
         self.name_callback = name_callback
         self.question_callback = question_callback
 
@@ -26,31 +33,47 @@ class AppController:
         self.apply_styles()
     
     def start(self):
+    """TODO: Describe start.
+"""
         self.start_splash()
         sys.exit(self.app.exec())
 
     def apply_styles(self):
+    """TODO: Describe apply_styles.
+"""
         style_path = os.path.join(os.path.dirname(os.path.dirname(__file__),), "app_style.qss")
         with open(style_path, "r") as style_file:
             self.app.setStyleSheet(style_file.read())
 
     def start_splash(self):
+    """TODO: Describe start_splash.
+"""
         self.splash.show()
         QTimer.singleShot(2000, lambda: self.finish_splash())
 
     def finish_splash(self):
+    """TODO: Describe finish_splash.
+"""
         self.splash.close()
         self.view.showMaximized()
         self.set_mode_normal()
 
     def is_priority_mode(self):
+    """TODO: Describe is_priority_mode.
+"""
         return self.model.mode in ["get_name", "ask_if_name"]
 
     def set_mode_normal(self):
+    """TODO: Describe set_mode_normal.
+"""
         self.model.mode = "normal"
         self.view.set_screen("normal")
 
     def set_mode_get_name(self, photo_base64):
+    """TODO: Describe set_mode_get_name.
+Args:
+    photo_base64 (:obj:`Any`): TODO.
+"""
         if self.is_priority_mode():
             print(f"Se ha intentado poner en modo ask name pero hay una pantalla prioritaria activa: {self.model.mode}")
             return False
@@ -62,6 +85,11 @@ class AppController:
         return True
 
     def set_mode_ask_if_name(self, photo_base64, name):
+    """TODO: Describe set_mode_ask_if_name.
+Args:
+    photo_base64 (:obj:`Any`): TODO.
+    name (:obj:`Any`): TODO.
+"""
         if self.is_priority_mode():
             print(f"Se ha intentado poner en modo ask IF name pero hay una pantalla prioritaria activa: {self.model.mode}")
             return False
@@ -74,6 +102,10 @@ class AppController:
         return True
 
     def set_mode_show_photo(self, photo_base64):
+    """TODO: Describe set_mode_show_photo.
+Args:
+    photo_base64 (:obj:`Any`): TODO.
+"""
         if self.is_priority_mode():
             print(f"Se ha intentado poner en modo show photo pero hay una pantalla prioritaria activa: {self.model.mode}")
             return False
@@ -85,6 +117,8 @@ class AppController:
         return True
 
     def submit_name(self):
+    """TODO: Describe submit_name.
+"""
         if self.model.mode != "get_name":
             return
         name = self.view.get_name_screen.input_field.text().strip()
@@ -101,6 +135,10 @@ class AppController:
         self.set_mode_normal()
 
     def submit_confirmation(self, answer: bool):
+    """TODO: Describe submit_confirmation.
+Args:
+    answer (:obj:`Any`): TODO.
+"""
         if self.model.mode != "ask_if_name":
             return
 

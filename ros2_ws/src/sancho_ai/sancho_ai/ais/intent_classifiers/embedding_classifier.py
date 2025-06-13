@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 from .intent_classifier import IntentClassifier
 
 from ...log_manager import LogManager
@@ -9,9 +10,16 @@ import numpy as np
 
 class EmbeddingClassifier(IntentClassifier):
 
+"""TODO: Describe class."""
     SIMILARITY_THRESHOLD = 0.8
 
     def __init__(self, embedding_engine: EmbeddingEngine, provider: str = None, model: str = None):
+    """TODO: Describe __init__.
+Args:
+    embedding_engine (:obj:`Any`): TODO.
+    provider (:obj:`Any`): TODO.
+    model (:obj:`Any`): TODO.
+"""
         self.embedding_engine = embedding_engine
         self.provider = provider
         self.model = model
@@ -19,6 +27,11 @@ class EmbeddingClassifier(IntentClassifier):
         self.examples = IntentExamplesEmbeddingRegistry.get_intent_examples()
 
     def classify(self, user_input, _):
+    """TODO: Describe classify.
+Args:
+    user_input (:obj:`Any`): TODO.
+    _ (:obj:`Any`): TODO.
+"""
         LogManager.info(f"User: {user_input}")
         
         user_embedding, provider_used, model_used, message, success = self.embedding_engine.embedding_request(
@@ -52,4 +65,9 @@ class EmbeddingClassifier(IntentClassifier):
 
     @staticmethod
     def cosine_similarity(a, b):
+    """TODO: Describe cosine_similarity.
+Args:
+    a (:obj:`Any`): TODO.
+    b (:obj:`Any`): TODO.
+"""
         return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b) + 1e-9)

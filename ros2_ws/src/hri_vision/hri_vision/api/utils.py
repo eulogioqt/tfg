@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import numpy as np
 
 def euclidean_distance(features_a, features_b):

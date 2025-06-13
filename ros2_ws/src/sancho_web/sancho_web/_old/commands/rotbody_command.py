@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 from hri_msgs.msg import BodyOrientation
 from std_msgs.msg import String, Bool
 
@@ -6,10 +7,21 @@ from .command_executor import CommandExecutor
 
 class RotbodyCommand(CommandExecutor):
     
+"""TODO: Describe class."""
     def __init__(self, web_node):
+    """TODO: Describe __init__.
+Args:
+    web_node (:obj:`Any`): TODO.
+"""
         super().__init__(web_node)
 
     def on_command(self, sender, command, args):
+    """TODO: Describe on_command.
+Args:
+    sender (:obj:`Any`): TODO.
+    command (:obj:`Any`): TODO.
+    args (:obj:`Any`): TODO.
+"""
         if len(args) == 0:
             self.web_node.send_message(sender, "No has especificado el angulo rot_z")
         else:
@@ -32,6 +44,10 @@ class RotbodyCommand(CommandExecutor):
         return True
 
 def is_float(str):
+"""TODO: Describe is_float.
+Args:
+    str (:obj:`Any`): TODO.
+"""
     try:
         float(str)
         return True

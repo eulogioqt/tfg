@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 from .model_hotword import ModelHotword
 
 from .pvporcupine_hotword import PVPorcupineHotword

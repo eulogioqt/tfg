@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import os
 import wave
 import numpy as np
@@ -11,7 +12,13 @@ from hri_msgs.msg import ChunkMono, ChunkStereo
 
 class AudioNode(Node):
 
+"""TODO: Describe class."""
     def __init__(self, wav_path="sounds/sample.wav", chunk_size=1024):
+    """TODO: Describe __init__.
+Args:
+    wav_path (:obj:`Any`): TODO.
+    chunk_size (:obj:`Any`): TODO.
+"""
         super().__init__('audio')
 
         self.publisher_stereo = self.create_publisher(ChunkStereo, 'hri_audio/microphone/stereo', 10)
@@ -21,6 +28,8 @@ class AudioNode(Node):
         self.chunk_size = chunk_size
 
     def spin(self):
+    """TODO: Describe spin.
+"""
         first = True
 
         while rclpy.ok():
@@ -71,6 +80,10 @@ class AudioNode(Node):
 
 
 def main(args=None):
+"""TODO: Describe main.
+Args:
+    args (:obj:`Any`): TODO.
+"""
     rclpy.init(args=args)
 
     audio = AudioNode()

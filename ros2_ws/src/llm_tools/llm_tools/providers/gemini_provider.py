@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import json
 import google.generativeai as genai
 
@@ -8,7 +9,12 @@ from ..models import MODELS
 
 
 class GeminiProvider(APIProvider):
+"""TODO: Describe class."""
     def __init__(self, api_key):
+    """TODO: Describe __init__.
+Args:
+    api_key (:obj:`Any`): TODO.
+"""
         genai.configure(api_key=api_key)
 
         self.client = {
@@ -17,9 +23,22 @@ class GeminiProvider(APIProvider):
         self.formatter = GeminiFormatter()
 
     def embedding(self, *args, **kwargs):
+    """TODO: Describe embedding.
+Args:
+    *args (:obj:`Any`): TODO.
+    **kwargs (:obj:`Any`): TODO.
+"""
         raise NotImplementedError("This provider does not support embeddings.")
 
     def prompt(self, model, prompt_system, messages_json, user_input, parameters_json):
+    """TODO: Describe prompt.
+Args:
+    model (:obj:`Any`): TODO.
+    prompt_system (:obj:`Any`): TODO.
+    messages_json (:obj:`Any`): TODO.
+    user_input (:obj:`Any`): TODO.
+    parameters_json (:obj:`Any`): TODO.
+"""
         if not model:
             model = list(self.client.keys())[0]
 
@@ -37,4 +56,6 @@ class GeminiProvider(APIProvider):
         return response.text.strip(), model
 
     def get_active_models(self):
+    """TODO: Describe get_active_models.
+"""
         return list(self.client.keys())

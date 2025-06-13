@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import cv2
 import tempfile
 import os
@@ -6,7 +7,13 @@ from .base_detector import BaseDetector
 
 class YOLOv8FaceDetector(BaseDetector):
 
+"""TODO: Describe class."""
     def get_faces(self, frame, verbose=False):
+    """TODO: Describe get_faces.
+Args:
+    frame (:obj:`Any`): TODO.
+    verbose (:obj:`Any`): TODO.
+"""
         with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
             temp_path = tmp.name
             cv2.imwrite(temp_path, frame)

@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import asyncio
 import websockets
 import threading
@@ -25,7 +26,10 @@ from .http_server import HTTPServer
 
 class HRIWebNode(Node):
 
+"""TODO: Describe class."""
     def __init__(self):
+    """TODO: Describe __init__.
+"""
         super().__init__("web")
 
         self.broadcast_data = {}
@@ -50,19 +54,34 @@ class HRIWebNode(Node):
         self.get_logger().info("Nodo Web inicializado correctamente")
 
     def frames(self, msg):
+    """TODO: Describe frames.
+Args:
+    msg (:obj:`Any`): TODO.
+"""
         frame = self.br.imgmsg_to_cv2(msg, "bgr8")
         frame_hex = cv2.imencode(".jpg", frame)[1].tobytes().hex() # Si hacer esto aqui fuese un problema
         self.broadcast_data["IMAGE"] = frame_hex # Se puede usar la herencia y la vinculacion dinamica para hacer un metodo process_data
 
     def people(self, msg):
+    """TODO: Describe people.
+Args:
+    msg (:obj:`Any`): TODO.
+"""
         self.broadcast_data["PEOPLE"] = json.loads(msg.data)
     
     def human_voice_pan(self, msg):
+    """TODO: Describe human_voice_pan.
+Args:
+    msg (:obj:`Any`): TODO.
+"""
         self.broadcast_data["AUDIO"] = json.loads(msg.data)
 
 class HRIWeb:
 
+"""TODO: Describe class."""
     def __init__(self):
+    """TODO: Describe __init__.
+"""
         self.clients = []
 
         self.command_info = json.load(open('install/sancho_web/share/sancho_web/commands/commands.json'))
@@ -76,12 +95,19 @@ class HRIWeb:
         self.on_enable()
     
     def set_executor(self, command, executor):
+    """TODO: Describe set_executor.
+Args:
+    command (:obj:`Any`): TODO.
+    executor (:obj:`Any`): TODO.
+"""
         if command in self.command_info.keys():
             self.commands[command] = executor
         else:
             self.node.get_logger().info("El comando " + command + " no está registrado en commands.json")
 
     def on_enable(self):
+    """TODO: Describe on_enable.
+"""
         default_commands = DefaultCommands(self)
         self.set_executor("delete", default_commands)
         self.set_executor("rename", default_commands)
@@ -100,6 +126,8 @@ class HRIWeb:
         self.set_executor("kill", KillCommand(self))
 
     def spin(self):
+    """TODO: Describe spin.
+"""
         initiated_clients = []
 
         while rclpy.ok():
@@ -126,6 +154,11 @@ class HRIWeb:
             rclpy.spin_once(self.node)
 
     def process_message(self, sender, message):
+    """TODO: Describe process_message.
+Args:
+    sender (:obj:`Any`): TODO.
+    message (:obj:`Any`): TODO.
+"""
         if message.startswith("/"):
             command_message = message.rstrip()[1:]
             args = command_message.split(" ")
@@ -139,6 +172,11 @@ class HRIWeb:
             self.send_message(sender, message)
 
     def training_request(self, cmd_type_msg, args_msg):
+    """TODO: Describe training_request.
+Args:
+    cmd_type_msg (:obj:`Any`): TODO.
+    args_msg (:obj:`Any`): TODO.
+"""
         training_request = Training.Request()
         training_request.cmd_type = cmd_type_msg
         training_request.args = args_msg
@@ -150,6 +188,10 @@ class HRIWeb:
         return result_training.result, result_training.message
 
     def init_client(self, sender):
+    """TODO: Describe init_client.
+Args:
+    sender (:obj:`Any`): TODO.
+"""
         message = { 
             "commands": self.command_info 
         }
@@ -157,6 +199,11 @@ class HRIWeb:
         asyncio.run(self.send_to_client(sender, "INIT", message))
 
     def send_message(self, sender, message):
+    """TODO: Describe send_message.
+Args:
+    sender (:obj:`Any`): TODO.
+    message (:obj:`Any`): TODO.
+"""
         response = { 
             "message": message 
         }
@@ -164,10 +211,21 @@ class HRIWeb:
         asyncio.run(self.send_to_client(sender, "RESPONSE", response))
 
     async def send_to_all(self, type, message):
+    """TODO: Describe send_to_all.
+Args:
+    type (:obj:`Any`): TODO.
+    message (:obj:`Any`): TODO.
+"""
         tasks = [asyncio.create_task(self.send_to_client(client, type, message)) for client in self.clients]
         await asyncio.wait(tasks)
 
     async def send_to_client(self, client, type, message):
+    """TODO: Describe send_to_client.
+Args:
+    client (:obj:`Any`): TODO.
+    type (:obj:`Any`): TODO.
+    message (:obj:`Any`): TODO.
+"""
         try:
             message_dict = {
                 "type": type, 
@@ -180,6 +238,11 @@ class HRIWeb:
             print(">> ERROR AL ENVIAR: " + str(e))
 
     async def echo(self, websocket, _):
+    """TODO: Describe echo.
+Args:
+    websocket (:obj:`Any`): TODO.
+    _ (:obj:`Any`): TODO.
+"""
         self.clients.append(websocket)
         print(f">> ENTRADA: Nuevo cliente conectado: {websocket.remote_address[0]}:{websocket.remote_address[1]} (Conexiones activas: {len(self.clients)})")
 
@@ -196,14 +259,22 @@ class HRIWeb:
             print( f">> SALIDA: Cliente desconectado: {websocket.remote_address[0]}:{websocket.remote_address[1]} (Conexiones activas: {len(self.clients)})")
     
     async def socket_thread(self):
+    """TODO: Describe socket_thread.
+"""
         async with websockets.serve(self.echo, "0.0.0.0", 8765):
             await asyncio.Future()  # run forever
 
     def execute_socket_thread(self):
+    """TODO: Describe execute_socket_thread.
+"""
         asyncio.run(self.socket_thread())
 
 
 def main(args=None):
+"""TODO: Describe main.
+Args:
+    args (:obj:`Any`): TODO.
+"""
     rclpy.init(args=args)
     hri_web = HRIWeb()
 

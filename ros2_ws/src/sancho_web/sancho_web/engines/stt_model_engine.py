@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 from speech_msgs.msg import LoadModel as LoadModelMsg
 from speech_msgs.srv import STTGetActiveModel, STTGetModels, STTSetActiveModel, LoadModel, UnloadModel
 
@@ -5,7 +6,12 @@ from .service_engine import ServiceEngine
 
 
 class STTModelEngine(ServiceEngine):
+"""TODO: Describe class."""
     def __init__(self, node):
+    """TODO: Describe __init__.
+Args:
+    node (:obj:`Any`): TODO.
+"""
         super().__init__(node)
 
         self.get_models_cli = self.create_client(STTGetModels, 'speech_tools/stt/get_all_models')
@@ -18,6 +24,10 @@ class STTModelEngine(ServiceEngine):
         self.node.get_logger().info("STT Engine initialized successfully")
 
     def get_all_models_request(self, models=[]):
+    """TODO: Describe get_all_models_request.
+Args:
+    models (:obj:`Any`): TODO.
+"""
         req = STTGetModels.Request()
         req.models = models
 
@@ -26,6 +36,10 @@ class STTModelEngine(ServiceEngine):
         return [[i.model, i.needs_api_key] for i in result.models]
 
     def get_available_models_request(self, models=[]):
+    """TODO: Describe get_available_models_request.
+Args:
+    models (:obj:`Any`): TODO.
+"""
         req = STTGetModels.Request()
         req.models = models
 
@@ -34,6 +48,8 @@ class STTModelEngine(ServiceEngine):
         return [[i.model, i.needs_api_key] for i in result.models]
 
     def get_active_model_request(self):
+    """TODO: Describe get_active_model_request.
+"""
         req = STTGetActiveModel.Request()
 
         result = self.call_service(self.get_active_cli, req)
@@ -41,6 +57,10 @@ class STTModelEngine(ServiceEngine):
         return result.model
 
     def load_model_request(self, items_list):
+    """TODO: Describe load_model_request.
+Args:
+    items_list (:obj:`Any`): TODO.
+"""
         req = LoadModel.Request()
 
         req.items = []
@@ -52,6 +72,10 @@ class STTModelEngine(ServiceEngine):
         return [[i.model, i.message, i.success] for i in result.results]
 
     def unload_model_request(self, models):
+    """TODO: Describe unload_model_request.
+Args:
+    models (:obj:`Any`): TODO.
+"""
         req = UnloadModel.Request()
         req.models = models
 
@@ -60,6 +84,10 @@ class STTModelEngine(ServiceEngine):
         return [[i.model, i.message, i.success] for i in result.results]
 
     def set_active_model_request(self, model):
+    """TODO: Describe set_active_model_request.
+Args:
+    model (:obj:`Any`): TODO.
+"""
         req = STTSetActiveModel.Request()
         req.model = model
 

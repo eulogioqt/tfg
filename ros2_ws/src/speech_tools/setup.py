@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 from setuptools import find_packages, setup
 
 package_name = 'speech_tools'

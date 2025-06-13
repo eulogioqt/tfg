@@ -1,14 +1,23 @@
+"""TODO: Add module documentation."""
 import threading
 
 
 class WebSocketThreadMixer:
 
+"""TODO: Describe class."""
     def __init__(self, websocket, *others):
+    """TODO: Describe __init__.
+Args:
+    websocket (:obj:`Any`): TODO.
+    *others (:obj:`Any`): TODO.
+"""
         self.websocket = websocket
         self.others = others 
         self.threads = {}
 
     def run(self):
+    """TODO: Describe run.
+"""
         for other in self.others: # Arrancamos hilos
             thread = threading.Thread(target=other.run, daemon=False)
             thread.start()

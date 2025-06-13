@@ -1,7 +1,12 @@
+"""TODO: Add module documentation."""
 import json
 import os
 
 def real_name(name):
+"""TODO: Describe real_name.
+Args:
+    name (:obj:`Any`): TODO.
+"""
     return {
         "facenet": "FaceNet",
         "vggface": "VGGFace",
@@ -12,6 +17,10 @@ def real_name(name):
     }.get(name, name)
 
 def procesar_encoders(path_json):
+"""TODO: Describe procesar_encoders.
+Args:
+    path_json (:obj:`Any`): TODO.
+"""
     path = os.path.join(os.path.dirname(__file__), path_json)
     with open(path) as f:
         data = json.load(f)

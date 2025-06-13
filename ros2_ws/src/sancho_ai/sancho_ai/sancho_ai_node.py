@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import json
 import rclpy
 from rclpy.node import Node
@@ -10,7 +11,12 @@ from .ais import create_sancho_ai, AIType, LLMAskingAI
 
 class SanchoAINode(Node):
 
+"""TODO: Describe class."""
     def __init__(self, type):
+    """TODO: Describe __init__.
+Args:
+    type (:obj:`Any`): TODO.
+"""
         super().__init__("sancho_ai")
 
         self.type = type
@@ -25,6 +31,11 @@ class SanchoAINode(Node):
         self.get_logger().info("SanchoAI Node initializated successfully")
 
     def prompt_service(self, request, response):
+    """TODO: Describe prompt_service.
+Args:
+    request (:obj:`Any`): TODO.
+    response (:obj:`Any`): TODO.
+"""
         if not request.asking_mode:
             self.get_logger().info("Normal Sancho Prompt")
             return self.normal_message(response, request.chat_id, request.text)
@@ -41,6 +52,12 @@ class SanchoAINode(Node):
             self.get_logger().error(f"Sancho prompt with unknown asking mode: {request.asking_mode}")
 
     def normal_message(self, response, chat_id, text):
+    """TODO: Describe normal_message.
+Args:
+    response (:obj:`Any`): TODO.
+    chat_id (:obj:`Any`): TODO.
+    text (:obj:`Any`): TODO.
+"""
         chat_history = self.chats.get(chat_id, [])
 
         value, intent, arguments, provider, model = self.sancho_ai.on_message(text, chat_history)
@@ -60,6 +77,11 @@ class SanchoAINode(Node):
         return response
 
     def get_name_message(self, response, text):
+    """TODO: Describe get_name_message.
+Args:
+    response (:obj:`Any`): TODO.
+    text (:obj:`Any`): TODO.
+"""
         value, provider, model = self.asking_ai.get_name(text)
 
         response.value_json = json.dumps(value)
@@ -69,6 +91,11 @@ class SanchoAINode(Node):
         return response
 
     def confirm_name_message(self, response, text):
+    """TODO: Describe confirm_name_message.
+Args:
+    response (:obj:`Any`): TODO.
+    text (:obj:`Any`): TODO.
+"""
         value, provider, model = self.asking_ai.confirm_name(text)
 
         response.value_json = json.dumps(value)
@@ -78,6 +105,10 @@ class SanchoAINode(Node):
         return response
 
 def main(args=None):
+"""TODO: Describe main.
+Args:
+    args (:obj:`Any`): TODO.
+"""
     rclpy.init(args=args)
 
     node = SanchoAINode(AIType.LLM_CLASSIFIER_GENERATOR)

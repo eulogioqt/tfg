@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 from abc import ABC
 
 from ..intent_classifiers import IntentClassifier
@@ -8,12 +9,24 @@ from ...prompts.commands.commands import COMMANDS
 
 
 class ModularAI(ABC):
+"""TODO: Describe class."""
     def __init__(self, classifier: IntentClassifier, executor: IntentExecutor, response_generator: ResponseGenerator):
+    """TODO: Describe __init__.
+Args:
+    classifier (:obj:`Any`): TODO.
+    executor (:obj:`Any`): TODO.
+    response_generator (:obj:`Any`): TODO.
+"""
         self.classifier = classifier
         self.executor = executor
         self.response_generator = response_generator
 
     def on_message(self, user_input: str, chat_history: list = []) -> str:
+    """TODO: Describe on_message.
+Args:
+    user_input (:obj:`Any`): TODO.
+    chat_history (:obj:`Any`): TODO.
+"""
         intent, arguments, cl_provider_used, cl_model_used = self.classifier.classify(user_input, chat_history)
         
         if intent != COMMANDS.UNKNOWN:

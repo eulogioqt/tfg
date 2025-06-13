@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import sqlite3
 
 from datetime import datetime
@@ -5,17 +6,21 @@ from enum import Enum
 
 
 class CONSTANTS:
+"""TODO: Describe class."""
     class LEVEL(str, Enum):
+    """TODO: Describe class."""
         INFO = "INFO"
         WARNING = "WARNING"
         ERROR = "ERROR"
         DEBUG = "DEBUG"
 
     class ORIGIN(str, Enum):
+    """TODO: Describe class."""
         ROS = "ROS"
         WEB = "WEB"
 
     class ACTION(str, Enum):
+    """TODO: Describe class."""
         ADD_CLASS = "add_class"
         RENAME_CLASS = "rename_class"
         DELETE_CLASS = "delete_class"
@@ -35,13 +40,20 @@ class CONSTANTS:
         ACTIVE_STT_MODEL = "active_stt_model"
 
 class SystemDatabase:
+"""TODO: Describe class."""
     def __init__(self, db_path='system.db'):
+    """TODO: Describe __init__.
+Args:
+    db_path (:obj:`Any`): TODO.
+"""
         self.conn = sqlite3.connect(db_path)
         self.conn.row_factory = sqlite3.Row
         self.cursor = self.conn.cursor()
         self._create_tables()
 
     def _create_tables(self):
+    """TODO: Describe _create_tables.
+"""
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS logs (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -64,6 +76,16 @@ class SystemDatabase:
 
     # ----------------- LOGS -----------------
     def create_log(self, level, origin, action, actor=None, target=None, message=None, metadata_json=None):
+    """TODO: Describe create_log.
+Args:
+    level (:obj:`Any`): TODO.
+    origin (:obj:`Any`): TODO.
+    action (:obj:`Any`): TODO.
+    actor (:obj:`Any`): TODO.
+    target (:obj:`Any`): TODO.
+    message (:obj:`Any`): TODO.
+    metadata_json (:obj:`Any`): TODO.
+"""
         if level not in CONSTANTS.LEVEL._value2member_map_:
             raise ValueError(f"Invalid level: {level}")
         if origin not in CONSTANTS.ORIGIN._value2member_map_:
@@ -79,11 +101,17 @@ class SystemDatabase:
         self.conn.commit()
 
     def get_all_logs(self):
+    """TODO: Describe get_all_logs.
+"""
         self.cursor.execute('SELECT * FROM logs')
         rows = self.cursor.fetchall()
         return [dict(row) for row in rows]
 
     def get_log_by_id(self, id):
+    """TODO: Describe get_log_by_id.
+Args:
+    id (:obj:`Any`): TODO.
+"""
         self.cursor.execute('SELECT * FROM logs WHERE id = ?', (id,))
         row = self.cursor.fetchone()
         return dict(row) if row else {}

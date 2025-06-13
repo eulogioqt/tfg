@@ -1,10 +1,18 @@
+"""TODO: Add module documentation."""
 from datetime import datetime
 from typing import Optional
 from .sessions_database import SessionsDatabase
 
 
 class SessionManager:
+"""TODO: Describe class."""
     def __init__(self, db: SessionsDatabase, timeout_seconds: float = 5, time_between_detections: float = 1):
+    """TODO: Describe __init__.
+Args:
+    db (:obj:`Any`): TODO.
+    timeout_seconds (:obj:`Any`): TODO.
+    time_between_detections (:obj:`Any`): TODO.
+"""
         self.db = db
         self.timeout_seconds = timeout_seconds
         self.time_between_detections = time_between_detections
@@ -13,6 +21,13 @@ class SessionManager:
         self.active_sessions = {}  # faceprint_id -> SessionData
 
     def process_detection(self, faceprint_id: int, score_face: float, score_classification: float, face_image_base64: Optional[str] = None):
+    """TODO: Describe process_detection.
+Args:
+    faceprint_id (:obj:`Any`): TODO.
+    score_face (:obj:`Any`): TODO.
+    score_classification (:obj:`Any`): TODO.
+    face_image_base64 (:obj:`Any`): TODO.
+"""
         now = datetime.now().timestamp()
 
         self.actual_people[faceprint_id] = now
@@ -36,15 +51,23 @@ class SessionManager:
             ])
 
     def get_all_last_seen(self):
+    """TODO: Describe get_all_last_seen.
+"""
         actual_people_time = {}
         for key, value in self.actual_people.items():
             actual_people_time[key] = datetime.now().timestamp() - value
         return actual_people_time
     
     def get_last_seen(self, faceprint_id):
+    """TODO: Describe get_last_seen.
+Args:
+    faceprint_id (:obj:`Any`): TODO.
+"""
         return datetime.now().timestamp() - self.actual_people.get(faceprint_id, 0)
 
     def check_timeouts(self):
+    """TODO: Describe check_timeouts.
+"""
         now = datetime.now().timestamp()
 
         to_close = []
@@ -58,6 +81,10 @@ class SessionManager:
             self._close_session(faceprint_id)
     
     def _close_session(self, faceprint_id: int):
+    """TODO: Describe _close_session.
+Args:
+    faceprint_id (:obj:`Any`): TODO.
+"""
         session = self.active_sessions.pop(faceprint_id, None)
         if session is None:
             return
@@ -72,4 +99,9 @@ class SessionManager:
         self.db.create_session_with_detections(session_data)
 
     def _get_last_detection_time(self, session, default=0):
+    """TODO: Describe _get_last_detection_time.
+Args:
+    session (:obj:`Any`): TODO.
+    default (:obj:`Any`): TODO.
+"""
         return default if len(session['detections']) == 0 else session['detections'][-1][0]

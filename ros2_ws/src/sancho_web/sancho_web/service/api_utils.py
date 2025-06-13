@@ -1,8 +1,10 @@
+"""TODO: Add module documentation."""
 from typing import Optional, Dict
 from fastapi import Request, HTTPException
 
 
 class APIUtils:
+"""TODO: Describe class."""
     _admin_key = ""
 
     @classmethod
@@ -12,6 +14,11 @@ class APIUtils:
 
     @classmethod
     def is_admin(cls, request) -> bool:
+    """TODO: Describe is_admin.
+Args:
+    cls (:obj:`Any`): TODO.
+    request (:obj:`Any`): TODO.
+"""
         token = request.headers.get("Authorization")
         if token is None or len(token.split(" ")) < 2:
             return False
@@ -75,15 +82,34 @@ class APIUtils:
 
     @classmethod
     async def get(cls, client, url):
+    """TODO: Describe get.
+Args:
+    cls (:obj:`Any`): TODO.
+    client (:obj:`Any`): TODO.
+    url (:obj:`Any`): TODO.
+"""
         response = await client.get(url, headers={"Accept" : "application/json"})
         return response.json()
     
     @classmethod
     async def post(cls, client, url, content):
+    """TODO: Describe post.
+Args:
+    cls (:obj:`Any`): TODO.
+    client (:obj:`Any`): TODO.
+    url (:obj:`Any`): TODO.
+    content (:obj:`Any`): TODO.
+"""
         response = await client.post(url, json=content, headers={"Accept" : "application/json", "Authorization": f"Bearer {cls.get_admin_key()}"})
         return response.json()
     
     @classmethod
     async def delete(cls, client, url):
+    """TODO: Describe delete.
+Args:
+    cls (:obj:`Any`): TODO.
+    client (:obj:`Any`): TODO.
+    url (:obj:`Any`): TODO.
+"""
         response = await client.delete(url, headers={"Accept" : "application/json", "Authorization": f"Bearer {cls.get_admin_key()}"})
         return response.json()

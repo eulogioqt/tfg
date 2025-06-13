@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import gc
 import ast
 import rclpy
@@ -14,12 +15,15 @@ from .models import STT_MODELS, STT_NEEDS_API_KEY
 
 class STTNode(Node):
     
+"""TODO: Describe class."""
     MODELS_CLASS_MAP = { # Poner esto mas cool, solo con el nombre camelcase se puede hacer, lo demas no es necesario
         STT_MODELS.WHISPER: ("speech_tools.stt.whisper_stt", "WhisperSTT"),
         STT_MODELS.GOOGLE: ("speech_tools.stt.google_stt", "GoogleSTT"),
     }
 
     def __init__(self):
+    """TODO: Describe __init__.
+"""
         super().__init__("stt")
         
         self.model_map = {}
@@ -40,6 +44,11 @@ class STTNode(Node):
         self.get_logger().info('STT Node inicializado correctamente')
 
     def handle_get_all_models(self, request, response):
+    """TODO: Describe handle_get_all_models.
+Args:
+    request (:obj:`Any`): TODO.
+    response (:obj:`Any`): TODO.
+"""
         models_names = set(request.models)
         if not models_names:
             models_names = list(STT_MODELS)
@@ -54,6 +63,11 @@ class STTNode(Node):
         return response
 
     def handle_get_active_model(self, request, response):
+    """TODO: Describe handle_get_active_model.
+Args:
+    request (:obj:`Any`): TODO.
+    response (:obj:`Any`): TODO.
+"""
         self.get_logger().info(f"📖 Get Active Model service")
 
         if self.active_model:
@@ -62,6 +76,11 @@ class STTNode(Node):
         return response
 
     def handle_get_available_models(self, request, response):
+    """TODO: Describe handle_get_available_models.
+Args:
+    request (:obj:`Any`): TODO.
+    response (:obj:`Any`): TODO.
+"""
         models_names = set(request.models)
         if not models_names:
             models_names = list(STT_MODELS)
@@ -76,6 +95,11 @@ class STTNode(Node):
         return response
 
     def handle_stt(self, request, response):
+    """TODO: Describe handle_stt.
+Args:
+    request (:obj:`Any`): TODO.
+    response (:obj:`Any`): TODO.
+"""
         try:
             model_name = self._get_or_active(request.model)
             model = self._get_model(model_name)
@@ -98,6 +122,11 @@ class STTNode(Node):
         return response
 
     def handle_load_model(self, request, response):
+    """TODO: Describe handle_load_model.
+Args:
+    request (:obj:`Any`): TODO.
+    response (:obj:`Any`): TODO.
+"""
         self.get_logger().info(f"📖 Load model service")
 
         response.results = []
@@ -117,6 +146,11 @@ class STTNode(Node):
         return response
 
     def handle_unload_model(self, request, response):
+    """TODO: Describe handle_unload_model.
+Args:
+    request (:obj:`Any`): TODO.
+    response (:obj:`Any`): TODO.
+"""
         self.get_logger().info(f"📖 Unload model service")
         
         response.results = []
@@ -147,12 +181,19 @@ class STTNode(Node):
         return response
 
     def handle_set_active_model(self, request, response):
+    """TODO: Describe handle_set_active_model.
+Args:
+    request (:obj:`Any`): TODO.
+    response (:obj:`Any`): TODO.
+"""
         self.get_logger().info(f"📖 Set Active Model service. Model: {request.model}")
         response.success, response.message = self._set_active_model(request.model)
 
         return response
 
     def _init_from_parameters(self):
+    """TODO: Describe _init_from_parameters.
+"""
         models_to_load = self.parse_string_list(self.declare_parameter("load_models", "[]").get_parameter_value().string_value)
         active_model = self.declare_parameter("active_model", "").get_parameter_value().string_value
 
@@ -171,6 +212,10 @@ class STTNode(Node):
                 self.get_logger().warn(f"❌ {message}")
 
     def _set_active_model(self, model):
+    """TODO: Describe _set_active_model.
+Args:
+    model (:obj:`Any`): TODO.
+"""
         if not model:
             return False, "Model must be specified"
         if model not in list(STT_MODELS):
@@ -183,6 +228,11 @@ class STTNode(Node):
         return True, f"Active model set to '{model}'"
 
     def _try_load_model(self, model_name, api_key=""):
+    """TODO: Describe _try_load_model.
+Args:
+    model_name (:obj:`Any`): TODO.
+    api_key (:obj:`Any`): TODO.
+"""
         if model_name not in self.model_map:
             if model_name not in self.MODELS_CLASS_MAP:
                 raise ValueError(f"Model '{model_name}' is not supported.")
@@ -199,6 +249,10 @@ class STTNode(Node):
         return self.model_map[model_name]
 
     def _get_or_active(self, model_name):
+    """TODO: Describe _get_or_active.
+Args:
+    model_name (:obj:`Any`): TODO.
+"""
         if not model_name:
             if self.active_model:
                 return self.active_model
@@ -208,23 +262,43 @@ class STTNode(Node):
         return model_name
 
     def _get_model(self, model_name) -> STTModel:
+    """TODO: Describe _get_model.
+Args:
+    model_name (:obj:`Any`): TODO.
+"""
         if model_name not in self.model_map:
             raise ValueError(f"Model '{model_name}' is not loaded.")
         return self.model_map[model_name]
 
     def _fill_response(self, response, message, success, model_used="", text=""):
+    """TODO: Describe _fill_response.
+Args:
+    response (:obj:`Any`): TODO.
+    message (:obj:`Any`): TODO.
+    success (:obj:`Any`): TODO.
+    model_used (:obj:`Any`): TODO.
+    text (:obj:`Any`): TODO.
+"""
         response.model_used = model_used
         response.text = text
         response.message = message
         response.success = success
 
     def parse_string_list(self, raw_string) -> list[list[str]]:
+    """TODO: Describe parse_string_list.
+Args:
+    raw_string (:obj:`Any`): TODO.
+"""
         try:
             return ast.literal_eval(raw_string)
         except Exception:
             return []
 
 def main(args=None):
+"""TODO: Describe main.
+Args:
+    args (:obj:`Any`): TODO.
+"""
     rclpy.init(args=args)
 
     node = STTNode()

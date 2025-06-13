@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 from enum import Enum
 from typing import Type
 
@@ -11,13 +12,19 @@ from .embedding_classifier_templates_ai import EmbeddingClassifierTemplatesAI
 
 
 class SmartStrEnum(str, Enum):
+"""TODO: Describe class."""
     def __str__(self):
+    """TODO: Describe __str__.
+"""
         return self.value
 
     def __repr__(self):
+    """TODO: Describe __repr__.
+"""
         return self.value
     
 class AIType(SmartStrEnum):
+"""TODO: Describe class."""
     DUMMY = "DUMMY"
     SIMPLE_TEMPLATES = "SIMPLE"
     LLM_CLASSIFIER_TEMPLATES = "LLM_CLASSIFIER_TEMPLATES"
@@ -34,6 +41,10 @@ AI_CLASSES: dict[AIType, Type[AI]] = {
 }
 
 def create_sancho_ai(ai_type: AIType) -> AI:
+"""TODO: Describe create_sancho_ai.
+Args:
+    ai_type (:obj:`Any`): TODO.
+"""
     AI_CLASS = AI_CLASSES.get(ai_type)
     if not AI_CLASS:
         raise ValueError(f"AI type '{ai_type}' is not registered.")

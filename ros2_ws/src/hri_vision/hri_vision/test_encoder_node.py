@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import os
 import cv2
 import time
@@ -25,7 +26,12 @@ from hri_vision.human_face_recognizer import EncoderType
 
 
 class TestEncoderNode(Node):
+"""TODO: Describe class."""
     def __init__(self, test_encoder: "TestEncoder"):
+    """TODO: Describe __init__.
+Args:
+    test_encoder (:obj:`Any`): TODO.
+"""
         super().__init__('test_encoder_node')
         self.test_encoder = test_encoder
         self.data_queue = Queue(maxsize=1)
@@ -46,11 +52,14 @@ class TestEncoderNode(Node):
 
 
 class TestEncoder:
+"""TODO: Describe class."""
     LOWER_BOUND = 0.75
     MIDDLE_BOUND = 0.80
     UPPER_BOUND = 0.90
 
     def __init__(self):
+    """TODO: Describe __init__.
+"""
         self.node = TestEncoderNode(self)
         self.dataset_path = "/home/ubuntu/tfg/sandbox/vision/mapir_dataset"
         self.subscribed = False
@@ -66,16 +75,22 @@ class TestEncoder:
         random.seed(42)
 
     def load_results(self):
+    """TODO: Describe load_results.
+"""
         if os.path.exists(self.results_path):
             with open(self.results_path, 'r') as f:
                 return json.load(f)
         return {}
 
     def save_results(self):
+    """TODO: Describe save_results.
+"""
         with open(self.results_path, 'w') as f:
             json.dump(self.results, f, indent=4)
 
     def spin(self):
+    """TODO: Describe spin.
+"""
         for encoder in EncoderType:
             if encoder.value in self.results:
                 self.node.get_logger().info(f"Encoder '{encoder.value}' ya evaluado. Saltando...")
@@ -119,6 +134,10 @@ class TestEncoder:
                 self.node.get_logger().info(f"\n==== Finalizado {encoder.value} ====")
 
     def run_test_for_encoder(self, encoder):
+    """TODO: Describe run_test_for_encoder.
+Args:
+    encoder (:obj:`Any`): TODO.
+"""
         total = 0
         correct = 0
         class_wise = {}
@@ -211,6 +230,8 @@ class TestEncoder:
         }
 
     def load_dataset(self):
+    """TODO: Describe load_dataset.
+"""
         samples = []
         for class_name in sorted(os.listdir(self.dataset_path)):
             class_dir = os.path.join(self.dataset_path, class_name)
@@ -225,6 +246,11 @@ class TestEncoder:
         return samples
 
     def process_frame(self, frame, real_class):
+    """TODO: Describe process_frame.
+Args:
+    frame (:obj:`Any`): TODO.
+    real_class (:obj:`Any`): TODO.
+"""
         frame_msg = self.node.br.cv2_to_imgmsg(frame, "bgr8")
         positions_msg, scores_msg = self.detection_request(frame_msg)
         positions, scores = self.node.br.msg_to_detector(positions_msg, scores_msg)
@@ -267,6 +293,13 @@ class TestEncoder:
         return classified_name, recog_time, name_questions, confirm_questions, emb_size
 
     def process_face_name_response(self, real_class, face_base64, features, score):
+    """TODO: Describe process_face_name_response.
+Args:
+    real_class (:obj:`Any`): TODO.
+    face_base64 (:obj:`Any`): TODO.
+    features (:obj:`Any`): TODO.
+    score (:obj:`Any`): TODO.
+"""
         self.node.get_logger().info(f"RESPUESTA: {real_class}")
         self.training_request(String(data="add_class"), String(data=json.dumps({
             "class_name": real_class,
@@ -277,6 +310,15 @@ class TestEncoder:
         return real_class
 
     def process_face_question_response(self, real_class, classified_id, classified_name, face_base64, features, score):
+    """TODO: Describe process_face_question_response.
+Args:
+    real_class (:obj:`Any`): TODO.
+    classified_id (:obj:`Any`): TODO.
+    classified_name (:obj:`Any`): TODO.
+    face_base64 (:obj:`Any`): TODO.
+    features (:obj:`Any`): TODO.
+    score (:obj:`Any`): TODO.
+"""
         self.node.get_logger().info(f"PREGUNTANDIO SI {real_class} ES {classified_name}")
         if real_class == classified_name:
             self.node.get_logger().info(f"RESPUESTA: SI")
@@ -290,6 +332,10 @@ class TestEncoder:
             return self.process_face_name_response(real_class, face_base64, features, score), True
 
     def detection_request(self, frame_msg):
+    """TODO: Describe detection_request.
+Args:
+    frame_msg (:obj:`Any`): TODO.
+"""
         req = Detection.Request()
         req.frame = frame_msg
         future = self.node.detection_client.call_async(req)
@@ -297,6 +343,12 @@ class TestEncoder:
         return future.result().positions, future.result().scores
 
     def recognition_request(self, frame_msg, position_msg, score_msg):
+    """TODO: Describe recognition_request.
+Args:
+    frame_msg (:obj:`Any`): TODO.
+    position_msg (:obj:`Any`): TODO.
+    score_msg (:obj:`Any`): TODO.
+"""
         req = Recognition.Request()
         req.frame = frame_msg
         req.position = position_msg
@@ -308,6 +360,11 @@ class TestEncoder:
                 future.result().face_updated, future.result().recognition_time)
 
     def training_request(self, cmd_type_msg, args_msg):
+    """TODO: Describe training_request.
+Args:
+    cmd_type_msg (:obj:`Any`): TODO.
+    args_msg (:obj:`Any`): TODO.
+"""
         req = Training.Request()
         req.cmd_type = cmd_type_msg
         req.args = args_msg
@@ -316,6 +373,11 @@ class TestEncoder:
         return future.result().result, future.result().message.data
 
     def ros2web_request(self, topic, name):
+    """TODO: Describe ros2web_request.
+Args:
+    topic (:obj:`Any`): TODO.
+    name (:obj:`Any`): TODO.
+"""
         if not self.node.ros2web_client.service_is_ready():
             return 0
 
@@ -327,6 +389,8 @@ class TestEncoder:
         return future.result().value
 
     def get_faceprint_metrics(self):
+    """TODO: Describe get_faceprint_metrics.
+"""
         req = GetString.Request()
         req.args = json.dumps({})
         future = self.node.get_faceprints_client.call_async(req)
@@ -336,6 +400,10 @@ class TestEncoder:
         return self.compute_faceprint_metrics(data)
 
     def compute_faceprint_metrics(self, faceprints):
+    """TODO: Describe compute_faceprint_metrics.
+Args:
+    faceprints (:obj:`Any`): TODO.
+"""
         class_centroids = {}
         intra_variances = []
         total_embeddings = 0
@@ -411,6 +479,10 @@ class TestEncoder:
         }
 
 def main(args=None):
+"""TODO: Describe main.
+Args:
+    args (:obj:`Any`): TODO.
+"""
     rclpy.init(args=args)
 
     test_encoder = TestEncoder()

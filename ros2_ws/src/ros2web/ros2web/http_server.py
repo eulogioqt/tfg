@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import os
 import socket
 import webbrowser
@@ -6,7 +7,15 @@ from werkzeug.serving import make_server
 
 
 class HTTPServer:
+"""TODO: Describe class."""
     def __init__(self, host="0.0.0.0", port=8080, webclient_dir=None, open_on_start=False):
+    """TODO: Describe __init__.
+Args:
+    host (:obj:`Any`): TODO.
+    port (:obj:`Any`): TODO.
+    webclient_dir (:obj:`Any`): TODO.
+    open_on_start (:obj:`Any`): TODO.
+"""
         self.host = host
         self.port = port
 
@@ -20,6 +29,8 @@ class HTTPServer:
         self.server = make_server(self.host, self.port, self.app)
 
     def _find_client_dist(self):
+    """TODO: Describe _find_client_dist.
+"""
         env_path = os.environ.get("WEBCLIENT_DIST_PATH")
         if env_path and os.path.exists(env_path):
             return env_path
@@ -43,6 +54,8 @@ class HTTPServer:
         print("No se pudo encontrar el directorio 'web_interface/dist'.")
 
     def serve_html(self):
+    """TODO: Describe serve_html.
+"""
         index_path = os.path.join(self.webclient_dir, 'index.html')
         if os.path.exists(index_path):
             return send_from_directory(self.webclient_dir, 'index.html')
@@ -50,6 +63,10 @@ class HTTPServer:
             abort(404, description="index.html no encontrado")
 
     def serve_static(self, path):
+    """TODO: Describe serve_static.
+Args:
+    path (:obj:`Any`): TODO.
+"""
         full_path = os.path.join(self.webclient_dir, path)
 
         if os.path.exists(full_path) and os.path.isfile(full_path):
@@ -62,6 +79,8 @@ class HTTPServer:
             abort(404, description="index.html no encontrado")
 
     def get_local_ip(self):
+    """TODO: Describe get_local_ip.
+"""
         ip = "127.0.0.1"
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -72,10 +91,14 @@ class HTTPServer:
         return ip
 
     def stop(self):
+    """TODO: Describe stop.
+"""
         if self.server:
             self.server.shutdown()
 
     def run(self):
+    """TODO: Describe run.
+"""
         print(f"Sirviendo desde: {self.webclient_dir}")
 
         if self.open_on_start:

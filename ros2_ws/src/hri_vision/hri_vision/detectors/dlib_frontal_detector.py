@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import dlib
 import cv2
 
@@ -6,10 +7,18 @@ from .base_detector import BaseDetector
 
 class DLIBFrontalDetector(BaseDetector):
 
+"""TODO: Describe class."""
     def __init__(self):
+    """TODO: Describe __init__.
+"""
         self.face_detector = dlib.get_frontal_face_detector()
 
     def get_faces(self, frame, verbose=False):
+    """TODO: Describe get_faces.
+Args:
+    frame (:obj:`Any`): TODO.
+    verbose (:obj:`Any`): TODO.
+"""
         frame_copy = frame.copy()
         faces, scores, idx = self.face_detector.run(frame, 1, 0)
 

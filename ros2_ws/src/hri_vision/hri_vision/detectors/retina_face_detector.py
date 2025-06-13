@@ -1,13 +1,22 @@
+"""TODO: Add module documentation."""
 import cv2
 import numpy as np
 import retinaface.RetinaFace as retinaface
 from .base_detector import BaseDetector
 
 class RetinaFaceDetector(BaseDetector):
+"""TODO: Describe class."""
     def __init__(self):
+    """TODO: Describe __init__.
+"""
         self.model = retinaface.build_model()
 
     def get_faces(self, frame, verbose=False):
+    """TODO: Describe get_faces.
+Args:
+    frame (:obj:`Any`): TODO.
+    verbose (:obj:`Any`): TODO.
+"""
         frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) 
         detections = retinaface.detect_faces(frame_bgr, model=self.model)
 

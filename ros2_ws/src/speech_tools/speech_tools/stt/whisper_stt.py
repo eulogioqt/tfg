@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import os
 import torch
 import torchaudio
@@ -9,10 +10,22 @@ from .stt_model import STTModel
 
 
 class WhisperSTT(STTModel):
+"""TODO: Describe class."""
     def __init__(self, model_size: str = "large-v3", device: str = "cuda", compute_type: str = "float16"):
+    """TODO: Describe __init__.
+Args:
+    model_size (:obj:`Any`): TODO.
+    device (:obj:`Any`): TODO.
+    compute_type (:obj:`Any`): TODO.
+"""
         self.model = WhisperModel(model_size, device=device, compute_type=compute_type)
 
     def transcribe(self, audio: list[int], sample_rate: int) -> str:
+    """TODO: Describe transcribe.
+Args:
+    audio (:obj:`Any`): TODO.
+    sample_rate (:obj:`Any`): TODO.
+"""
         try:
             audio_tensor = torch.tensor(audio, dtype=torch.float32) / 32768.0
             audio_tensor = audio_tensor.unsqueeze(0)  # (1, num_samples)
@@ -35,5 +48,7 @@ class WhisperSTT(STTModel):
                 os.remove(tmp_path)
 
     def unload(self):
+    """TODO: Describe unload.
+"""
         del self.model
         super().unload()

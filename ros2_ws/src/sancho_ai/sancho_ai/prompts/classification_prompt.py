@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import json
 
 from .prompt import Prompt
@@ -40,7 +41,13 @@ Output:
 """
 
 class ClassificationPrompt(Prompt):
+"""TODO: Describe class."""
     def __init__(self, user_input: str, chat_history: list = []):
+    """TODO: Describe __init__.
+Args:
+    user_input (:obj:`Any`): TODO.
+    chat_history (:obj:`Any`): TODO.
+"""
         self.user_input = user_input.strip()
         self.chat_history = chat_history
 
@@ -51,6 +58,8 @@ class ClassificationPrompt(Prompt):
         self.history_str = self._format_history()
 
     def _format_intents(self):
+    """TODO: Describe _format_intents.
+"""
         lines = []
         for cmd in self.commands:
             line = f"- {cmd['name']}"
@@ -62,6 +71,8 @@ class ClassificationPrompt(Prompt):
         return "\n".join(lines)
 
     def _format_examples(self):
+    """TODO: Describe _format_examples.
+"""
         examples = []
         for cmd in self.commands:
             for example in cmd.get("examples", []):
@@ -72,6 +83,8 @@ class ClassificationPrompt(Prompt):
         return "\n\n".join(examples)
 
     def _format_history(self):
+    """TODO: Describe _format_history.
+"""
         lines = []
         for msg in self.chat_history[-6:]:
             role = msg.get("role", "user").lower()
@@ -80,15 +93,21 @@ class ClassificationPrompt(Prompt):
         return "\n".join(lines) if lines else "No previous conversation."
 
     def get_prompt_system(self):
+    """TODO: Describe get_prompt_system.
+"""
         return PROMPT_TEMPLATE.replace("{intents_definitions}", self.intents_definitions_str)\
                               .replace("{examples_section}", self.examples_str)\
                               .replace("{chat_history}", self.history_str)\
                               .replace("{user_input}", self.user_input)
 
     def get_user_prompt(self):
+    """TODO: Describe get_user_prompt.
+"""
         return ""
 
     def get_parameters(self):
+    """TODO: Describe get_parameters.
+"""
         return json.dumps({
             "temperature": 0.0,
             "max_tokens": 512

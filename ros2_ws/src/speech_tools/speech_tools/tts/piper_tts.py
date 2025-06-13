@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import os
 import numpy as np
 from piper import PiperVoice
@@ -8,7 +9,10 @@ from ..models import TTS_SPEAKERS
 
 class PiperTTS(TTSModel):
 
+"""TODO: Describe class."""
     def __init__(self):
+    """TODO: Describe __init__.
+"""
         path_dave = os.path.join(os.path.dirname(__file__), "tts_models/es_ES-davefx-medium.onnx")
         path_shar = os.path.join(os.path.dirname(__file__), "tts_models/es_ES-sharvard-medium.onnx")
 
@@ -18,6 +22,11 @@ class PiperTTS(TTSModel):
         } 
 
     def synthesize(self, text: str, speaker: str) -> tuple[list[int], str]:
+    """TODO: Describe synthesize.
+Args:
+    text (:obj:`Any`): TODO.
+    speaker (:obj:`Any`): TODO.
+"""
         if not speaker:
             speaker = self.get_speakers()[0]
 
@@ -33,11 +42,17 @@ class PiperTTS(TTSModel):
         return audio.tolist(), speaker
 
     def get_sample_rate(self) -> int:
+    """TODO: Describe get_sample_rate.
+"""
         return next(iter(self.models.values())).config.sample_rate
     
     def get_speakers(self) -> list[str]:
+    """TODO: Describe get_speakers.
+"""
         return list(TTS_SPEAKERS.PIPER)
 
     def unload(self):
+    """TODO: Describe unload.
+"""
         del self.models
         super().unload()

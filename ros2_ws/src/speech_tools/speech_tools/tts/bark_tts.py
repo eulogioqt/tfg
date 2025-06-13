@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import torch
 import numpy as np
 from bark import generate_audio, preload_models, SAMPLE_RATE
@@ -8,7 +9,10 @@ from ..models import TTS_SPEAKERS
 
 class BarkTTS(TTSModel):
 
+"""TODO: Describe class."""
     def __init__(self):
+    """TODO: Describe __init__.
+"""
         use_gpu = torch.cuda.is_available()
         preload_models(
             text_use_gpu=use_gpu, 
@@ -18,6 +22,11 @@ class BarkTTS(TTSModel):
         )
 
     def synthesize(self, text: str, speaker: str) -> tuple[list[int], str]:
+    """TODO: Describe synthesize.
+Args:
+    text (:obj:`Any`): TODO.
+    speaker (:obj:`Any`): TODO.
+"""
         if not speaker:
             speaker = self.get_speakers()[0]
 
@@ -33,7 +42,11 @@ class BarkTTS(TTSModel):
         return audio.tolist(), speaker
 
     def get_sample_rate(self) -> int:
+    """TODO: Describe get_sample_rate.
+"""
         return SAMPLE_RATE
     
     def get_speakers(self) -> list[str]:
+    """TODO: Describe get_speakers.
+"""
         return list(TTS_SPEAKERS.BARK)
