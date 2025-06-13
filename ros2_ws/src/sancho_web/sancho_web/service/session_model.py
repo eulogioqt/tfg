@@ -1,9 +1,11 @@
+"""TODO: Add module documentation."""
 from pydantic import BaseModel, Field
 from typing import List, Union
 from datetime import datetime
 
 
 class Session(BaseModel):
+"""TODO: Describe class."""
     id: int = Field(default=None, example=1)
     faceprint_id: str = Field(example="0")
     start_time: str = Field(default_factory=str(datetime.now().timestamp()), example="1712345678")

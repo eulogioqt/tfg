@@ -1,10 +1,14 @@
+"""TODO: Add module documentation."""
 from PyQt6.QtWidgets import QSplashScreen, QApplication
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
 import os
 
 class SplashScreen(QSplashScreen):
+"""TODO: Describe class."""
     def __init__(self):
+    """TODO: Describe __init__.
+"""
         splash_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "splash_logo.png")
         pixmap = QPixmap(splash_path)
 

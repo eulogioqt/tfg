@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import dlib
 import cv2
 
@@ -6,10 +7,18 @@ from .base_detector import BaseDetector
 
 class DLIBCNNDetector(BaseDetector):
 
+"""TODO: Describe class."""
     def __init__(self):
+    """TODO: Describe __init__.
+"""
         self.cnn_face_detector = dlib.cnn_face_detection_model_v1('/home/ubuntu/tfg/ros2_ws/src/hri_vision/hri_vision/models/mmod_human_face_detector.dat')
 
     def get_faces(self, frame, verbose=False):
+    """TODO: Describe get_faces.
+Args:
+    frame (:obj:`Any`): TODO.
+    verbose (:obj:`Any`): TODO.
+"""
         frame_copy = frame.copy()
         faces = self.cnn_face_detector(frame, 1)
 

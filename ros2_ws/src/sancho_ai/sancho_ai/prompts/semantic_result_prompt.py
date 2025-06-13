@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import json
 
 from .prompt import Prompt
@@ -40,16 +41,27 @@ Return only the JSON.
 """
 
 class SemanticResultPrompt(Prompt):
+"""TODO: Describe class."""
     def __init__(self, semantic_result: dict, user_input: str, chat_history: list = []):
+    """TODO: Describe __init__.
+Args:
+    semantic_result (:obj:`Any`): TODO.
+    user_input (:obj:`Any`): TODO.
+    chat_history (:obj:`Any`): TODO.
+"""
         self.semantic_result = semantic_result
         self.user_input = user_input.strip()
         self.chat_history = chat_history
         self.intent_descriptions = self._load_intent_descriptions()
 
     def _load_intent_descriptions(self):
+    """TODO: Describe _load_intent_descriptions.
+"""
         return {cmd["name"]: cmd["description"] for cmd in CommandRegistry.get_commands()}
 
     def get_prompt_system(self):
+    """TODO: Describe get_prompt_system.
+"""
         details = self.semantic_result.get("output", {}).get("details", "").strip()
         intent = self.semantic_result.get("intent", "UNKNOWN").strip()
         intent_description = self.intent_descriptions.get(intent, "Sin descripción disponible.")
@@ -62,9 +74,13 @@ class SemanticResultPrompt(Prompt):
                               .replace("{intent_description}", intent_description)
 
     def get_user_prompt(self):
+    """TODO: Describe get_user_prompt.
+"""
         return ""
 
     def get_parameters(self):
+    """TODO: Describe get_parameters.
+"""
         return json.dumps({
             "temperature": 0.65,
             "max_tokens": 50
@@ -72,6 +88,13 @@ class SemanticResultPrompt(Prompt):
 
     @staticmethod
     def build_semantic_result(intent, arguments, status, details):
+    """TODO: Describe build_semantic_result.
+Args:
+    intent (:obj:`Any`): TODO.
+    arguments (:obj:`Any`): TODO.
+    status (:obj:`Any`): TODO.
+    details (:obj:`Any`): TODO.
+"""
         return {
             "intent": intent,
             "arguments": arguments,

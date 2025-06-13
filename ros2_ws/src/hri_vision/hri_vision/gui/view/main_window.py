@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 from PyQt6.QtWidgets import QStackedWidget
 from .screens.get_name_screen import GetNameScreen
 from .screens.ask_if_name_screen import AskIfNameScreen
@@ -6,7 +7,10 @@ from .screens.normal_screen import NormalScreen
 
 
 class MainWindow(QStackedWidget):
+"""TODO: Describe class."""
     def __init__(self):
+    """TODO: Describe __init__.
+"""
         super().__init__()
         self.get_name_screen = GetNameScreen()
         self.ask_if_name_screen = AskIfNameScreen()
@@ -26,6 +30,11 @@ class MainWindow(QStackedWidget):
         self.set_screen("normal")
 
     def set_screen(self, screen_name, **kwargs):
+    """TODO: Describe set_screen.
+Args:
+    screen_name (:obj:`Any`): TODO.
+    **kwargs (:obj:`Any`): TODO.
+"""
         screen = self.screens.get(screen_name)
         if screen:
             screen.update_content(**kwargs)

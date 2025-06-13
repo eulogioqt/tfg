@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import os
 import json
 
@@ -13,7 +14,10 @@ from llm_tools.models import PROVIDER, MODELS, NEEDS_API_KEY
 
 class TestAllModelsNode(Node):
 
+"""TODO: Describe class."""
     def __init__(self):
+    """TODO: Describe __init__.
+"""
         super().__init__("test_all_models")
         load_dotenv()
 
@@ -26,17 +30,30 @@ class TestAllModelsNode(Node):
         self.failed_tests = []
 
     def wait_for_service(self, client):
+    """TODO: Describe wait_for_service.
+Args:
+    client (:obj:`Any`): TODO.
+"""
         if not client.wait_for_service(timeout_sec=3.0):
             self.get_logger().error(f"Service {client.srv_name} not available.")
             return False
         return True
 
     def call_sync(self, client, request):
+    """TODO: Describe call_sync.
+Args:
+    client (:obj:`Any`): TODO.
+    request (:obj:`Any`): TODO.
+"""
         future = client.call_async(request)
         rclpy.spin_until_future_complete(self, future)
         return future.result()
 
     def get_api_key_for(self, provider):
+    """TODO: Describe get_api_key_for.
+Args:
+    provider (:obj:`Any`): TODO.
+"""
         if provider not in NEEDS_API_KEY:
             return ""
         if provider == PROVIDER.OPENAI:
@@ -48,6 +65,11 @@ class TestAllModelsNode(Node):
         return ""
 
     def get_models_from_enum(self, model_enum_group, provider):
+    """TODO: Describe get_models_from_enum.
+Args:
+    model_enum_group (:obj:`Any`): TODO.
+    provider (:obj:`Any`): TODO.
+"""
         try:
             enum_class = getattr(model_enum_group, provider.name.upper())
             return [str(m) for m in enum_class]
@@ -55,6 +77,12 @@ class TestAllModelsNode(Node):
             return []
 
     def load_model(self, provider, model, api_key=""):
+    """TODO: Describe load_model.
+Args:
+    provider (:obj:`Any`): TODO.
+    model (:obj:`Any`): TODO.
+    api_key (:obj:`Any`): TODO.
+"""
         if not self.wait_for_service(self.cli_load):
             return False
         req = LoadModel.Request()
@@ -67,6 +95,11 @@ class TestAllModelsNode(Node):
         return False
 
     def unload_model(self, provider, model):
+    """TODO: Describe unload_model.
+Args:
+    provider (:obj:`Any`): TODO.
+    model (:obj:`Any`): TODO.
+"""
         if not self.wait_for_service(self.cli_unload):
             return
         req = UnloadModel.Request()
@@ -77,6 +110,11 @@ class TestAllModelsNode(Node):
             self.get_logger().info(f"🧹 Descargado {provider}/{model}: {r.message}")
 
     def test_prompt(self, provider, model):
+    """TODO: Describe test_prompt.
+Args:
+    provider (:obj:`Any`): TODO.
+    model (:obj:`Any`): TODO.
+"""
         if not self.wait_for_service(self.cli_prompt):
             return False, "Servicio no disponible"
         req = Prompt.Request()
@@ -95,6 +133,11 @@ class TestAllModelsNode(Node):
             return False, res.message
 
     def test_embedding(self, provider, model):
+    """TODO: Describe test_embedding.
+Args:
+    provider (:obj:`Any`): TODO.
+    model (:obj:`Any`): TODO.
+"""
         if not self.wait_for_service(self.cli_embedding):
             return False, "Servicio no disponible"
         req = Embedding.Request()
@@ -110,6 +153,8 @@ class TestAllModelsNode(Node):
             return False, res.message
 
     def run_all_tests(self):
+    """TODO: Describe run_all_tests.
+"""
         self.get_logger().info("🧪 Iniciando pruebas individuales por modelo...")
 
         for provider in PROVIDER:
@@ -149,6 +194,8 @@ class TestAllModelsNode(Node):
         self.print_summary()
 
     def print_summary(self):
+    """TODO: Describe print_summary.
+"""
         self.get_logger().info("\n📋 RESUMEN FINAL")
         self.get_logger().info("✅ Modelos exitosos:")
         for name in self.successful_tests:
@@ -162,6 +209,10 @@ class TestAllModelsNode(Node):
 
 
 def main(args=None):
+"""TODO: Describe main.
+Args:
+    args (:obj:`Any`): TODO.
+"""
     rclpy.init(args=args)
     node = TestAllModelsNode()
     node.run_all_tests()

@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import json
 
 from enum import Enum
@@ -6,14 +7,24 @@ from abc import ABC, abstractmethod
 
 ##### CLIENT MESSAGES #####
 class PromptMessage():
+"""TODO: Describe class."""
     def __init__(self, msg):
+    """TODO: Describe __init__.
+Args:
+    msg (:obj:`Any`): TODO.
+"""
         self.id = msg["id"]
         self.chat_id = msg["chatId"]
         self.want_tts = msg["wantTts"]
         self.value = msg["value"]
 
 class AudioPromptMessage():
+"""TODO: Describe class."""
     def __init__(self, msg):
+    """TODO: Describe __init__.
+Args:
+    msg (:obj:`Any`): TODO.
+"""
         self.id = msg["id"]
         self.chat_id = msg["chatId"]
         self.want_tts = msg["wantTts"]
@@ -21,7 +32,12 @@ class AudioPromptMessage():
         self.sample_rate = msg["sampleRate"]
 
 class TranscriptionRequestMessage():
+"""TODO: Describe class."""
     def __init__(self, msg):
+    """TODO: Describe __init__.
+Args:
+    msg (:obj:`Any`): TODO.
+"""
         self.id = msg["id"]
         self.audio = msg["audio"]
         self.sample_rate = msg["sampleRate"]
@@ -29,15 +45,31 @@ class TranscriptionRequestMessage():
 ##### SERVER MESSAGES #####
 class JSONMessage(ABC):
     @abstractmethod
+"""TODO: Describe class."""
     def to_dict(self) -> dict:
+    """TODO: Describe to_dict.
+"""
         pass
 
     def to_json(self) -> str:
+    """TODO: Describe to_json.
+"""
         return json.dumps(self.to_dict())
 
 
 class ResponseMessage(JSONMessage):
+"""TODO: Describe class."""
     def __init__(self, id, value, method, intent, arguments, provider, model):
+    """TODO: Describe __init__.
+Args:
+    id (:obj:`Any`): TODO.
+    value (:obj:`Any`): TODO.
+    method (:obj:`Any`): TODO.
+    intent (:obj:`Any`): TODO.
+    arguments (:obj:`Any`): TODO.
+    provider (:obj:`Any`): TODO.
+    model (:obj:`Any`): TODO.
+"""
         self.id = id
         self.value = value
         self.method = method
@@ -47,6 +79,8 @@ class ResponseMessage(JSONMessage):
         self.model = model
     
     def to_dict(self):
+    """TODO: Describe to_dict.
+"""
         return {
             "type": MessageType.RESPONSE,
             "data": {
@@ -62,16 +96,25 @@ class ResponseMessage(JSONMessage):
 
 
 class FaceprintEventMessage(JSONMessage):
+"""TODO: Describe class."""
     class Event(str, Enum):
+    """TODO: Describe class."""
         CREATE = "CREATE"
         UPDATE = "UPDATE"
         DELETE = "DELETE"
 
     def __init__(self, event, id):
+    """TODO: Describe __init__.
+Args:
+    event (:obj:`Any`): TODO.
+    id (:obj:`Any`): TODO.
+"""
         self.event = event
         self.id = id
     
     def to_dict(self):
+    """TODO: Describe to_dict.
+"""
         return {
             "type": MessageType.FACEPRINT_EVENT,
             "data": {
@@ -81,12 +124,21 @@ class FaceprintEventMessage(JSONMessage):
         }
 
 class PromptTranscriptionMessage(JSONMessage):
+"""TODO: Describe class."""
     def __init__(self, id, value, model):
+    """TODO: Describe __init__.
+Args:
+    id (:obj:`Any`): TODO.
+    value (:obj:`Any`): TODO.
+    model (:obj:`Any`): TODO.
+"""
         self.id = id
         self.value = value
         self.model = model
     
     def to_dict(self):
+    """TODO: Describe to_dict.
+"""
         return {
             "type": MessageType.PROMPT_TRANSCRIPTION,
             "data": {
@@ -97,7 +149,16 @@ class PromptTranscriptionMessage(JSONMessage):
         }
 
 class AudioResponseMessage(JSONMessage):
+"""TODO: Describe class."""
     def __init__(self, id, audio, sample_rate, model, speaker):
+    """TODO: Describe __init__.
+Args:
+    id (:obj:`Any`): TODO.
+    audio (:obj:`Any`): TODO.
+    sample_rate (:obj:`Any`): TODO.
+    model (:obj:`Any`): TODO.
+    speaker (:obj:`Any`): TODO.
+"""
         self.id = id
         self.audio = list(audio)
         self.sample_rate = sample_rate
@@ -105,6 +166,8 @@ class AudioResponseMessage(JSONMessage):
         self.speaker = speaker
         
     def to_dict(self):
+    """TODO: Describe to_dict.
+"""
         return {
             "type": MessageType.AUDIO_RESPONSE,
             "data": {
@@ -118,6 +181,7 @@ class AudioResponseMessage(JSONMessage):
 
 ##### TYPES #####
 class MessageType(str, Enum):
+"""TODO: Describe class."""
     PROMPT = "PROMPT" # Client -> Server
     AUDIO_PROMPT = "AUDIO_PROMPT" # Client -> Server
     TRANSCRIPTION_REQUEST = "TRANSCRIPTION_REQUEST" # Client -> Server
@@ -141,6 +205,10 @@ MESSAGE_OBJECT = {
 
 ##### PARSER #####
 def parse_message(msg):
+"""TODO: Describe parse_message.
+Args:
+    msg (:obj:`Any`): TODO.
+"""
     try:
         msg = json.loads(msg)
         return msg.get("type"), msg.get("data")

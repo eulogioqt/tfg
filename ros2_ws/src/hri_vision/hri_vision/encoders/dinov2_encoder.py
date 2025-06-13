@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import os
 import torch
 import numpy as np
@@ -10,7 +11,10 @@ from .base_encoder import BaseEncoder
 
 
 class DinoV2Encoder(BaseEncoder):
+"""TODO: Describe class."""
     def __init__(self):
+    """TODO: Describe __init__.
+"""
         load_dotenv()
         hf_token = os.getenv("HUGGING_FACE_API_KEY")
 
@@ -37,6 +41,10 @@ class DinoV2Encoder(BaseEncoder):
         ])
 
     def encode_face(self, face):
+    """TODO: Describe encode_face.
+Args:
+    face (:obj:`Any`): TODO.
+"""
         if isinstance(face, np.ndarray):
             face = Image.fromarray(face)
 

@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import ast
 import rclpy
 import importlib
@@ -12,6 +13,7 @@ from .models import PROVIDER, MODELS, NEEDS_API_KEY, EXECUTED_LOCALLY
 
 class LLMNode(Node):
 
+"""TODO: Describe class."""
     PROVIDER_CLASS_MAP = {
         PROVIDER.OPENAI: ("llm_tools.providers.openai_provider", "OpenAIProvider"),
         PROVIDER.MISTRAL: ("llm_tools.providers.mistral_provider", "MistralProvider"),
@@ -29,6 +31,8 @@ class LLMNode(Node):
     }
 
     def __init__(self):
+    """TODO: Describe __init__.
+"""
         super().__init__('llm')
         
         self.provider_map = {}
@@ -51,6 +55,11 @@ class LLMNode(Node):
         self.get_logger().info("LLM Node initializated succesfully")
 
     def handle_get_all_models(self, request, response):
+    """TODO: Describe handle_get_all_models.
+Args:
+    request (:obj:`Any`): TODO.
+    response (:obj:`Any`): TODO.
+"""
         provider_names = set(request.providers)
         if not provider_names:
             provider_names = list(PROVIDER)
@@ -86,6 +95,11 @@ class LLMNode(Node):
         return response
 
     def handle_get_active_models(self, request, response):
+    """TODO: Describe handle_get_active_models.
+Args:
+    request (:obj:`Any`): TODO.
+    response (:obj:`Any`): TODO.
+"""
         self.get_logger().info(f"📖 Get Active Models service")
 
         if self.active_llm:
@@ -96,6 +110,11 @@ class LLMNode(Node):
         return response
 
     def handle_get_available_models(self, request, response):
+    """TODO: Describe handle_get_available_models.
+Args:
+    request (:obj:`Any`): TODO.
+    response (:obj:`Any`): TODO.
+"""
         provider_names = set(request.providers)
         if not provider_names:
             provider_names = list(PROVIDER)
@@ -131,6 +150,11 @@ class LLMNode(Node):
         return response
 
     def handle_prompt(self, request, response):
+    """TODO: Describe handle_prompt.
+Args:
+    request (:obj:`Any`): TODO.
+    response (:obj:`Any`): TODO.
+"""
         self.get_logger().info(f"📖 Prompt service for provider='{request.provider}', model='{request.model}'")
 
         try:
@@ -156,6 +180,11 @@ class LLMNode(Node):
         return response
 
     def handle_embedding(self, request, response):
+    """TODO: Describe handle_embedding.
+Args:
+    request (:obj:`Any`): TODO.
+    response (:obj:`Any`): TODO.
+"""
         self.get_logger().info(f"📖 Embedding service for provider='{request.provider}', model='{request.model}'")
         
         try:
@@ -178,6 +207,11 @@ class LLMNode(Node):
         return response
 
     def handle_load_model(self, request, response):
+    """TODO: Describe handle_load_model.
+Args:
+    request (:obj:`Any`): TODO.
+    response (:obj:`Any`): TODO.
+"""
         self.get_logger().info(f"📖 Load model service for items: {[{'provider': i.provider, 'models': i.models} for i in request.items]}'")
 
         response.results = []
@@ -198,6 +232,11 @@ class LLMNode(Node):
         return response
 
     def handle_unload_model(self, request, response):
+    """TODO: Describe handle_unload_model.
+Args:
+    request (:obj:`Any`): TODO.
+    response (:obj:`Any`): TODO.
+"""
         self.get_logger().info(f"📖 Unload model service for items: {[{'provider': i.provider, 'models': i.models} for i in request.items]}'")
         
         response.results = []
@@ -221,22 +260,38 @@ class LLMNode(Node):
         return response
 
     def handle_set_active_llm(self, request, response):
+    """TODO: Describe handle_set_active_llm.
+Args:
+    request (:obj:`Any`): TODO.
+    response (:obj:`Any`): TODO.
+"""
         self.get_logger().info(f"📖 Set Active LLM Model service. Provider: {request.provider} Model: {request.model}")
         response.success, response.message = self._set_active_model("llm", request.provider, request.model)
 
         return response
 
     def handle_set_active_embedding(self, request, response):
+    """TODO: Describe handle_set_active_embedding.
+Args:
+    request (:obj:`Any`): TODO.
+    response (:obj:`Any`): TODO.
+"""
         self.get_logger().info(f"📖 Set Active Embedding Model service. Provider: {request.provider} Model: {request.model}")
         response.success, response.message = self._set_active_model("embedding", request.provider, request.model)
 
         return response
 
     def _init_from_parameters(self):
+    """TODO: Describe _init_from_parameters.
+"""
         self._init_from_parameters_generic("llm")
         self._init_from_parameters_generic("embedding")
 
     def _init_from_parameters_generic(self, kind):
+    """TODO: Describe _init_from_parameters_generic.
+Args:
+    kind (:obj:`Any`): TODO.
+"""
         assert kind in ["llm", "embedding"]
 
         kind_upper = kind.upper()
@@ -267,6 +322,12 @@ class LLMNode(Node):
                 self.get_logger().warn(f"❌ {message}")
 
     def _set_active_model(self, kind, provider, model):
+    """TODO: Describe _set_active_model.
+Args:
+    kind (:obj:`Any`): TODO.
+    provider (:obj:`Any`): TODO.
+    model (:obj:`Any`): TODO.
+"""
         assert kind in ['llm', 'embedding']
 
         kind_upper = kind.upper()
@@ -288,6 +349,11 @@ class LLMNode(Node):
         return True, f"Active {model_label} set to {provider}/{model}"
     
     def _try_load_provider(self, name, api_key=""): # HAY QUE HACER QUE COMPRUEBE QUE LA API KEY ESTA BIEN PUESTA
+    """TODO: Describe _try_load_provider.
+Args:
+    name (:obj:`Any`): TODO.
+    api_key (:obj:`Any`): TODO.
+"""
         if name not in self.provider_map:
             if name not in self.PROVIDER_CLASS_MAP:
                 raise ValueError(f"Provider '{name}' is not supported.")
@@ -304,6 +370,12 @@ class LLMNode(Node):
         return self.provider_map[name]
     
     def _get_or_active(self, kind, provider_name, model_name):
+    """TODO: Describe _get_or_active.
+Args:
+    kind (:obj:`Any`): TODO.
+    provider_name (:obj:`Any`): TODO.
+    model_name (:obj:`Any`): TODO.
+"""
         assert kind in ['llm', 'embedding']
 
         if not provider_name:
@@ -316,6 +388,10 @@ class LLMNode(Node):
         return provider_name, model_name
 
     def _get_provider(self, provider_name) -> BaseProvider:
+    """TODO: Describe _get_provider.
+Args:
+    provider_name (:obj:`Any`): TODO.
+"""
         if provider_name in self.provider_map:
             return self.provider_map[provider_name]
         elif provider_name not in list(PROVIDER):
@@ -324,23 +400,46 @@ class LLMNode(Node):
             raise ValueError(f"Provider {provider_name} is not loaded.")
 
     def _fill_response(self, response, success, message, provider="", model=""):
+    """TODO: Describe _fill_response.
+Args:
+    response (:obj:`Any`): TODO.
+    success (:obj:`Any`): TODO.
+    message (:obj:`Any`): TODO.
+    provider (:obj:`Any`): TODO.
+    model (:obj:`Any`): TODO.
+"""
         response.success = success
         response.message = message
         response.provider_used = provider
         response.model_used = model
     
     def _fill_result(self, result, models, success, message):
+    """TODO: Describe _fill_result.
+Args:
+    result (:obj:`Any`): TODO.
+    models (:obj:`Any`): TODO.
+    success (:obj:`Any`): TODO.
+    message (:obj:`Any`): TODO.
+"""
         result.models = models
         result.success = success
         result.message = message
 
     def parse_string_list(self, raw_string) -> list[str]:
+    """TODO: Describe parse_string_list.
+Args:
+    raw_string (:obj:`Any`): TODO.
+"""
         try:
             return ast.literal_eval(raw_string)
         except Exception:
             return []
 
 def main(args=None):
+"""TODO: Describe main.
+Args:
+    args (:obj:`Any`): TODO.
+"""
     rclpy.init(args=args)
 
     node = LLMNode()

@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import sounddevice as sd
 import numpy as np
 from scipy.ndimage import gaussian_filter1d

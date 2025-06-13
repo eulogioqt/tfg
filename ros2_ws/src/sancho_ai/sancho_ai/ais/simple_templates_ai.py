@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 from ..ais.base import ModularAI
 from ..ais.intent_classifiers import SimpleClassifier
 from ..ais.intent_executors import IntentExecutor
@@ -8,7 +9,10 @@ from ..engines import  HRIEngine
 
 class SimpleTemplatesAI(ModularAI):
 
+"""TODO: Describe class."""
     def __init__(self):
+    """TODO: Describe __init__.
+"""
         node = HRIEngine.create_client_node()
         hri_engine = HRIEngine(node)
 

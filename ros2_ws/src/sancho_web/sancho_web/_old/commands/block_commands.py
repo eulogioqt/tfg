@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 from std_msgs.msg import Bool
 
 from .command_executor import CommandExecutor
@@ -5,7 +6,12 @@ from .command_executor import CommandExecutor
 
 class BlockCommands(CommandExecutor):
 
+"""TODO: Describe class."""
     def __init__(self, web_node):
+    """TODO: Describe __init__.
+Args:
+    web_node (:obj:`Any`): TODO.
+"""
         super().__init__(web_node)
 
         self.motor_list = {
@@ -15,6 +21,12 @@ class BlockCommands(CommandExecutor):
         }
 
     def on_command(self, sender, command, args):
+    """TODO: Describe on_command.
+Args:
+    sender (:obj:`Any`): TODO.
+    command (:obj:`Any`): TODO.
+    args (:obj:`Any`): TODO.
+"""
         prefix = "des" if self.equals_ignore_case(command, "unblock") else ""
             
         if len(args) == 0:

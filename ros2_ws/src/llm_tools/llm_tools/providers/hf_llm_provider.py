@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import gc
 import json
 import torch
@@ -8,7 +9,14 @@ from ..prompt_formatters import HFChatTemplateFormatter
 
 
 class HFLLMProvider(BaseProvider):
+"""TODO: Describe class."""
     def __init__(self, models=None, api_key=None, model_formatters=None):
+    """TODO: Describe __init__.
+Args:
+    models (:obj:`Any`): TODO.
+    api_key (:obj:`Any`): TODO.
+    model_formatters (:obj:`Any`): TODO.
+"""
         self.api_key = api_key
         self.model_formatters = model_formatters
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -21,9 +29,22 @@ class HFLLMProvider(BaseProvider):
             self.load(models)
 
     def embedding(self, *args, **kwargs):
+    """TODO: Describe embedding.
+Args:
+    *args (:obj:`Any`): TODO.
+    **kwargs (:obj:`Any`): TODO.
+"""
         raise NotImplementedError("This provider does not support embeddings.")
 
     def prompt(self, model, prompt_system, messages_json, user_input, parameters_json):
+    """TODO: Describe prompt.
+Args:
+    model (:obj:`Any`): TODO.
+    prompt_system (:obj:`Any`): TODO.
+    messages_json (:obj:`Any`): TODO.
+    user_input (:obj:`Any`): TODO.
+    parameters_json (:obj:`Any`): TODO.
+"""
         if not model:
             model = list(self.models.keys())[0]
 
@@ -46,6 +67,10 @@ class HFLLMProvider(BaseProvider):
         return response, model
 
     def load(self, models):
+    """TODO: Describe load.
+Args:
+    models (:obj:`Any`): TODO.
+"""
         for model_enum in models:
             tokenizer = AutoTokenizer.from_pretrained(model_enum, token=self.api_key)
             model = AutoModelForCausalLM.from_pretrained(
@@ -60,6 +85,10 @@ class HFLLMProvider(BaseProvider):
             self.formatters[model_enum] = (self.model_formatters or {}).get(model_enum, HFChatTemplateFormatter)(tokenizer)
 
     def unload(self, models=None):
+    """TODO: Describe unload.
+Args:
+    models (:obj:`Any`): TODO.
+"""
         if not models:
             models = self.get_active_models()
 
@@ -73,4 +102,6 @@ class HFLLMProvider(BaseProvider):
             torch.cuda.empty_cache()
 
     def get_active_models(self):
+    """TODO: Describe get_active_models.
+"""
         return list(self.models.keys())

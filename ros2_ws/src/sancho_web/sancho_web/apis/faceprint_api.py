@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import json
 
 from std_msgs.msg import String
@@ -9,16 +10,27 @@ from sancho_web.database.system_database import CONSTANTS
 
 class FaceprintAPI:
 
+"""TODO: Describe class."""
     def __init__(self, node):
+    """TODO: Describe __init__.
+Args:
+    node (:obj:`Any`): TODO.
+"""
         self.engine = FaceprintEngine(node)
 
     def get_all_faceprints(self) -> APIResponse:
+    """TODO: Describe get_all_faceprints.
+"""
         faceprints_json = self.engine.get_faceprint_request()
         faceprints = json.loads(faceprints_json)
 
         return JSONResponse(content=faceprints)
 
     def get_faceprint(self, id: str) -> APIResponse:
+    """TODO: Describe get_faceprint.
+Args:
+    id (:obj:`Any`): TODO.
+"""
         faceprint_json = self.engine.get_faceprint_request(json.dumps({ "id": id }))
 
         faceprint = json.loads(faceprint_json)
@@ -28,6 +40,11 @@ class FaceprintAPI:
         return JSONResponse(content=faceprint)
 
     def create_faceprint(self, name: str, image_base64: str) -> APIResponse:
+    """TODO: Describe create_faceprint.
+Args:
+    name (:obj:`Any`): TODO.
+    image_base64 (:obj:`Any`): TODO.
+"""
         image_cv2 = self.engine.br.base64_to_cv2(image_base64)
         image_msg = self.engine.br.cv2_to_imgmsg(image_cv2, encoding="bgr8")
         
@@ -85,6 +102,11 @@ class FaceprintAPI:
                     return HTTPException(detail=f"Ya te conozco {classified_name}, esta función es para personas nuevas.")
 
     def update_faceprint(self, id: str, faceprint: dict) -> APIResponse:
+    """TODO: Describe update_faceprint.
+Args:
+    id (:obj:`Any`): TODO.
+    faceprint (:obj:`Any`): TODO.
+"""
         new_name = faceprint["name"]
         if new_name is None:
             return HTTPException(detail="No has incluido el campo name.")
@@ -111,6 +133,10 @@ class FaceprintAPI:
         return JSONResponse(content=updated_item)
 
     def delete_faceprint(self, id: str) -> APIResponse:
+    """TODO: Describe delete_faceprint.
+Args:
+    id (:obj:`Any`): TODO.
+"""
         item_json = self.engine.get_faceprint_request(json.dumps({ "id": id }))
         item = json.loads(item_json)
         if not item:

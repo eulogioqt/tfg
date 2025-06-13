@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import numpy as np
 import torch
 from scipy.signal import resample_poly
@@ -22,6 +23,10 @@ vad_buffer = deque(maxlen=int(BUFFER_DURATION * INPUT_SR))  # para VAD
 chunk_duration_sec = CHUNK_SIZE / INPUT_SR
 
 def process_audio_chunk(chunk_bytes):
+"""TODO: Describe process_audio_chunk.
+Args:
+    chunk_bytes (:obj:`Any`): TODO.
+"""
     global state, voice_buffer, silence_duration
 
     # Convertir a float32

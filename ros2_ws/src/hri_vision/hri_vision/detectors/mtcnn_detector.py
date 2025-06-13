@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import cv2
 from mtcnn.mtcnn import MTCNN
 
@@ -6,10 +7,18 @@ from .base_detector import BaseDetector
 
 class MTCNNDetector(BaseDetector):
 
+"""TODO: Describe class."""
     def __init__(self):
+    """TODO: Describe __init__.
+"""
         self.faceDetector = MTCNN()
 
     def get_faces(self, frame, verbose=False):
+    """TODO: Describe get_faces.
+Args:
+    frame (:obj:`Any`): TODO.
+    verbose (:obj:`Any`): TODO.
+"""
         frameCopy = frame.copy()
         faces = self.faceDetector.detect_faces(frame)
 

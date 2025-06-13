@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import os
 from .sound import load
 

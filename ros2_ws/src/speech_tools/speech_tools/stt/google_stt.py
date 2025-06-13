@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import base64
 import requests
 
@@ -5,10 +6,20 @@ from .stt_model import STTModel
 
 
 class GoogleSTT(STTModel):
+"""TODO: Describe class."""
     def __init__(self, api_key: str):
+    """TODO: Describe __init__.
+Args:
+    api_key (:obj:`Any`): TODO.
+"""
         self.api_url = f"https://speech.googleapis.com/v1/speech:recognize?key={api_key}"
 
     def transcribe(self, audio: bytes, sample_rate: int) -> str:
+    """TODO: Describe transcribe.
+Args:
+    audio (:obj:`Any`): TODO.
+    sample_rate (:obj:`Any`): TODO.
+"""
         try:
             audio_base64 = base64.b64encode(audio).decode('utf-8')
 

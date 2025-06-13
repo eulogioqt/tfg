@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import ast
 import rclpy
 from rclpy.node import Node
@@ -17,6 +18,7 @@ from .apis import FaceprintAPI, LogAPI, SessionAPI, TTSModelAPI, STTModelAPI, LL
 
 class APIRESTNode(Node):
 
+"""TODO: Describe class."""
     AVAILABLE_APIS = {
         API_LIST.FACEPRINTS: (FaceprintAPI, set_faceprint_api),
         API_LIST.LOGS: (LogAPI, set_log_api),
@@ -27,6 +29,8 @@ class APIRESTNode(Node):
     }
 
     def __init__(self):
+    """TODO: Describe __init__.
+"""
         super().__init__("api_rest_node")
 
         apis = self.parse_string_list(self.declare_parameter("apis", "[]").get_parameter_value().string_value)
@@ -35,9 +39,15 @@ class APIRESTNode(Node):
         self.get_logger().info("API REST Node initializated successfully.")
 
     def spin(self):
+    """TODO: Describe spin.
+"""
         uvicorn.run(app, host="0.0.0.0", port=7654)
 
     def configure_apis(self, selected):
+    """TODO: Describe configure_apis.
+Args:
+    selected (:obj:`Any`): TODO.
+"""
         if not selected:
             selected = list(self.AVAILABLE_APIS.keys())
 
@@ -50,6 +60,10 @@ class APIRESTNode(Node):
                 setter_fn(api_instance)
 
     def parse_string_list(self, raw_string) -> list[str]:
+    """TODO: Describe parse_string_list.
+Args:
+    raw_string (:obj:`Any`): TODO.
+"""
         try:
             return ast.literal_eval(raw_string)
         except Exception:
@@ -57,6 +71,10 @@ class APIRESTNode(Node):
         
 
 def main(args=None):
+"""TODO: Describe main.
+Args:
+    args (:obj:`Any`): TODO.
+"""
     rclpy.init(args=args)
 
     api_rest_node = APIRESTNode()

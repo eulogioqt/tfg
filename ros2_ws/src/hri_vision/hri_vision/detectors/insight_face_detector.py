@@ -1,14 +1,23 @@
+"""TODO: Add module documentation."""
 import cv2
 from insightface.app import FaceAnalysis
 from .base_detector import BaseDetector
 
 
 class InsightFaceDetector(BaseDetector):
+"""TODO: Describe class."""
     def __init__(self):
+    """TODO: Describe __init__.
+"""
         self.app = FaceAnalysis(allowed_modules=['detection'], providers=['cuda'])
         self.app.prepare(ctx_id=0, det_size=(640, 640))
 
     def get_faces(self, frame, verbose=False):
+    """TODO: Describe get_faces.
+Args:
+    frame (:obj:`Any`): TODO.
+    verbose (:obj:`Any`): TODO.
+"""
         faces = self.app.get(frame)
         face_positions = []
         face_scores = []

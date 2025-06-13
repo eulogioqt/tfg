@@ -1,3 +1,4 @@
+"""TODO: Add module documentation."""
 import time
 import json
 import numpy as np
@@ -18,11 +19,13 @@ from .utils import STTHotword, PVPorcupineHotword, IntensityAttachCriterion, Sil
 
 
 class AUDIO_STATE(int, Enum):
+"""TODO: Describe class."""
     NO_AUDIO = -1
     SOME_AUDIO = 0
     END_AUDIO = 1
 
 class HELPER_STATE(int, Enum):
+"""TODO: Describe class."""
     NAME = 0
     SPEAKING = 1
     COMMAND = 2
@@ -33,7 +36,12 @@ class HELPER_STATE(int, Enum):
 # arreglar ojos lo que pasa eso y mirad los baudios y lo del for 20
 class AssistantHelperNode(Node):
 
+"""TODO: Describe class."""
     def __init__(self, assistant_helper: "AssistantHelper"):
+    """TODO: Describe __init__.
+Args:
+    assistant_helper (:obj:`Any`): TODO.
+"""
         super().__init__("assistant_helper")
 
         self.assistant_helper = assistant_helper
@@ -52,12 +60,20 @@ class AssistantHelperNode(Node):
         self.get_logger().info("Assistant Helper Node initializated succesfully.")
 
     def microphone_callback(self, msg):
+    """TODO: Describe microphone_callback.
+Args:
+    msg (:obj:`Any`): TODO.
+"""
         new_audio = list([np.int16(x) for x in msg.chunk_mono])
         sample_rate = msg.sample_rate
         
         self.chunk_queue.put([new_audio, sample_rate])
     
     def mode_callback(self, msg):
+    """TODO: Describe mode_callback.
+Args:
+    msg (:obj:`Any`): TODO.
+"""
         data = json.loads(msg.data)
         helper_state = data["helper_state"]
 
@@ -77,7 +93,12 @@ class AssistantHelperNode(Node):
 
 class AssistantHelper:
 
+"""TODO: Describe class."""
     def __init__(self, name="Sancho"):
+    """TODO: Describe __init__.
+Args:
+    name (:obj:`Any`): TODO.
+"""
         self.name = name
 
         self.audio_state = AUDIO_STATE.NO_AUDIO
@@ -103,6 +124,8 @@ class AssistantHelper:
         self.node = AssistantHelperNode()
 
     def spin(self):
+    """TODO: Describe spin.
+"""
         while rclpy.ok():
             if not self.node.chunk_queue.empty(): # Combine audio chunks
                 [new_audio, self.sample_rate] = self.node.chunk_queue.get()
@@ -116,6 +139,10 @@ class AssistantHelper:
             rclpy.spin_once(self.node)
 
     def process_name_mode(self, new_audio):
+    """TODO: Describe process_name_mode.
+Args:
+    new_audio (:obj:`Any`): TODO.
+"""
         if self.hotword_detector.detect(new_audio, self.sample_rate):
             self.node.face_mode_pub.publish(String(data="listening"))
             self.helper_state = HELPER_STATE.COMMAND
@@ -132,6 +159,10 @@ class AssistantHelper:
             self.previous_chunk = []
 
     def process_command_mode(self, new_audio):
+    """TODO: Describe process_command_mode.
+Args:
+    new_audio (:obj:`Any`): TODO.
+"""
         self.check_audio = self.check_audio + new_audio
         
         if self.helper_state != HELPER_STATE.ASKING and len(self.audio) == 0 and time.time() - self.hotword_detection_time > self.timeout_seconds: # Si timeout, vuelve a idle
@@ -172,6 +203,10 @@ class AssistantHelper:
             self.node.chunk_queue = Queue() # Limpiar lo que se ha acumulado mientras hace STT, mejor que que procese lo acumulado
 
     def process_audio_command(self, audio):
+    """TODO: Describe process_audio_command.
+Args:
+    audio (:obj:`Any`): TODO.
+"""
         self.node.get_logger().info(f"Transcribing {len(self.audio) / self.sample_rate}s chunk...")
 
         rec = self.stt_request(list(map(int, audio)), self.sample_rate)                
@@ -192,6 +227,11 @@ class AssistantHelper:
             self.node.get_logger().info("Transcription result is empty.")
 
     def stt_request(self, audio, sample_rate):
+    """TODO: Describe stt_request.
+Args:
+    audio (:obj:`Any`): TODO.
+    sample_rate (:obj:`Any`): TODO.
+"""
         stt_request = STT.Request()
         stt_request.audio = audio
         stt_request.sample_rate = sample_rate
@@ -203,10 +243,19 @@ class AssistantHelper:
         return result_stt.text
     
     def is_audio_length(self, audio, seconds):
+    """TODO: Describe is_audio_length.
+Args:
+    audio (:obj:`Any`): TODO.
+    seconds (:obj:`Any`): TODO.
+"""
         return len(audio) >= seconds * self.sample_rate
 
 
 def main(args=None):
+"""TODO: Describe main.
+Args:
+    args (:obj:`Any`): TODO.
+"""
     rclpy.init(args=args)
 
     assistant_helper = AssistantHelper()
