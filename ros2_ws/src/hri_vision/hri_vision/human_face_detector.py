@@ -50,7 +50,7 @@ class HumanFaceDetector(Node):
         super().__init__("human_face_detector")
 
         self.show_metrics = self.declare_parameter("show_metrics", False).value
-        detector_name = self.declare_parameter("detector_name", DetectorType.INSIGHTFACE).value.lower()
+        detector_name = self.declare_parameter("detector_name", DetectorType.YOLOV5).value.lower()
 
         try:
             detector_type = DetectorType(detector_name)

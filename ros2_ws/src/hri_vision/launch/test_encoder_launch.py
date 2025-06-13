@@ -1,7 +1,5 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from hri_vision.human_face_detector import DetectorType
-
 
 def generate_launch_description():
     return LaunchDescription([
@@ -9,9 +7,6 @@ def generate_launch_description():
             package='hri_vision',
             executable='detector',
             name='detector',
-            parameters=[{
-                'detector_name': f"{DetectorType.YOLOV5}"
-            }],
             output='screen'
         ),
         Node(
