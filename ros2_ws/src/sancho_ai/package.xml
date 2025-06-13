@@ -14,7 +14,6 @@
 
   <exec_depend>hri_msgs</exec_depend>
   <exec_depend>llm_msgs</exec_depend>
-  <exec_depend>llm_tools</exec_depend>
   <exec_depend>rclpy</exec_depend>
   <exec_depend>rumi_msgs</exec_depend>
   <exec_depend>std_msgs</exec_depend>

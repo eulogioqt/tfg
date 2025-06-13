@@ -26,9 +26,6 @@
   <exec_depend>human_face_recognition_msgs</exec_depend>
 
   <exec_depend>hri_msgs</exec_depend>
-  <exec_depend>llm_tools</exec_depend>
-  <exec_depend>sancho_ai</exec_depend>
-  <exec_depend>sancho_web</exec_depend>
   <exec_depend>speech_msgs</exec_depend>
   <exec_depend>speech_tools</exec_depend>
   <export>
