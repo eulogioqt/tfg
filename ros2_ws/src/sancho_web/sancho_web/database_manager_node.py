@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import os
 import json
 import rclpy
@@ -11,10 +10,7 @@ from .database.system_database import SystemDatabase
 
 
 class DatabaseManagerNode(Node):
-"""TODO: Describe class."""
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         super().__init__('database_manager_node')
 
         self.get_logs_service_srv = self.create_service(GetString, 'logs/get', self.get_logs_service)
@@ -26,10 +22,6 @@ class DatabaseManagerNode(Node):
         self.get_logger().info("Database Manager Node initializated succesfully")
 
     def log_callback(self, msg):
-    """TODO: Describe log_callback.
-Args:
-    msg (:obj:`Any`): TODO.
-"""
         try:
             self.db.create_log(
                 level=msg.level,
@@ -46,11 +38,6 @@ Args:
             self.get_logger().error(f"❌ Error procesando log: {e}")
 
     def get_logs_service(self, request, response):
-    """TODO: Describe get_logs_service.
-Args:
-    request (:obj:`Any`): TODO.
-    response (:obj:`Any`): TODO.
-"""
         args = json.loads(request.args) if request.args else {}
         log_id = args.get("id")
         
@@ -66,10 +53,6 @@ Args:
 
 
 def main(args=None):
-"""TODO: Describe main.
-Args:
-    args (:obj:`Any`): TODO.
-"""
     rclpy.init(args=args)
 
     node = DatabaseManagerNode()

@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import os
 import cv2
 import base64
@@ -9,7 +8,6 @@ from ..database.faceprints_database import FaceprintsDatabase
 
 class ComplexClassifier:
 
-"""TODO: Describe class."""
     def __init__(self, db_mode="save"):
         '''Inits classifier'''
 

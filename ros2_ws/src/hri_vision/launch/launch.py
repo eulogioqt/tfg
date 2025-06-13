@@ -1,10 +1,7 @@
-"""TODO: Add module documentation."""
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
 def generate_launch_description():
-"""TODO: Describe generate_launch_description.
-"""
     return LaunchDescription([
         Node(
             package='hri_vision',

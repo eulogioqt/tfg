@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
@@ -8,8 +7,6 @@ from sancho_web.apis import API_LIST
 
 
 def generate_launch_description():
-"""TODO: Describe generate_launch_description.
-"""
     return LaunchDescription([
         Node(
             package='speech_tools',

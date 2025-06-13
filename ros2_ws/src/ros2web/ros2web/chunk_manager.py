@@ -1,25 +1,15 @@
-"""TODO: Add module documentation."""
 import uuid
 
 from .chunk_protocol import JSONMessage, ChunkMessage
 
 
 class ChunkManager:
-"""TODO: Describe class."""
     def __init__(self, max_chunk_size=256000):
-    """TODO: Describe __init__.
-Args:
-    max_chunk_size (:obj:`Any`): TODO.
-"""
         self.max_chunk_size = max_chunk_size
 
         self.buffers = {}
 
     def msg_to_chunks(self, full_str) -> list[ChunkMessage]:
-    """TODO: Describe msg_to_chunks.
-Args:
-    full_str (:obj:`Any`): TODO.
-"""
         chunks = []
         
         id = str(uuid.uuid4())
@@ -34,13 +24,6 @@ Args:
         return chunks
 
     def chunk_to_msg(self, id, chunk_index, final, data):
-    """TODO: Describe chunk_to_msg.
-Args:
-    id (:obj:`Any`): TODO.
-    chunk_index (:obj:`Any`): TODO.
-    final (:obj:`Any`): TODO.
-    data (:obj:`Any`): TODO.
-"""
         if id not in self.buffers:
             self.buffers[id] = []
 

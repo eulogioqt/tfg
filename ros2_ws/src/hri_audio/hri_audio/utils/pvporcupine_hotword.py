@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import os
 import struct
 import pvporcupine
@@ -12,10 +11,7 @@ from .model_hotword import ModelHotword
 
 class PVPorcupineHotword(ModelHotword):
     
-"""TODO: Describe class."""
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         load_dotenv()
 
         device = os.environ.get("DEVICE")
@@ -32,11 +28,6 @@ class PVPorcupineHotword(ModelHotword):
         self.buffer = np.array([], dtype=np.int16)
 
     def detect(self, audio_chunk: list[int], sample_rate: int) -> bool:
-    """TODO: Describe detect.
-Args:
-    audio_chunk (:obj:`Any`): TODO.
-    sample_rate (:obj:`Any`): TODO.
-"""
         audio_np = np.array(audio_chunk, dtype=np.int16)
 
         if sample_rate != self.porcupine.sample_rate:

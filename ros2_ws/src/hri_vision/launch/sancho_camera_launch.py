@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import os
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, GroupAction
@@ -9,8 +8,6 @@ from ament_index_python.packages import get_package_share_directory
 from launch.actions import ExecuteProcess
 
 def generate_launch_description():
-"""TODO: Describe generate_launch_description.
-"""
     usb_cam_param_file = os.path.join(
         get_package_share_directory('hri_vision'),
         'config',

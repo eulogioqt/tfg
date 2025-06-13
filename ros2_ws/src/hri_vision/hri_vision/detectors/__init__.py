@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 from .base_detector import BaseDetector
 
 from .cv2_detector import CV2Detector

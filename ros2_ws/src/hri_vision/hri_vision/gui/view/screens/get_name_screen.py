@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import base64
 
 from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QLineEdit, QPushButton, QMessageBox
@@ -7,10 +6,7 @@ from PyQt6.QtCore import Qt
 
 
 class GetNameScreen(QWidget):
-"""TODO: Describe class."""
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         super().__init__()
         self.layout = QVBoxLayout(self)
         self.image_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
@@ -24,10 +20,6 @@ class GetNameScreen(QWidget):
         self.layout.addWidget(self.send_button)
 
     def update_content(self, photo_base64=None):
-    """TODO: Describe update_content.
-Args:
-    photo_base64 (:obj:`Any`): TODO.
-"""
         if photo_base64:
             pixmap = QPixmap()
             pixmap.loadFromData(base64.b64decode(photo_base64))
@@ -38,8 +30,4 @@ Args:
         self.input_field.clear()
 
     def show_warning(self, message: str):
-    """TODO: Describe show_warning.
-Args:
-    message (:obj:`Any`): TODO.
-"""
         QMessageBox.warning(self, "Atención", message)

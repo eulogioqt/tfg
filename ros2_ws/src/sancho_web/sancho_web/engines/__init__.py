@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 from .service_engine import ServiceEngine
 from .faceprint_engine import FaceprintEngine
 from .log_engine import LogEngine

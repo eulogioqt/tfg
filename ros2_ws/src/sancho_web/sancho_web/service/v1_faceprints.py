@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 from typing import Optional, List
 from fastapi import APIRouter, HTTPException, Query, Request, Path
 
@@ -17,10 +16,6 @@ version = "v1"
 
 faceprint_api: FaceprintAPI = None
 def set_faceprint_api(api):
-"""TODO: Describe set_faceprint_api.
-Args:
-    api (:obj:`Any`): TODO.
-"""
     global faceprint_api
     faceprint_api = api
 
@@ -28,10 +23,6 @@ Args:
 async def get_faceprints(
     request: Request,
 ):
-"""TODO: Describe get_faceprints.
-Args:
-    request (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
 
     try:
@@ -49,11 +40,6 @@ async def get_faceprint_by_id(
     request: Request,
     id: str = Path(description="Id de la persona"),
 ):
-"""TODO: Describe get_faceprint_by_id.
-Args:
-    request (:obj:`Any`): TODO.
-    id (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
     
     try:
@@ -71,11 +57,6 @@ async def create_faceprint(
     faceprint_create: FaceprintCreate,
     request: Request
 ):
-"""TODO: Describe create_faceprint.
-Args:
-    faceprint_create (:obj:`Any`): TODO.
-    request (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
     APIUtils.check_content_type_json(request)
 
@@ -99,12 +80,6 @@ async def update_faceprint(
     faceprint_update: FaceprintUpdate,
     request: Request
 ):
-"""TODO: Describe update_faceprint.
-Args:
-    id (:obj:`Any`): TODO.
-    faceprint_update (:obj:`Any`): TODO.
-    request (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
     APIUtils.check_content_type_json(request)
 
@@ -124,11 +99,6 @@ async def delete_faceprint(
     id: str,
     request: Request
 ):
-"""TODO: Describe delete_faceprint.
-Args:
-    id (:obj:`Any`): TODO.
-    request (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
 
     try:

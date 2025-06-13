@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import ast
 
 from rclpy.node import Node
@@ -8,12 +7,7 @@ from ros2web_msgs.srv import R2WSubscribe
 
 class DynamicSubscribableNode(Node, ABC):
 
-"""TODO: Describe class."""
     def __init__(self, node_name):
-    """TODO: Describe __init__.
-Args:
-    node_name (:obj:`Any`): TODO.
-"""
         super().__init__(node_name)
 
         self.dynamic_subscriptions = []
@@ -25,11 +19,6 @@ Args:
         self.subscribe_serv = self.create_service(R2WSubscribe, "ros2web/subscribe", self.subscribe_service)
 
     def subscribe_to_topic(self, topic_name, name=None):
-    """TODO: Describe subscribe_to_topic.
-Args:
-    topic_name (:obj:`Any`): TODO.
-    name (:obj:`Any`): TODO.
-"""
         name = name if name else topic_name # Prepara name
         topic_name = topic_name if topic_name.startswith("/") else "/" + topic_name # Prepara topic name
         topic_types = dict(self.get_topic_names_and_types()) # Diccionario topic: tipo
@@ -44,8 +33,6 @@ Args:
             # Hacer que los retrys vayan creciendo tipo 10 veces un segundo despues 10 veces 2s 4 8 16...
 
             def retry_callback():
-            """TODO: Describe retry_callback.
-"""
                 self.subscribe_to_topic(topic_name, name)
                 retry_timer.cancel() # ver como hacer mejor sin timer que se cancela algo que sea como setTimeout en javascript
 
@@ -72,28 +59,13 @@ Args:
         return 1
 
     def subscribe_service(self, request, response):
-    """TODO: Describe subscribe_service.
-Args:
-    request (:obj:`Any`): TODO.
-    response (:obj:`Any`): TODO.
-"""
         success = self.subscribe_to_topic(request.topic, request.name)
         response.value = success
         return response
 
     def parse_topics(self, raw_string):
-    """TODO: Describe parse_topics.
-Args:
-    raw_string (:obj:`Any`): TODO.
-"""
         return ast.literal_eval(raw_string)
 
     @abstractmethod
     def generic_callback(self, topic, name, value):
-    """TODO: Describe generic_callback.
-Args:
-    topic (:obj:`Any`): TODO.
-    name (:obj:`Any`): TODO.
-    value (:obj:`Any`): TODO.
-"""
         pass

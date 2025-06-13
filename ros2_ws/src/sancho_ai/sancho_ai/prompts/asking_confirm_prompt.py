@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import json
 from .prompt import Prompt
 
@@ -60,27 +59,16 @@ Output:
 """
 
 class AskingConfirmPrompt(Prompt):
-"""TODO: Describe class."""
     def __init__(self, user_input: str):
-    """TODO: Describe __init__.
-Args:
-    user_input (:obj:`Any`): TODO.
-"""
         self.user_input = user_input.strip()
 
     def get_prompt_system(self):
-    """TODO: Describe get_prompt_system.
-"""
         return PROMPT_TEMPLATE.replace("{user_input}", self.user_input)
 
     def get_user_prompt(self):
-    """TODO: Describe get_user_prompt.
-"""
         return ""
 
     def get_parameters(self):
-    """TODO: Describe get_parameters.
-"""
         return json.dumps({
             "temperature": 0.0,
             "max_tokens": 256

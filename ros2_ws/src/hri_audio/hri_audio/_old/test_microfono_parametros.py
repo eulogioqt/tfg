@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import io
 import time
 import wave
@@ -8,8 +7,6 @@ device_index =0
 maxInputChannels=0
 defaultSampleRate=0
 def listar_dispositivos():
-"""TODO: Describe listar_dispositivos.
-"""
     p = pyaudio.PyAudio()
     print("Dispositivos de entrada:")
     for i in range(p.get_device_count()):
@@ -24,10 +21,6 @@ def listar_dispositivos():
     p.terminate()
 
 def mostrar_parametros(numero_dispositivo):
-"""TODO: Describe mostrar_parametros.
-Args:
-    numero_dispositivo (:obj:`Any`): TODO.
-"""
     p = pyaudio.PyAudio()
     global device_index
     global maxInputChannels
@@ -42,8 +35,6 @@ Args:
     p.terminate()
 
 def main():
-"""TODO: Describe main.
-"""
     print("Lista de dispositivos de audio disponibles:")
     listar_dispositivos()
     print("-------------------------------------------")
@@ -54,13 +45,6 @@ def main():
     
 
 def grabar_audio(device_index, chunk_size=1024, sample_rate=48000, channels=2):
-"""TODO: Describe grabar_audio.
-Args:
-    device_index (:obj:`Any`): TODO.
-    chunk_size (:obj:`Any`): TODO.
-    sample_rate (:obj:`Any`): TODO.
-    channels (:obj:`Any`): TODO.
-"""
     p = pyaudio.PyAudio()
     print(device_index)
     stream = p.open(format=pyaudio.paInt16,
@@ -94,12 +78,6 @@ Args:
 
 def convert_to_wav(left_channel, right_channel, sample_rate):
     # Combinar los canales izquierdo y derecho en un arreglo estéreo de numpy
-"""TODO: Describe convert_to_wav.
-Args:
-    left_channel (:obj:`Any`): TODO.
-    right_channel (:obj:`Any`): TODO.
-    sample_rate (:obj:`Any`): TODO.
-"""
     audio_stereo = np.column_stack((left_channel, right_channel))
     
     # Convertir el arreglo de numpy a un objeto de bytes en formato WAV

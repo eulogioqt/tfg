@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 from datetime import datetime
 import time
 import requests
@@ -25,13 +24,7 @@ from human_face_recognition_msgs.srv import HelperMode, GetString
 
 class Asssistant(Node):
 
-"""TODO: Describe class."""
     def __init__(self, name, available_commands):
-    """TODO: Describe __init__.
-Args:
-    name (:obj:`Any`): TODO.
-    available_commands (:obj:`Any`): TODO.
-"""
         super().__init__("assistant")
         load_dotenv()
         # Obtener la clave API desde la variable de entorno
@@ -76,34 +69,18 @@ Args:
         #msg = [text, self.accent]
         #msg_json = json.dumps(msg)
         
-    """TODO: Describe read_text.
-Args:
-    text (:obj:`Any`): TODO.
-"""
         self.input_tts.publish(String(data=text))
     
     def actual_people_callback(self, msg):
-    """TODO: Describe actual_people_callback.
-Args:
-    msg (:obj:`Any`): TODO.
-"""
         self.actual_people = json.loads(msg.data)
 
     def text_callback(self, msg):
-    """TODO: Describe text_callback.
-Args:
-    msg (:obj:`Any`): TODO.
-"""
         if self.text_queue.qsize() < 1:
             self.text_queue.put(msg)
         else:
             self.get_logger().info("Text Queue IS FULL!!!")
 
     def helper_mode_request(self, mode):
-    """TODO: Describe helper_mode_request.
-Args:
-    mode (:obj:`Any`): TODO.
-"""
         helper_mode_request = HelperMode.Request()
 
         helper_mode_request.mode = mode
@@ -141,10 +118,6 @@ Args:
                 self.execute_command(most_similar_command, argument)
     def process_command_llm(self, command):
             # Directivas adicionales para el comportamiento del robot
-    """TODO: Describe process_command_llm.
-Args:
-    command (:obj:`Any`): TODO.
-"""
         messages = [
             {"role": "system", "content": (
                 "Eres un robot asistente que responde a comandos de voz. "
@@ -187,11 +160,6 @@ Args:
     
     def execute_command(self, most_similar_command, argument):
         # Buscar la función correspondiente en el diccionario
-    """TODO: Describe execute_command.
-Args:
-    most_similar_command (:obj:`Any`): TODO.
-    argument (:obj:`Any`): TODO.
-"""
         action = self.command_actions.get(most_similar_command)
 
         # Verificar si existe una función para el comando identificado
@@ -269,16 +237,10 @@ Args:
             self.read_text("No he encontrado nada relacionado con tu busqueda")
 
     def translate_to_english(self, text):
-    """TODO: Describe translate_to_english.
-Args:
-    text (:obj:`Any`): TODO.
-"""
         english_text = translate(text, "es", "en")
         self.read_text(english_text)
 
     def actual_weather(self):
-    """TODO: Describe actual_weather.
-"""
         ciudad = "Malaga"
         api_key = "9ee89e6c536f992e3b25f22ae34e4124"
         result = f"Lo siento, ha habido un problema y no he podido obtener el tiempo en {ciudad}"
@@ -301,8 +263,6 @@ Args:
         self.read_text(result)
 
     def cant_help(self):
-    """TODO: Describe cant_help.
-"""
         self.read_text("Lo siento, pero no puedo ayudarte con eso.")
         
     def change_name(self, new_name):
@@ -414,10 +374,6 @@ Args:
 
 
 def main(args=None):
-"""TODO: Describe main.
-Args:
-    args (:obj:`Any`): TODO.
-"""
     rclpy.init(args=args)
 
     available_commands = [

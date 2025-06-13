@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import numpy as np
 import pickle
 

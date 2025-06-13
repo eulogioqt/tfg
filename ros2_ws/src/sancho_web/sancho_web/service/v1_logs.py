@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 from typing import Optional, List
 from fastapi import APIRouter, HTTPException, Query, Request, Path
 
@@ -17,10 +16,6 @@ version = "v1"
 
 log_api: LogAPI = None
 def set_log_api(api):
-"""TODO: Describe set_log_api.
-Args:
-    api (:obj:`Any`): TODO.
-"""
     global log_api
     log_api = api
 
@@ -28,10 +23,6 @@ Args:
 async def get_logs(
     request: Request
 ):
-"""TODO: Describe get_logs.
-Args:
-    request (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
 
     try:
@@ -49,11 +40,6 @@ async def get_logs_by_id(
     request: Request,
     id: str = Path(description="Id del log")
 ):
-"""TODO: Describe get_logs_by_id.
-Args:
-    request (:obj:`Any`): TODO.
-    id (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
     
     try:

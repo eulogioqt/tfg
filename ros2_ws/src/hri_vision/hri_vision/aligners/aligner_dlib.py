@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import os
 import dlib
 import cv2

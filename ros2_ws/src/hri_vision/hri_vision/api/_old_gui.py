@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import os
 import string
 import random
@@ -9,44 +8,15 @@ import numpy as np
 from PIL import Image, ImageTk, ImageFont, ImageDraw
 
 def getClassifiedText(distance, classified=None, showDistance=None):
-"""TODO: Describe getClassifiedText.
-Args:
-    distance (:obj:`Any`): TODO.
-    classified (:obj:`Any`): TODO.
-    showDistance (:obj:`Any`): TODO.
-"""
     return str(classified if classified is not None else "Desconocido") + ("" if not showDistance or distance is None or classified is None else ": " + str(round(100*distance, 2)) + "%")
 
 def getClassifiedColor(distance, MIDDLE_BOUND, UPPER_BOUND):
-"""TODO: Describe getClassifiedColor.
-Args:
-    distance (:obj:`Any`): TODO.
-    MIDDLE_BOUND (:obj:`Any`): TODO.
-    UPPER_BOUND (:obj:`Any`): TODO.
-"""
     return (0, 255, 255) if distance is None or MIDDLE_BOUND <= distance <= UPPER_BOUND else (0, 255, 0) if distance > MIDDLE_BOUND else (0, 0, 255)
 
 def getScoreColor(score):
-"""TODO: Describe getScoreColor.
-Args:
-    score (:obj:`Any`): TODO.
-"""
     return (0, 255, 255) if score is None or 0.6 <= score <= 0.85 else (0, 0, 255) if score < 0.6 else (0, 255, 0)
 
 def drawTexts(frame, position, distance, MIDDLE_BOUND, UPPER_BOUND, classified=None, score=None, wantedWidth=None, showDistance=False, showScore=False):
-"""TODO: Describe drawTexts.
-Args:
-    frame (:obj:`Any`): TODO.
-    position (:obj:`Any`): TODO.
-    distance (:obj:`Any`): TODO.
-    MIDDLE_BOUND (:obj:`Any`): TODO.
-    UPPER_BOUND (:obj:`Any`): TODO.
-    classified (:obj:`Any`): TODO.
-    score (:obj:`Any`): TODO.
-    wantedWidth (:obj:`Any`): TODO.
-    showDistance (:obj:`Any`): TODO.
-    showScore (:obj:`Any`): TODO.
-"""
     text = getClassifiedText(distance, classified=classified, showDistance=showDistance)
     colorClassified = getClassifiedColor(distance, MIDDLE_BOUND, UPPER_BOUND)
     colorScore = getScoreColor(score)
@@ -56,21 +26,6 @@ Args:
         drawText(frame, "Score: " + str(round(score, 5)), [position[0], position[1] + int(h*1.5)], colorScore, wantedWidth=wantedWidth)
 
 def mark_face(frame, position, distance, MIDDLE_BOUND, UPPER_BOUND, classified=None, drawRectangle=True, score=None, showDistance=False, showScore=False, interlocutor=None, inter_time=0):
-"""TODO: Describe mark_face.
-Args:
-    frame (:obj:`Any`): TODO.
-    position (:obj:`Any`): TODO.
-    distance (:obj:`Any`): TODO.
-    MIDDLE_BOUND (:obj:`Any`): TODO.
-    UPPER_BOUND (:obj:`Any`): TODO.
-    classified (:obj:`Any`): TODO.
-    drawRectangle (:obj:`Any`): TODO.
-    score (:obj:`Any`): TODO.
-    showDistance (:obj:`Any`): TODO.
-    showScore (:obj:`Any`): TODO.
-    interlocutor (:obj:`Any`): TODO.
-    inter_time (:obj:`Any`): TODO.
-"""
     x, y, w, h = position
     if drawRectangle:
         cv2.rectangle(frame, (x, y), (x + w, y + h), getClassifiedColor(distance, MIDDLE_BOUND, UPPER_BOUND), 2)
@@ -80,15 +35,6 @@ Args:
         drawText(frame, "INTERLOCUTOR " + str(round(inter_time, 2)) + "s", (x-20, y), (0, 255, 255), wantedWidth=w+40)
 
 def drawText(image, text, position, textColor, bgColor=(0,0,0), wantedWidth=None):
-"""TODO: Describe drawText.
-Args:
-    image (:obj:`Any`): TODO.
-    text (:obj:`Any`): TODO.
-    position (:obj:`Any`): TODO.
-    textColor (:obj:`Any`): TODO.
-    bgColor (:obj:`Any`): TODO.
-    wantedWidth (:obj:`Any`): TODO.
-"""
     font = cv2.FONT_HERSHEY_SIMPLEX
     textThickness = 2
     scale = 1
@@ -109,19 +55,9 @@ Args:
     return position[0], position[1], width, height
 
 def submit(root):
-"""TODO: Describe submit.
-Args:
-    root (:obj:`Any`): TODO.
-"""
     root.event_generate('<Return>')
 
 def ask_if_name(face, class_name, initial_value=None):
-"""TODO: Describe ask_if_name.
-Args:
-    face (:obj:`Any`): TODO.
-    class_name (:obj:`Any`): TODO.
-    initial_value (:obj:`Any`): TODO.
-"""
     if not os.environ.get("DISPLAY"):
         return True
     
@@ -134,10 +70,6 @@ Args:
     result = None
 
     def set_result(bool_value):
-    """TODO: Describe set_result.
-Args:
-    bool_value (:obj:`Any`): TODO.
-"""
         nonlocal result
         result = bool_value
         print(">> USUARIO:", result)
@@ -191,18 +123,9 @@ Args:
     return result
 
 def submit_name(root):
-"""TODO: Describe submit_name.
-Args:
-    root (:obj:`Any`): TODO.
-"""
     root.destroy()
 
 def get_name(face, initial_value=None):
-"""TODO: Describe get_name.
-Args:
-    face (:obj:`Any`): TODO.
-    initial_value (:obj:`Any`): TODO.
-"""
     if not os.environ.get("DISPLAY"):
         rnd_name = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
         return rnd_name
@@ -215,8 +138,6 @@ Args:
 
     nombre = None
     def get_input():
-    """TODO: Describe get_input.
-"""
         nonlocal nombre
         nombre = nombre_entry.get()
         print(">> USUARIO:", nombre)

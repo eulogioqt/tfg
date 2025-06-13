@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import cv2
 import time
 
@@ -13,12 +12,7 @@ from ros2web_msgs.srv import R2WSubscribe
 
 class Video(Node):
 
-"""TODO: Describe class."""
     def __init__(self, path):
-    """TODO: Describe __init__.
-Args:
-    path (:obj:`Any`): TODO.
-"""
         super().__init__("video")
 
         self.get_logger().info(f"Trying to open video on path {path}")
@@ -34,11 +28,6 @@ Args:
         self.spin()
 
     def subscribe_request(self, topic, name=""):
-    """TODO: Describe subscribe_request.
-Args:
-    topic (:obj:`Any`): TODO.
-    name (:obj:`Any`): TODO.
-"""
         subscribe_request = R2WSubscribe.Request()
         subscribe_request.topic = topic
         subscribe_request.name = name
@@ -50,8 +39,6 @@ Args:
         return result_subscribe.value
 
     def spin(self):
-    """TODO: Describe spin.
-"""
         fps = self.video.get(cv2.CAP_PROP_FPS)
         if fps == 0:
             self.get_logger().warn("FPS reportado como 0. Usando valor por defecto: 30")
@@ -92,10 +79,6 @@ Args:
 
 
 def main(args=None):
-"""TODO: Describe main.
-Args:
-    args (:obj:`Any`): TODO.
-"""
     rclpy.init(args=args)
 
     video = Video("../sandbox/video.mp4")

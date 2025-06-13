@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import json
 from queue import Queue
 
@@ -20,7 +19,6 @@ from .hri_bridge import HRIBridge
 
 class HRILogicNode(Node):
 
-"""TODO: Describe class."""
     def __init__(self, hri_logic : "HRILogic"):
         """Initializes the logic node. Subscribes to camera and publishes recognition images"""
 
@@ -66,37 +64,20 @@ class HRILogicNode(Node):
         self.get_logger().info("HRI Logic Node initializated succesfully")
 
     def frame_callback(self, frame_msg):
-    """TODO: Describe frame_callback.
-Args:
-    frame_msg (:obj:`Any`): TODO.
-"""
         if self.data_queue.empty():
             self.data_queue.put(frame_msg)
     
     def face_name_response_callback(self, msg):
-    """TODO: Describe face_name_response_callback.
-Args:
-    msg (:obj:`Any`): TODO.
-"""
         self.face_name_queue.put(msg.name)
 
     def face_question_response_callback(self, msg):
-    """TODO: Describe face_question_response_callback.
-Args:
-    msg (:obj:`Any`): TODO.
-"""
         self.face_question_queue.put(msg.answer)
     
     def face_timeout_response_callback(self, _):
-    """TODO: Describe face_timeout_response_callback.
-Args:
-    _ (:obj:`Any`): TODO.
-"""
         self.hri_logic.gui_request_sent_info = None
 
 class HRILogic():
 
-"""TODO: Describe class."""
     LOWER_BOUND = 0.75
     MIDDLE_BOUND = 0.80
     UPPER_BOUND = 0.90
@@ -213,10 +194,6 @@ class HRILogic():
         self.node.publisher_recognition.publish(self.node.br.cv2_to_imgmsg(frame, "bgr8"))
 
     def process_face_name_response(self, name):
-    """TODO: Describe process_face_name_response.
-Args:
-    name (:obj:`Any`): TODO.
-"""
         [_, _, face_aligned_base64, features, score, _] = self.gui_request_sent_info
         self.gui_request_sent_info = None
 
@@ -243,10 +220,6 @@ Args:
             self.node.get_logger().info(f">> ERROR: Algo salio mal al agregar una nueva clase: {message}")
 
     def process_face_question_response(self, answer):
-    """TODO: Describe process_face_question_response.
-Args:
-    answer (:obj:`Any`): TODO.
-"""
         [classified_id, classified_name, face_aligned_base64, features, score, distance] = self.gui_request_sent_info
         self.gui_request_sent_info = None
 
@@ -351,11 +324,6 @@ Args:
         return result_training.result, result_training.message.data
 
     def gui_request(self, mode, data_json):
-    """TODO: Describe gui_request.
-Args:
-    mode (:obj:`Any`): TODO.
-    data_json (:obj:`Any`): TODO.
-"""
         req = TriggerUserInteraction.Request()
         req.mode = mode
         req.data_json = data_json
@@ -368,11 +336,6 @@ Args:
 
     # Services
     def get_actual_people_service(self, request, response):
-    """TODO: Describe get_actual_people_service.
-Args:
-    request (:obj:`Any`): TODO.
-    response (:obj:`Any`): TODO.
-"""
         actual_people_time = self.people.get_all_last_seen()
         actual_people_json = json.dumps(actual_people_time)
         response.text = actual_people_json
@@ -380,22 +343,12 @@ Args:
         return response
 
     def get_last_frame_service(self, request, response):
-    """TODO: Describe get_last_frame_service.
-Args:
-    request (:obj:`Any`): TODO.
-    response (:obj:`Any`): TODO.
-"""
         response.text = self.node.br.cv2_to_base64(self.last_frame, quality=100)
 
         return response
 
     # Utils
     def read_text(self, text, asking_mode=""):
-    """TODO: Describe read_text.
-Args:
-    text (:obj:`Any`): TODO.
-    asking_mode (:obj:`Any`): TODO.
-"""
         self.node.get_logger().info(f"[SANCHO] {text}")
         self.node.input_tts.publish(String(data=json.dumps({
             "text": text,
@@ -403,13 +356,6 @@ Args:
         })))
     
     def create_log(self, action, faceprint_id, message="", metadata_json=""):
-    """TODO: Describe create_log.
-Args:
-    action (:obj:`Any`): TODO.
-    faceprint_id (:obj:`Any`): TODO.
-    message (:obj:`Any`): TODO.
-    metadata_json (:obj:`Any`): TODO.
-"""
         self.node.publisher_log.publish(Log(
             level=CONSTANTS.LEVEL.INFO,
             origin=CONSTANTS.ORIGIN.ROS,
@@ -421,10 +367,6 @@ Args:
         ))
 
 def main(args=None):
-"""TODO: Describe main.
-Args:
-    args (:obj:`Any`): TODO.
-"""
     rclpy.init(args=args)
 
     hri_logic = HRILogic()

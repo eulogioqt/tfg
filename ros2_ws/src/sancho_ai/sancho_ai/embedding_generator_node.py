@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import os
 import json
 from pathlib import Path
@@ -17,10 +16,7 @@ from llm_tools.models import PROVIDER, MODELS, NEEDS_API_KEY
 
 class EmbeddingGeneratorNode(Node):
 
-"""TODO: Describe class."""
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         super().__init__('generate_embeddings_node')
         load_dotenv()
 
@@ -39,40 +35,22 @@ class EmbeddingGeneratorNode(Node):
             self.output = {}
 
     def wait_for_service(self, client):
-    """TODO: Describe wait_for_service.
-Args:
-    client (:obj:`Any`): TODO.
-"""
         if not client.wait_for_service(timeout_sec=5.0):
             self.get_logger().error(f"Service {client.srv_name} not available.")
             return False
         return True
 
     def call_sync(self, client, request):
-    """TODO: Describe call_sync.
-Args:
-    client (:obj:`Any`): TODO.
-    request (:obj:`Any`): TODO.
-"""
         future = client.call_async(request)
         rclpy.spin_until_future_complete(self, future)
         return future.result()
 
     def get_api_key_for(self, provider):
-    """TODO: Describe get_api_key_for.
-Args:
-    provider (:obj:`Any`): TODO.
-"""
         if provider not in NEEDS_API_KEY:
             return ""
         return os.environ.get(f"{provider.name.upper()}_API_KEY", "")
 
     def load_model(self, provider, model_name):
-    """TODO: Describe load_model.
-Args:
-    provider (:obj:`Any`): TODO.
-    model_name (:obj:`Any`): TODO.
-"""
         if not self.wait_for_service(self.cli_load):
             return False
         req = LoadModel.Request()
@@ -82,11 +60,6 @@ Args:
         return res.results[0].success if res and res.results else False
 
     def unload_model(self, provider, model_name):
-    """TODO: Describe unload_model.
-Args:
-    provider (:obj:`Any`): TODO.
-    model_name (:obj:`Any`): TODO.
-"""
         if not self.wait_for_service(self.cli_unload):
             return
         req = UnloadModel.Request()
@@ -95,14 +68,10 @@ Args:
         self.call_sync(self.cli_unload, req)
 
     def save_output(self):
-    """TODO: Describe save_output.
-"""
         with open(self.output_file, 'w') as f:
             json.dump(self.output, f, indent=2)
 
     def generate_embeddings(self):
-    """TODO: Describe generate_embeddings.
-"""
         for provider in PROVIDER:
             model_enum = getattr(MODELS.EMBEDDING, provider.name.upper(), None)
             if model_enum is None:
@@ -149,12 +118,6 @@ Args:
         self.get_logger().info("✅ Embeddings generados correctamente.")
 
     def get_embedding(self, provider, model_name, text):
-    """TODO: Describe get_embedding.
-Args:
-    provider (:obj:`Any`): TODO.
-    model_name (:obj:`Any`): TODO.
-    text (:obj:`Any`): TODO.
-"""
         if not self.wait_for_service(self.cli_embedding):
             return None
         req = Embedding.Request()
@@ -170,10 +133,6 @@ Args:
 
 
 def main(args=None):
-"""TODO: Describe main.
-Args:
-    args (:obj:`Any`): TODO.
-"""
     rclpy.init(args=args)
 
     node = EmbeddingGeneratorNode()

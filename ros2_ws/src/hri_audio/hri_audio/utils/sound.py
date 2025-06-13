@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import pygame
 
 def load(path):

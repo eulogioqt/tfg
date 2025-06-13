@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 from .factory import create_sancho_ai, AIType
 
 from .dummy_ai import DummyAI

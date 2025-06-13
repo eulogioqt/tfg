@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import json
 import rclpy
 import sounddevice as sd
@@ -15,10 +14,6 @@ from sancho_ai.prompts.commands import COMMANDS
 
 
 def try_json_loads(text):
-"""TODO: Describe try_json_loads.
-Args:
-    text (:obj:`Any`): TODO.
-"""
     try:
         return json.loads(text)
     except Exception:
@@ -28,10 +23,7 @@ Args:
 # para publicar las transcripciones igual, quitar tanto json
 class AssistantNode(Node):
 
-"""TODO: Describe class."""
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         super().__init__("assistant")
 
         self.face_mode_pub = self.create_publisher(String, "face/mode", 10)
@@ -60,33 +52,20 @@ class AssistantNode(Node):
         self.get_logger().info("Assistant Node initializated succesfully.")
 
     def text_callback(self, msg):
-    """TODO: Describe text_callback.
-Args:
-    msg (:obj:`Any`): TODO.
-"""
         if self.queue.qsize() < 1:
             self.queue.put(msg.data)
 
     def tts_callback(self, msg):
-    """TODO: Describe tts_callback.
-Args:
-    msg (:obj:`Any`): TODO.
-"""
         if self.tts_queue.qsize() < 1:
             self.tts_queue.put(msg.data)
 
 
 class Assistant:
 
-"""TODO: Describe class."""
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         self.node = AssistantNode()
     
     def spin(self):
-    """TODO: Describe spin.
-"""
         while rclpy.ok():
             if not self.node.queue.empty():
                 user_dict = json.loads(self.node.queue.get())
@@ -142,10 +121,6 @@ class Assistant:
             rclpy.spin_once(self.node)
 
     def sancho_prompt_request(self, text):
-    """TODO: Describe sancho_prompt_request.
-Args:
-    text (:obj:`Any`): TODO.
-"""
         sancho_prompt_request = SanchoPrompt.Request()
         sancho_prompt_request.chat_id = "0"
         sancho_prompt_request.text = text
@@ -163,10 +138,6 @@ Args:
         return text, emotion, data, result_sancho_prompt.intent
 
     def sancho_get_name_request(self, text):
-    """TODO: Describe sancho_get_name_request.
-Args:
-    text (:obj:`Any`): TODO.
-"""
         sancho_prompt_request = SanchoPrompt.Request()
         sancho_prompt_request.text = text
         sancho_prompt_request.asking_mode = "get_name"
@@ -183,10 +154,6 @@ Args:
         return name_said, name
     
     def sancho_confirm_name_request(self, text):
-    """TODO: Describe sancho_confirm_name_request.
-Args:
-    text (:obj:`Any`): TODO.
-"""
         sancho_prompt_request = SanchoPrompt.Request()
         sancho_prompt_request.text = text
         sancho_prompt_request.asking_mode = "confirm_name"
@@ -203,10 +170,6 @@ Args:
         return answer_said, answer
 
     def tts_request(self, text):
-    """TODO: Describe tts_request.
-Args:
-    text (:obj:`Any`): TODO.
-"""
         tts_request = TTS.Request()
         tts_request.text = text
 
@@ -217,11 +180,6 @@ Args:
         return result_tts.audio, result_tts.sample_rate
 
     def gui_request(self, mode, data_json):
-    """TODO: Describe gui_request.
-Args:
-    mode (:obj:`Any`): TODO.
-    data_json (:obj:`Any`): TODO.
-"""
         req = TriggerUserInteraction.Request()
         req.mode = mode
         req.data_json = data_json
@@ -233,13 +191,6 @@ Args:
         return result.accepted
 
     def play_tts(self, text, emotion, asking_mode="", wait=True):
-    """TODO: Describe play_tts.
-Args:
-    text (:obj:`Any`): TODO.
-    emotion (:obj:`Any`): TODO.
-    asking_mode (:obj:`Any`): TODO.
-    wait (:obj:`Any`): TODO.
-"""
         self.node.face_mode_pub.publish(String(data="speaking")) # Mouth speaking
         self.node.helper_mode_pub.publish(String(data=json.dumps({ "helper_state": HELPER_STATE.SPEAKING.value }))) # Speaking mode
         if emotion:
@@ -263,10 +214,6 @@ Args:
 
 
 def main(args=None):
-"""TODO: Describe main.
-Args:
-    args (:obj:`Any`): TODO.
-"""
     rclpy.init(args=args)
 
     assistant = Assistant()

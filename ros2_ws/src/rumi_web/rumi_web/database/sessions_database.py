@@ -1,22 +1,14 @@
-"""TODO: Add module documentation."""
 import sqlite3
 
 
 class SessionsDatabase:
-"""TODO: Describe class."""
     def __init__(self, db_path='sessions.db'):
-    """TODO: Describe __init__.
-Args:
-    db_path (:obj:`Any`): TODO.
-"""
         self.conn = sqlite3.connect(db_path)
         self.conn.row_factory = sqlite3.Row
         self.cursor = self.conn.cursor()
         self._create_tables()
 
     def _create_tables(self):
-    """TODO: Describe _create_tables.
-"""
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS sessions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -42,8 +34,6 @@ Args:
 
     # ----------------- SESSIONS -----------------
     def get_all_sessions(self):
-    """TODO: Describe get_all_sessions.
-"""
         self.cursor.execute('SELECT * FROM sessions')
         sessions = self.cursor.fetchall()
         result = []
@@ -56,10 +46,6 @@ Args:
         return result
 
     def get_session_by_id(self, id):
-    """TODO: Describe get_session_by_id.
-Args:
-    id (:obj:`Any`): TODO.
-"""
         self.cursor.execute('SELECT * FROM sessions WHERE id = ?', (id,))
         session = self.cursor.fetchone()
         if session:
@@ -71,10 +57,6 @@ Args:
             return {}
 
     def get_sessions_by_faceprint_id(self, faceprint_id):
-    """TODO: Describe get_sessions_by_faceprint_id.
-Args:
-    faceprint_id (:obj:`Any`): TODO.
-"""
         self.cursor.execute('SELECT * FROM sessions WHERE faceprint_id = ?', (faceprint_id,))
         sessions = self.cursor.fetchall()
         result = []
@@ -88,10 +70,6 @@ Args:
 
     # ----------------- DETECTIONS -----------------
     def get_detections_by_session(self, session_id):
-    """TODO: Describe get_detections_by_session.
-Args:
-    session_id (:obj:`Any`): TODO.
-"""
         self.cursor.execute('SELECT timestamp, score_face, score_classification, face_image_base64 FROM detections WHERE session_id = ?', (session_id,))
         rows = self.cursor.fetchall()
         return [

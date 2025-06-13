@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import json
 import time
 from enum import Enum
@@ -20,24 +19,17 @@ from .encoders import ( BaseEncoder,
 )
 
 class SmartStrEnum(str, Enum):
-"""TODO: Describe class."""
     def __str__(self):
-    """TODO: Describe __str__.
-"""
         return self.value
 
     def __repr__(self):
-    """TODO: Describe __repr__.
-"""
         return self.value
 
 class DBMode(SmartStrEnum):
-"""TODO: Describe class."""
     SAVE = "save",
     NO_SAVE = "no_save"
 
 class EncoderType(SmartStrEnum):
-"""TODO: Describe class."""
     FACENET = "facenet"
     ARCFACE = "arcface"
     DINOV2 = "dinov2"
@@ -58,10 +50,7 @@ ENCODER_CLASS_MAP = {
 
 class HumanFaceRecognizer(Node):
 
-"""TODO: Describe class."""
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         super().__init__("human_face_recognizer")
 
         self.show_metrics = self.declare_parameter("show_metrics", False).value
@@ -104,11 +93,6 @@ class HumanFaceRecognizer(Node):
         self.br = HRIBridge()
 
     def recognition(self, request, response):
-    """TODO: Describe recognition.
-Args:
-    request (:obj:`Any`): TODO.
-    response (:obj:`Any`): TODO.
-"""
         frame = self.br.imgmsg_to_cv2(request.frame, "bgr8")
         position = [
             request.position.x,
@@ -155,11 +139,6 @@ Args:
         return response
 
     def training(self, request, response):
-    """TODO: Describe training.
-Args:
-    request (:obj:`Any`): TODO.
-    response (:obj:`Any`): TODO.
-"""
         try:
             cmd_type = request.cmd_type.data
             args = json.loads(request.args.data)
@@ -186,12 +165,6 @@ Args:
         return response
 
     def send_faceprint_event(self, event, id, origin):
-    """TODO: Describe send_faceprint_event.
-Args:
-    event (:obj:`Any`): TODO.
-    id (:obj:`Any`): TODO.
-    origin (:obj:`Any`): TODO.
-"""
         faceprint_event = FaceprintEvent()
         faceprint_event.event = event
         faceprint_event.id = id
@@ -199,21 +172,12 @@ Args:
         self.faceprint_event_pub.publish(faceprint_event)
 
     def get_people(self, request, response):
-    """TODO: Describe get_people.
-Args:
-    request (:obj:`Any`): TODO.
-    response (:obj:`Any`): TODO.
-"""
         args = json.loads(request.args) if request.args else {}
         id = args.get("id", "").strip()
         name = args.get("name", "").strip()
         fields = args.get("fields", [])
 
         def filter_fields(obj):
-        """TODO: Describe filter_fields.
-Args:
-    obj (:obj:`Any`): TODO.
-"""
             return {k: obj[k] for k in fields if k in obj} if fields else obj
 
         if id:
@@ -227,16 +191,10 @@ Args:
         return response
 
     def save_data(self):
-    """TODO: Describe save_data.
-"""
         self.classifier.db.save()
 
 
 def main(args=None):
-"""TODO: Describe main.
-Args:
-    args (:obj:`Any`): TODO.
-"""
     rclpy.init(args=args)
     node = HumanFaceRecognizer()
     rclpy.spin(node)

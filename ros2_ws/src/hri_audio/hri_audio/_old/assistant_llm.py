@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import datetime
 import time
 import requests
@@ -21,13 +20,7 @@ from human_face_recognition_msgs.srv import HelperMode, GetString
 
 class Asssistant(Node):
 
-"""TODO: Describe class."""
     def __init__(self, name, recognizer):
-    """TODO: Describe __init__.
-Args:
-    name (:obj:`Any`): TODO.
-    recognizer (:obj:`Any`): TODO.
-"""
         super().__init__("assistant")
         
         self.name = name
@@ -49,27 +42,15 @@ Args:
         #msg = [text, self.accent]
         #msg_json = json.dumps(msg)
         
-    """TODO: Describe read_text.
-Args:
-    text (:obj:`Any`): TODO.
-"""
         self.input_tts.publish(String(data=text))
     
     def text_callback(self, msg):
-    """TODO: Describe text_callback.
-Args:
-    msg (:obj:`Any`): TODO.
-"""
         if self.text_queue.qsize() < 1:
             self.text_queue.put(msg)
         else:
             self.get_logger().info("Text Queue IS FULL!!!")
 
     def helper_mode_request(self, mode):
-    """TODO: Describe helper_mode_request.
-Args:
-    mode (:obj:`Any`): TODO.
-"""
         helper_mode_request = HelperMode.Request()
 
         helper_mode_request.mode = mode
@@ -81,8 +62,6 @@ Args:
         return result_helper_mode.result
     
     def get_actual_people_request(self):
-    """TODO: Describe get_actual_people_request.
-"""
         result = "{}"
 
         if self.get_actual_people_client.service_is_ready():
@@ -119,10 +98,6 @@ Args:
             self.process_text(text_lower)
             
     def process_text(self, text):
-    """TODO: Describe process_text.
-Args:
-    text (:obj:`Any`): TODO.
-"""
         most_similar_command = self.recognizer.recognize_command(text)
         self.process_command(most_similar_command, text)
         
@@ -319,10 +294,6 @@ Args:
 
 
 def main(args=None):
-"""TODO: Describe main.
-Args:
-    args (:obj:`Any`): TODO.
-"""
     rclpy.init(args=args)
     commands = [
         "busca", 
@@ -358,40 +329,21 @@ import torch
 import torch.nn.functional as F
 
 class CommandRecognizer:
-"""TODO: Describe class."""
     def __init__(self,recognizable_commands=None, model_name='hiiamsid/sentence_similarity_spanish_es'):
-    """TODO: Describe __init__.
-Args:
-    recognizable_commands (:obj:`Any`): TODO.
-    model_name (:obj:`Any`): TODO.
-"""
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModel.from_pretrained(model_name)
         self.preestablished_commands = recognizable_commands
         self.command_embeddings = self.compute_embeddings(self.preestablished_commands)
 
     def mean_pooling(self, model_output, attention_mask):
-    """TODO: Describe mean_pooling.
-Args:
-    model_output (:obj:`Any`): TODO.
-    attention_mask (:obj:`Any`): TODO.
-"""
         token_embeddings = model_output[0] # First element of model_output contains all token embeddings
         input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
         return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
 
     def normalize_embeddings(self, embeddings):
-    """TODO: Describe normalize_embeddings.
-Args:
-    embeddings (:obj:`Any`): TODO.
-"""
         return F.normalize(embeddings, p=2, dim=1)
 
     def compute_embeddings(self, sentences):
-    """TODO: Describe compute_embeddings.
-Args:
-    sentences (:obj:`Any`): TODO.
-"""
         encoded_input = self.tokenizer(sentences, padding=True, truncation=True, return_tensors='pt')
         with torch.no_grad():
             model_output = self.model(**encoded_input)
@@ -399,10 +351,6 @@ Args:
         return self.normalize_embeddings(sentence_embeddings)
 
     def recognize_command(self, user_input):
-    """TODO: Describe recognize_command.
-Args:
-    user_input (:obj:`Any`): TODO.
-"""
         user_embeddings = self.compute_embeddings([user_input])
         similarities = []
         for command_embedding in self.command_embeddings:

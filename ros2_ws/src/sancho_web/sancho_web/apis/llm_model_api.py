@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import json
 from ..engines import LLMModelEngine
 from .api_responses import HTTPException, JSONResponse, APIResponse
@@ -7,19 +6,10 @@ from sancho_web.database.system_database import CONSTANTS
 
 class LLMModelAPI:
 
-"""TODO: Describe class."""
     def __init__(self, node):
-    """TODO: Describe __init__.
-Args:
-    node (:obj:`Any`): TODO.
-"""
         self.engine = LLMModelEngine(node)
 
     def get_all_llm_providers(self, providers: list[str] = []) -> APIResponse:
-    """TODO: Describe get_all_llm_providers.
-Args:
-    providers (:obj:`Any`): TODO.
-"""
         providers_response = []
 
         [all_providers, _] = self.engine.get_all_models_request(providers)
@@ -45,10 +35,6 @@ Args:
         return JSONResponse(content=providers_response)
 
     def get_llm_provider(self, provider: str) -> APIResponse:
-    """TODO: Describe get_llm_provider.
-Args:
-    provider (:obj:`Any`): TODO.
-"""
         [all_providers, _] = self.engine.get_all_models_request([provider])
         if not all_providers:
             raise HTTPException(status_code=404, detail=f"Provider '{provider}' not found.")
@@ -78,12 +64,6 @@ Args:
         return JSONResponse(content=item)
 
     def load_llm_model(self, provider: str, model: str, api_key: str) -> APIResponse:
-    """TODO: Describe load_llm_model.
-Args:
-    provider (:obj:`Any`): TODO.
-    model (:obj:`Any`): TODO.
-    api_key (:obj:`Any`): TODO.
-"""
         results = self.engine.load_model_request([[provider, [model], api_key]])
         [_, _, message, success] = results[0]
 
@@ -98,11 +78,6 @@ Args:
         })
 
     def unload_llm_model(self, provider: str, model: str) -> APIResponse:
-    """TODO: Describe unload_llm_model.
-Args:
-    provider (:obj:`Any`): TODO.
-    model (:obj:`Any`): TODO.
-"""
         results = self.engine.unload_model_request([[provider, [model]]])
         [_, _, message, success] = results[0]
 
@@ -117,11 +92,6 @@ Args:
         })
 
     def set_active_llm_model(self, provider: str, model: str) -> APIResponse:
-    """TODO: Describe set_active_llm_model.
-Args:
-    provider (:obj:`Any`): TODO.
-    model (:obj:`Any`): TODO.
-"""
         [message, success] = self.engine.set_active_model_request(provider, model)
 
         if success:
@@ -135,13 +105,6 @@ Args:
         })
 
     def _build_provider_dict(self, provider: str, needs_api_key: bool, executed_locally: bool, models: list[dict]) -> dict:
-    """TODO: Describe _build_provider_dict.
-Args:
-    provider (:obj:`Any`): TODO.
-    needs_api_key (:obj:`Any`): TODO.
-    executed_locally (:obj:`Any`): TODO.
-    models (:obj:`Any`): TODO.
-"""
         return {
             "provider": provider,
             "needs_api_key": needs_api_key,
@@ -150,12 +113,6 @@ Args:
         }
 
     def _build_model_dict(self, model: str, loaded: bool, active: bool) -> dict:
-    """TODO: Describe _build_model_dict.
-Args:
-    model (:obj:`Any`): TODO.
-    loaded (:obj:`Any`): TODO.
-    active (:obj:`Any`): TODO.
-"""
         return {
             "model": model,
             "loaded": loaded,

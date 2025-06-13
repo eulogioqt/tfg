@@ -1,12 +1,7 @@
-"""TODO: Add module documentation."""
 import json
 import os
 
 def procesar_resultados(path_json):
-"""TODO: Describe procesar_resultados.
-Args:
-    path_json (:obj:`Any`): TODO.
-"""
     path = os.path.join(os.path.dirname(__file__), path_json)
     with open(path) as f:
         data = json.load(f)
@@ -40,10 +35,6 @@ Args:
         print(f"    {real_name(fila[0]):20} & {fila[1]:4} & {fila[2]:.4f} & {fila[3]:.4f} & {fila[4]:.4f} & {fila[5]:.4f} & {fila[6]:.4f} & {score_fnmt} \\\\")
 
 def real_name(str):
-"""TODO: Describe real_name.
-Args:
-    str (:obj:`Any`): TODO.
-"""
     return {
         "yolov5": "YOLOv5-face",
         "insightface": "InsightFace-lite",

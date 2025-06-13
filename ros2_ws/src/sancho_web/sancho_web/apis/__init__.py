@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 from .api_responses import APIResponse, HTTPException, JSONResponse
 from .faceprint_api import FaceprintAPI
 from .log_api import LogAPI
@@ -11,19 +10,13 @@ from enum import Enum
 
 
 class SmartStrEnum(str, Enum):
-"""TODO: Describe class."""
     def __str__(self):
-    """TODO: Describe __str__.
-"""
         return self.value
 
     def __repr__(self):
-    """TODO: Describe __repr__.
-"""
         return self.value
 
 class API_LIST(SmartStrEnum):
-"""TODO: Describe class."""
     FACEPRINTS = "faceprints"
     LOGS = "logs"
     SESSIONS = "sessions"

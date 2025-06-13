@@ -1,14 +1,10 @@
-"""TODO: Add module documentation."""
 import cv2
 import numpy as np
 from yolo5face.get_model import get_model
 from .base_detector import BaseDetector
 
 class YOLOv5FaceDetector(BaseDetector):
-"""TODO: Describe class."""
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         self.model = get_model(
             "yolov5n",
             device="cuda",
@@ -16,11 +12,6 @@ class YOLOv5FaceDetector(BaseDetector):
         )
 
     def get_faces(self, frame, verbose=False):
-    """TODO: Describe get_faces.
-Args:
-    frame (:obj:`Any`): TODO.
-    verbose (:obj:`Any`): TODO.
-"""
         boxes, points, scores = self.model.detector.predict(frame, target_size=640)
 
         face_positions = [

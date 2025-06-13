@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import pyaudio
 import numpy as np
 
@@ -10,10 +9,7 @@ from hri_msgs.msg import ChunkMono, ChunkStereo
 
 class MicrophoneCapturerNode(Node):
 
-"""TODO: Describe class."""
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         super().__init__("microphone_capturer")
 
         self.publisher_stereo = self.create_publisher(ChunkStereo, 'hri_audio/microphone/stereo', 10)
@@ -22,13 +18,7 @@ class MicrophoneCapturerNode(Node):
 
 class MicrophoneCapturer:
 
-"""TODO: Describe class."""
     def __init__(self, device_name="orbbec", chunk_size=1024):
-    """TODO: Describe __init__.
-Args:
-    device_name (:obj:`Any`): TODO.
-    chunk_size (:obj:`Any`): TODO.
-"""
         device = self.get_device_by_name(device_name)
         if not device:
             raise Exception(f"Microphone with name {device_name} not found.")
@@ -43,8 +33,6 @@ Args:
         self.node = MicrophoneCapturerNode()
 
     def spin(self):
-    """TODO: Describe spin.
-"""
         first = True
 
         while rclpy.ok():
@@ -77,10 +65,6 @@ Args:
                  self.node.get_logger().info(f">> Microphone Publisher Error: {e}")
     
     def get_device_by_name(self, device_name):
-    """TODO: Describe get_device_by_name.
-Args:
-    device_name (:obj:`Any`): TODO.
-"""
         p = pyaudio.PyAudio()
 
         device = None
@@ -96,13 +80,6 @@ Args:
         return device
 
     def setup_microphone(self, device_index, sample_rate, num_channels, chunk_size):
-    """TODO: Describe setup_microphone.
-Args:
-    device_index (:obj:`Any`): TODO.
-    sample_rate (:obj:`Any`): TODO.
-    num_channels (:obj:`Any`): TODO.
-    chunk_size (:obj:`Any`): TODO.
-"""
         p = pyaudio.PyAudio()
 
         return p.open(format=pyaudio.paInt16, channels=num_channels, rate=sample_rate,
@@ -110,10 +87,6 @@ Args:
      
 
 def main(args=None):
-"""TODO: Describe main.
-Args:
-    args (:obj:`Any`): TODO.
-"""
     rclpy.init(args=args)
 
     microphone_capturer = MicrophoneCapturer()

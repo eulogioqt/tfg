@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import rclpy
 from rclpy.node import Node
 from rclpy.client import Client
@@ -11,21 +10,10 @@ from abc import ABC
 
 class ServiceEngine(ABC):
     
-"""TODO: Describe class."""
     def __init__(self, node: Node):
-    """TODO: Describe __init__.
-Args:
-    node (:obj:`Any`): TODO.
-"""
         self.node = node
 
     def create_client(self, srv_type, srv_name, wait=True):
-    """TODO: Describe create_client.
-Args:
-    srv_type (:obj:`Any`): TODO.
-    srv_name (:obj:`Any`): TODO.
-    wait (:obj:`Any`): TODO.
-"""
         client = self.node.create_client(srv_type, srv_name)
         while wait and not client.wait_for_service(timeout_sec=1.0):
             self.node.get_logger().info(f'{srv_name} service not available, waiting again...')
@@ -33,11 +21,6 @@ Args:
         return client
 
     def call_service(self, client: Client, request):
-    """TODO: Describe call_service.
-Args:
-    client (:obj:`Any`): TODO.
-    request (:obj:`Any`): TODO.
-"""
         if not client.service_is_ready():
             self.node.get_logger().warn(f"Service'{client.srv_name}' not available")
             return None
@@ -46,10 +29,6 @@ Args:
         result_holder = {}
 
         def done_cb(fut):
-        """TODO: Describe done_cb.
-Args:
-    fut (:obj:`Any`): TODO.
-"""
             try:
                 result_holder["value"] = fut.result()
             except Exception as e:
@@ -66,10 +45,6 @@ Args:
 
     @staticmethod
     def create_client_node(name="service_engine_client"):
-    """TODO: Describe create_client_node.
-Args:
-    name (:obj:`Any`): TODO.
-"""
         node = rclpy.create_node(name)
 
         executor = SingleThreadedExecutor()

@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import json
 from .prompt import Prompt
 
@@ -53,19 +52,11 @@ Let's continue the conversation.
 
 
 class UnknownPrompt(Prompt):
-"""TODO: Describe class."""
     def __init__(self, user_input: str, robot_context: dict = {}):
-    """TODO: Describe __init__.
-Args:
-    user_input (:obj:`Any`): TODO.
-    robot_context (:obj:`Any`): TODO.
-"""
         self.user_input = user_input.strip()
         self.robot_context = robot_context
 
     def _format_robot_context(self) -> str:
-    """TODO: Describe _format_robot_context.
-"""
         ctx = self.robot_context
         lines = []
 
@@ -104,19 +95,13 @@ Args:
         return "\n".join(lines)
 
     def get_prompt_system(self):
-    """TODO: Describe get_prompt_system.
-"""
         context_text = self._format_robot_context()
         return UNKNOWN_PROMPT_TEMPLATE.replace('{robot_context}', context_text)
 
     def get_user_prompt(self):
-    """TODO: Describe get_user_prompt.
-"""
         return self.user_input
 
     def get_parameters(self):
-    """TODO: Describe get_parameters.
-"""
         return json.dumps({
             "temperature": 0.6,
             "max_tokens": 256

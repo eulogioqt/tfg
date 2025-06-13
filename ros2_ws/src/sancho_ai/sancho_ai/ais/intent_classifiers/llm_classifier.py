@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 from .intent_classifier import IntentClassifier
 
 from ...log_manager import LogManager
@@ -9,25 +8,12 @@ from ...prompts.commands.commands import COMMANDS
 
 class LLMClassifier(IntentClassifier):
 
-"""TODO: Describe class."""
     def __init__(self, llm_engine: LLMEngine, provider: str = None, model: str = None):
-    """TODO: Describe __init__.
-Args:
-    llm_engine (:obj:`Any`): TODO.
-    provider (:obj:`Any`): TODO.
-    model (:obj:`Any`): TODO.
-"""
         self.llm_engine = llm_engine
         self.provider = provider
         self.model = model
 
     def classify(self, user_input, chat_history=[], testing=False):
-    """TODO: Describe classify.
-Args:
-    user_input (:obj:`Any`): TODO.
-    chat_history (:obj:`Any`): TODO.
-    testing (:obj:`Any`): TODO.
-"""
         classification_prompt = ClassificationPrompt(user_input, chat_history)
 
         LogManager.info(f"User: {user_input}")

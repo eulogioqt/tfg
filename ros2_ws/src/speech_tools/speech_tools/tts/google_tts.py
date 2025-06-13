@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import numpy as np
 
 from gtts import gTTS
@@ -11,13 +10,7 @@ from ..models import TTS_SPEAKERS
 
 class GoogleTTS(TTSModel):
 
-"""TODO: Describe class."""
     def synthesize(self, text: str, speaker: str) -> tuple[list[int], str]:
-    """TODO: Describe synthesize.
-Args:
-    text (:obj:`Any`): TODO.
-    speaker (:obj:`Any`): TODO.
-"""
         if not speaker:
             speaker = self.get_speakers()[0]
             
@@ -36,11 +29,7 @@ Args:
         return audio.tolist(), speaker
 
     def get_sample_rate(self) -> int:
-    """TODO: Describe get_sample_rate.
-"""
         return 24000
     
     def get_speakers(self) -> list[str]:
-    """TODO: Describe get_speakers.
-"""
         return list(TTS_SPEAKERS.GOOGLE)

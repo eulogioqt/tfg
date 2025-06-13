@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import re
 import cv2
 import base64
@@ -12,10 +11,7 @@ from hri_msgs.msg import FacePosition
 
 class HRIBridge:
 
-"""TODO: Describe class."""
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         self.br = CvBridge()
 
     def imgmsg_to_cv2(self, img_msg, desired_encoding="passthrough"):

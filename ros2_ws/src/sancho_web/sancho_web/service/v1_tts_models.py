@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 from typing import Optional, List
 from fastapi import APIRouter, HTTPException, Query, Request, Path
 
@@ -17,10 +16,6 @@ version = "v1"
 
 tts_model_api: TTSModelAPI = None
 def set_tts_model_api(api):
-"""TODO: Describe set_tts_model_api.
-Args:
-    api (:obj:`Any`): TODO.
-"""
     global tts_model_api
     tts_model_api = api
 
@@ -29,11 +24,6 @@ async def get_tts_models(
     request: Request,
     models: Optional[List[str]] = Query(None, description="Lista de modelos a buscar")
 ):
-"""TODO: Describe get_tts_models.
-Args:
-    request (:obj:`Any`): TODO.
-    models (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
 
     try:
@@ -56,16 +46,6 @@ async def get_tts_model_by_name(
     limit: int = Query(default=10, description="Cantidad de marcadores a devolver, por defecto 10"),
     hateoas: Optional[bool] = Query(default=False, description="Incluir enlace HATEOAS")
 ):
-"""TODO: Describe get_tts_model_by_name.
-Args:
-    request (:obj:`Any`): TODO.
-    model (:obj:`Any`): TODO.
-    fields (:obj:`Any`): TODO.
-    sort (:obj:`Any`): TODO.
-    offset (:obj:`Any`): TODO.
-    limit (:obj:`Any`): TODO.
-    hateoas (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
     
     try:
@@ -83,11 +63,6 @@ async def load_tts_model(
     tts_load_model: TTSLoadModel,
     request: Request
 ):
-"""TODO: Describe load_tts_model.
-Args:
-    tts_load_model (:obj:`Any`): TODO.
-    request (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
     APIUtils.check_content_type_json(request)
 
@@ -110,11 +85,6 @@ async def unload_tts_model(
     tts_unload_model: TTSUnloadModel,
     request: Request
 ):
-"""TODO: Describe unload_tts_model.
-Args:
-    tts_unload_model (:obj:`Any`): TODO.
-    request (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
     APIUtils.check_content_type_json(request)
 
@@ -136,11 +106,6 @@ async def activate_tts_model(
     tts_active_model: TTSActiveModel,
     request: Request
 ):
-"""TODO: Describe activate_tts_model.
-Args:
-    tts_active_model (:obj:`Any`): TODO.
-    request (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
     APIUtils.check_content_type_json(request)
 

@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 from typing import Optional, List
 from fastapi import APIRouter, HTTPException, Query, Request, Path
 
@@ -17,10 +16,6 @@ version = "v1"
 
 stt_model_api: STTModelAPI = None
 def set_stt_model_api(api):
-"""TODO: Describe set_stt_model_api.
-Args:
-    api (:obj:`Any`): TODO.
-"""
     global stt_model_api
     stt_model_api = api
 
@@ -29,11 +24,6 @@ async def get_stt_models(
     request: Request,
     models: Optional[List[str]] = Query(None, description="Lista de modelos a buscar")
 ):
-"""TODO: Describe get_stt_models.
-Args:
-    request (:obj:`Any`): TODO.
-    models (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
 
     try:
@@ -56,16 +46,6 @@ async def get_stt_model_by_name(
     limit: int = Query(default=10, description="Cantidad de marcadores a devolver, por defecto 10"),
     hateoas: Optional[bool] = Query(default=False, description="Incluir enlace HATEOAS")
 ):
-"""TODO: Describe get_stt_model_by_name.
-Args:
-    request (:obj:`Any`): TODO.
-    model (:obj:`Any`): TODO.
-    fields (:obj:`Any`): TODO.
-    sort (:obj:`Any`): TODO.
-    offset (:obj:`Any`): TODO.
-    limit (:obj:`Any`): TODO.
-    hateoas (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
 
     try:
@@ -83,11 +63,6 @@ async def load_stt_model(
     stt_load_model: STTLoadModel,
     request: Request
 ):
-"""TODO: Describe load_stt_model.
-Args:
-    stt_load_model (:obj:`Any`): TODO.
-    request (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
     APIUtils.check_content_type_json(request)
 
@@ -110,11 +85,6 @@ async def unload_stt_model(
     stt_unload_model: STTUnloadModel,
     request: Request
 ):
-"""TODO: Describe unload_stt_model.
-Args:
-    stt_unload_model (:obj:`Any`): TODO.
-    request (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
     APIUtils.check_content_type_json(request)
 
@@ -136,11 +106,6 @@ async def activate_stt_model(
     stt_active_model: STTActiveModel,
     request: Request
 ):
-"""TODO: Describe activate_stt_model.
-Args:
-    stt_active_model (:obj:`Any`): TODO.
-    request (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
     APIUtils.check_content_type_json(request)
 

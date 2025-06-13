@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 from typing import Optional, List
 from fastapi import APIRouter, HTTPException, Query, Request, Path
 
@@ -17,10 +16,6 @@ version = "v1"
 
 llm_model_api: LLMModelAPI = None
 def set_llm_model_api(api):
-"""TODO: Describe set_llm_model_api.
-Args:
-    api (:obj:`Any`): TODO.
-"""
     global llm_model_api
     llm_model_api = api
 
@@ -30,11 +25,6 @@ async def get_llm_providers(
     request: Request,
     providers: Optional[List[str]] = Query(None, description="Lista de proveedores a buscar")
 ):
-"""TODO: Describe get_llm_providers.
-Args:
-    request (:obj:`Any`): TODO.
-    providers (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
 
     try:
@@ -51,11 +41,6 @@ async def get_llm_provider(
     request: Request,
     provider: str = Path(description="Nombre del proveedor")
 ):
-"""TODO: Describe get_llm_provider.
-Args:
-    request (:obj:`Any`): TODO.
-    provider (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
 
     try:
@@ -73,11 +58,6 @@ async def load_llm_model(
     llm_load_model: LLMLoadModel,
     request: Request
 ):
-"""TODO: Describe load_llm_model.
-Args:
-    llm_load_model (:obj:`Any`): TODO.
-    request (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
     APIUtils.check_content_type_json(request)
 
@@ -101,11 +81,6 @@ async def unload_llm_model(
     llm_unload_model: LLMUnloadModel,
     request: Request
 ):
-"""TODO: Describe unload_llm_model.
-Args:
-    llm_unload_model (:obj:`Any`): TODO.
-    request (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
     APIUtils.check_content_type_json(request)
 
@@ -128,11 +103,6 @@ async def activate_llm_model(
     llm_active_model: LLMActiveModel,
     request: Request
 ):
-"""TODO: Describe activate_llm_model.
-Args:
-    llm_active_model (:obj:`Any`): TODO.
-    request (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
     APIUtils.check_content_type_json(request)
 

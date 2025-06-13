@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 from typing import Optional, List
 from fastapi import APIRouter, HTTPException, Query, Request, Path
 
@@ -17,10 +16,6 @@ version = "v1"
 
 session_api: SessionAPI = None
 def set_session_api(api):
-"""TODO: Describe set_session_api.
-Args:
-    api (:obj:`Any`): TODO.
-"""
     global session_api
     session_api = api
 
@@ -29,11 +24,6 @@ async def get_sessions(
     request: Request,
     faceprint_id: Optional[str] = Query(None, description="ID de un faceprint")
 ):
-"""TODO: Describe get_sessions.
-Args:
-    request (:obj:`Any`): TODO.
-    faceprint_id (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
 
     try:
@@ -50,10 +40,6 @@ Args:
 async def get_sessions_summary(
     request: Request
 ):
-"""TODO: Describe get_sessions_summary.
-Args:
-    request (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
     
     try:
@@ -72,11 +58,6 @@ async def get_sessions_by_id(
     request: Request,
     id: str = Path(description="Id de la sesión")
 ):
-"""TODO: Describe get_sessions_by_id.
-Args:
-    request (:obj:`Any`): TODO.
-    id (:obj:`Any`): TODO.
-"""
     APIUtils.check_accept_json(request)
     
     try:

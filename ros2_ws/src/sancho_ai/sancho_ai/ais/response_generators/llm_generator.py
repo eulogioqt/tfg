@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import json
 from datetime import datetime
 
@@ -12,7 +11,6 @@ from ...prompts.commands import COMMAND_RESUITS
 
 class LLMGenerator(ResponseGenerator):
 
-"""TODO: Describe class."""
     EMOTION_MAP = {
         COMMAND_RESUITS.FAILURE: "sad",
         COMMAND_RESUITS.MISSING_ARGUMENT: "neutral",
@@ -20,24 +18,10 @@ class LLMGenerator(ResponseGenerator):
     }
 
     def __init__(self, hri_engine: HRIEngine, llm_engine: LLMEngine):
-    """TODO: Describe __init__.
-Args:
-    hri_engine (:obj:`Any`): TODO.
-    llm_engine (:obj:`Any`): TODO.
-"""
         self.hri_engine = hri_engine
         self.llm_engine = llm_engine
     
     def generate_response(self, details: str, status: str, intent: str, arguments: dict, user_input: str, chat_history: list) -> str:
-    """TODO: Describe generate_response.
-Args:
-    details (:obj:`Any`): TODO.
-    status (:obj:`Any`): TODO.
-    intent (:obj:`Any`): TODO.
-    arguments (:obj:`Any`): TODO.
-    user_input (:obj:`Any`): TODO.
-    chat_history (:obj:`Any`): TODO.
-"""
         status_emotion = self.EMOTION_MAP[status]
 
         semantic_result = SemanticResultPrompt.build_semantic_result(intent, arguments, status, details)
@@ -86,11 +70,6 @@ Args:
         return response, emotion, provider_used, model_used
 
     def continue_conversation(self, user_input: str, chat_history: list) -> str:
-    """TODO: Describe continue_conversation.
-Args:
-    user_input (:obj:`Any`): TODO.
-    chat_history (:obj:`Any`): TODO.
-"""
         robot_context = self._build_robot_context()
 
         unknown_prompt = UnknownPrompt(user_input, robot_context)
@@ -139,8 +118,6 @@ Args:
         return text_response, emotion, provider_used, model_used
     
     def _build_robot_context(self):
-    """TODO: Describe _build_robot_context.
-"""
         actual_people_json = self.hri_engine.get_actual_people_request()
         actual_people = json.loads(actual_people_json)
         visible_ids = [int(fpid) for fpid, t in actual_people.items() if t < 1]

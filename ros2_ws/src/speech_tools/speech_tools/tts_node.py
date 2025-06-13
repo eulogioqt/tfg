@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import gc
 import ast
 import rclpy
@@ -14,7 +13,6 @@ from .models import TTS_MODELS, TTS_SPEAKERS, TTS_NEEDS_API_KEY
 
 class TTSNode(Node):
     
-"""TODO: Describe class."""
     MODELS_CLASS_MAP = { # Poner esto mas cool, solo con el nombre camelcase se puede hacer, lo demas no es necesario
         TTS_MODELS.BARK: ("speech_tools.tts.bark_tts", "BarkTTS"),
         TTS_MODELS.CSS10: ("speech_tools.tts.css10_tts", "CSS10TTS"),
@@ -26,8 +24,6 @@ class TTSNode(Node):
     }
 
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         super().__init__("tts")
         
         self.model_map = {}
@@ -47,11 +43,6 @@ class TTSNode(Node):
         self.get_logger().info('TTS Node inicializado correctamente')
 
     def handle_get_all_models(self, request, response):
-    """TODO: Describe handle_get_all_models.
-Args:
-    request (:obj:`Any`): TODO.
-    response (:obj:`Any`): TODO.
-"""
         models_names = set(request.models)
         if not models_names:
             models_names = list(TTS_MODELS)
@@ -71,11 +62,6 @@ Args:
         return response
 
     def handle_get_active_model(self, request, response):
-    """TODO: Describe handle_get_active_model.
-Args:
-    request (:obj:`Any`): TODO.
-    response (:obj:`Any`): TODO.
-"""
         self.get_logger().info(f"📖 Get Active Model service.")
 
         if self.active_model:
@@ -84,11 +70,6 @@ Args:
         return response
 
     def handle_get_available_models(self, request, response):
-    """TODO: Describe handle_get_available_models.
-Args:
-    request (:obj:`Any`): TODO.
-    response (:obj:`Any`): TODO.
-"""
         models_names = set(request.models)
         if not models_names:
             models_names = list(TTS_MODELS)
@@ -108,11 +89,6 @@ Args:
         return response
 
     def handle_tts(self, request, response):
-    """TODO: Describe handle_tts.
-Args:
-    request (:obj:`Any`): TODO.
-    response (:obj:`Any`): TODO.
-"""
         try:
             model_name, speaker_name = self._get_or_active(request.model, request.speaker)
             model = self._get_model(model_name)
@@ -131,11 +107,6 @@ Args:
         return response
 
     def handle_load_model(self, request, response):
-    """TODO: Describe handle_load_model.
-Args:
-    request (:obj:`Any`): TODO.
-    response (:obj:`Any`): TODO.
-"""
         self.get_logger().info(f"📖 Load model service")
 
         response.results = []
@@ -155,11 +126,6 @@ Args:
         return response
 
     def handle_unload_model(self, request, response):
-    """TODO: Describe handle_unload_model.
-Args:
-    request (:obj:`Any`): TODO.
-    response (:obj:`Any`): TODO.
-"""
         self.get_logger().info(f"📖 Unload model service")
         
         response.results = []
@@ -190,11 +156,6 @@ Args:
         return response
 
     def handle_set_active_model(self, request, response):
-    """TODO: Describe handle_set_active_model.
-Args:
-    request (:obj:`Any`): TODO.
-    response (:obj:`Any`): TODO.
-"""
         self.get_logger().info(f"📖 Set Active Model service. Model: {request.model}, Speaker: {request.speaker}")
 
         response.success, response.message = self._set_active_model(request.model, request.speaker)
@@ -202,8 +163,6 @@ Args:
         return response
 
     def _init_from_parameters(self):
-    """TODO: Describe _init_from_parameters.
-"""
         models_to_load = self.parse_string_list(self.declare_parameter("load_models", "[]").get_parameter_value().string_value)
         active_model = self.declare_parameter("active_model", "").get_parameter_value().string_value
         active_speaker = self.declare_parameter("active_speaker", "").get_parameter_value().string_value
@@ -223,11 +182,6 @@ Args:
                 self.get_logger().warn(f"❌ {message}")
 
     def _set_active_model(self, model, speaker):
-    """TODO: Describe _set_active_model.
-Args:
-    model (:obj:`Any`): TODO.
-    speaker (:obj:`Any`): TODO.
-"""
         if not model:
             return False, "Model must be specified"
         if model not in list(TTS_MODELS):
@@ -246,11 +200,6 @@ Args:
         return True, f"Active model set to '{model}/{speaker}'"
 
     def _try_load_model(self, model_name, api_key=""):
-    """TODO: Describe _try_load_model.
-Args:
-    model_name (:obj:`Any`): TODO.
-    api_key (:obj:`Any`): TODO.
-"""
         if model_name not in self.model_map:
             if model_name not in self.MODELS_CLASS_MAP:
                 raise ValueError(f"Model '{model_name}' is not supported.")
@@ -267,11 +216,6 @@ Args:
         return self.model_map[model_name]
 
     def _get_or_active(self, model_name, speaker_name):
-    """TODO: Describe _get_or_active.
-Args:
-    model_name (:obj:`Any`): TODO.
-    speaker_name (:obj:`Any`): TODO.
-"""
         if not model_name:
             if self.active_model:
                 return self.active_model
@@ -281,10 +225,6 @@ Args:
         return model_name, speaker_name
 
     def _get_model(self, model_name) -> TTSModel:
-    """TODO: Describe _get_model.
-Args:
-    model_name (:obj:`Any`): TODO.
-"""
         if model_name in self.model_map:
             return self.model_map[model_name]
         elif model_name not in list(TTS_MODELS):
@@ -293,16 +233,6 @@ Args:
             raise ValueError(f"Model {model_name} is not loaded.")
 
     def _fill_response(self, response, audio, sample_rate, message, success, model_used="", speaker_used=""):
-    """TODO: Describe _fill_response.
-Args:
-    response (:obj:`Any`): TODO.
-    audio (:obj:`Any`): TODO.
-    sample_rate (:obj:`Any`): TODO.
-    message (:obj:`Any`): TODO.
-    success (:obj:`Any`): TODO.
-    model_used (:obj:`Any`): TODO.
-    speaker_used (:obj:`Any`): TODO.
-"""
         response.audio = audio
         response.sample_rate = sample_rate
         response.model_used = model_used
@@ -311,20 +241,12 @@ Args:
         response.success = success
 
     def parse_string_list(self, raw_string) -> list[str]:
-    """TODO: Describe parse_string_list.
-Args:
-    raw_string (:obj:`Any`): TODO.
-"""
         try:
             return ast.literal_eval(raw_string)
         except Exception:
             return []
 
 def main(args=None):
-"""TODO: Describe main.
-Args:
-    args (:obj:`Any`): TODO.
-"""
     rclpy.init(args=args)
     
     tts = TTSNode()

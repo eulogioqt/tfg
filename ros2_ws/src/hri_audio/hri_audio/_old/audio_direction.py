@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import numpy as np
 import json
 
@@ -23,14 +22,7 @@ import numpy as np
 
 class AudioDirection(Node):
 
-"""TODO: Describe class."""
     def __init__(self, sample_rate=48000, distance_mics=0.1225, direction_chunk_seconds=1):
-    """TODO: Describe __init__.
-Args:
-    sample_rate (:obj:`Any`): TODO.
-    distance_mics (:obj:`Any`): TODO.
-    direction_chunk_seconds (:obj:`Any`): TODO.
-"""
         super().__init__("audio_direction")
         
         self.sample_rate = sample_rate
@@ -55,22 +47,12 @@ Args:
 
 
     def audio_average_intensity(self, audio):
-    """TODO: Describe audio_average_intensity.
-Args:
-    audio (:obj:`Any`): TODO.
-"""
         average_intensity = np.mean(np.abs(audio))
         if average_intensity < 0:
             average_intensity = 32767
         return average_intensity
     
     def audio_location(self, request, response, intensity_threshold=300):
-    """TODO: Describe audio_location.
-Args:
-    request (:obj:`Any`): TODO.
-    response (:obj:`Any`): TODO.
-    intensity_threshold (:obj:`Any`): TODO.
-"""
         has_speech = False
         audio_samples = np.array(self.audio_left, dtype=np.int16) 
         audio = AudioSegment(
@@ -161,10 +143,6 @@ Args:
         return response
     
     def listener_callback(self, msg):
-    """TODO: Describe listener_callback.
-Args:
-    msg (:obj:`Any`): TODO.
-"""
         self.audio_left = self.audio_left + list([np.int16(x) for x in msg.chunk_left])
         self.audio_right = self.audio_right + list([np.int16(x) for x in msg.chunk_right])
         
@@ -186,10 +164,6 @@ Args:
         #     self.audio_right = self.audio_right + list([np.int16(x) for x in msg.chunk_rig
         
 def main(args=None):
-"""TODO: Describe main.
-Args:
-    args (:obj:`Any`): TODO.
-"""
     rclpy.init(args=args)
     
     audio_direction = AudioDirection()

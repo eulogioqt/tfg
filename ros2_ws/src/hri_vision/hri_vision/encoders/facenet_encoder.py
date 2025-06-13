@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 import tensorflow as tf
@@ -20,17 +19,10 @@ from .base_encoder import BaseEncoder
 
 class FacenetEncoder(BaseEncoder):
 
-"""TODO: Describe class."""
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         self.model = FaceNet()
 
     def encode_face(self, face):
-    """TODO: Describe encode_face.
-Args:
-    face (:obj:`Any`): TODO.
-"""
         shapeFace = np.expand_dims(face, axis=0)
         features = self.model.embeddings(shapeFace)[0]
 

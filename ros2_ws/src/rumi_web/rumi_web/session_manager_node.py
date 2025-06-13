@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import os
 import json
 
@@ -13,10 +12,7 @@ from .database.session_manager import SessionManager
 
 
 class SessionManagerNode(Node):
-"""TODO: Describe class."""
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         super().__init__('api_client_node')
 
         self.db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "database/sessions.db"))
@@ -33,11 +29,6 @@ class SessionManagerNode(Node):
         self.create_timer(10.0, self.sessions.check_timeouts)
 
     def set_session_params_service(self, request, response):
-    """TODO: Describe set_session_params_service.
-Args:
-    request (:obj:`Any`): TODO.
-    response (:obj:`Any`): TODO.
-"""
         self.sessions.timeout_seconds = request.timeout_seconds
         self.sessions.time_between_detections = request.time_between_detections
 
@@ -51,19 +42,10 @@ Args:
         return response
 
     def session_callback(self, msg):
-    """TODO: Describe session_callback.
-Args:
-    msg (:obj:`Any`): TODO.
-"""
         self.get_logger().info(f"Nuevo procesamiento: ({str(msg.faceprint_id)}, {str(msg.detection_score)}, {str(msg.classification_score)})")
         self.sessions.process_detection(str(msg.faceprint_id), float(msg.detection_score), float(msg.classification_score))
 
     def get_sessions_service(self, request, response):
-    """TODO: Describe get_sessions_service.
-Args:
-    request (:obj:`Any`): TODO.
-    response (:obj:`Any`): TODO.
-"""
         args = request.args
 
         if args:
@@ -149,10 +131,6 @@ Args:
         return response
 
 def main(args=None):
-"""TODO: Describe main.
-Args:
-    args (:obj:`Any`): TODO.
-"""
     rclpy.init(args=args)
 
     session_manager_node = SessionManagerNode()

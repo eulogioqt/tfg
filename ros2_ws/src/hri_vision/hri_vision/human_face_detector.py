@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import cv2
 import rclpy
 import time
@@ -16,19 +15,13 @@ from .detectors import ( BaseDetector,
 
 
 class SmartStrEnum(str, Enum):
-"""TODO: Describe class."""
     def __str__(self):
-    """TODO: Describe __str__.
-"""
         return self.value
 
     def __repr__(self):
-    """TODO: Describe __repr__.
-"""
         return self.value
 
 class DetectorType(SmartStrEnum):
-"""TODO: Describe class."""
     CV2 = "cv2"
     DLIB_CNN = "dlib_cnn"
     DLIB_FRONTAL = "dlib_frontal"
@@ -53,10 +46,7 @@ DETECTOR_CLASS_MAP = {
 
 class HumanFaceDetector(Node):
 
-"""TODO: Describe class."""
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         super().__init__("human_face_detector")
 
         self.show_metrics = self.declare_parameter("show_metrics", False).value
@@ -77,11 +67,6 @@ class HumanFaceDetector(Node):
         self.br = HRIBridge()
 
     def detection(self, request, response):
-    """TODO: Describe detection.
-Args:
-    request (:obj:`Any`): TODO.
-    response (:obj:`Any`): TODO.
-"""
         start_detection = time.time()
 
         frame = self.br.imgmsg_to_cv2(request.frame, "bgr8")
@@ -113,10 +98,6 @@ Args:
 
 
 def main(args=None):
-"""TODO: Describe main.
-Args:
-    args (:obj:`Any`): TODO.
-"""
     rclpy.init(args=args)
 
     node = HumanFaceDetector()

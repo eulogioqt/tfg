@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import json
 import rclpy
 from rclpy.node import Node
@@ -20,10 +19,7 @@ from speech_msgs.srv import STT, TTS
 
 class SanchoWebNode(Node):
 
-"""TODO: Describe class."""
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         super().__init__("sancho_web")
 
         self.web_queue = Queue()
@@ -49,17 +45,9 @@ class SanchoWebNode(Node):
         self.get_logger().info("Sancho Web Node initializated succesfully")
 
     def web_callback(self, msg):
-    """TODO: Describe web_callback.
-Args:
-    msg (:obj:`Any`): TODO.
-"""
         self.web_queue.put([msg.key, msg.value])
 
     def faceprint_event_callback(self, msg):
-    """TODO: Describe faceprint_event_callback.
-Args:
-    msg (:obj:`Any`): TODO.
-"""
         if msg.origin != FaceprintEvent.ORIGIN_WEB: # Si el origen del evento es la web, no mandar a la web
             event = self.event_map.get(msg.event)
             message = FaceprintEventMessage(event, msg.id)
@@ -67,15 +55,10 @@ Args:
 
 class SanchoWeb:
     
-"""TODO: Describe class."""
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         self.node = SanchoWebNode()
 
     def spin(self):
-    """TODO: Describe spin.
-"""
         while True:
             if self.node.web_queue.qsize() > 0: # Web messages received
                 [key, value] = self.node.web_queue.get()
@@ -91,11 +74,6 @@ class SanchoWeb:
             rclpy.spin_once(self.node)
 
     def on_web_message(self, key, msg) -> JSONMessage:
-    """TODO: Describe on_web_message.
-Args:
-    key (:obj:`Any`): TODO.
-    msg (:obj:`Any`): TODO.
-"""
         type, data = parse_message(msg)
         self.node.get_logger().info(f"Mensaje recibido: {type}")
 
@@ -128,11 +106,6 @@ Args:
             self.send_message(key, PromptTranscriptionMessage(transcription_request.id, transcription, model))   
 
     def sancho_prompt_request(self, text, chat_id):
-    """TODO: Describe sancho_prompt_request.
-Args:
-    text (:obj:`Any`): TODO.
-    chat_id (:obj:`Any`): TODO.
-"""
         req = SanchoPrompt.Request()
         req.text = text
         req.chat_id = chat_id
@@ -145,11 +118,6 @@ Args:
             json.loads(result.args_json), result.provider, result.model
 
     def stt_request(self, audio, sample_rate):
-    """TODO: Describe stt_request.
-Args:
-    audio (:obj:`Any`): TODO.
-    sample_rate (:obj:`Any`): TODO.
-"""
         if not self.node.sancho_prompt_client.service_is_ready():
             return "", ""
         
@@ -164,10 +132,6 @@ Args:
         return result.text, result.model_used
 
     def tts_request(self, text):
-    """TODO: Describe tts_request.
-Args:
-    text (:obj:`Any`): TODO.
-"""
         if not self.node.sancho_prompt_client.service_is_ready():
             return [], 0, "", ""
         
@@ -181,18 +145,9 @@ Args:
         return result.audio, result.sample_rate, result.model_used, result.speaker_used
 
     def send_message(self, key, msg: JSONMessage):
-    """TODO: Describe send_message.
-Args:
-    key (:obj:`Any`): TODO.
-    msg (:obj:`Any`): TODO.
-"""
         self.node.ros_pub.publish(R2WMessage(key=key, value=msg.to_json()))
 
 def main(args=None):
-"""TODO: Describe main.
-Args:
-    args (:obj:`Any`): TODO.
-"""
     rclpy.init(args=args)
 
     sancho_web = SanchoWeb()

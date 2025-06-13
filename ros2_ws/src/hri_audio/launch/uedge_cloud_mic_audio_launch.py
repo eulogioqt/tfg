@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import os
 from dotenv import load_dotenv
 from launch import LaunchDescription
@@ -13,8 +12,6 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
 
 def generate_launch_description():
-"""TODO: Describe generate_launch_description.
-"""
     return LaunchDescription([
         Node(
             package='speech_tools',

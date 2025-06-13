@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import json
 
 from .command_executor import CommandExecutor
@@ -7,21 +6,10 @@ from std_msgs.msg import String
 
 class DefaultCommands(CommandExecutor):
     
-"""TODO: Describe class."""
     def __init__(self, web_node):
-    """TODO: Describe __init__.
-Args:
-    web_node (:obj:`Any`): TODO.
-"""
         super().__init__(web_node)
 
     def on_command(self, sender, command, args):
-    """TODO: Describe on_command.
-Args:
-    sender (:obj:`Any`): TODO.
-    command (:obj:`Any`): TODO.
-    args (:obj:`Any`): TODO.
-"""
         if self.equals_ignore_case(command, "delete"):
             if len(args) == 0:
                 self.web_node.send_message(sender, "¡No has especificado un nombre!")

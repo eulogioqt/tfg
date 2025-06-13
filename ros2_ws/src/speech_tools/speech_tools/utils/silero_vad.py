@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import torch
 import numpy as np
 
@@ -8,12 +7,9 @@ from scipy.signal import resample_poly
 
 class SileroVAD(Node):
     
-"""TODO: Describe class."""
     VAD_SAMPLE_RATE = 16000
 
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         model, utils = torch.hub.load(repo_or_dir='snakers4/silero-vad', model='silero_vad', trust_repo=True)
         (get_speech_ts, _, _, _, _) = utils
 
@@ -21,11 +17,6 @@ class SileroVAD(Node):
         self.get_speech_ts = get_speech_ts
 
     def has_human_voice(self, audio, sample_rate):
-    """TODO: Describe has_human_voice.
-Args:
-    audio (:obj:`Any`): TODO.
-    sample_rate (:obj:`Any`): TODO.
-"""
         audio_np = np.array(audio, dtype=np.float32) / 32768.0
 
         audio_resampled_np = resample_poly(audio_np, self.VAD_SAMPLE_RATE, sample_rate)

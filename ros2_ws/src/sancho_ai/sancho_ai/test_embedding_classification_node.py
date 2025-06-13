@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import os 
 import json
 import time
@@ -18,12 +17,6 @@ from .engines import EmbeddingEngine
 from .prompts.commands.commands import COMMANDS
 
 def compute_embedding_metrics(classifier: EmbeddingClassifier, tests: list, logger) -> Dict[str, Any]:
-"""TODO: Describe compute_embedding_metrics.
-Args:
-    classifier (:obj:`Any`): TODO.
-    tests (:obj:`Any`): TODO.
-    logger (:obj:`Any`): TODO.
-"""
     metrics = {
         "total_tests": len(tests),
         "intent_correct": 0,
@@ -61,10 +54,7 @@ Args:
 
 class TestEmbeddingClassificationNode(Node):
 
-"""TODO: Describe class."""
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         super().__init__('intent_eval_embedding_node')
         load_dotenv()
 
@@ -79,51 +69,32 @@ class TestEmbeddingClassificationNode(Node):
         self.results = self.load_results()
 
     def load_results(self):
-    """TODO: Describe load_results.
-"""
         if self.results_file.exists():
             with open(self.results_file, 'r') as f:
                 return json.load(f)
         return {}
 
     def save_results(self):
-    """TODO: Describe save_results.
-"""
         with open(self.results_file, 'w') as f:
             json.dump(self.results, f, indent=2)
 
     def wait_for_service(self, client):
-    """TODO: Describe wait_for_service.
-Args:
-    client (:obj:`Any`): TODO.
-"""
         if not client.wait_for_service(timeout_sec=5.0):
             self.get_logger().error(f"Service {client.srv_name} not available.")
             return False
         return True
 
     def call_sync(self, client, request):
-    """TODO: Describe call_sync.
-Args:
-    client (:obj:`Any`): TODO.
-    request (:obj:`Any`): TODO.
-"""
         future = client.call_async(request)
         rclpy.spin_until_future_complete(self, future)
         return future.result()
 
     def get_api_key_for(self, provider):
-    """TODO: Describe get_api_key_for.
-Args:
-    provider (:obj:`Any`): TODO.
-"""
         if provider not in NEEDS_API_KEY:
             return ""
         return os.environ.get(f"{provider.name.upper()}_API_KEY", "")
 
     def run_all_tests(self):
-    """TODO: Describe run_all_tests.
-"""
         with open(self.tests_file) as f:
             tests = json.load(f)
 
@@ -163,11 +134,6 @@ Args:
         self.get_logger().info("✅ Evaluación embeddings finalizada.")
 
     def load_model(self, provider, model_name):
-    """TODO: Describe load_model.
-Args:
-    provider (:obj:`Any`): TODO.
-    model_name (:obj:`Any`): TODO.
-"""
         if not self.wait_for_service(self.cli_load):
             return False
         req = LoadModel.Request()
@@ -177,11 +143,6 @@ Args:
         return res.results[0].success if res and res.results else False
 
     def unload_model(self, provider, model_name):
-    """TODO: Describe unload_model.
-Args:
-    provider (:obj:`Any`): TODO.
-    model_name (:obj:`Any`): TODO.
-"""
         if not self.wait_for_service(self.cli_unload):
             return False
         req = UnloadModel.Request()
@@ -191,10 +152,6 @@ Args:
 
 
 def main(args=None):
-"""TODO: Describe main.
-Args:
-    args (:obj:`Any`): TODO.
-"""
     rclpy.init(args=args)
 
     node = TestEmbeddingClassificationNode()

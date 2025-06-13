@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import json
 
 from rclpy.node import Node
@@ -12,24 +11,12 @@ from ..log_manager import LogManager
 
 
 class LLMAskingAI(AskingAI):
-"""TODO: Describe class."""
     def __init__(self, node: Node = None, provider: str = None, model: str = None):
-    """TODO: Describe __init__.
-Args:
-    node (:obj:`Any`): TODO.
-    provider (:obj:`Any`): TODO.
-    model (:obj:`Any`): TODO.
-"""
         self.llm_engine = LLMEngine(node if node else LLMEngine.create_client_node())
         self.provider = provider
         self.model = model
 
     def get_name(self, message, testing=False):
-    """TODO: Describe get_name.
-Args:
-    message (:obj:`Any`): TODO.
-    testing (:obj:`Any`): TODO.
-"""
         prompt = AskingNamePrompt(message)
 
         response, provider_used, model_used, log_message, success = self.llm_engine.prompt_request(
@@ -71,11 +58,6 @@ Args:
         return ({"name_said": False, "name": ""}, provider_used, model_used, meta) if testing else ({"name_said": False, "name": ""}, provider_used, model_used)
 
     def confirm_name(self, message, testing=False):
-    """TODO: Describe confirm_name.
-Args:
-    message (:obj:`Any`): TODO.
-    testing (:obj:`Any`): TODO.
-"""
         prompt = AskingConfirmPrompt(message)
 
         response, provider_used, model_used, log_message, success = self.llm_engine.prompt_request(

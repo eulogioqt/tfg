@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 from .phi_formatter import PhiFormatter
 from .prompt_formatter import PromptFormatter
 from .openai_formatter import OpenAIFormatter

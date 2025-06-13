@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import rclpy
 from rclpy.node import Node
 import os
@@ -18,15 +17,11 @@ from .detectors import (
 )
 
 class DatasetType(Enum):
-"""TODO: Describe class."""
     WIDERFACE = 'widerface'
     MAPIR = 'mapir'
 
 class TestDetectorNode(Node):
-"""TODO: Describe class."""
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         super().__init__('test_detector_node')
         self.declare_parameter('dataset_type', DatasetType.WIDERFACE.value)
 
@@ -36,11 +31,6 @@ class TestDetectorNode(Node):
         self.get_logger().info(f"Inicializando evaluación con dataset: {self.dataset_type.name}")
 
     def compute_iou(self, boxA, boxB):
-    """TODO: Describe compute_iou.
-Args:
-    boxA (:obj:`Any`): TODO.
-    boxB (:obj:`Any`): TODO.
-"""
         xA = max(boxA[0], boxB[0])
         yA = max(boxA[1], boxB[1])
         xB = min(boxA[0] + boxA[2], boxB[0] + boxB[2])
@@ -54,12 +44,6 @@ Args:
         return interArea / unionArea if unionArea > 0 else 0
 
     def match_detections(self, preds, gts, iou_thresh=0.5):
-    """TODO: Describe match_detections.
-Args:
-    preds (:obj:`Any`): TODO.
-    gts (:obj:`Any`): TODO.
-    iou_thresh (:obj:`Any`): TODO.
-"""
         matches, used_pred, used_gt, ious = [], set(), set(), []
         for i, gt in enumerate(gts):
             for j, pred in enumerate(preds):
@@ -75,12 +59,6 @@ Args:
         return matches, ious
 
     def evaluate_detector(self, get_faces, dataset, iou_thresh=0.5):
-    """TODO: Describe evaluate_detector.
-Args:
-    get_faces (:obj:`Any`): TODO.
-    dataset (:obj:`Any`): TODO.
-    iou_thresh (:obj:`Any`): TODO.
-"""
         total_tp, total_fp, total_fn, total_time = 0, 0, 0, 0.0
         iou_total, iou_count = 0.0, 0
 
@@ -119,8 +97,6 @@ Args:
         }
 
     def load_mapir_dataset(self):
-    """TODO: Describe load_mapir_dataset.
-"""
         dataset = []
         for class_name in sorted(os.listdir(self.mapir_dataset_path)):
             class_dir = os.path.join(self.mapir_dataset_path, class_name)
@@ -146,8 +122,6 @@ Args:
         return dataset
 
     def load_widerface_dataset(self):
-    """TODO: Describe load_widerface_dataset.
-"""
         self.get_logger().info("Cargando dataset WIDER FACE (val)...")
         dataset_wider = WIDERFace(root="widerface_data", split="val", download=True)
         dataset = []
@@ -165,8 +139,6 @@ Args:
         return dataset
 
     def evaluate_all_detectors(self):
-    """TODO: Describe evaluate_all_detectors.
-"""
         if self.dataset_type == DatasetType.WIDERFACE:
             dataset = self.load_widerface_dataset()
         else:
@@ -204,10 +176,6 @@ Args:
         self.get_logger().info(f"Evaluación completada. Resultados: {results_path}")
 
 def main(args=None):
-"""TODO: Describe main.
-Args:
-    args (:obj:`Any`): TODO.
-"""
     rclpy.init(args=args)
 
     node = TestDetectorNode()

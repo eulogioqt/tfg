@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 import json
 import rclpy
 
@@ -19,10 +18,7 @@ from ros2web_msgs.msg import R2WMessage
 
 class ServerNode(DynamicSubscribableNode):
 
-"""TODO: Describe class."""
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         super().__init__("server")
 
         self.ros_queue = Queue()
@@ -35,28 +31,15 @@ class ServerNode(DynamicSubscribableNode):
         self.get_logger().info("Server Node initializated successfully")
 
     def server_callback(self, msg):
-    """TODO: Describe server_callback.
-Args:
-    msg (:obj:`Any`): TODO.
-"""
         self.ros_queue.put([msg.key, msg.value])
 
     def generic_callback(self, topic, name, value):
-    """TODO: Describe generic_callback.
-Args:
-    topic (:obj:`Any`): TODO.
-    name (:obj:`Any`): TODO.
-    value (:obj:`Any`): TODO.
-"""
         self.broadcast_topics[topic] = [name, value]
 
 
 class Server(StoppableNode):
 
-"""TODO: Describe class."""
     def __init__(self):
-    """TODO: Describe __init__.
-"""
         super().__init__()
 
         self.node = ServerNode()
@@ -66,8 +49,6 @@ class Server(StoppableNode):
         self.chunk_manager = ChunkManager()
 
     def spin(self):
-    """TODO: Describe spin.
-"""
         if self.node.ros_queue.qsize() > 0:
             [key, value] = self.node.ros_queue.get()
 
@@ -90,11 +71,6 @@ class Server(StoppableNode):
                 self.broadcast_chunked(message)
 
     def on_message(self, key, msg):
-    """TODO: Describe on_message.
-Args:
-    key (:obj:`Any`): TODO.
-    msg (:obj:`Any`): TODO.
-"""
         type, data = parse_message(msg)
         self.node.get_logger().info(f"Message received from ({key}).")
 
@@ -102,11 +78,6 @@ Args:
             self.node.web_pub.publish(R2WMessage(key=key, value=data)) # Data is already JSON
 
     def on_message_chunked(self, key, msg):
-    """TODO: Describe on_message_chunked.
-Args:
-    key (:obj:`Any`): TODO.
-    msg (:obj:`Any`): TODO.
-"""
         type, id, chunk_index, final, data = parse_chunk_message(msg) 
         self.node.get_logger().info(f"Chunk received from ({key}): Index={chunk_index} Final={final}")
 
@@ -116,11 +87,6 @@ Args:
                 self.on_message(key, full_data)
 
     def send_chunked(self, key, msg: JSONMessage):
-    """TODO: Describe send_chunked.
-Args:
-    key (:obj:`Any`): TODO.
-    msg (:obj:`Any`): TODO.
-"""
         client = self.ws.get_client(key)
         self.node.get_logger().info(f"Sending message to ({key}).")
         for chunk in self.chunk_manager.msg_to_chunks(msg.to_json()):
@@ -128,33 +94,17 @@ Args:
             self.ws.send_message(client, chunk.to_json())
 
     def broadcast_chunked(self,  msg: JSONMessage):
-    """TODO: Describe broadcast_chunked.
-Args:
-    msg (:obj:`Any`): TODO.
-"""
         for chunk in self.chunk_manager.msg_to_chunks(msg.to_json()):
             self.ws.broadcast_message(chunk.to_json())
 
     def on_user_connect(self, key):
-    """TODO: Describe on_user_connect.
-Args:
-    key (:obj:`Any`): TODO.
-"""
         self.node.get_logger().info(f"Client connected ({key}) (Connections: {self.ws.get_connection_count()})")
 
     def on_user_disconnect(self, key):
-    """TODO: Describe on_user_disconnect.
-Args:
-    key (:obj:`Any`): TODO.
-"""
         self.node.get_logger().info(f"Client disconnected ({key}) (Connections: {self.ws.get_connection_count()})")
 
 
 def main(args=None):
-"""TODO: Describe main.
-Args:
-    args (:obj:`Any`): TODO.
-"""
     rclpy.init(args=args)
 
     server = Server()

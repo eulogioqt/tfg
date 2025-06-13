@@ -1,4 +1,3 @@
-"""TODO: Add module documentation."""
 from .base_encoder import BaseEncoder
 
 from .arcface_encoder import ArcFaceEncoder
