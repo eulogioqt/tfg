@@ -14,7 +14,7 @@ def getClassifiedColor(distance, MIDDLE_BOUND, UPPER_BOUND):
     return (0, 255, 255) if distance is None or MIDDLE_BOUND <= distance <= UPPER_BOUND else (0, 255, 0) if distance > MIDDLE_BOUND else (0, 0, 255)
 
 def getScoreColor(score):
-    return (0, 255, 255) if score is None or 1 <= score <= 1.5 else (0, 0, 255) if score < 1 else (0, 255, 0)
+    return (0, 255, 255) if score is None or 0.6 <= score <= 0.85 else (0, 0, 255) if score < 0.6 else (0, 255, 0)
 
 def drawTexts(frame, position, distance, MIDDLE_BOUND, UPPER_BOUND, classified=None, score=None, wantedWidth=None, showDistance=False, showScore=False):
     text = getClassifiedText(distance, classified=classified, showDistance=showDistance)

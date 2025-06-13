@@ -92,7 +92,7 @@ const ChatMessage = ({ message, onSelect }) => {
                     backgroundColor,
                     border: `1px solid ${shadowColor}`,
                     borderRadius: "8px",
-                    maxWidth: "70%",
+                    maxWidth: message.value.data.image ? "70%" : "70%",
                     padding: "4px 10px",
                     wordWrap: "break-word",
                     lineHeight: "1.25em",

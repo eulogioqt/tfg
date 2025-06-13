@@ -42,8 +42,8 @@ class FaceprintAPI:
             position = positions_msg[0]
             score = scores[0]
 
-            if score < 1:
-                return HTTPException(detail=f"La puntuación de la detección ha sido demasiado baja ({score:.2f} < 1). Por favor, envía una imagen mejor.")
+            if score < 0.6:
+                return HTTPException(detail=f"La puntuación de la detección ha sido demasiado baja ({score:.2f} < 0.6). Por favor, envía una imagen mejor.")
             else:
                 face_aligned_msg, features_msg, classified_id, classified_name_msg, distance_msg, pos_msg, face_updated = \
                     self.engine.recognition_request(image_msg, position, score)
