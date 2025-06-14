@@ -24,3 +24,5 @@ RESPOSNIVE ACCESIBLE
 ARREGLAR LO DE METADATA
 poner en el de este npm run build
 explicar logs en el database node
+como referenciar correctamente al paper?
+repasar INDICE y las coas de paragraph que no me gusta
