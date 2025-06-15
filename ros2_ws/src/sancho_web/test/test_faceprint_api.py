@@ -6,7 +6,7 @@ BASE_URL = "http://localhost:7654/api/v1/faceprints"
 HEADERS = {"Accept": "application/json", "Content-Type": "application/json"}
 DUMMY_IMAGE = base64.b64encode(b"fake_image_bytes").decode("utf-8")
 
-
+# Test de integración
 def test_create_and_get_faceprint():
     name = "TestUser1"
     payload = {"name": name, "image": DUMMY_IMAGE}
