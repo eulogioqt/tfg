@@ -1,80 +1,37 @@
-from unittest.mock import Mock
-from sancho_ai.ais.base.modular_ai import ModularAI
-from sancho_ai.prompts.commands.commands import COMMANDS
+from abc import ABC
 
-# Clase dummy concreta para instanciar ModularAI
-class DummyModularAI(ModularAI):
-    pass
+from ..intent_classifiers import IntentClassifier
+from ..intent_executors import IntentExecutor
+from ..response_generators import ResponseGenerator
 
-# Test: pipeline completo cuando la intención es conocida
-def test_modular_ai_pipeline_known_intent():
-    # Arrange
-    classifier = Mock()
-    executor = Mock()
-    generator = Mock()
+from ...prompts.commands.commands import COMMANDS
 
-    classifier.classify.return_value = (
-        COMMANDS.TAKE_PICTURE, {"foo": 1}, "prov", "model"
-    )
-    executor.execute.return_value = (
-        "details", "ok", {"data": 42}
-    )
-    generator.generate_response.return_value = (
-        "done", "happy", "gprov", "gmodel"
-    )
 
-    ai = DummyModularAI(classifier, executor, generator)
+class ModularAI(ABC):
+    def __init__(self, classifier: IntentClassifier, executor: IntentExecutor, response_generator: ResponseGenerator):
+        self.classifier = classifier
+        self.executor = executor
+        self.response_generator = response_generator
 
-    # Act
-    value, intent, args, prov, model = ai.on_message("hi", ["h"])
+    def on_message(self, user_input: str, chat_history: list = []) -> str:
+        intent, arguments, cl_provider_used, cl_model_used = self.classifier.classify(user_input, chat_history)
+        
+        if intent != COMMANDS.UNKNOWN:
+            details, status, data = self.executor.execute(intent, arguments)
 
-    # Assert
-    classifier.classify.assert_called_once_with("hi", ["h"])
-    executor.execute.assert_called_once_with(COMMANDS.TAKE_PICTURE, {"foo": 1})
-    generator.generate_response.assert_called_once_with(
-        "details", "ok", COMMANDS.TAKE_PICTURE, {"foo": 1}, "hi", ["h"]
-    )
+            response, emotion, provider_used, model_used = \
+                self.response_generator.generate_response(
+                    details, status, intent, arguments, user_input, chat_history
+                )
+        else:
+            data = {}
+            response, emotion, provider_used, model_used = \
+                self.response_generator.continue_conversation(user_input, chat_history)
 
-    assert value == {
-        "text": "done",
-        "emotion": "happy",
-        "data": {"data": 42}
-    }
-    assert intent == COMMANDS.TAKE_PICTURE
-    assert args == {"foo": 1}
-    assert prov == "gprov"
-    assert model == "gmodel"
+        value = {
+            "text": response,
+            "emotion": emotion,
+            "data": data
+        }
 
-# Test: pipeline alternativo cuando la intención es UNKNOWN
-def test_modular_ai_pipeline_unknown_intent():
-    # Arrange
-    classifier = Mock()
-    executor = Mock()
-    generator = Mock()
-
-    classifier.classify.return_value = (
-        COMMANDS.UNKNOWN, {}, "prov", "model"
-    )
-    generator.continue_conversation.return_value = (
-        "ok", "neutral", "gprov", "gmodel"
-    )
-
-    ai = DummyModularAI(classifier, executor, generator)
-
-    # Act
-    value, intent, args, prov, model = ai.on_message("hello")
-
-    # Assert
-    classifier.classify.assert_called_once_with("hello", [])
-    executor.execute.assert_not_called()
-    generator.continue_conversation.assert_called_once_with("hello", [])
-
-    assert value == {
-        "text": "ok",
-        "emotion": "neutral",
-        "data": {}
-    }
-    assert intent == COMMANDS.UNKNOWN
-    assert args == {}
-    assert prov == "gprov"
-    assert model == "gmodel"
+        return value, intent, arguments, provider_used, model_used

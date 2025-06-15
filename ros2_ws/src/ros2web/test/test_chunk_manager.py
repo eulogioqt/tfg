@@ -1,6 +1,5 @@
-import uuid
 from ros2web.chunk_manager import ChunkManager
-from ros2web.chunk_protocol import ChunkMessage
+
 
 # Test: Fragmentation of message into chunks
 def test_msg_to_chunks_basic():

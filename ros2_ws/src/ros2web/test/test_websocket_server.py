@@ -1,7 +1,7 @@
-import asyncio
 import pytest
 from unittest.mock import AsyncMock, MagicMock
 from ros2web.websocket_server import WebSocketServer
+
 
 class DummyWebSocket:
     def __init__(self, messages):
@@ -22,6 +22,7 @@ class DummyWebSocket:
     
     async def close(self):
         pass
+
 
 @pytest.mark.asyncio
 async def test_handler_processes_messages():

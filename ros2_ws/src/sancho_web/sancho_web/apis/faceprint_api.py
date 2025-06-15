@@ -22,7 +22,7 @@ class FaceprintAPI:
         faceprint_json = self.engine.get_faceprint_request(json.dumps({ "id": id }))
 
         faceprint = json.loads(faceprint_json)
-        if faceprint is None:
+        if not faceprint:
             return HTTPException(status_code=404, detail=f"Faceprint con id {id} no encontrado")
         
         return JSONResponse(content=faceprint)
@@ -126,4 +126,4 @@ class FaceprintAPI:
         metadata_json = json.dumps({ "faceprint_id": id })
         self.engine.create_log(CONSTANTS.ACTION.DELETE_CLASS, id)
 
-        return JSONResponse(content=f"Faceprint con id {id} elliminado correctamente.")
+        return JSONResponse(content=f"Faceprint con id {id} eliminado correctamente.")
