@@ -58,6 +58,7 @@ class AssistantHelperNode(Node):
         self.chunk_queue.put([new_audio, sample_rate])
     
     def mode_callback(self, msg):
+        self.get_logger().info(msg.data)
         data = json.loads(msg.data)
         helper_state = data["helper_state"]
 
@@ -100,7 +101,7 @@ class AssistantHelper:
         self.chunk_attach_criterion = IntensityAttachCriterion(self.intensity_threshold)
         #self.chunk_attach_criterion = SileroVADAttachCriterion()
         
-        self.node = AssistantHelperNode()
+        self.node = AssistantHelperNode(self)
 
     def spin(self):
         while rclpy.ok():

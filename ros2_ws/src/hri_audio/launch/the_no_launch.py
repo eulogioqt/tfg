@@ -139,10 +139,4 @@ def generate_launch_description():
             name='database_manager',
             output='screen'
         ),
-        Node(
-            package='hri_vision',
-            executable='gui',
-            name='gui',
-            output='screen',
-        )
     ])

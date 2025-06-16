@@ -115,7 +115,7 @@ class HumanFaceRecognizer(Node):
 
         UPPER_BOUND = 0.9
         face_updated = False
-        if faceprint and score >= 0.6 and distance >= UPPER_BOUND:
+        if faceprint and score >= 1 and distance >= UPPER_BOUND:
             face_updated = self.classifier.save_face(classified_id, face_aligned, score)
             if face_updated:
                 self.send_faceprint_event(FaceprintEvent.UPDATE, classified_id, FaceprintEvent.ORIGIN_ROS)
