@@ -31,12 +31,22 @@ public:
             serial_out_path = "/dev/ttyUSB2";
             serial_out_ = std::make_unique<std::ofstream>(serial_out_path);
         }
+        if (!serial_out_->is_open())
+        {
+            serial_out_path = "/dev/ttyUSB0";
+            serial_out_ = std::make_unique<std::ofstream>(serial_out_path);
+        }
 
         std::string serial_in_path = "/dev/ttyUSB2";
         serial_in_fd_ = open(serial_in_path.c_str(), O_RDONLY | O_NONBLOCK);
         if (serial_in_fd_ == -1)
         {
             serial_in_path = "/dev/ttyUSB1";
+            serial_in_fd_ = open(serial_in_path.c_str(), O_RDONLY | O_NONBLOCK);
+        }
+        if (serial_in_fd_ == -1)
+        {
+            serial_in_path = "/dev/ttyUSB0";
             serial_in_fd_ = open(serial_in_path.c_str(), O_RDONLY | O_NONBLOCK);
         }
 
