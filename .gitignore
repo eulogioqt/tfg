@@ -2,6 +2,8 @@ ros2_ws/build/
 ros2_ws/install/
 ros2_ws/log/
 mapir_dataset
+sandbox
+line_counter.sh
 widerface_data
 yolov8n-face.pt
 widerface_data/*

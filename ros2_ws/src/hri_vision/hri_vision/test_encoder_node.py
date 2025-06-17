@@ -18,7 +18,7 @@ from std_msgs.msg import String
 from hri_msgs.srv import Detection, Recognition, Training, GetString
 from ros2web_msgs.srv import R2WSubscribe
 
-from .api._old_gui import mark_face
+from .api.gui_utils import mark_face
 from .hri_bridge import HRIBridge
 
 from hri_vision.human_face_recognizer import EncoderType

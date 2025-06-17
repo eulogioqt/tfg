@@ -12,7 +12,7 @@ from rumi_msgs.msg import SessionMessage
 from sancho_web.database.system_database import CONSTANTS
 
 from .database.people_manager import PeopleManager
-from .api._old_gui import mark_face
+from .api.gui_utils import mark_face
 
 from .hri_bridge import HRIBridge
 
