@@ -1,4 +1,3 @@
-// src/contexts/AudioContext.js
 import { createContext, useContext, useRef, useState } from "react";
 
 const AudioContextReact = createContext();

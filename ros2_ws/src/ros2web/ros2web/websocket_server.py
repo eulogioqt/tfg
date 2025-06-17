@@ -30,7 +30,7 @@ class WebSocketServer:
         if not self.stop_event.is_set():
             self.stop_event.set()
 
-    async def _handler(self, websocket): # Depende de la version hay que poner un argumento, path despues de websocket
+    async def _handler(self, websocket):
         client_ip, client_port = websocket.remote_address
         key = f"{client_ip}:{client_port}"
 
@@ -87,7 +87,7 @@ class WebSocketServer:
             for client in self.clients.values():
                 await client.close()
 
-    async def _main(self): # Revisar esto, ahora mismo el broadcast se hace en el spin de server, pero lo suyo seria que se hiciese asi
+    async def _main(self):
         websocket_task = asyncio.create_task(self._websocket_server())
         broadcast_task = asyncio.create_task(self._broadcast())
 

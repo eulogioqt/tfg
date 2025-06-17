@@ -13,7 +13,7 @@ from .models import TTS_MODELS, TTS_SPEAKERS, TTS_NEEDS_API_KEY
 
 class TTSNode(Node):
     
-    MODELS_CLASS_MAP = { # Poner esto mas cool, solo con el nombre camelcase se puede hacer, lo demas no es necesario
+    MODELS_CLASS_MAP = {
         TTS_MODELS.BARK: ("speech_tools.tts.bark_tts", "BarkTTS"),
         TTS_MODELS.CSS10: ("speech_tools.tts.css10_tts", "CSS10TTS"),
         TTS_MODELS.GOOGLE: ("speech_tools.tts.google_tts", "GoogleTTS"),

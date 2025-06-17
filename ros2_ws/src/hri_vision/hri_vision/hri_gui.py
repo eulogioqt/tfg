@@ -17,7 +17,7 @@ def encode_image_base64(path):
         return base64.b64encode(img_file.read()).decode("utf-8")
 
 
-class HRIGUINode(Node): # Hay que meter que se pueda decir el nombre con voz y un LLM lo extraiga y demas
+class HRIGUINode(Node):
     def __init__(self, hri_gui: 'HRIGUI'):
         super().__init__("hri_gui")
 

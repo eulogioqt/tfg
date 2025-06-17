@@ -52,7 +52,7 @@ class MicrophoneCapturer:
                     chunk_stereo.chunk_left = audio_mix[::2]
                     chunk_stereo.chunk_right  = audio_mix[1::2]
 
-                    chunk_mono.chunk_mono = audio_mix[::2] # Probar a hacer algun metodo de mono to stereo
+                    chunk_mono.chunk_mono = audio_mix[::2]
 
                     self.node.publisher_stereo.publish(chunk_stereo)
 

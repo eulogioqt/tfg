@@ -24,7 +24,7 @@ export const useCamera = () => {
 
     const stopCamera = () => {
         if (streamRef.current) {
-            streamRef.current.getTracks().forEach(track => track.stop());
+            streamRef.current.getTracks().forEach((track) => track.stop());
             streamRef.current = null;
         }
         setIsActive(false);
@@ -52,7 +52,6 @@ export const useCamera = () => {
     };
 
     useEffect(() => {
-        // Cleanup automático si se desmonta el componente
         return () => stopCamera();
     }, []);
 

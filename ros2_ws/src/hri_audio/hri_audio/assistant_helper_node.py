@@ -29,8 +29,6 @@ class HELPER_STATE(int, Enum):
     ASKING = 3
 
 
-# PROBAR EL VAD Y PROBAR A PONER QUE SI TE ACABA DE RESPONDER ESTE 5S ESCUCHANDOTE Y SI NO HAGA TIMEOUT SABE
-# arreglar ojos lo que pasa eso y mirad los baudios y lo del for 20
 class AssistantHelperNode(Node):
 
     def __init__(self, assistant_helper: "AssistantHelper"):
@@ -86,7 +84,7 @@ class AssistantHelper:
         self.asking_mode = None
 
         self.sample_rate = -1 # Will set on mic callbacks
-        self.helper_chunk_size = 0.5 # Revisar este valor
+        self.helper_chunk_size = 0.5
         self.intensity_threshold = 1400
         self.timeout_seconds = 5
 
@@ -97,7 +95,7 @@ class AssistantHelper:
         self.previous_chunk = []
 
         #self.hotword_detector = STTHotword(self.stt_request, name=name)
-        self.hotword_detector = PVPorcupineHotword() # Hacer un de esto para usar intensity o VAD para meter chunks
+        self.hotword_detector = PVPorcupineHotword()
         self.chunk_attach_criterion = IntensityAttachCriterion(self.intensity_threshold)
         #self.chunk_attach_criterion = SileroVADAttachCriterion()
         

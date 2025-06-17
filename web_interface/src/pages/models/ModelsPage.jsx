@@ -10,8 +10,6 @@ const PANELS = [
     { key: "tts", label: "TTS", icon: "bi-volume-up-fill", component: <TTSPanel /> },
     { key: "stt", label: "STT", icon: "bi-mic-fill", component: <STTPanel /> },
     { key: "llm", label: "LLM", icon: "bi-cpu-fill", component: <LLMPanel /> },
-    //{ key: "embeddings", label: "EMBEDDINGS", icon: "bi-graph-up", component: <span>Sin implementar</span> },
-    //{ key: "ai_method", label: "AI Method", icon: "bi-kanban-fill", component: <span>Sin implementar</span> },
 ];
 
 const ModulesPage = () => {

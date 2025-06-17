@@ -27,9 +27,9 @@ class R2WBridge():
         return data.data
 
     def any_to_r2w(self, data):
-        if isinstance(data, Image): # esto igual
+        if isinstance(data, Image):
             return self.img_to_r2w(data)
-        if isinstance(data, String): # esto que sea opcional
+        if isinstance(data, String):
             return self.str_to_r2w(data)
         else:
             return message_to_ordereddict(data)

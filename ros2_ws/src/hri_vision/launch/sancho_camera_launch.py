@@ -20,7 +20,7 @@ def generate_launch_description():
         output='screen',
         parameters=[usb_cam_param_file],
         remappings=[
-            ('/image_raw', '/sancho_camera/image_raw'),  # Remapear a namespace ordenado
+            ('/image_raw', '/sancho_camera/image_raw'),
             ('/camera_info', '/sancho_camera/camera_info')
         ]
     )

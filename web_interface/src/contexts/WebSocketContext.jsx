@@ -73,7 +73,6 @@ export const WebSocketProvider = ({ children }) => {
     }, []);
 
     const onTopic = (event) => {
-        // También se tiene event.topic, name no es el /x/y.. de ros
         publish(`ROS_TOPIC_${event.name}`, event.value);
     };
 

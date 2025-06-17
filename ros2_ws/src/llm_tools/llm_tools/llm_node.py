@@ -287,7 +287,7 @@ class LLMNode(Node):
         
         return True, f"Active {model_label} set to {provider}/{model}"
     
-    def _try_load_provider(self, name, api_key=""): # HAY QUE HACER QUE COMPRUEBE QUE LA API KEY ESTA BIEN PUESTA
+    def _try_load_provider(self, name, api_key=""):
         if name not in self.provider_map:
             if name not in self.PROVIDER_CLASS_MAP:
                 raise ValueError(f"Provider '{name}' is not supported.")

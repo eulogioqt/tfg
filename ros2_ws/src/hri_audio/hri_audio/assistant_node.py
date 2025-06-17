@@ -19,8 +19,7 @@ def try_json_loads(text):
     except Exception:
         return None
 
-# Refactorizar el input tts para poder poner con un topic solo el texto y con otro un mensaje custom con la emocion y con el asking mode
-# para publicar las transcripciones igual, quitar tanto json
+
 class AssistantNode(Node):
 
     def __init__(self):

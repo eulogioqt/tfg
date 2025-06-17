@@ -30,7 +30,6 @@ class DynamicSubscribableNode(Node, ABC):
         
         if topic_name not in topic_types: # Comprueba si el topic esta disponible, si no, reintenta subscribirse al segundo
             self.get_logger().warn(f"Topic {topic_name} not found. Will retry in 1 second.")
-            # Hacer que los retrys vayan creciendo tipo 10 veces un segundo despues 10 veces 2s 4 8 16...
 
             def retry_callback():
                 self.subscribe_to_topic(topic_name, name)
