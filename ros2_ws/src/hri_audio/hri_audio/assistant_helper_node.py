@@ -56,11 +56,13 @@ class AssistantHelperNode(Node):
         self.chunk_queue.put([new_audio, sample_rate])
     
     def mode_callback(self, msg):
-        self.get_logger().info(msg.data)
+        for i in range(10):
+            self.get_logger().info(f"RECIBIDO EN EL CAMBIAR MODO: {msg.data}")
         data = json.loads(msg.data)
         helper_state = data["helper_state"]
 
         if helper_state in [e.value for e in HELPER_STATE]:
+            self.assistant_helper.transcription_sent = False
             self.assistant_helper.helper_state = HELPER_STATE(helper_state)
             state_name = HELPER_STATE(helper_state).name
             self.get_logger().info(f"Helper state changed to: {state_name}")
@@ -70,8 +72,11 @@ class AssistantHelperNode(Node):
 
                 self.assistant_helper.asking_mode = asking_mode
                 self.get_logger().info(f"With asking mode: {asking_mode}")
+            else:
+                self.assistant_helper.asking_mode = None
         else:
             self.get_logger().info(f"Invalid helper state mode: {helper_state}")
+            self.assistant_helper.asking_mode = None
 
 
 class AssistantHelper:
@@ -82,6 +87,7 @@ class AssistantHelper:
         self.audio_state = AUDIO_STATE.NO_AUDIO
         self.helper_state = HELPER_STATE.NAME
         self.asking_mode = None
+        self.transcription_sent = False
 
         self.sample_rate = -1 # Will set on mic callbacks
         self.helper_chunk_size = 0.5
@@ -105,8 +111,11 @@ class AssistantHelper:
         while rclpy.ok():
             if not self.node.chunk_queue.empty(): # Combine audio chunks
                 [new_audio, self.sample_rate] = self.node.chunk_queue.get()
-                
-                if self.helper_state == HELPER_STATE.NAME: # Si NAME mode
+
+                if self.transcription_sent:
+                    pass
+
+                elif self.helper_state == HELPER_STATE.NAME: # Si NAME mode
                     self.process_name_mode(new_audio)
 
                 elif self.helper_state in [HELPER_STATE.COMMAND, HELPER_STATE.ASKING]: # Si COMMAND mode
@@ -114,7 +123,7 @@ class AssistantHelper:
 
             rclpy.spin_once(self.node)
 
-    def process_name_mode(self, new_audio):
+    def process_name_mode(self, new_audio): 
         if self.hotword_detector.detect(new_audio, self.sample_rate):
             self.node.face_mode_pub.publish(String(data="listening"))
             self.helper_state = HELPER_STATE.COMMAND
@@ -136,7 +145,7 @@ class AssistantHelper:
         if self.helper_state != HELPER_STATE.ASKING and len(self.audio) == 0 and time.time() - self.hotword_detection_time > self.timeout_seconds: # Si timeout, vuelve a idle
             self.node.face_mode_pub.publish(String(data="idle"))
             self.helper_state = HELPER_STATE.NAME
-
+            
             play(TIME_OUT_SOUND, wait_for_end=True)
             self.node.get_logger().info(f"No audio command detected for {self.timeout_seconds} seconds, timeout.")
 
@@ -185,6 +194,7 @@ class AssistantHelper:
                     "text": rec,
                     **({"asking_mode": self.asking_mode} if self.asking_mode else {})
                 })))
+                self.transcription_sent = True
                 
                 self.node.get_logger().info(f"✅✅✅ Text transcribed ({len(audio) / self.sample_rate}s): {rec}")
         else:

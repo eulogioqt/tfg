@@ -70,7 +70,8 @@ class Assistant:
                 user_dict = json.loads(self.node.queue.get())
                 user_text = user_dict["text"]
                 asking_mode = user_dict.get("asking_mode", "")
-                
+                for i in range(10):
+                    self.node.get_logger().info(f"MODO AL ASSISTANT: {asking_mode}")
                 self.node.face_mode_pub.publish(String(data="thinking"))
 
                 if not asking_mode: # Si es un mensaje normal
@@ -88,7 +89,8 @@ class Assistant:
                     if name_said:
                         self.node.name_answer_pub.publish(String(data=name))
                         self.node.helper_mode_pub.publish(String(data=json.dumps({
-                            "helper_state": HELPER_STATE.NAME.value
+                            "helper_state": HELPER_STATE.NAME.value,
+                            "asking_mode": ""
                         })))
                         self.node.face_mode_pub.publish(String(data="idle"))
                     else:
@@ -99,7 +101,8 @@ class Assistant:
                     if answer_said:
                         self.node.confirm_name_pub.publish(Bool(data=answer))
                         self.node.helper_mode_pub.publish(String(data=json.dumps({
-                            "helper_state": HELPER_STATE.NAME.value
+                            "helper_state": HELPER_STATE.NAME.value,
+                            "asking_mode": ""
                         })))
                         self.node.face_mode_pub.publish(String(data="idle"))
                     else:
