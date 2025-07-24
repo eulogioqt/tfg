@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>sancho_web</name>
+  <name>sancho_web_assistant</name>
   <version>0.0.0</version>
   <description>Web APIs exposing Sancho AI services</description>
   <maintainer email="euquemada@gmail.com">eulogioqt</maintainer>

@@ -9,7 +9,7 @@ from hri_msgs.srv import Detection, Recognition, Training, GetString, TriggerUse
 from hri_msgs.msg import Log, FaceNameResponse, FaceQuestionResponse
 from rumi_msgs.msg import SessionMessage
 
-from sancho_web.database.system_database import CONSTANTS
+from sancho_web_assistant.database.system_database import CONSTANTS
 
 from .database.people_manager import PeopleManager
 from .api.gui_utils import mark_face

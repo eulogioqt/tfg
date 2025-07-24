@@ -4,7 +4,7 @@ from std_msgs.msg import String
 
 from ..engines import FaceprintEngine
 from .api_responses import APIResponse, HTTPException, JSONResponse
-from sancho_web.database.system_database import CONSTANTS
+from sancho_web_assistant.database.system_database import CONSTANTS
 
 
 class FaceprintAPI:

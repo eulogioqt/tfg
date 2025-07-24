@@ -1,7 +1,7 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
-from sancho_web.apis import API_LIST
+from sancho_web_assistant.apis import API_LIST
 
 
 def generate_launch_description():
@@ -38,13 +38,13 @@ def generate_launch_description():
             output='screen'
         ),
         Node(
-            package='sancho_web',
-            executable='sancho_web',
-            name='sancho_web',
+            package='sancho_web_assistant',
+            executable='sancho_web_assistant',
+            name='sancho_web_assistant',
             output='screen'
         ),
         Node(
-            package='sancho_web',
+            package='sancho_web_assistant',
             executable='api_rest',
             name='api_rest',
             output='screen',

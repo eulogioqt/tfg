@@ -27,7 +27,7 @@ The system combines:
 | `sancho_ai`        | Central logic: extracts intents and orchestrates robot actions.   |
 | `mouth_controller` | Controls LED mouth (and soon eyes) based on voice/emotion.        |
 | `ros2web`          | Real-time ROS ↔ Web communication via WebSockets.                 |
-| `sancho_web`       | REST API backend for managing models, logs, and face data.        |
+| `sancho_web_assistant`       | REST API backend for managing models, logs, and face data.        |
 | `rumi_web`         | Web dashboard for face database and interaction statistics.       |
 | `web_interface`    | React + Vite frontend for user interaction and robot control.     |
 

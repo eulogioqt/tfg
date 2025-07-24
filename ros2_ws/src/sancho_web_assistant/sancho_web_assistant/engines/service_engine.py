@@ -6,7 +6,7 @@ from abc import ABC
 
 from hri_msgs.msg import Log
 
-from sancho_web.database.system_database import CONSTANTS
+from sancho_web_assistant.database.system_database import CONSTANTS
 
 
 class ServiceEngine(ABC):

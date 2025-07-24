@@ -20,7 +20,7 @@ from speech_msgs.srv import STT, TTS
 class SanchoWebNode(Node):
 
     def __init__(self):
-        super().__init__("sancho_web")
+        super().__init__("sancho_web_assistant")
 
         self.web_queue = Queue()
         self.msg_queue = Queue()
@@ -150,7 +150,7 @@ class SanchoWeb:
 def main(args=None):
     rclpy.init(args=args)
 
-    sancho_web = SanchoWeb()
+    sancho_web_assistant = SanchoWeb()
 
-    sancho_web.spin()
+    sancho_web_assistant.spin()
     rclpy.shutdown()

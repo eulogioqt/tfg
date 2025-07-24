@@ -1,7 +1,7 @@
 import json
 from ..engines import TTSModelEngine
 from .api_responses import HTTPException, JSONResponse, APIResponse
-from sancho_web.database.system_database import CONSTANTS
+from sancho_web_assistant.database.system_database import CONSTANTS
 
 
 class TTSModelAPI:

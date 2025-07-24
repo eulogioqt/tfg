@@ -1,7 +1,7 @@
 from glob import glob
 from setuptools import find_packages, setup
 
-package_name = 'sancho_web'
+package_name = 'sancho_web_assistant'
 
 setup(
     name=package_name,
@@ -28,9 +28,9 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'sancho_web = sancho_web.sancho_web_node:main',
-            'api_rest = sancho_web.api_rest_node:main',
-            'database_manager = sancho_web.database_manager_node:main'
+            'sancho_web_assistant = sancho_web_assistant.sancho_web_assistant_node:main',
+            'api_rest = sancho_web_assistant.api_rest_node:main',
+            'database_manager = sancho_web_assistant.database_manager_node:main'
         ],
     },
 )

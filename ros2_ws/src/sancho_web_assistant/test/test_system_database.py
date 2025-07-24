@@ -1,5 +1,5 @@
 import pytest
-from sancho_web.database.system_database import SystemDatabase, CONSTANTS
+from sancho_web_assistant.database.system_database import SystemDatabase, CONSTANTS
 
 
 @pytest.fixture

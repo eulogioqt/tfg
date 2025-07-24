@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
-from sancho_web.apis import API_LIST
+from sancho_web_assistant.apis import API_LIST
 from speech_tools.models import STT_MODELS, TTS_MODELS, TTS_SPEAKERS
 from llm_tools.models import PROVIDER, MODELS
 
@@ -89,13 +89,13 @@ def generate_launch_description():
             output='screen'
         ),
         Node(
-            package='sancho_web',
-            executable='sancho_web',
-            name='sancho_web',
+            package='sancho_web_assistant',
+            executable='sancho_web_assistant',
+            name='sancho_web_assistant',
             output='screen'
         ),
         Node(
-            package='sancho_web',
+            package='sancho_web_assistant',
             executable='api_rest',
             name='api_rest',
             output='screen',
@@ -134,7 +134,7 @@ def generate_launch_description():
             output='screen'
         ),
         Node(
-            package='sancho_web',
+            package='sancho_web_assistant',
             executable='database_manager',
             name='database_manager',
             output='screen'
